@@ -559,6 +559,56 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .quiz-match-pct{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
 .quiz-match-bar{height:6px;background:var(--bg3);border-radius:100px;margin:8px 0;overflow:hidden}
 .quiz-match-bar-fill{height:100%;border-radius:100px;background:var(--accent);transition:width 1s ease}
+
+/* SIGNUP CHECKBOX */
+.signup-checkbox-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;text-align:left}
+.signup-checkbox-row input[type="checkbox"]{margin-top:2px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+
+/* ── MOBILE RESPONSIVE — NEW FEATURES ─────────────────── */
+@media(max-width:768px){
+  .feat-section{padding:24px 16px}
+  .feat-header h1{font-size:26px}
+  .feat-header p{font-size:13px}
+  .feat-card{padding:16px}
+  .goal-meter{width:160px;height:160px}
+  .goal-meter-val{font-size:26px}
+  .goal-scenario{flex-wrap:wrap}
+  .goal-scenario input,.goal-scenario select{min-width:60px}
+  .planner-cal{gap:1px}
+  .planner-day{padding:6px 2px;font-size:10px;min-height:44px}
+  .planner-day-head{font-size:9px}
+  .app-card{padding:12px}
+  .share-card{width:100%;padding:24px}
+  .share-card .share-val{font-size:36px}
+  .share-actions{flex-wrap:wrap}
+  .qa-reply{margin-left:16px;padding:10px}
+  .qa-post{padding:12px}
+  .quiz-question{font-size:18px}
+  .quiz-option{padding:12px 16px;font-size:13px}
+  .quiz-result-card{padding:14px}
+  .quiz-match-pct{font-size:22px}
+  .email-capture{padding:20px}
+  .email-capture h3{font-size:20px}
+  .email-capture-form{flex-direction:column}
+  .scholarship-card{padding:12px}
+  .scholarship-amount{font-size:20px}
+  .streak-badge{font-size:12px;padding:4px 12px}
+  .progress-stat .stat-val{font-size:22px}
+  .activity-dot{width:10px;height:10px}
+  .premium-gate{padding:40px 16px}
+  .premium-gate h3{font-size:20px}
+}
+@media(max-width:480px){
+  .feat-section{padding:16px 12px}
+  .feat-header h1{font-size:22px}
+  .planner-day{padding:4px 1px;font-size:9px;min-height:36px}
+  .goal-meter{width:140px;height:140px}
+  .goal-meter-val{font-size:22px}
+  .quiz-options{gap:8px}
+  .quiz-option{padding:10px 12px;font-size:12px}
+  nav .nav-links{gap:4px}
+  .modal-box{padding:20px}
+}
 </style>
 </head>
 <body>
@@ -591,6 +641,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <label class="field-label">Password</label>
         <input type="password" id="signup-password" placeholder="Min. 6 characters">
       </div>
+      <label class="signup-checkbox-row">
+        <input type="checkbox" id="signup-newsletter" checked>
+        <span>Send me weekly college tips & deadline reminders (you can unsubscribe anytime)</span>
+      </label>
       <button class="auth-btn" onclick="handleSignup()">Create Free Account →</button>
       <div class="auth-divider">or</div>
       <button class="auth-social-btn" onclick="handleGoogleAuth()">
@@ -2305,6 +2359,10 @@ window.handleSignup = async function() {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await DB.setCurrentUser(cred.user, { name });
+    const wantsNewsletter = document.getElementById('signup-newsletter')?.checked;
+    if (wantsNewsletter && email) {
+      subscribeEmailToFirestore(email, cred.user.displayName || name);
+    }
     closeAuth();
     showToast('✓ Account created! Welcome to GradeScope.');
   } catch (e) {
@@ -3731,6 +3789,18 @@ function postQuestion() {
 /* ============================================================
    EMAIL CAPTURE
 ============================================================ */
+function subscribeEmailToFirestore(email, name) {
+  try {
+    const subRef = doc(db, 'email_subscribers', email);
+    setDoc(subRef, {
+      email: email,
+      name: name || '',
+      subscribedAt: serverTimestamp(),
+      active: true,
+      source: 'app'
+    }, { merge: true });
+  } catch(e) { console.error('Firestore subscribe error', e); }
+}
 function subscribeEmail() {
   const email = document.getElementById('email-capture-input').value.trim();
   if (!email || !email.includes('@')) { showToast('Enter a valid email!', 'error'); return; }
@@ -3738,6 +3808,7 @@ function subscribeEmail() {
   if (subs.includes(email)) { showToast('You\'re already subscribed!'); return; }
   subs.push(email);
   localStorage.setItem('gs_email_subs', JSON.stringify(subs));
+  subscribeEmailToFirestore(email, window.currentUser?.displayName || '');
   const msg = document.getElementById('email-capture-msg');
   msg.textContent = '✓ Subscribed! Check your inbox for a welcome email.';
   msg.style.display = 'block';

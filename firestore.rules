@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // User profiles
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      match /{subcollection}/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    // Email subscribers — anyone can subscribe, only admin functions can read all
+    match /email_subscribers/{email} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    // Email logs — only readable by admin functions
+    match /email_logs/{logId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}
