@@ -1065,7 +1065,7 @@ const WEEKLY_TIPS = [
 ];
 
 // ── Email HTML template ─────────────────────────────────────
-function getEmailHTML(tip, weekNum) {
+function getEmailHTML(tip, weekNum, totalWeeks) {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -1103,7 +1103,7 @@ function getEmailHTML(tip, weekNum) {
       <div style="font-size:12px;color:#8a847b;margin-top:4px">Your weekly college prep tips</div>
     </div>
     <div class="content">
-      <div class="week-badge">Week ${weekNum} of 104</div>
+      <div class="week-badge">Week ${weekNum} of ${totalWeeks}</div>
       <h1>${tip.subject}</h1>
       ${tip.tips.map((t, i) => `
       <div class="tip">
@@ -1151,14 +1151,20 @@ async function main() {
     process.exit(1);
   }
 
-  // Determine which tip to send (rotate through 52 weeks)
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const weekOfYear = Math.ceil((now - startOfYear) / 604800000);
-  const tipIndex = (weekOfYear - 1) % WEEKLY_TIPS.length;
+  // Determine which tip to send (sequential counter stored in Firestore)
+  let weekNum = 1;
+  const counterRef = db.collection("email_meta").doc("week_counter");
+  const counterSnap = await counterRef.get();
+  if (counterSnap.exists) {
+    weekNum = (counterSnap.data().current || 0) + 1;
+    if (weekNum > WEEKLY_TIPS.length) weekNum = 1;
+  }
+  await counterRef.set({ current: weekNum });
+
+  const tipIndex = weekNum - 1;
   const tip = WEEKLY_TIPS[tipIndex];
 
-  console.log(`Week ${weekOfYear} — sending: "${tip.subject}"`);
+  console.log(`Week ${weekNum} of ${WEEKLY_TIPS.length} — sending: "${tip.subject}"`);
 
   // Get all active subscribers from Firestore
   const subscribersSnap = await db
@@ -1179,7 +1185,7 @@ async function main() {
     auth: { user: emailUser, pass: emailPass },
   });
 
-  const emailHTML = getEmailHTML(tip, weekOfYear);
+  const emailHTML = getEmailHTML(tip, weekNum, WEEKLY_TIPS.length);
 
   // Send to each subscriber
   const results = { sent: 0, failed: 0 };
@@ -1207,7 +1213,7 @@ async function main() {
     const { FieldValue } = await import("firebase-admin/firestore");
     await db.collection("email_logs").add({
       sentAt: FieldValue.serverTimestamp(),
-      weekOfYear,
+      weekNum,
       tipSubject: tip.subject,
       subscriberCount: subscribersSnap.size,
       sent: results.sent,

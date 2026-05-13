@@ -770,10 +770,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <label class="field-label">Password</label>
         <input type="password" id="signup-password" placeholder="Min. 6 characters">
       </div>
-      <label class="signup-checkbox-row">
-        <input type="checkbox" id="signup-newsletter" checked>
-        <span>Send me weekly college tips & deadline reminders (you can unsubscribe anytime)</span>
-      </label>
+      <p style="font-size:12px;color:#8a847b;margin:8px 0 0;line-height:1.4">By creating an account, you'll receive weekly college tips & deadline reminders. You can unsubscribe anytime.</p>
       <button class="auth-btn" onclick="handleSignup()">Create Free Account →</button>
       <div class="auth-divider">or</div>
       <button class="auth-social-btn" onclick="handleGoogleAuth()">
@@ -2611,17 +2608,13 @@ window.handleSignup = async function() {
   const pass  = document.getElementById('signup-password')?.value;
   const errEl = document.getElementById('auth-error');
   function showErr(msg) { if(errEl) { errEl.textContent = msg; errEl.classList.add('show'); } }
-  const newsletterChecked = document.getElementById('signup-newsletter')?.checked;
   if (!name || !email || !pass) { showErr('Please fill in all fields.'); return; }
   if (pass.length < 6)          { showErr('Password must be at least 6 characters.'); return; }
-  if (!newsletterChecked)        { showErr('Please subscribe to our weekly newsletter to create an account.'); return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await DB.setCurrentUser(cred.user, { name });
-    if (newsletterChecked && email) {
-      subscribeEmailToFirestore(email, cred.user.displayName || name);
-    }
+    subscribeEmailToFirestore(email, cred.user.displayName || name);
     closeAuth();
     showToast('✓ Account created! Welcome to GradeScope.');
   } catch (e) {

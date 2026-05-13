@@ -13,7 +13,12 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
-    // Email logs — only readable by admin functions
+    // Email metadata (week counter) — server-side only
+    match /email_meta/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+    // Email logs — server-side only
     match /email_logs/{logId} {
       allow read: if false;
       allow write: if false;
