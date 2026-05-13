@@ -1,28 +1,25 @@
 /**
  * GradeScope — Automated Weekly College Tips Email
  *
- * Sends AI-curated college prep tips to all subscribers every Monday at 8 AM ET.
- * Subscribers are stored in Firestore `email_subscribers` collection.
+ * Runs via GitHub Actions every Monday at 8 AM ET (12:00 UTC).
+ * Reads subscribers from Firestore, sends branded email via Gmail SMTP.
  *
- * Setup:
- *   1. Enable Firebase Blaze plan (required for scheduled functions)
- *   2. Set email credentials:
- *        firebase functions:config:set email.user="your-email@gmail.com"
- *        firebase functions:config:set email.pass="your-app-password"
- *      (Use a Gmail App Password: https://myaccount.google.com/apppasswords)
- *   3. Deploy:
- *        firebase deploy --only functions
+ * Required environment variables:
+ *   FIREBASE_SERVICE_ACCOUNT — JSON string of Firebase service account key
+ *   EMAIL_USER              — Gmail address to send from
+ *   EMAIL_PASS              — Gmail App Password (not your regular password)
  */
 
-const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onRequest } = require("firebase-functions/v2/https");
-const admin = require("firebase-admin");
-const nodemailer = require("nodemailer");
+import { initializeApp, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { createTransport } from "nodemailer";
 
-admin.initializeApp();
-const db = admin.firestore();
+// ── Firebase setup ──────────────────────────────────────────
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+initializeApp({ credential: cert(serviceAccount) });
+const db = getFirestore();
 
-// 52 unique weekly tips — one for each week of the year
+// ── 52 unique weekly tips — one for each week of the year ───
 const WEEKLY_TIPS = [
   {
     subject: "5 GPA Boosters You're Probably Ignoring",
@@ -546,6 +543,7 @@ const WEEKLY_TIPS = [
   }
 ];
 
+// ── Email HTML template ─────────────────────────────────────
 function getEmailHTML(tip, weekNum) {
   return `<!DOCTYPE html>
 <html>
@@ -586,139 +584,96 @@ function getEmailHTML(tip, weekNum) {
         </div>
       </div>`).join('')}
       <div style="text-align:center">
-        <a href="https://gradescope.app" class="cta">Open GradeScope →</a>
+        <a href="https://gradescope.app" class="cta">Open GradeScope &rarr;</a>
       </div>
     </div>
     <div class="footer">
       <p>You're receiving this because you signed up for GradeScope weekly tips.</p>
-      <p><a href="https://gradescope.app">GradeScope</a> · Free college planning tools</p>
+      <p><a href="https://gradescope.app">GradeScope</a> &middot; Free college planning tools</p>
     </div>
   </div>
 </body>
 </html>`;
 }
 
-// Weekly email — runs every Monday at 8:00 AM Eastern Time
-exports.sendWeeklyEmails = onSchedule(
-  {
-    schedule: "every monday 08:00",
-    timeZone: "America/New_York",
-    region: "us-central1",
-  },
-  async () => {
-    // Determine which tip to send (rotate through 52 weeks)
-    const weekOfYear = Math.ceil(
-      (Date.now() - new Date(new Date().getFullYear(), 0, 1)) / 604800000
-    );
-    const tipIndex = (weekOfYear - 1) % WEEKLY_TIPS.length;
-    const tip = WEEKLY_TIPS[tipIndex];
+// ── Main ────────────────────────────────────────────────────
+async function main() {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
 
-    // Get all active subscribers
-    const subscribersSnap = await db
-      .collection("email_subscribers")
-      .where("active", "==", true)
-      .get();
+  if (!emailUser || !emailPass) {
+    console.error("Missing EMAIL_USER or EMAIL_PASS environment variables.");
+    process.exit(1);
+  }
 
-    if (subscribersSnap.empty) {
-      console.log("No active subscribers — skipping.");
-      return;
+  // Determine which tip to send (rotate through 52 weeks)
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const weekOfYear = Math.ceil((now - startOfYear) / 604800000);
+  const tipIndex = (weekOfYear - 1) % WEEKLY_TIPS.length;
+  const tip = WEEKLY_TIPS[tipIndex];
+
+  console.log(`Week ${weekOfYear} — sending: "${tip.subject}"`);
+
+  // Get all active subscribers from Firestore
+  const subscribersSnap = await db
+    .collection("email_subscribers")
+    .where("active", "==", true)
+    .get();
+
+  if (subscribersSnap.empty) {
+    console.log("No active subscribers — skipping.");
+    return;
+  }
+
+  console.log(`Found ${subscribersSnap.size} active subscriber(s).`);
+
+  // Set up Gmail SMTP transport
+  const transporter = createTransport({
+    service: "gmail",
+    auth: { user: emailUser, pass: emailPass },
+  });
+
+  const emailHTML = getEmailHTML(tip, weekOfYear);
+
+  // Send to each subscriber
+  const results = { sent: 0, failed: 0 };
+  for (const docSnap of subscribersSnap.docs) {
+    const sub = docSnap.data();
+    try {
+      await transporter.sendMail({
+        from: `"GradeScope" <${emailUser}>`,
+        to: sub.email,
+        subject: `\u{1F4DA} ${tip.subject} — GradeScope Weekly Tips`,
+        html: emailHTML,
+      });
+      results.sent++;
+      console.log(`  Sent to ${sub.email}`);
+    } catch (err) {
+      console.error(`  Failed to send to ${sub.email}: ${err.message}`);
+      results.failed++;
     }
+  }
 
-    // Set up email transport
-    // Credentials come from Firebase environment config:
-    //   firebase functions:config:set email.user="x" email.pass="y"
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
+  console.log(`Done. ${results.sent} sent, ${results.failed} failed.`);
 
-    if (!emailUser || !emailPass) {
-      console.error(
-        "Email credentials not configured. Run:\n" +
-          '  firebase functions:secrets:set EMAIL_USER\n' +
-          '  firebase functions:secrets:set EMAIL_PASS'
-      );
-      return;
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: emailUser, pass: emailPass },
-    });
-
-    const emailHTML = getEmailHTML(tip, weekOfYear);
-
-    // Send to each subscriber
-    const results = { sent: 0, failed: 0 };
-    const batch = subscribersSnap.docs.map(async (docSnap) => {
-      const sub = docSnap.data();
-      try {
-        await transporter.sendMail({
-          from: `"GradeScope" <${emailUser}>`,
-          to: sub.email,
-          subject: `📚 ${tip.subject} — GradeScope Weekly Tips`,
-          html: emailHTML,
-        });
-        results.sent++;
-      } catch (err) {
-        console.error(`Failed to send to ${sub.email}:`, err.message);
-        results.failed++;
-      }
-    });
-
-    await Promise.all(batch);
-    console.log(
-      `Weekly email sent. ${results.sent} delivered, ${results.failed} failed.`
-    );
-
-    // Log the send
+  // Log the send to Firestore
+  try {
+    const { FieldValue } = await import("firebase-admin/firestore");
     await db.collection("email_logs").add({
-      sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      sentAt: FieldValue.serverTimestamp(),
       weekOfYear,
       tipSubject: tip.subject,
       subscriberCount: subscribersSnap.size,
       sent: results.sent,
       failed: results.failed,
     });
+  } catch (e) {
+    console.warn("Could not log to Firestore:", e.message);
   }
-);
+}
 
-// Manual trigger endpoint (for testing)
-exports.sendTestEmail = onRequest(
-  { region: "us-central1" },
-  async (req, res) => {
-    const { email } = req.query;
-    if (!email) {
-      res.status(400).send("Provide ?email=your@email.com");
-      return;
-    }
-
-    const weekOfYear = Math.ceil(
-      (Date.now() - new Date(new Date().getFullYear(), 0, 1)) / 604800000
-    );
-    const tipIndex = (weekOfYear - 1) % WEEKLY_TIPS.length;
-    const tip = WEEKLY_TIPS[tipIndex];
-
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
-    if (!emailUser || !emailPass) {
-      res.status(500).send("Email credentials not configured.");
-      return;
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: emailUser, pass: emailPass },
-    });
-
-    try {
-      await transporter.sendMail({
-        from: `"GradeScope" <${emailUser}>`,
-        to: email,
-        subject: `📚 ${tip.subject} — GradeScope Weekly Tips`,
-        html: getEmailHTML(tip, weekOfYear),
-      });
-      res.send(`Test email sent to ${email}`);
-    } catch (err) {
-      res.status(500).send(`Failed: ${err.message}`);
-    }
-  }
-);
+main().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
+});
