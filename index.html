@@ -1644,7 +1644,9 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import {
-  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
   doc,
   getDoc,
   setDoc,
@@ -1655,8 +1657,7 @@ import {
   deleteDoc,
   query,
   orderBy,
-  serverTimestamp,
-  enableIndexedDbPersistence
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1672,8 +1673,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-const db = getFirestore(app);
-enableIndexedDbPersistence(db).catch(() => {});
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+});
 const googleProvider = new GoogleAuthProvider();
 
 // Expose auth globally so non-module scripts can use window.currentUser
