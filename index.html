@@ -2124,10 +2124,10 @@ function switchAuthTab(tab) {
    https://dashboard.stripe.com/products
 ============================================================ */
 const STRIPE_CONFIG = {
-  publishableKey: 'pk_test_REPLACE_WITH_YOUR_KEY',
+  publishableKey: 'pk_test_51TWkyaAMuEElk3jV2mJjlUTTJPS0OYBPiRDdlUNDEKYHnaPIygntC4UETn640LIY8Go5Fnh1vvBXpZGRNbAumT9q009Vmc7dRl',
   prices: {
-    monthly: 'price_REPLACE_WITH_MONTHLY_PRICE_ID',
-    annual:  'price_REPLACE_WITH_ANNUAL_PRICE_ID'
+    monthly: 'price_1TWl3zAMuEElk3jViAVfYxdi',
+    annual:  'price_1TWl42AMuEElk3jVknubOB7L'
   },
   successUrl: window.location.origin + window.location.pathname + '?payment=success&session_id={CHECKOUT_SESSION_ID}',
   cancelUrl:  window.location.origin + window.location.pathname + '?payment=cancelled'
@@ -2137,7 +2137,7 @@ let selectedPlan = 'monthly';
 let stripeInstance = null;
 
 function getStripe() {
-  if (!stripeInstance && STRIPE_CONFIG.publishableKey !== 'pk_test_REPLACE_WITH_YOUR_KEY') {
+  if (!stripeInstance && STRIPE_CONFIG.publishableKey) {
     stripeInstance = Stripe(STRIPE_CONFIG.publishableKey);
   }
   return stripeInstance;
