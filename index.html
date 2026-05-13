@@ -609,6 +609,135 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   nav .nav-links{gap:4px}
   .modal-box{padding:20px}
 }
+
+/* ── AI COUNSELOR CHATBOT ───────────────────────────── */
+.counselor-chat{display:flex;flex-direction:column;height:500px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg)}
+.counselor-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.counselor-msg{max-width:80%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.counselor-msg.bot{background:var(--bg2);color:var(--ink);align-self:flex-start;border-bottom-left-radius:4px}
+.counselor-msg.user{background:var(--accent);color:white;align-self:flex-end;border-bottom-right-radius:4px}
+.counselor-msg.typing{background:var(--bg2);color:var(--ink3);font-style:italic}
+.counselor-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:white}
+[data-theme="dark"] .counselor-input-row{background:var(--bg2)}
+.counselor-input-row input{flex:1;padding:10px 14px;border-radius:100px;border:1px solid var(--border);font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--bg);outline:none}
+.counselor-input-row input:focus{border-color:var(--accent)}
+.counselor-input-row button{padding:10px 20px;border-radius:100px;background:var(--accent);color:white;border:none;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:var(--transition)}
+.counselor-input-row button:hover{background:#b5571f}
+.counselor-input-row button:disabled{opacity:.5;cursor:not-allowed}
+.counselor-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 12px}
+.counselor-suggest-btn{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:var(--bg);color:var(--ink2);font-size:12px;cursor:pointer;font-family:var(--font-body);transition:var(--transition)}
+.counselor-suggest-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* ── SAT/ACT PREP MODE ──────────────────────────────── */
+.prep-stats-row{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.prep-stat-card{flex:1;min-width:120px;text-align:center;padding:16px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border)}
+.prep-stat-val{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.prep-stat-label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.prep-question-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;margin-bottom:16px;box-shadow:var(--shadow)}
+[data-theme="dark"] .prep-question-card{background:var(--bg2)}
+.prep-q-subject{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;margin-bottom:12px}
+.prep-q-subject.math{background:var(--blue-light);color:var(--blue)}
+.prep-q-subject.reading{background:var(--green-light);color:var(--green)}
+.prep-q-subject.writing{background:var(--gold-light);color:var(--gold)}
+.prep-q-text{font-size:16px;line-height:1.7;margin-bottom:20px;color:var(--ink)}
+.prep-options{display:grid;gap:10px}
+.prep-option{padding:14px 18px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;transition:var(--transition);background:white;font-family:var(--font-body)}
+[data-theme="dark"] .prep-option{background:var(--bg2)}
+.prep-option:hover{border-color:var(--accent);background:var(--accent-light)}
+.prep-option.selected{border-color:var(--accent);background:var(--accent-light);font-weight:600}
+.prep-option.correct{border-color:var(--green);background:var(--green-light);font-weight:600}
+.prep-option.wrong{border-color:var(--red);background:var(--red-light)}
+.prep-explanation{padding:16px;background:var(--blue-light);border-radius:var(--radius);margin-top:16px;font-size:13px;line-height:1.7;color:var(--ink)}
+.prep-streak-flame{font-size:20px;animation:flamePulse 1s ease-in-out infinite}
+@keyframes flamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.prep-xp-toast{position:fixed;top:80px;right:24px;background:var(--gold);color:white;padding:8px 16px;border-radius:100px;font-weight:700;font-size:14px;z-index:9999;animation:xpFloat 1.5s ease forwards;pointer-events:none}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.prep-score-predict{text-align:center;padding:20px;background:var(--bg2);border-radius:var(--radius);margin-top:16px;border:1px solid var(--border)}
+.prep-score-val{font-size:36px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.prep-score-label{font-size:12px;color:var(--ink3);margin-top:4px}
+.prep-mode-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.prep-mode-tab{padding:8px 16px;border-radius:100px;border:1px solid var(--border);background:var(--bg);color:var(--ink2);font-size:13px;cursor:pointer;font-family:var(--font-body);font-weight:500;transition:var(--transition)}
+.prep-mode-tab.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.prep-mode-tab:hover:not(.active){background:var(--bg2)}
+.prep-diff-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.prep-diff-tab{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:var(--bg);color:var(--ink2);font-size:12px;cursor:pointer;font-family:var(--font-body);font-weight:500;transition:var(--transition)}
+.prep-diff-tab.active{font-weight:700}
+.prep-diff-tab.active[data-diff="easy"]{background:#e8f5e9;color:#2e7d32;border-color:#66bb6a}
+.prep-diff-tab.active[data-diff="medium"]{background:#fff3e0;color:#e65100;border-color:#ffa726}
+.prep-diff-tab.active[data-diff="hard"]{background:#fce4ec;color:#c62828;border-color:#ef5350}
+.prep-diff-tab.active[data-diff="all"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.prep-diff-tab:hover:not(.active){background:var(--bg2)}
+.prep-diff-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;margin-left:8px}
+.prep-diff-badge.easy{background:#e8f5e9;color:#2e7d32}
+.prep-diff-badge.medium{background:#fff3e0;color:#e65100}
+.prep-diff-badge.hard{background:#fce4ec;color:#c62828}
+.prep-exam-section{margin-top:24px;padding:20px;background:var(--bg2);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.prep-exam-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.prep-exam-card{padding:20px;background:var(--bg);border-radius:var(--radius);border:2px solid var(--border);cursor:pointer;transition:var(--transition);text-align:center}
+.prep-exam-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.prep-exam-card h3{margin:0 0 8px;font-size:18px}
+.prep-exam-card p{margin:0;font-size:13px;color:var(--ink3)}
+.prep-exam-timer{font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.prep-exam-progress{height:6px;background:var(--border);border-radius:100px;margin:12px 0;overflow:hidden}
+.prep-exam-progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width 0.3s ease}
+.prep-exam-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border)}
+.prep-exam-quit{padding:6px 14px;border-radius:100px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:var(--font-body);font-weight:600}
+.prep-exam-quit:hover{background:var(--red-light)}
+@media(max-width:600px){.prep-exam-cards{grid-template-columns:1fr}}
+
+/* ── COLLEGE COMPARISON TOOL ─────────────────────────── */
+.compare-selector{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.compare-slot{flex:1;min-width:200px;padding:16px;border:2px dashed var(--border);border-radius:var(--radius-lg);text-align:center;cursor:pointer;transition:var(--transition)}
+.compare-slot:hover{border-color:var(--accent);background:var(--accent-light)}
+.compare-slot.filled{border-style:solid;border-color:var(--accent);background:var(--accent-light)}
+.compare-slot .slot-name{font-weight:600;font-size:14px;color:var(--ink)}
+.compare-slot .slot-hint{font-size:12px;color:var(--ink3);margin-top:4px}
+.compare-search-box{position:relative}
+.compare-search-box input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--bg);outline:none}
+.compare-search-box input:focus{border-color:var(--accent)}
+.compare-dropdown{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:var(--shadow-lg);display:none}
+[data-theme="dark"] .compare-dropdown{background:var(--bg2)}
+.compare-dropdown.show{display:block}
+.compare-drop-item{padding:10px 14px;cursor:pointer;font-size:13px;transition:var(--transition);border-bottom:1px solid var(--border2)}
+.compare-drop-item:hover{background:var(--accent-light);color:var(--accent)}
+.compare-drop-item:last-child{border-bottom:none}
+.compare-table{width:100%;border-collapse:collapse;margin-top:20px}
+.compare-table th,.compare-table td{padding:12px 16px;text-align:center;border-bottom:1px solid var(--border);font-size:13px}
+.compare-table th{font-weight:700;color:var(--ink);background:var(--bg2);position:sticky;top:0}
+.compare-table td:first-child{text-align:left;font-weight:600;color:var(--ink2);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.compare-table tr:hover td{background:var(--accent-light)}
+.compare-radar-wrap{display:flex;justify-content:center;margin:24px 0}
+.compare-winner{display:inline-block;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.compare-winner.a{background:var(--accent-light);color:var(--accent)}
+.compare-winner.b{background:var(--blue-light);color:var(--blue)}
+.compare-winner.c{background:var(--green-light);color:var(--green)}
+
+@media(max-width:768px){
+  .counselor-chat{height:400px}
+  .counselor-msg{max-width:90%;font-size:13px}
+  .counselor-suggestions{gap:6px}
+  .counselor-suggest-btn{font-size:11px;padding:5px 10px}
+  .prep-stats-row{gap:8px}
+  .prep-stat-card{padding:12px;min-width:80px}
+  .prep-stat-val{font-size:22px}
+  .prep-question-card{padding:16px}
+  .prep-option{padding:10px 14px;font-size:13px}
+  .compare-selector{flex-direction:column}
+  .compare-slot{min-width:auto}
+  .compare-table th,.compare-table td{padding:8px;font-size:11px}
+}
+@media(max-width:480px){
+  .counselor-chat{height:350px}
+  .prep-mode-tabs{gap:4px}
+  .prep-mode-tab{padding:6px 12px;font-size:12px}
+  .prep-diff-tabs{gap:4px}
+  .prep-diff-tab{padding:4px 10px;font-size:11px}
+  .prep-stat-val{font-size:18px}
+  .prep-exam-timer{font-size:18px}
+  .prep-exam-header{flex-direction:column;gap:8px;text-align:center}
+  .compare-radar-wrap canvas{width:100%!important;height:auto!important}
+}
 </style>
 </head>
 <body>
@@ -720,6 +849,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <button class="nav-link" id="nav-tools" onclick="goToTools()">Calculators</button>
     <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay AI ✦</button>
     <button class="nav-link" id="nav-goals" onclick="showPage('goals')">Goals</button>
+    <button class="nav-link" id="nav-prep" onclick="showPage('prep');initPrep()">SAT Prep</button>
+    <button class="nav-link" id="nav-compare" onclick="showPage('compare')">Compare</button>
     <button class="nav-link" id="nav-premium" onclick="showPage('premium')">Pricing</button>
     <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
     <button class="nav-link" id="nav-dashboard" onclick="goDashboard()" style="display:none">Dashboard</button>
@@ -735,6 +866,9 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <button class="profile-menu-item" onclick="showPage('scholarships');initScholarships();toggleProfileMenu()">💰 Scholarships</button>
         <button class="profile-menu-item" onclick="showPage('quiz');initQuiz();toggleProfileMenu()">🧩 College Quiz</button>
         <button class="profile-menu-item" onclick="showPage('community');renderQA();toggleProfileMenu()">💬 Community</button>
+        <button class="profile-menu-item" onclick="showPage('counselor');initCounselor();toggleProfileMenu()">🤖 AI Counselor</button>
+        <button class="profile-menu-item" onclick="showPage('prep');initPrep();toggleProfileMenu()">📝 SAT/ACT Prep</button>
+        <button class="profile-menu-item" onclick="showPage('compare');toggleProfileMenu()">⚖️ Compare Colleges</button>
         <div class="profile-menu-divider"></div>
         <button class="profile-menu-item" onclick="showPage('premium');toggleProfileMenu()">⭐ Upgrade to Pro</button>
         <div class="profile-menu-divider"></div>
@@ -783,6 +917,9 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="hero-tool-item" onclick="showTool('loan')"><div class="hero-tool-icon" style="background:#fce8e8">💰</div><div><div class="hero-tool-name">Student Loan Calc</div><div class="hero-tool-desc">Monthly payment & total cost</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('goals')"><div class="hero-tool-icon" style="background:#e8f5ee">🎯</div><div><div class="hero-tool-name">GPA Goal Tracker</div><div class="hero-tool-desc">Set targets & track progress</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('quiz');initQuiz()"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('prep');initPrep()"><div class="hero-tool-icon" style="background:#e8eef8">📝</div><div><div class="hero-tool-name">SAT/ACT Prep</div><div class="hero-tool-desc">Practice questions with XP & streaks</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('compare')"><div class="hero-tool-icon" style="background:#fef8e1">⚖️</div><div><div class="hero-tool-name">College Compare</div><div class="hero-tool-desc">Side-by-side with radar charts</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('counselor');initCounselor()"><div class="hero-tool-icon" style="background:#fdf0e8">🤖</div><div><div class="hero-tool-name">AI Counselor <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">24/7 admissions advice chatbot</div></div><div class="hero-tool-arrow">→</div></div>
       </div>
     </div>
   </div>
@@ -796,7 +933,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo">GradeScope</div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
-      <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('community')">Community</a><a onclick="showPage('quiz');initQuiz()">College Quiz</a></div>
+      <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('prep');initPrep()">SAT Prep</a><a onclick="showPage('compare')">Compare</a><a onclick="showPage('counselor');initCounselor()">AI Counselor</a></div>
       <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay AI</a></div>
       <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a><a href="#">Cookie Policy</a></div>
     </div>
@@ -1699,6 +1836,127 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
             <button class="feat-btn feat-btn-secondary" onclick="startQuiz()" style="margin-left:8px">🔄 Retake Quiz</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI ADMISSIONS COUNSELOR -->
+<div class="page" id="page-counselor">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>🤖 AI Admissions Counselor <span class="feat-badge pro">✦ Pro</span></h1>
+      <p>Get 24/7 personalized college admissions advice — essays, strategy, financial aid, and more.</p>
+    </div>
+    <div id="counselor-gate"></div>
+    <div id="counselor-content" style="display:none">
+      <div class="counselor-chat" id="counselor-chat">
+        <div class="counselor-msgs" id="counselor-msgs">
+          <div class="counselor-msg bot">Hey there! 👋 I'm your AI admissions counselor. I can help with college strategy, essay topics, financial aid, interview prep, and more. What's on your mind?</div>
+        </div>
+        <div class="counselor-suggestions" id="counselor-suggestions">
+          <button class="counselor-suggest-btn" onclick="askCounselor('Is my GPA good enough for top schools?')">Is my GPA good enough?</button>
+          <button class="counselor-suggest-btn" onclick="askCounselor('What should I write my Common App essay about?')">Essay topic ideas</button>
+          <button class="counselor-suggest-btn" onclick="askCounselor('How do I get more financial aid?')">Financial aid tips</button>
+          <button class="counselor-suggest-btn" onclick="askCounselor('What extracurriculars look best for college apps?')">Best extracurriculars</button>
+          <button class="counselor-suggest-btn" onclick="askCounselor('How do I prepare for college interviews?')">Interview prep</button>
+        </div>
+        <div class="counselor-input-row">
+          <input type="text" id="counselor-input" placeholder="Ask me anything about college admissions..." onkeydown="if(event.key==='Enter')sendCounselorMsg()">
+          <button onclick="sendCounselorMsg()" id="counselor-send-btn">Send</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--ink3)">AI responses are for guidance only — always verify with your school counselor.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SAT/ACT PREP MODE -->
+<div class="page" id="page-prep">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>📝 SAT/ACT Prep <span class="feat-badge free">Free</span></h1>
+      <p>Practice with real-format questions, earn XP, build streaks, and watch your score prediction climb.</p>
+    </div>
+    <div class="prep-stats-row" id="prep-stats">
+      <div class="prep-stat-card">
+        <div class="prep-stat-val" id="prep-xp">0</div>
+        <div class="prep-stat-label">Total XP</div>
+      </div>
+      <div class="prep-stat-card">
+        <div class="prep-stat-val"><span id="prep-streak">0</span> <span class="prep-streak-flame" id="prep-flame" style="display:none">🔥</span></div>
+        <div class="prep-stat-label">Day Streak</div>
+      </div>
+      <div class="prep-stat-card">
+        <div class="prep-stat-val" id="prep-correct">0</div>
+        <div class="prep-stat-label">Correct</div>
+      </div>
+      <div class="prep-stat-card">
+        <div class="prep-stat-val" id="prep-accuracy">0%</div>
+        <div class="prep-stat-label">Accuracy</div>
+      </div>
+    </div>
+    <div class="prep-mode-tabs" id="prep-tabs">
+      <button class="prep-mode-tab active" onclick="setPrepSubject('all')">All Subjects</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('math')">Math</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('reading')">Reading</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('writing')">Writing</button>
+    </div>
+    <div class="prep-diff-tabs" id="prep-diff-tabs">
+      <button class="prep-diff-tab active" data-diff="all" onclick="setPrepDifficulty('all')">All Levels</button>
+      <button class="prep-diff-tab" data-diff="easy" onclick="setPrepDifficulty('easy')">🟢 Easy</button>
+      <button class="prep-diff-tab" data-diff="medium" onclick="setPrepDifficulty('medium')">🟡 Medium</button>
+      <button class="prep-diff-tab" data-diff="hard" onclick="setPrepDifficulty('hard')">🔴 Hard</button>
+    </div>
+    <div id="prep-question-area"></div>
+    <div class="prep-score-predict" id="prep-score-predict" style="display:none">
+      <div class="prep-score-label">Predicted SAT Score</div>
+      <div class="prep-score-val" id="prep-predicted-score">—</div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:4px">Based on your accuracy across all subjects</div>
+    </div>
+    <div class="prep-exam-section" id="prep-exam-section">
+      <h2 style="margin:0 0 4px">📋 Full Practice Exams <span class="feat-badge pro">Pro</span></h2>
+      <p style="margin:0;font-size:13px;color:var(--ink3)">Timed, full-length practice tests with score reports</p>
+      <div class="prep-exam-cards" id="prep-exam-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLEGE COMPARISON TOOL -->
+<div class="page" id="page-compare">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>⚖️ College Head-to-Head</h1>
+      <p>Compare colleges side-by-side on what matters most — acceptance rate, cost, size, ranking, and more.</p>
+    </div>
+    <div class="compare-selector" id="compare-slots">
+      <div class="compare-slot" id="compare-slot-0" onclick="openCompareSearch(0)">
+        <div class="slot-name" id="compare-name-0">+ Add College</div>
+        <div class="slot-hint">Click to search</div>
+      </div>
+      <div class="compare-slot" id="compare-slot-1" onclick="openCompareSearch(1)">
+        <div class="slot-name" id="compare-name-1">+ Add College</div>
+        <div class="slot-hint">Click to search</div>
+      </div>
+      <div class="compare-slot" id="compare-slot-2" onclick="openCompareSearch(2)">
+        <div class="slot-name" id="compare-name-2">+ Add College (optional)</div>
+        <div class="slot-hint">Click to search</div>
+      </div>
+    </div>
+    <div class="compare-search-box" id="compare-search-box" style="display:none;margin-bottom:16px">
+      <input type="text" id="compare-search-input" placeholder="Search for a college..." oninput="filterCompareColleges()" onkeydown="if(event.key==='Escape'){document.getElementById('compare-search-box').style.display='none'}">
+      <div class="compare-dropdown" id="compare-dropdown"></div>
+    </div>
+    <div id="compare-results" style="display:none">
+      <div class="compare-radar-wrap">
+        <canvas id="compare-radar" width="400" height="400"></canvas>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="compare-table" id="compare-table"></table>
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="feat-btn feat-btn-primary" onclick="shareComparison()">📤 Share Comparison</button>
+        <button class="feat-btn feat-btn-secondary" onclick="resetComparison()" style="margin-left:8px">🔄 Start Over</button>
       </div>
     </div>
   </div>
@@ -4009,6 +4267,803 @@ window.quizBack = quizBack;
 window.quizNext = quizNext;
 window.shareQuizResults = shareQuizResults;
 window.goalScenarios = goalScenarios;
+
+/* ============================================================
+   AI ADMISSIONS COUNSELOR (Pro)
+============================================================ */
+function initCounselor() {
+  if (!isPro()) {
+    document.getElementById('counselor-gate').innerHTML = '<div class="premium-gate"><h3>🤖 AI Admissions Counselor</h3><p>Upgrade to Pro for 24/7 personalized college admissions advice powered by AI.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock AI Counselor — Start Free Trial</button></div>';
+    document.getElementById('counselor-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('counselor-gate').innerHTML = '';
+  document.getElementById('counselor-content').style.display = 'block';
+}
+
+function askCounselor(text) {
+  document.getElementById('counselor-input').value = text;
+  sendCounselorMsg();
+}
+
+async function sendCounselorMsg() {
+  const input = document.getElementById('counselor-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('counselor-msgs');
+  msgs.innerHTML += '<div class="counselor-msg user">' + text.replace(/</g,'&lt;') + '</div>';
+  msgs.innerHTML += '<div class="counselor-msg bot typing" id="counselor-typing">Thinking...</div>';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  document.getElementById('counselor-send-btn').disabled = true;
+  document.getElementById('counselor-suggestions').style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        system: 'You are a friendly, knowledgeable college admissions counselor for high school students. Give specific, actionable advice. Keep responses concise (2-4 paragraphs max). Use a warm, encouraging tone. Cover topics like: college selection strategy, essay writing, financial aid/FAFSA, extracurriculars, standardized testing, interviews, recommendation letters, and application timelines. If asked about specific GPA/test scores, give realistic but encouraging assessments. Never discourage a student from applying anywhere.',
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I had trouble processing that. Could you try rephrasing your question?';
+    const typing = document.getElementById('counselor-typing');
+    if (typing) typing.remove();
+    const formatted = reply.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    msgs.innerHTML += '<div class="counselor-msg bot"><p>' + formatted + '</p></div>';
+  } catch (e) {
+    const typing = document.getElementById('counselor-typing');
+    if (typing) typing.remove();
+    msgs.innerHTML += '<div class="counselor-msg bot">Sorry, I\'m having trouble connecting right now. Please try again in a moment.</div>';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+  document.getElementById('counselor-send-btn').disabled = false;
+}
+
+window.initCounselor = initCounselor;
+window.askCounselor = askCounselor;
+window.sendCounselorMsg = sendCounselorMsg;
+
+/* ============================================================
+   SAT/ACT PREP MODE
+============================================================ */
+const PREP_QUESTIONS = [
+  // ── EASY MATH ──
+  {subject:'math',difficulty:'easy',q:'If 3x + 7 = 22, what is the value of x?',opts:['3','4','5','6'],answer:2,explain:'Subtract 7 from both sides: 3x = 15. Divide by 3: x = 5.'},
+  {subject:'math',difficulty:'easy',q:'A circle has a radius of 6. What is its area?',opts:['36π','12π','6π','18π'],answer:0,explain:'Area = πr² = π(6²) = 36π.'},
+  {subject:'math',difficulty:'easy',q:'If f(x) = 2x² - 3x + 1, what is f(3)?',opts:['10','8','12','14'],answer:0,explain:'f(3) = 2(9) - 3(3) + 1 = 18 - 9 + 1 = 10.'},
+  {subject:'math',difficulty:'easy',q:'What is the slope of the line passing through (2, 5) and (6, 13)?',opts:['2','3','4','1'],answer:0,explain:'Slope = (13-5)/(6-2) = 8/4 = 2.'},
+  {subject:'math',difficulty:'easy',q:'If a triangle has sides 3, 4, and 5, what is its area?',opts:['6','10','7.5','12'],answer:0,explain:'This is a right triangle (3-4-5). Area = ½ × base × height = ½ × 3 × 4 = 6.'},
+  {subject:'math',difficulty:'easy',q:'What is the value of √(144) + √(25)?',opts:['17','15','13','19'],answer:0,explain:'√144 = 12, √25 = 5. So 12 + 5 = 17.'},
+  {subject:'math',difficulty:'easy',q:'In a class of 30 students, 18 play soccer. What percentage play soccer?',opts:['55%','60%','65%','50%'],answer:1,explain:'18/30 = 0.60 = 60%.'},
+  {subject:'math',difficulty:'easy',q:'If 2^x = 32, what is x?',opts:['4','5','6','3'],answer:1,explain:'2^5 = 32, so x = 5.'},
+  {subject:'math',difficulty:'easy',q:'What is the median of: 3, 7, 9, 12, 15?',opts:['7','9','10','12'],answer:1,explain:'The middle value of the sorted list is 9.'},
+  {subject:'math',difficulty:'easy',q:'A car travels 180 miles in 3 hours. What is its average speed?',opts:['50 mph','55 mph','60 mph','65 mph'],answer:2,explain:'Speed = Distance/Time = 180/3 = 60 mph.'},
+  // ── MEDIUM MATH ──
+  {subject:'math',difficulty:'medium',q:'If log₂(x) = 6, what is x?',opts:['32','64','128','36'],answer:1,explain:'log₂(x) = 6 means 2⁶ = 64, so x = 64.'},
+  {subject:'math',difficulty:'medium',q:'What is the equation of the line perpendicular to y = 2x + 3 passing through (0, 1)?',opts:['y = -½x + 1','y = 2x + 1','y = -2x + 1','y = ½x + 1'],answer:0,explain:'Perpendicular slope is the negative reciprocal: -1/2. Using point (0,1): y = -½x + 1.'},
+  {subject:'math',difficulty:'medium',q:'A bag has 5 red and 3 blue marbles. Two are drawn without replacement. P(both red)?',opts:['5/14','5/8','25/64','10/28'],answer:0,explain:'P(1st red) = 5/8, P(2nd red) = 4/7. P(both) = 5/8 × 4/7 = 20/56 = 5/14.'},
+  {subject:'math',difficulty:'medium',q:'Simplify: (x² - 9) / (x + 3)',opts:['x - 3','x + 3','x² - 3','x - 9'],answer:0,explain:'x² - 9 = (x+3)(x-3). Divided by (x+3) gives (x-3).'},
+  {subject:'math',difficulty:'medium',q:'What is the sum of the interior angles of a hexagon?',opts:['540°','720°','900°','1080°'],answer:1,explain:'Sum = (n-2) × 180° = (6-2) × 180° = 4 × 180° = 720°.'},
+  {subject:'math',difficulty:'medium',q:'If sin(θ) = 3/5, what is cos(θ) in the first quadrant?',opts:['4/5','3/4','5/3','2/5'],answer:0,explain:'Using sin²θ + cos²θ = 1: cos²θ = 1 - 9/25 = 16/25, so cosθ = 4/5.'},
+  {subject:'math',difficulty:'medium',q:'What is the vertex of the parabola y = x² - 6x + 11?',opts:['(3, 2)','(3, 11)','(-3, 2)','(6, 11)'],answer:0,explain:'Complete the square: y = (x-3)² + 2. Vertex is at (3, 2).'},
+  {subject:'math',difficulty:'medium',q:'A sequence starts: 2, 6, 18, 54, ... What is the 6th term?',opts:['162','486','324','972'],answer:1,explain:'Geometric sequence with ratio 3. a₆ = 2 × 3⁵ = 2 × 243 = 486.'},
+  // ── HARD MATH ──
+  {subject:'math',difficulty:'hard',q:'What is the remainder when x³ + 2x² - 5x + 3 is divided by (x - 1)?',opts:['1','0','3','-1'],answer:0,explain:'By the Remainder Theorem, substitute x=1: 1 + 2 - 5 + 3 = 1.'},
+  {subject:'math',difficulty:'hard',q:'How many distinct permutations of the letters in "MISSISSIPPI"?',opts:['34,650','39,916,800','11!','4,989,600'],answer:0,explain:'11!/(4!×4!×2!) = 39916800/(24×24×2) = 34,650. Account for repeated letters.'},
+  {subject:'math',difficulty:'hard',q:'If the determinant of [[a,b],[c,d]] is 5 and [[2a,2b],[c,d]]\'s determinant is:',opts:['10','5','20','2.5'],answer:0,explain:'Multiplying one row by k multiplies the determinant by k. 2×5 = 10.'},
+  {subject:'math',difficulty:'hard',q:'What is lim(x→0) [sin(3x)/x]?',opts:['3','1','0','∞'],answer:0,explain:'lim(x→0) sin(3x)/x = lim 3·sin(3x)/(3x) = 3·1 = 3, using lim sin(u)/u = 1.'},
+  {subject:'math',difficulty:'hard',q:'Find the area between y = x² and y = x from x = 0 to x = 1.',opts:['1/6','1/3','1/2','1/4'],answer:0,explain:'∫₀¹(x - x²)dx = [x²/2 - x³/3]₀¹ = 1/2 - 1/3 = 1/6.'},
+  {subject:'math',difficulty:'hard',q:'A complex number z satisfies |z - 3i| = |z + 1|. This describes a:',opts:['Line','Circle','Parabola','Ellipse'],answer:0,explain:'The locus of points equidistant from a point (0,3) and (-1,0) is the perpendicular bisector — a line.'},
+  {subject:'math',difficulty:'hard',q:'What is the sum of the infinite series 1 + 1/2 + 1/4 + 1/8 + ...?',opts:['2','1.5','∞','3'],answer:0,explain:'Geometric series with a=1, r=1/2. Sum = a/(1-r) = 1/(1-0.5) = 2.'},
+  {subject:'math',difficulty:'hard',q:'If f(x) = eˣ·sin(x), what is f\'(x)?',opts:['eˣ(sin x + cos x)','eˣ·cos x','eˣ·sin x','eˣ(sin x - cos x)'],answer:0,explain:'Product rule: f\'(x) = eˣ·sin x + eˣ·cos x = eˣ(sin x + cos x).'},
+  // ── EASY READING ──
+  {subject:'reading',difficulty:'easy',q:'In the context of a passage about climate change, "mitigate" most nearly means:',opts:['Worsen','Reduce the severity of','Ignore','Celebrate'],answer:1,explain:'"Mitigate" means to make less severe, serious, or painful — to reduce the impact.'},
+  {subject:'reading',difficulty:'easy',q:'A passage states: "The author\'s tone shifted from optimistic to somber." What does this imply?',opts:['The author became more hopeful','The author became more serious and sad','The author became angry','The author became confused'],answer:1,explain:'"Somber" means dark, gloomy, or serious — a shift from optimism indicates growing concern.'},
+  {subject:'reading',difficulty:'easy',q:'Which best describes the purpose of an anecdote in an argumentative essay?',opts:['To provide statistical evidence','To illustrate a point through a personal story','To refute the opposing view','To summarize the conclusion'],answer:1,explain:'Anecdotes are brief personal stories used to illustrate or support a point in an argument.'},
+  {subject:'reading',difficulty:'easy',q:'If an author uses the phrase "a double-edged sword," they are suggesting:',opts:['Something is purely beneficial','Something has both advantages and disadvantages','Something is dangerous','Something is old-fashioned'],answer:1,explain:'"Double-edged sword" is an idiom meaning something has both positive and negative consequences.'},
+  {subject:'reading',difficulty:'easy',q:'The word "ubiquitous" most nearly means:',opts:['Rare','Present everywhere','Dangerous','Beautiful'],answer:1,explain:'"Ubiquitous" means found or existing everywhere, being very common.'},
+  {subject:'reading',difficulty:'easy',q:'An author writes: "The silence was deafening." This is an example of:',opts:['Simile','Metaphor','Oxymoron','Alliteration'],answer:2,explain:'An oxymoron combines two contradictory terms — silence cannot literally be deafening.'},
+  {subject:'reading',difficulty:'easy',q:'What is the primary purpose of a thesis statement?',opts:['To entertain the reader','To present the main argument of an essay','To provide background information','To list sources'],answer:1,explain:'A thesis statement declares the main point or argument that the essay will support.'},
+  {subject:'reading',difficulty:'easy',q:'"The data suggests a correlation, not causation." This means:',opts:['One thing directly causes another','Two things occur together but one doesn\'t necessarily cause the other','The data is unreliable','There is no relationship between the variables'],answer:1,explain:'Correlation means two variables are related, but one does not necessarily cause the other.'},
+  // ── MEDIUM READING ──
+  {subject:'reading',difficulty:'medium',q:'An author argues that social media harms teens but acknowledges its benefits for connectivity. This technique is called:',opts:['Red herring','Concession','Hyperbole','Ad hominem'],answer:1,explain:'A concession acknowledges an opposing point before reinforcing your own argument.'},
+  {subject:'reading',difficulty:'medium',q:'"The company\'s profits were anemic." In context, "anemic" most nearly means:',opts:['Sick','Weak or lacking vitality','Bloody','Powerful'],answer:1,explain:'"Anemic" figuratively means weak, pale, or lacking force — profits were disappointingly low.'},
+  {subject:'reading',difficulty:'medium',q:'A historian writes: "The revolution was inevitable, yet its timing surprised everyone." The juxtaposition suggests:',opts:['The revolution was unexpected','The cause was clear but the trigger was not','The historian disagrees with the revolution','The revolution failed'],answer:1,explain:'The "yet" creates contrast between the known inevitability and the surprising specific timing.'},
+  {subject:'reading',difficulty:'medium',q:'Which rhetorical device does "Ask not what your country can do for you — ask what you can do for your country" use?',opts:['Alliteration','Chiasmus','Simile','Understatement'],answer:1,explain:'Chiasmus reverses the structure of a phrase: "country...you" becomes "you...country."'},
+  {subject:'reading',difficulty:'medium',q:'An author describes a character who "wore her confidence like armor." This suggests the character:',opts:['Is physically strong','Uses confidence as protection','Is arrogant','Literally wears armor'],answer:1,explain:'The simile "like armor" implies confidence serves a defensive, protective purpose for her.'},
+  {subject:'reading',difficulty:'medium',q:'In a passage, an unreliable narrator is one who:',opts:['Tells the story in third person','Cannot be fully trusted by the reader','Uses complex vocabulary','Speaks directly to the reader'],answer:1,explain:'An unreliable narrator\'s account may be biased, incomplete, or deliberately misleading.'},
+  // ── HARD READING ──
+  {subject:'reading',difficulty:'hard',q:'A passage argues: "Democracy requires an informed citizenry, yet information overload breeds apathy." The author\'s central paradox is:',opts:['Democracy is impossible','More information doesn\'t guarantee better outcomes','Citizens are always apathetic','Information should be restricted'],answer:1,explain:'The paradox is that the abundance of information — theoretically good for democracy — can actually undermine engagement.'},
+  {subject:'reading',difficulty:'hard',q:'An author consistently uses passive voice when describing corporate decisions but active voice for employee actions. This choice most likely serves to:',opts:['Vary sentence structure','Obscure corporate accountability while emphasizing worker responsibility','Show poor writing skills','Follow academic conventions'],answer:1,explain:'Passive voice ("mistakes were made") deflects blame from corporations, while active voice assigns clear agency to employees.'},
+  {subject:'reading',difficulty:'hard',q:'A literary critic describes a novel as "a palimpsest of cultural anxieties." "Palimpsest" here implies:',opts:['A simple narrative','Layered meanings written over earlier ones','A geographical metaphor','A chronological retelling'],answer:1,explain:'A palimpsest is a manuscript with layers of writing; metaphorically, the novel contains multiple layers of meaning overwriting each other.'},
+  {subject:'reading',difficulty:'hard',q:'Two passages discuss urban planning. Passage A uses data-driven analysis; Passage B uses personal narratives. A reader evaluating their relative strength should consider:',opts:['Only data is valid evidence','Narratives always outweigh data','The context determines which form of evidence is more persuasive','Both are equally weak'],answer:2,explain:'Evaluating evidence requires considering the argument\'s context, audience, and purpose — neither form is inherently superior.'},
+  {subject:'reading',difficulty:'hard',q:'An essay\'s conclusion introduces a new metaphor not present in the introduction. This structural choice most likely:',opts:['Is a writing error','Signals a shift in the author\'s understanding through the essay','Weakens the argument','Is purely decorative'],answer:1,explain:'A new concluding metaphor often reflects intellectual development — the author\'s thinking has evolved through the argument.'},
+  {subject:'reading',difficulty:'hard',q:'A satirical essay praises a politician\'s "remarkable ability to say nothing with extraordinary eloquence." The function of this irony is to:',opts:['Compliment the politician','Criticize substance-free rhetoric','Describe public speaking skills','Remain neutral'],answer:1,explain:'The irony lies in praising a negative quality (empty rhetoric) — the "praise" is actually sharp criticism.'},
+  // ── EASY WRITING ──
+  {subject:'writing',difficulty:'easy',q:'Which sentence is grammatically correct?',opts:['Me and him went to the store.','Him and I went to the store.','He and I went to the store.','Me and he went to the store.'],answer:2,explain:'"He and I" uses subject pronouns correctly as the subject of the sentence.'},
+  {subject:'writing',difficulty:'easy',q:'Choose the correct word: "The team celebrated _____ victory."',opts:['they\'re','there','their','its'],answer:2,explain:'"Their" is the possessive pronoun for "team" (referring to the members).'},
+  {subject:'writing',difficulty:'easy',q:'Which transition best shows contrast?',opts:['Furthermore','However','Additionally','Similarly'],answer:1,explain:'"However" is a contrast transition that signals an opposing or different idea.'},
+  {subject:'writing',difficulty:'easy',q:'Identify the error: "Each of the students have completed their assignment."',opts:['"Each" should be "All"','"have" should be "has"','"their" should be "his"','No error'],answer:1,explain:'"Each" is singular and requires "has" — "Each of the students has completed..."'},
+  {subject:'writing',difficulty:'easy',q:'Which is the most concise version?',opts:['Due to the fact that it was raining','Because it was raining','On account of the fact that rain was occurring','In light of the rainy conditions'],answer:1,explain:'"Because it was raining" is the most concise and direct way to express this idea.'},
+  {subject:'writing',difficulty:'easy',q:'A semicolon is correctly used to:',opts:['Introduce a list','Join two independent clauses','End a question','Separate a dependent and independent clause'],answer:1,explain:'Semicolons join two closely related independent clauses that could each stand alone as sentences.'},
+  {subject:'writing',difficulty:'easy',q:'Which word best replaces "very tired"?',opts:['Exhausted','Sleepy','Lazy','Bored'],answer:0,explain:'"Exhausted" is a stronger, more precise word that replaces the weak "very tired" combination.'},
+  {subject:'writing',difficulty:'easy',q:'"The dog chased it\'s tail." What is wrong with this sentence?',opts:['Nothing is wrong','"it\'s" should be "its"','"chased" should be "chases"','"tail" should be "tale"'],answer:1,explain:'"Its" (no apostrophe) is possessive. "It\'s" is a contraction of "it is."'},
+  // ── MEDIUM WRITING ──
+  {subject:'writing',difficulty:'medium',q:'Which sentence demonstrates correct parallel structure?',opts:['She likes hiking, to swim, and biking.','She likes hiking, swimming, and biking.','She likes to hike, swimming, and to bike.','She likes hiking, swimming, and to bike.'],answer:1,explain:'Parallel structure requires consistent grammatical form: all gerunds (hiking, swimming, biking).'},
+  {subject:'writing',difficulty:'medium',q:'"The council voted; moreover, they implemented the policy immediately." Is this punctuation correct?',opts:['Yes, the semicolon is used correctly','No, a comma should replace the semicolon','No, "moreover" doesn\'t need a semicolon before it','No, remove "moreover" entirely'],answer:0,explain:'A semicolon before a conjunctive adverb (moreover) joining two independent clauses is correct.'},
+  {subject:'writing',difficulty:'medium',q:'Which revision eliminates the dangling modifier? "Walking to school, the rain started pouring."',opts:['Walking to school, it started raining.','While I was walking to school, the rain started pouring.','The rain started pouring, walking to school.','Walking to school started the rain pouring.'],answer:1,explain:'The original has a dangling modifier — "Walking" has no proper subject. Adding "While I was" fixes it.'},
+  {subject:'writing',difficulty:'medium',q:'In academic writing, which is the strongest thesis statement?',opts:['"Social media is bad."','"This paper will discuss social media."','"Social media platforms erode adolescent mental health by promoting unrealistic comparison."','"Some people think social media is harmful."'],answer:2,explain:'A strong thesis is specific, arguable, and states a clear claim with reasoning.'},
+  {subject:'writing',difficulty:'medium',q:'"Neither the teacher nor the students _____ prepared." Choose the correct verb.',opts:['was','were','is','has been'],answer:1,explain:'With "neither...nor," the verb agrees with the nearer subject ("students" = plural), so "were."'},
+  {subject:'writing',difficulty:'medium',q:'Which sentence correctly uses a colon?',opts:['She needed: eggs, milk, and bread.','She needed one thing: determination.','She: needed to focus on her work.','She needed to: buy groceries.'],answer:1,explain:'A colon follows an independent clause and introduces an explanation, example, or list elaboration.'},
+  // ── HARD WRITING ──
+  {subject:'writing',difficulty:'hard',q:'"The data shows that students who study collaboratively perform better; however, this correlation may reflect selection bias rather than a causal relationship." The function of the semicolon clause is to:',opts:['Support the initial claim','Qualify the claim with a methodological limitation','Contradict the data','Introduce new evidence'],answer:1,explain:'The "however" clause qualifies the claim by raising selection bias as an alternative explanation — a nuanced academic move.'},
+  {subject:'writing',difficulty:'hard',q:'Restructure for maximum impact: "Climate change is a problem that affects many ecosystems and is caused by human activity and has been getting worse over time."',opts:['Human-driven climate change, accelerating over decades, threatens ecosystems worldwide.','Climate change, which humans cause, is a worsening problem for ecosystems.','Many ecosystems are affected by climate change which is caused by humans and getting worse.','The problem of climate change affects ecosystems and is getting worse because of humans.'],answer:0,explain:'The best revision uses a participial phrase for concision, front-loads the cause, and ends with impact.'},
+  {subject:'writing',difficulty:'hard',q:'A student writes: "The protagonist\'s development is effected by the antagonist\'s machinations." The error is:',opts:['No error','"effected" should be "affected"','"protagonist\'s" should be "protagonists"','"machinations" is the wrong word'],answer:1,explain:'"Affect" (verb) means to influence. "Effect" as a verb means to bring about/cause. The protagonist is influenced, not caused.'},
+  {subject:'writing',difficulty:'hard',q:'Which revision best maintains formal academic register? "Scientists totally proved that the old theory was wrong."',opts:['Scientists definitively demonstrated that the previous theory was inaccurate.','Scientists completely showed the old theory to be incorrect.','Scientists for sure proved the prior theory wrong.','It was totally shown by scientists that the theory was wrong.'],answer:0,explain:'"Definitively demonstrated" and "previous theory was inaccurate" maintain formal academic register without colloquialisms.'},
+  {subject:'writing',difficulty:'hard',q:'"While the study\'s methodology was rigorous, its sample size—limited to 47 participants—undermines the generalizability of its conclusions." The em dashes serve to:',opts:['Replace parentheses for emphasis on a limiting detail','Indicate a grammatical error','Separate independent clauses','Show dialogue'],answer:0,explain:'Em dashes set off an appositive phrase with more emphasis than parentheses, highlighting the limitation.'},
+  {subject:'writing',difficulty:'hard',q:'In which sentence does the subjunctive mood correctly express a hypothetical? ',opts:['If I was rich, I would travel.','If I were rich, I would travel.','If I am rich, I would travel.','If I be rich, I would travel.'],answer:1,explain:'The subjunctive "were" (not "was") is used for hypothetical/contrary-to-fact conditions: "If I were..."'},
+];
+
+// ── FULL PRACTICE EXAM QUESTION BANKS (Pro) ──
+const SAT_EXAM_QUESTIONS = [
+  // Reading & Writing (27 questions, 64 min in real SAT — we use 20 questions, ~30 min)
+  {section:'Reading & Writing',q:'Based on the passage excerpt: "The author argues that urbanization, while economically beneficial, creates ecological debt." Which choice best describes the author\'s position?',opts:['Urbanization should be stopped','Economic growth and ecology are inherently opposed','Cities create environmental costs that offset economic gains','Ecological debt is a myth'],answer:2,explain:'The author acknowledges economic benefits but emphasizes ecological costs — a balanced critique.'},
+  {section:'Reading & Writing',q:'The word "precipitous" in "a precipitous decline in biodiversity" most nearly means:',opts:['Gradual','Steep and dramatic','Unexpected','Temporary'],answer:1,explain:'"Precipitous" means extremely steep, rapid, or dramatic — here describing a severe decline.'},
+  {section:'Reading & Writing',q:'A researcher studying ocean acidification writes: "The pH levels have decreased by 0.1 units since the industrial revolution—a 30% increase in acidity." The purpose of the dash is to:',opts:['Correct a previous error','Provide a surprising clarification','Introduce a new topic','End the sentence'],answer:1,explain:'The dash introduces a startling restatement — 0.1 pH units sounds small, but equals 30% more acidity.'},
+  {section:'Reading & Writing',q:'Which choice best combines: "Marie Curie discovered radium. She was the first woman to win a Nobel Prize. Her work transformed physics."',opts:['Marie Curie discovered radium, was the first woman to win a Nobel Prize, and her work transformed physics.','Marie Curie, who discovered radium and became the first woman to win a Nobel Prize, transformed physics with her work.','Marie Curie discovered radium and she was the first woman to win a Nobel Prize and transformed physics.','Discovering radium, Marie Curie won a Nobel Prize first for women and transformed physics.'],answer:1,explain:'Option B uses a relative clause to embed details concisely while maintaining a clear main clause.'},
+  {section:'Reading & Writing',q:'"The novelist\'s prose, at once sparse and evocative, _____ readers to construct vivid mental landscapes from minimal description." Which completes the sentence?',opts:['compels','compel','compelling','are compelling'],answer:0,explain:'The subject is "prose" (singular), requiring the singular verb "compels."'},
+  {section:'Reading & Writing',q:'A study finds that students who eat breakfast score 15% higher on tests. Which additional finding would most weaken this conclusion?',opts:['Students who eat breakfast also sleep more and have higher-income parents','Breakfast foods contain nutrients that aid cognition','The study was conducted over three years','Similar results were found in other countries'],answer:0,explain:'Confounding variables (more sleep, higher income) suggest breakfast may not be the actual cause.'},
+  {section:'Reading & Writing',q:'An editorial states: "We cannot afford to wait for perfect data before acting on climate change." This argument assumes that:',opts:['Climate data will never be perfect','Inaction carries greater risk than imperfect action','Scientists are unreliable','Climate change is not serious'],answer:1,explain:'The argument implicitly assumes the cost of delay exceeds the cost of acting on imperfect information.'},
+  {section:'Reading & Writing',q:'"The filibuster, a procedural mechanism originally designed to protect minority viewpoints, has increasingly become a tool for legislative obstruction." The sentence structure serves to:',opts:['Define "filibuster" for unfamiliar readers','Contrast original purpose with current use','Argue for eliminating the filibuster','Present two equal interpretations'],answer:1,explain:'The appositive phrase sets up the contrast between original intent ("protect") and current reality ("obstruction").'},
+  {section:'Reading & Writing',q:'Which transition best connects: "Renewable energy costs have dropped 90% in a decade. _____, fossil fuels still receive $5.9 trillion in annual subsidies."',opts:['Therefore','Similarly','Nevertheless','Specifically'],answer:2,explain:'"Nevertheless" signals contrast: despite renewables being cheaper, fossil fuels still get massive subsidies.'},
+  {section:'Reading & Writing',q:'A chart shows that countries with higher GDP spend more on healthcare but don\'t necessarily have better health outcomes. The data best supports which claim?',opts:['Spending more on healthcare is wasteful','Healthcare spending has diminishing returns beyond a certain point','Poor countries have better health outcomes','GDP and healthcare are unrelated'],answer:1,explain:'The data shows spending helps up to a point but doesn\'t guarantee proportionally better outcomes.'},
+  // Math (22 questions, 70 min in real SAT — we use 10 questions, ~20 min)
+  {section:'Math',q:'If the function f(x) = ax² + bx + c has roots at x = -2 and x = 5, and f(0) = -30, what is the value of a?',opts:['3','-3','6','-6'],answer:0,explain:'f(x) = a(x+2)(x-5). f(0) = a(2)(-5) = -10a = -30, so a = 3.'},
+  {section:'Math',q:'A circle in the xy-plane has equation (x-3)² + (y+2)² = 25. Which point lies ON the circle?',opts:['(3, 3)','(0, 2)','(8, -2)','(3, -7)'],answer:2,explain:'(8-3)² + (-2+2)² = 25 + 0 = 25. Point (8,-2) satisfies the equation.'},
+  {section:'Math',q:'If 3ⁿ⁺¹ = 81 × 3², what is n?',opts:['5','6','7','4'],answer:0,explain:'81 = 3⁴, so 81 × 3² = 3⁴ × 3² = 3⁶. Thus 3ⁿ⁺¹ = 3⁶, so n + 1 = 6 and n = 5.'},
+  {section:'Math',q:'A right triangle has legs of length 8 and 15. What is the length of the hypotenuse?',opts:['17','19','23','20'],answer:0,explain:'c² = 8² + 15² = 64 + 225 = 289. c = √289 = 17.'},
+  {section:'Math',q:'The mean of five numbers is 12. When a sixth number is added, the mean becomes 15. What is the sixth number?',opts:['27','30','33','18'],answer:1,explain:'Sum of 5 numbers = 60. New sum = 6 × 15 = 90. Sixth number = 90 - 60 = 30.'},
+  {section:'Math',q:'If |2x - 7| ≤ 3, what is the solution set?',opts:['2 ≤ x ≤ 5','x ≤ 2 or x ≥ 5','-5 ≤ x ≤ 2','4 ≤ x ≤ 10'],answer:0,explain:'-3 ≤ 2x-7 ≤ 3 → 4 ≤ 2x ≤ 10 → 2 ≤ x ≤ 5.'},
+  {section:'Math',q:'A store offers 20% off, then an additional 10% off the sale price. What is the total percent discount?',opts:['30%','28%','32%','25%'],answer:1,explain:'After 20% off: 0.80. After additional 10%: 0.80 × 0.90 = 0.72. Discount = 1 - 0.72 = 28%.'},
+  {section:'Math',q:'What is the value of (2 + 3i)(4 - i) where i = √(-1)?',opts:['11 + 10i','5 + 2i','11 + 14i','8 - 3i²'],answer:0,explain:'8 - 2i + 12i - 3i² = 8 + 10i + 3 = 11 + 10i (since i² = -1).'},
+  {section:'Math',q:'The graph of y = -2(x-1)² + 8 opens in which direction, and what is its maximum value?',opts:['Downward, max = 8','Upward, max = 8','Downward, max = 1','Upward, min = 8'],answer:0,explain:'Negative leading coefficient means it opens downward. Vertex at (1, 8), so maximum is 8.'},
+  {section:'Math',q:'A population doubles every 5 years. If it starts at 1,000, what will it be after 20 years?',opts:['8,000','16,000','32,000','4,000'],answer:1,explain:'20 years = 4 doubling periods. 1000 × 2⁴ = 1000 × 16 = 16,000.'},
+];
+
+const ACT_EXAM_QUESTIONS = [
+  // English (20 questions, ~15 min)
+  {section:'English',q:'"The students, along with their teacher, _____ planning the field trip." Select the correct verb.',opts:['are','is','were planning to be','has been'],answer:0,explain:'"Along with their teacher" is a parenthetical phrase, not part of the subject. The main subject is "students" (plural), so "are" is correct.'},
+  {section:'English',q:'Which punctuation correctly completes: "The experiment yielded unexpected results___ the team decided to replicate it."',opts:['; therefore,',', therefore','— therefore,','. Therefore'],answer:0,explain:'A semicolon joins two independent clauses. "Therefore" is a conjunctive adverb needing a semicolon before and comma after.'},
+  {section:'English',q:'"Having finished the marathon, a celebration was held by the runners." This sentence contains:',opts:['A split infinitive','A dangling modifier','Correct grammar','A run-on sentence'],answer:1,explain:'"Having finished the marathon" modifies "a celebration" — but celebrations don\'t finish marathons. It should modify "the runners."'},
+  {section:'English',q:'Choose the most effective revision: "The museum was old. It had paintings. The paintings were beautiful. People visited often."',opts:['The old museum had beautiful paintings that attracted frequent visitors.','The museum, which was old, had paintings that were beautiful, and people visited it often.','The museum was old and had paintings and they were beautiful and people visited often.','People often visited the old museum because it had beautiful paintings.'],answer:3,explain:'Option D is most effective: it establishes cause-effect, is concise, and flows naturally.'},
+  {section:'English',q:'"The committee has made _____ decision." Which correctly completes this?',opts:['it\'s','its','their','they\'re'],answer:1,explain:'"Committee" is singular in standard American English, requiring "its" (possessive, no apostrophe).'},
+  {section:'English',q:'In context: "The policy was implemented; _____, not all stakeholders were consulted." Which transition fits?',opts:['furthermore','however','therefore','similarly'],answer:1,explain:'"However" shows contrast between implementation and the lack of complete consultation.'},
+  {section:'English',q:'"Neither the CEO nor the board members _____ aware of the discrepancy." Choose the correct verb.',opts:['was','were','is','has been'],answer:1,explain:'With "neither...nor," the verb agrees with the nearer subject: "board members" is plural, so "were."'},
+  {section:'English',q:'Which sentence avoids redundancy?',opts:['The reason is because of budget cuts.','The annual yearly report is due Friday.','She returned back to her office.','Budget cuts caused the delay.'],answer:3,explain:'The others are redundant: "reason...because," "annual yearly," "returned back." Option D is clean.'},
+  {section:'English',q:'"Students whom the professor mentored often went on to publish research." Is "whom" used correctly?',opts:['Yes — "whom" is the object of "mentored"','No — it should be "who"','No — it should be "which"','No — it should be "that"'],answer:0,explain:'"Whom" is correct as the object of the verb "mentored" (the professor mentored whom).'},
+  {section:'English',q:'Which revision best improves clarity? "The data was analyzed by the researchers using advanced statistical methods that produced significant results."',opts:['Using advanced statistical methods, the researchers analyzed the data and produced significant results.','The researchers, using advanced methods, analyzed data significantly.','Advanced statistical methods were used by researchers to analyze data that was significant.','Significant results were produced by data analyzed by researchers using methods.'],answer:0,explain:'Option A clarifies who did what by making "researchers" the subject and placing the method in a participial phrase.'},
+  // Math (20 questions, ~20 min)
+  {section:'Math',q:'If 5x - 3 = 2x + 9, what is x?',opts:['3','4','6','2'],answer:1,explain:'5x - 2x = 9 + 3 → 3x = 12 → x = 4.'},
+  {section:'Math',q:'A rectangle has a perimeter of 36 and a length that is twice its width. What is the area?',opts:['72','54','108','48'],answer:0,explain:'Let width = w. 2(2w + w) = 36 → 6w = 36 → w = 6. Length = 12. Area = 6 × 12 = 72.'},
+  {section:'Math',q:'What is the value of cos(60°)?',opts:['½','√3/2','√2/2','1'],answer:0,explain:'cos(60°) = ½. This is a standard trigonometric value.'},
+  {section:'Math',q:'If f(x) = 3x - 1 and g(x) = x² + 2, what is f(g(2))?',opts:['17','15','19','21'],answer:0,explain:'g(2) = 4 + 2 = 6. f(6) = 3(6) - 1 = 17.'},
+  {section:'Math',q:'A 30-60-90 triangle has a hypotenuse of 10. What is the length of the shorter leg?',opts:['5','5√3','5√2','10√3'],answer:0,explain:'In a 30-60-90 triangle, the shorter leg = hypotenuse/2 = 10/2 = 5.'},
+  {section:'Math',q:'The probability of event A is 0.3 and event B is 0.5. If they are independent, what is P(A and B)?',opts:['0.15','0.80','0.35','0.50'],answer:0,explain:'For independent events: P(A∩B) = P(A) × P(B) = 0.3 × 0.5 = 0.15.'},
+  {section:'Math',q:'What is the distance between points (-3, 4) and (5, -2)?',opts:['10','8','12','14'],answer:0,explain:'d = √[(5-(-3))² + (-2-4)²] = √[64 + 36] = √100 = 10.'},
+  {section:'Math',q:'If the ratio of boys to girls is 3:5 and there are 40 students total, how many boys are there?',opts:['15','24','18','12'],answer:0,explain:'Boys = (3/8) × 40 = 15.'},
+  {section:'Math',q:'What is the next term in the arithmetic sequence: 7, 13, 19, 25, ...?',opts:['29','31','33','27'],answer:1,explain:'Common difference = 6. Next term = 25 + 6 = 31.'},
+  {section:'Math',q:'A cone has a radius of 3 and a height of 4. What is its volume?',opts:['12π','36π','9π','16π'],answer:0,explain:'V = (1/3)πr²h = (1/3)π(9)(4) = 12π.'},
+  // Reading (5 questions, ~10 min)
+  {section:'Reading',q:'A passage discusses how coral reefs support 25% of marine species despite covering less than 1% of the ocean floor. The author\'s primary purpose is to:',opts:['Argue for ocean conservation funding','Highlight the disproportionate ecological importance of reefs','Describe coral biology','Compare reefs to other ecosystems'],answer:1,explain:'The contrast between 1% coverage and 25% species support emphasizes ecological significance.'},
+  {section:'Reading',q:'"The Industrial Revolution, far from being a clean break with the past, was rooted in centuries of incremental agricultural and commercial change." This statement challenges:',opts:['The idea that the Industrial Revolution was important','The narrative of sudden, revolutionary transformation','The role of agriculture in history','Commercial change theory'],answer:1,explain:'The author directly challenges the "clean break" narrative, arguing for gradual, evolutionary change.'},
+  {section:'Reading',q:'Two viewpoints: Author A says standardized testing measures achievement objectively. Author B says it measures test-taking ability, not knowledge. They fundamentally disagree about:',opts:['Whether tests should exist','What standardized tests actually measure','The difficulty of tests','How tests are graded'],answer:1,explain:'The core disagreement is about construct validity — whether tests measure achievement or test-taking skill.'},
+  {section:'Reading',q:'A study found that bilingual children show enhanced executive function. The researcher notes: "While our sample was limited to middle-class families..." This caveat suggests:',opts:['The finding is wrong','Results may not generalize to other socioeconomic groups','Middle-class children are smarter','Bilingualism only helps wealthy children'],answer:1,explain:'The researcher is acknowledging a limitation in generalizability due to restricted sample demographics.'},
+  {section:'Reading',q:'"The author\'s use of second person ("you") throughout the essay serves to:" (assuming it\'s an argumentative piece)',opts:['Show informality','Directly implicate the reader in the argument','Follow convention','Avoid using "I"'],answer:1,explain:'Second person draws the reader in as a participant, making the argument feel personally relevant.'},
+  // Science (5 questions, ~10 min)
+  {section:'Science',q:'A graph shows that as CO₂ concentration increases from 300 to 600 ppm, plant growth rate increases, then plateaus above 500 ppm. Which conclusion is best supported?',opts:['CO₂ is toxic to plants above 500 ppm','Other factors become limiting at high CO₂ levels','Plants cannot absorb CO₂ above 500 ppm','The data is inconclusive'],answer:1,explain:'The plateau suggests CO₂ is no longer the limiting factor — other resources (light, water, nutrients) constrain growth.'},
+  {section:'Science',q:'Two scientists disagree: Scientist 1 says a fossil is 65 million years old (K-Pg boundary). Scientist 2 says 70 million years old (late Cretaceous). Which evidence would resolve this?',opts:['The fossil\'s color','Radiometric dating of the surrounding rock layer','The fossil\'s size','Comparison to living species'],answer:1,explain:'Radiometric dating provides absolute ages for rock layers, directly resolving the age dispute.'},
+  {section:'Science',q:'An experiment tests whether fertilizer affects tomato growth. Group A gets fertilizer; Group B gets water only. Both are in identical conditions. Group B is the:',opts:['Independent variable','Dependent variable','Control group','Experimental error'],answer:2,explain:'Group B (no treatment) is the control group — it provides a baseline for comparison.'},
+  {section:'Science',q:'A table shows three metals with melting points: Al (660°C), Cu (1085°C), Fe (1538°C). A furnace reaches 1200°C. Which metals will melt?',opts:['Only Al','Al and Cu','All three','Only Fe'],answer:1,explain:'At 1200°C, aluminum (660°C) and copper (1085°C) will melt, but iron (1538°C) will not.'},
+  {section:'Science',q:'A pH test shows: Solution X = 2, Solution Y = 7, Solution Z = 12. Which statement is correct?',opts:['X is basic, Z is acidic','Y is neutral, X is strongly acidic','Z is neutral','All are acidic'],answer:1,explain:'pH 7 is neutral, pH 2 is strongly acidic, pH 12 is strongly basic.'},
+];
+
+let prepState = { subject: 'all', difficulty: 'all', current: 0, answered: [], xp: 0, streak: 0, lastDate: null, correct: 0, total: 0, history: [] };
+let examState = null;
+let examTimer = null;
+
+const XP_MULTIPLIER = { easy: 1, medium: 1.5, hard: 2 };
+const DIFF_LABELS = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+
+function loadPrepState() {
+  const saved = localStorage.getItem('gs_prep_state');
+  if (saved) {
+    const s = JSON.parse(saved);
+    Object.assign(prepState, s);
+    if (!prepState.difficulty) prepState.difficulty = 'all';
+    const today = new Date().toDateString();
+    if (prepState.lastDate && prepState.lastDate !== today) {
+      const last = new Date(prepState.lastDate);
+      const diff = Math.floor((new Date(today) - last) / 86400000);
+      if (diff > 1) prepState.streak = 0;
+    }
+  }
+}
+
+function savePrepState() {
+  localStorage.setItem('gs_prep_state', JSON.stringify(prepState));
+}
+
+function initPrep() {
+  loadPrepState();
+  document.querySelectorAll('.prep-diff-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.diff === prepState.difficulty);
+  });
+  updatePrepStats();
+  loadPrepQuestion();
+  renderExamCards();
+}
+
+function setPrepSubject(sub) {
+  prepState.subject = sub;
+  document.querySelectorAll('.prep-mode-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  prepState.current = 0;
+  prepState.answered = [];
+  loadPrepQuestion();
+}
+
+function setPrepDifficulty(diff) {
+  prepState.difficulty = diff;
+  document.querySelectorAll('.prep-diff-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.diff === diff);
+  });
+  prepState.current = 0;
+  prepState.answered = [];
+  savePrepState();
+  loadPrepQuestion();
+}
+
+function getFilteredQuestions() {
+  return PREP_QUESTIONS.filter(q => {
+    const subMatch = prepState.subject === 'all' || q.subject === prepState.subject;
+    const diffMatch = prepState.difficulty === 'all' || q.difficulty === prepState.difficulty;
+    return subMatch && diffMatch;
+  });
+}
+
+function loadPrepQuestion() {
+  if (examState) return;
+  const questions = getFilteredQuestions();
+  if (questions.length === 0) {
+    document.getElementById('prep-question-area').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3)">No questions match the selected filters. Try a different subject or difficulty level.</div>';
+    return;
+  }
+  const idx = prepState.current % questions.length;
+  const q = questions[idx];
+  const diffBadge = `<span class="prep-diff-badge ${q.difficulty}">${q.difficulty.toUpperCase()}</span>`;
+  const area = document.getElementById('prep-question-area');
+  area.innerHTML = `
+    <div class="prep-question-card">
+      <span class="prep-q-subject ${q.subject}">${q.subject.toUpperCase()}</span>${diffBadge}
+      <div style="float:right;font-size:12px;color:var(--ink3)">Question ${idx+1} of ${questions.length}</div>
+      <div class="prep-q-text">${q.q}</div>
+      <div class="prep-options">
+        ${q.opts.map((o,i) => `<div class="prep-option" data-idx="${i}" onclick="selectPrepAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</div>`).join('')}
+      </div>
+      <div id="prep-explain" style="display:none"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="feat-btn feat-btn-primary" id="prep-next-btn" onclick="nextPrepQuestion()" style="display:none">Next Question →</button>
+      </div>
+    </div>`;
+}
+
+function selectPrepAnswer(idx) {
+  if (examState) return selectExamAnswer(idx);
+  const questions = getFilteredQuestions();
+  const qIdx = prepState.current % questions.length;
+  const q = questions[qIdx];
+  if (prepState.answered.includes(prepState.current)) return;
+  prepState.answered.push(prepState.current);
+  prepState.total++;
+
+  const opts = document.querySelectorAll('.prep-option');
+  opts.forEach(o => { o.style.pointerEvents = 'none'; });
+  opts[q.answer].classList.add('correct');
+
+  const isCorrect = idx === q.answer;
+  if (isCorrect) {
+    prepState.correct++;
+    const mult = XP_MULTIPLIER[q.difficulty] || 1;
+    const baseXp = 10;
+    const xpGain = Math.round((baseXp + (prepState.streak * 2)) * mult);
+    prepState.xp += xpGain;
+    showXPToast('+' + xpGain + ' XP' + (mult > 1 ? ' (' + mult + 'x)' : ''));
+    const today = new Date().toDateString();
+    if (prepState.lastDate !== today) {
+      const last = prepState.lastDate ? new Date(prepState.lastDate) : null;
+      const diff = last ? Math.floor((new Date(today) - last) / 86400000) : 999;
+      prepState.streak = diff === 1 ? prepState.streak + 1 : 1;
+      prepState.lastDate = today;
+    }
+  } else {
+    opts[idx].classList.add('wrong');
+  }
+
+  const explainDiv = document.getElementById('prep-explain');
+  explainDiv.style.display = 'block';
+  explainDiv.innerHTML = `<div class="prep-explanation">${isCorrect ? '✅ Correct!' : '❌ Incorrect.'} ${q.explain}</div>`;
+  document.getElementById('prep-next-btn').style.display = '';
+  savePrepState();
+  updatePrepStats();
+}
+
+function nextPrepQuestion() {
+  if (examState) return nextExamQuestion();
+  prepState.current++;
+  loadPrepQuestion();
+}
+
+function updatePrepStats() {
+  document.getElementById('prep-xp').textContent = prepState.xp;
+  document.getElementById('prep-streak').textContent = prepState.streak;
+  document.getElementById('prep-flame').style.display = prepState.streak > 0 ? '' : 'none';
+  document.getElementById('prep-correct').textContent = prepState.correct;
+  const acc = prepState.total > 0 ? Math.round((prepState.correct / prepState.total) * 100) : 0;
+  document.getElementById('prep-accuracy').textContent = acc + '%';
+  if (prepState.total >= 5) {
+    const predict = document.getElementById('prep-score-predict');
+    predict.style.display = '';
+    const predicted = Math.round(400 + (acc / 100) * 1200);
+    document.getElementById('prep-predicted-score').textContent = Math.min(predicted, 1600);
+  }
+}
+
+function showXPToast(text) {
+  const toast = document.createElement('div');
+  toast.className = 'prep-xp-toast';
+  toast.textContent = text;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 1600);
+}
+
+// ── Full Practice Exam Logic (Pro) ──
+function renderExamCards() {
+  const cards = document.getElementById('prep-exam-cards');
+  if (!cards) return;
+  const pro = isPro();
+  cards.innerHTML = `
+    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'sat\')' : 'showProGate()'}">
+      <h3>📝 Full SAT</h3>
+      <p><strong>20 questions</strong> · 50 min timer</p>
+      <p style="margin-top:8px;font-size:12px">Reading & Writing + Math sections</p>
+      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+    </div>
+    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'act\')' : 'showProGate()'}">
+      <h3>📋 Full ACT</h3>
+      <p><strong>40 questions</strong> · 55 min timer</p>
+      <p style="margin-top:8px;font-size:12px">English, Math, Reading & Science</p>
+      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+    </div>`;
+}
+
+function showProGate() {
+  showToast('This feature requires a Pro subscription. Upgrade to access full practice exams!', 'info');
+}
+
+function startExam(type) {
+  const questions = type === 'sat' ? [...SAT_EXAM_QUESTIONS] : [...ACT_EXAM_QUESTIONS];
+  const timeMinutes = type === 'sat' ? 50 : 55;
+  examState = {
+    type: type,
+    questions: questions,
+    current: 0,
+    answers: new Array(questions.length).fill(null),
+    correct: 0,
+    startTime: Date.now(),
+    timeLimit: timeMinutes * 60 * 1000,
+    finished: false
+  };
+  document.getElementById('prep-tabs').style.display = 'none';
+  document.getElementById('prep-diff-tabs').style.display = 'none';
+  document.getElementById('prep-exam-section').style.display = 'none';
+  document.getElementById('prep-score-predict').style.display = 'none';
+  startExamTimer();
+  loadExamQuestion();
+}
+
+function startExamTimer() {
+  if (examTimer) clearInterval(examTimer);
+  examTimer = setInterval(() => {
+    if (!examState || examState.finished) { clearInterval(examTimer); return; }
+    const elapsed = Date.now() - examState.startTime;
+    const remaining = Math.max(0, examState.timeLimit - elapsed);
+    if (remaining <= 0) { finishExam(); return; }
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const timerEl = document.getElementById('exam-timer-display');
+    if (timerEl) {
+      timerEl.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+      if (remaining < 300000) timerEl.style.color = 'var(--red)';
+    }
+  }, 1000);
+}
+
+function loadExamQuestion() {
+  const q = examState.questions[examState.current];
+  const progress = ((examState.current) / examState.questions.length * 100).toFixed(0);
+  const elapsed = Date.now() - examState.startTime;
+  const remaining = Math.max(0, examState.timeLimit - elapsed);
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  const area = document.getElementById('prep-question-area');
+  area.innerHTML = `
+    <div class="prep-exam-header">
+      <div>
+        <strong>${examState.type.toUpperCase()} Practice Exam</strong>
+        <span style="margin-left:12px;font-size:13px;color:var(--ink3)">${q.section}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="prep-exam-timer" id="exam-timer-display">${mins}:${secs.toString().padStart(2,'0')}</div>
+        <button class="prep-exam-quit" onclick="quitExam()">End Exam</button>
+      </div>
+    </div>
+    <div class="prep-exam-progress"><div class="prep-exam-progress-fill" style="width:${progress}%"></div></div>
+    <div class="prep-question-card">
+      <span class="prep-q-subject" style="background:var(--accent-light);color:var(--accent)">${q.section}</span>
+      <div style="float:right;font-size:12px;color:var(--ink3)">Question ${examState.current+1} of ${examState.questions.length}</div>
+      <div class="prep-q-text">${q.q}</div>
+      <div class="prep-options">
+        ${q.opts.map((o,i) => `<div class="prep-option" data-idx="${i}" onclick="selectPrepAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</div>`).join('')}
+      </div>
+      <div id="prep-explain" style="display:none"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="feat-btn feat-btn-primary" id="prep-next-btn" onclick="nextPrepQuestion()" style="display:none">${examState.current < examState.questions.length - 1 ? 'Next Question →' : 'Finish Exam'}</button>
+      </div>
+    </div>`;
+}
+
+function selectExamAnswer(idx) {
+  if (examState.answers[examState.current] !== null) return;
+  const q = examState.questions[examState.current];
+  examState.answers[examState.current] = idx;
+
+  const opts = document.querySelectorAll('.prep-option');
+  opts.forEach(o => { o.style.pointerEvents = 'none'; });
+  opts[q.answer].classList.add('correct');
+
+  const isCorrect = idx === q.answer;
+  if (isCorrect) examState.correct++;
+  else opts[idx].classList.add('wrong');
+
+  const explainDiv = document.getElementById('prep-explain');
+  explainDiv.style.display = 'block';
+  explainDiv.innerHTML = `<div class="prep-explanation">${isCorrect ? '✅ Correct!' : '❌ Incorrect.'} ${q.explain}</div>`;
+  document.getElementById('prep-next-btn').style.display = '';
+}
+
+function nextExamQuestion() {
+  if (examState.current >= examState.questions.length - 1) { finishExam(); return; }
+  examState.current++;
+  loadExamQuestion();
+}
+
+function finishExam() {
+  examState.finished = true;
+  if (examTimer) clearInterval(examTimer);
+  const total = examState.questions.length;
+  const correct = examState.correct;
+  const pct = Math.round((correct / total) * 100);
+  const elapsed = Date.now() - examState.startTime;
+  const minsUsed = Math.floor(elapsed / 60000);
+  const secsUsed = Math.floor((elapsed % 60000) / 1000);
+
+  let scoreDisplay = '';
+  if (examState.type === 'sat') {
+    const predicted = Math.min(Math.round(400 + (pct / 100) * 1200), 1600);
+    scoreDisplay = `<div class="prep-score-val">${predicted}</div><div class="prep-score-label">Predicted SAT Score (out of 1600)</div>`;
+  } else {
+    const predicted = Math.min(Math.round(1 + (pct / 100) * 35), 36);
+    scoreDisplay = `<div class="prep-score-val">${predicted}</div><div class="prep-score-label">Predicted ACT Score (out of 36)</div>`;
+  }
+
+  const sectionBreakdown = {};
+  examState.questions.forEach((q, i) => {
+    if (!sectionBreakdown[q.section]) sectionBreakdown[q.section] = { total: 0, correct: 0 };
+    sectionBreakdown[q.section].total++;
+    if (examState.answers[i] === q.answer) sectionBreakdown[q.section].correct++;
+  });
+  let breakdownHTML = Object.entries(sectionBreakdown).map(([sec, data]) => {
+    const secPct = Math.round((data.correct / data.total) * 100);
+    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${sec}</span><span><strong>${data.correct}/${data.total}</strong> (${secPct}%)</span></div>`;
+  }).join('');
+
+  const xpGain = Math.round(correct * 15 + (pct >= 80 ? 50 : 0));
+  prepState.xp += xpGain;
+  prepState.total += total;
+  prepState.correct += correct;
+  savePrepState();
+  updatePrepStats();
+
+  const area = document.getElementById('prep-question-area');
+  area.innerHTML = `
+    <div style="text-align:center;padding:30px">
+      <h2>${examState.type.toUpperCase()} Practice Exam Complete!</h2>
+      <div style="margin:20px 0">${scoreDisplay}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px auto;max-width:400px">
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${correct}/${total}</div><div style="font-size:12px;color:var(--ink3)">Correct</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${pct}%</div><div style="font-size:12px;color:var(--ink3)">Accuracy</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${minsUsed}m ${secsUsed}s</div><div style="font-size:12px;color:var(--ink3)">Time Used</div></div>
+      </div>
+      <div style="text-align:left;max-width:400px;margin:20px auto">
+        <h3 style="margin-bottom:8px">Section Breakdown</h3>
+        ${breakdownHTML}
+      </div>
+      <p style="margin-top:16px;color:var(--gold);font-weight:600">+${xpGain} XP earned${pct >= 80 ? ' (includes 50 XP bonus for 80%+ accuracy!)' : ''}</p>
+      <button class="feat-btn feat-btn-primary" onclick="exitExam()" style="margin-top:20px">Back to Practice</button>
+    </div>`;
+}
+
+function quitExam() {
+  if (confirm('Are you sure you want to end this exam? Your progress will be lost.')) finishExam();
+}
+
+function exitExam() {
+  examState = null;
+  if (examTimer) clearInterval(examTimer);
+  document.getElementById('prep-tabs').style.display = '';
+  document.getElementById('prep-diff-tabs').style.display = '';
+  document.getElementById('prep-exam-section').style.display = '';
+  loadPrepQuestion();
+  renderExamCards();
+}
+
+window.initPrep = initPrep;
+window.setPrepSubject = setPrepSubject;
+window.setPrepDifficulty = setPrepDifficulty;
+window.selectPrepAnswer = selectPrepAnswer;
+window.nextPrepQuestion = nextPrepQuestion;
+window.startExam = startExam;
+window.quitExam = quitExam;
+window.exitExam = exitExam;
+window.showProGate = showProGate;
+
+/* ============================================================
+   COLLEGE HEAD-TO-HEAD COMPARISON
+============================================================ */
+const COLLEGE_DATA = [
+  {name:'Harvard University',loc:'Cambridge, MA',accept:3.2,tuition:57261,size:7178,ranking:1,sat:'1490-1580',salary:95000,ratio:'5:1',type:'Private'},
+  {name:'Stanford University',loc:'Stanford, CA',accept:3.7,tuition:58416,size:8049,ranking:2,sat:'1500-1570',salary:97000,ratio:'5:1',type:'Private'},
+  {name:'MIT',loc:'Cambridge, MA',accept:3.5,tuition:59750,size:4638,ranking:3,sat:'1510-1580',salary:108000,ratio:'3:1',type:'Private'},
+  {name:'Yale University',loc:'New Haven, CT',accept:4.4,tuition:64700,size:6536,ranking:4,sat:'1470-1560',salary:89000,ratio:'6:1',type:'Private'},
+  {name:'Princeton University',loc:'Princeton, NJ',accept:3.7,tuition:59710,size:5604,ranking:5,sat:'1500-1570',salary:91000,ratio:'5:1',type:'Private'},
+  {name:'Columbia University',loc:'New York, NY',accept:3.9,tuition:66139,size:8902,ranking:6,sat:'1490-1560',salary:92000,ratio:'6:1',type:'Private'},
+  {name:'University of Chicago',loc:'Chicago, IL',accept:5.0,tuition:65619,size:7559,ranking:7,sat:'1500-1570',salary:87000,ratio:'5:1',type:'Private'},
+  {name:'Duke University',loc:'Durham, NC',accept:5.0,tuition:63054,size:6717,ranking:8,sat:'1470-1560',salary:88000,ratio:'6:1',type:'Private'},
+  {name:'Northwestern University',loc:'Evanston, IL',accept:5.6,tuition:63468,size:8659,ranking:9,sat:'1450-1540',salary:83000,ratio:'6:1',type:'Private'},
+  {name:'Johns Hopkins University',loc:'Baltimore, MD',accept:6.0,tuition:60480,size:5512,ranking:10,sat:'1470-1560',salary:81000,ratio:'6:1',type:'Private'},
+  {name:'UC Berkeley',loc:'Berkeley, CA',accept:11.6,tuition:14312,size:32143,ranking:15,sat:'1300-1520',salary:82000,ratio:'20:1',type:'Public'},
+  {name:'UCLA',loc:'Los Angeles, CA',accept:8.6,tuition:13401,size:32423,ranking:13,sat:'1290-1510',salary:74000,ratio:'18:1',type:'Public'},
+  {name:'University of Michigan',loc:'Ann Arbor, MI',accept:17.7,tuition:16736,size:33006,ranking:21,sat:'1340-1520',salary:75000,ratio:'15:1',type:'Public'},
+  {name:'Georgia Tech',loc:'Atlanta, GA',accept:16.0,tuition:12682,size:18584,ranking:28,sat:'1370-1530',salary:86000,ratio:'21:1',type:'Public'},
+  {name:'NYU',loc:'New York, NY',accept:12.2,tuition:60438,size:29401,ranking:30,sat:'1370-1530',salary:72000,ratio:'9:1',type:'Private'},
+  {name:'University of Virginia',loc:'Charlottesville, VA',accept:16.3,tuition:19846,size:17444,ranking:24,sat:'1350-1510',salary:73000,ratio:'15:1',type:'Public'},
+  {name:'Carnegie Mellon University',loc:'Pittsburgh, PA',accept:11.0,tuition:62260,size:7365,ranking:22,sat:'1460-1560',salary:96000,ratio:'5:1',type:'Private'},
+  {name:'USC',loc:'Los Angeles, CA',accept:9.9,tuition:66640,size:21000,ranking:25,sat:'1400-1530',salary:78000,ratio:'9:1',type:'Private'},
+  {name:'Vanderbilt University',loc:'Nashville, TN',accept:5.6,tuition:62694,size:7111,ranking:14,sat:'1460-1560',salary:79000,ratio:'7:1',type:'Private'},
+  {name:'Rice University',loc:'Houston, TX',accept:7.7,tuition:58128,size:4247,ranking:17,sat:'1470-1560',salary:82000,ratio:'6:1',type:'Private'},
+  {name:'University of Texas at Austin',loc:'Austin, TX',accept:28.7,tuition:11448,size:40804,ranking:38,sat:'1230-1480',salary:68000,ratio:'18:1',type:'Public'},
+  {name:'Boston University',loc:'Boston, MA',accept:11.3,tuition:65168,size:18515,ranking:36,sat:'1370-1510',salary:69000,ratio:'10:1',type:'Private'},
+  {name:'University of Florida',loc:'Gainesville, FL',accept:23.2,tuition:6380,size:34552,ranking:27,sat:'1310-1470',salary:64000,ratio:'17:1',type:'Public'},
+  {name:'Penn State University',loc:'State College, PA',accept:54.1,tuition:19286,size:40835,ranking:60,sat:'1160-1350',salary:62000,ratio:'15:1',type:'Public'},
+  {name:'University of Washington',loc:'Seattle, WA',accept:43.4,tuition:12076,size:36872,ranking:40,sat:'1240-1440',salary:71000,ratio:'21:1',type:'Public'},
+  {name:'Purdue University',loc:'West Lafayette, IN',accept:53.0,tuition:10002,size:37101,ranking:51,sat:'1180-1410',salary:67000,ratio:'13:1',type:'Public'},
+  {name:'Arizona State University',loc:'Tempe, AZ',accept:88.4,tuition:12124,size:65174,ranking:117,sat:'1080-1310',salary:57000,ratio:'22:1',type:'Public'},
+  {name:'Ohio State University',loc:'Columbus, OH',accept:52.6,tuition:11936,size:46818,ranking:43,sat:'1220-1410',salary:63000,ratio:'19:1',type:'Public'},
+  {name:'Brown University',loc:'Providence, RI',accept:5.0,tuition:65146,size:7160,ranking:11,sat:'1470-1560',salary:80000,ratio:'6:1',type:'Private'},
+  {name:'Cornell University',loc:'Ithaca, NY',accept:7.3,tuition:65204,size:15503,ranking:12,sat:'1450-1540',salary:84000,ratio:'9:1',type:'Private'},
+];
+
+let compareSlots = [null, null, null];
+let compareActiveSlot = -1;
+
+function openCompareSearch(slot) {
+  compareActiveSlot = slot;
+  const box = document.getElementById('compare-search-box');
+  box.style.display = 'block';
+  const input = document.getElementById('compare-search-input');
+  input.value = '';
+  input.focus();
+  filterCompareColleges();
+}
+
+function filterCompareColleges() {
+  const query = document.getElementById('compare-search-input').value.toLowerCase();
+  const dropdown = document.getElementById('compare-dropdown');
+  const selected = compareSlots.filter(Boolean).map(c => c.name);
+  const filtered = COLLEGE_DATA.filter(c => c.name.toLowerCase().includes(query) && !selected.includes(c.name));
+  if (filtered.length > 0 && query.length > 0) {
+    dropdown.innerHTML = filtered.slice(0, 8).map(c =>
+      `<div class="compare-drop-item" onclick="selectCompareCollege('${c.name}')">${c.name} <span style="color:var(--ink3);font-size:11px">${c.loc}</span></div>`
+    ).join('');
+    dropdown.classList.add('show');
+  } else if (query.length === 0) {
+    dropdown.innerHTML = COLLEGE_DATA.filter(c => !selected.includes(c.name)).slice(0, 8).map(c =>
+      `<div class="compare-drop-item" onclick="selectCompareCollege('${c.name}')">${c.name} <span style="color:var(--ink3);font-size:11px">${c.loc}</span></div>`
+    ).join('');
+    dropdown.classList.add('show');
+  } else {
+    dropdown.classList.remove('show');
+  }
+}
+
+function selectCompareCollege(name) {
+  const college = COLLEGE_DATA.find(c => c.name === name);
+  if (!college || compareActiveSlot < 0) return;
+  compareSlots[compareActiveSlot] = college;
+  const slot = document.getElementById('compare-slot-' + compareActiveSlot);
+  slot.classList.add('filled');
+  document.getElementById('compare-name-' + compareActiveSlot).textContent = college.name;
+  slot.querySelector('.slot-hint').textContent = college.loc;
+  document.getElementById('compare-search-box').style.display = 'none';
+  document.getElementById('compare-dropdown').classList.remove('show');
+  // If at least 2 selected, show comparison
+  const filled = compareSlots.filter(Boolean);
+  if (filled.length >= 2) renderComparison();
+}
+
+function renderComparison() {
+  const filled = compareSlots.filter(Boolean);
+  if (filled.length < 2) return;
+  document.getElementById('compare-results').style.display = '';
+
+  // Render table
+  const colors = ['var(--accent)', 'var(--blue)', 'var(--green)'];
+  const metrics = [
+    {label:'Location', key:'loc'},
+    {label:'Type', key:'type'},
+    {label:'Acceptance Rate', key:'accept', fmt: v => v+'%'},
+    {label:'Tuition/Year', key:'tuition', fmt: v => '$'+v.toLocaleString()},
+    {label:'Enrollment', key:'size', fmt: v => v.toLocaleString()},
+    {label:'US News Ranking', key:'ranking', fmt: v => '#'+v},
+    {label:'SAT Range', key:'sat'},
+    {label:'Avg Salary After', key:'salary', fmt: v => '$'+v.toLocaleString()},
+    {label:'Student:Faculty', key:'ratio'},
+  ];
+  let html = '<thead><tr><th></th>';
+  filled.forEach((c,i) => html += `<th style="color:${colors[i]}">${c.name}</th>`);
+  html += '</tr></thead><tbody>';
+  metrics.forEach(m => {
+    html += '<tr><td>' + m.label + '</td>';
+    filled.forEach(c => {
+      const v = c[m.key];
+      html += '<td>' + (m.fmt ? m.fmt(v) : v) + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('compare-table').innerHTML = html;
+
+  // Render radar chart
+  drawRadarChart(filled, colors);
+}
+
+function drawRadarChart(colleges, colors) {
+  const canvas = document.getElementById('compare-radar');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2, R = 150;
+  ctx.clearRect(0, 0, W, H);
+
+  const axes = [
+    {label:'Selectivity', key:'accept', invert:true, max:100},
+    {label:'Affordability', key:'tuition', invert:true, max:70000},
+    {label:'Ranking', key:'ranking', invert:true, max:120},
+    {label:'Size', key:'size', invert:false, max:70000},
+    {label:'Salary', key:'salary', invert:false, max:110000},
+  ];
+  const n = axes.length;
+
+  // Draw grid
+  for (let ring = 1; ring <= 5; ring++) {
+    ctx.beginPath();
+    const r = (ring/5) * R;
+    for (let i = 0; i <= n; i++) {
+      const angle = (Math.PI * 2 * i / n) - Math.PI/2;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.stroke();
+  }
+
+  // Draw axes labels
+  ctx.font = '11px Outfit, sans-serif';
+  ctx.fillStyle = '#8a847b';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < n; i++) {
+    const angle = (Math.PI * 2 * i / n) - Math.PI/2;
+    const lx = cx + (R + 28) * Math.cos(angle);
+    const ly = cy + (R + 28) * Math.sin(angle);
+    ctx.fillText(axes[i].label, lx, ly + 4);
+  }
+
+  // Draw college polygons
+  const colorVals = ['rgba(200,98,42,0.3)', 'rgba(30,79,163,0.3)', 'rgba(42,110,69,0.3)'];
+  const colorStrokes = ['#c8622a', '#1e4fa3', '#2a6e45'];
+  colleges.forEach((college, ci) => {
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const ax = axes[i % n];
+      let val = college[ax.key];
+      let norm = val / ax.max;
+      if (ax.invert) norm = 1 - norm;
+      norm = Math.max(0.05, Math.min(1, norm));
+      const angle = (Math.PI * 2 * (i % n) / n) - Math.PI/2;
+      const x = cx + (norm * R) * Math.cos(angle);
+      const y = cy + (norm * R) * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = colorVals[ci];
+    ctx.fill();
+    ctx.strokeStyle = colorStrokes[ci];
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Legend
+  colleges.forEach((c, i) => {
+    ctx.fillStyle = colorStrokes[i];
+    ctx.fillRect(10, 10 + i * 20, 12, 12);
+    ctx.fillStyle = '#1a1714';
+    ctx.textAlign = 'left';
+    ctx.font = '12px Outfit, sans-serif';
+    ctx.fillText(c.name, 28, 20 + i * 20);
+  });
+}
+
+function resetComparison() {
+  compareSlots = [null, null, null];
+  for (let i = 0; i < 3; i++) {
+    const slot = document.getElementById('compare-slot-' + i);
+    slot.classList.remove('filled');
+    document.getElementById('compare-name-' + i).textContent = i < 2 ? '+ Add College' : '+ Add College (optional)';
+    slot.querySelector('.slot-hint').textContent = 'Click to search';
+  }
+  document.getElementById('compare-results').style.display = 'none';
+  document.getElementById('compare-search-box').style.display = 'none';
+}
+
+function shareComparison() {
+  const filled = compareSlots.filter(Boolean);
+  if (filled.length < 2) return;
+  const text = '⚖️ College Comparison: ' + filled.map(c => c.name).join(' vs ') + '\n' +
+    filled.map(c => `${c.name}: #${c.ranking} ranked, ${c.accept}% accept rate, $${c.tuition.toLocaleString()}/yr`).join('\n') +
+    '\n\nCompare colleges at GradeScope!';
+  if (navigator.share) {
+    navigator.share({ title: 'College Comparison', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('Comparison copied to clipboard!'));
+  }
+}
+
+window.openCompareSearch = openCompareSearch;
+window.filterCompareColleges = filterCompareColleges;
+window.selectCompareCollege = selectCompareCollege;
+window.resetComparison = resetComparison;
+window.shareComparison = shareComparison;
 
 /* ============================================================
    INIT
