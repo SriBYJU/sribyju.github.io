@@ -563,6 +563,14 @@ function getEmailHTML(tip, weekNum) {
     .tip-num{display:inline-block;width:24px;height:24px;background:#c8622a;color:white;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0}
     .tip-row{display:flex;align-items:flex-start;gap:0}
     .cta{display:inline-block;padding:12px 24px;background:#c8622a;color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;margin:24px 0}
+    .pro-box{background:#fdf0e8;border:1px solid #f5d5c0;border-radius:10px;padding:20px;margin:28px 0 8px;text-align:center}
+    .pro-box h3{margin:0 0 8px;font-size:16px;color:#c8622a;font-weight:700}
+    .pro-box p{margin:0 0 14px;font-size:13px;color:#1a1714}
+    .pro-box ul{list-style:none;padding:0;margin:0 0 16px;font-size:13px;color:#1a1714;text-align:left;display:inline-block}
+    .pro-box ul li{padding:3px 0}
+    .pro-cta{display:inline-block;padding:10px 20px;background:#c8622a;color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px}
+    .signoff{padding:24px 0 0;font-size:14px;color:#1a1714;line-height:1.7}
+    .signoff .name{font-weight:700}
     .footer{text-align:center;padding:24px 0;border-top:1px solid #f3f1ec;font-size:12px;color:#8a847b}
     .footer a{color:#c8622a;text-decoration:underline}
   </style>
@@ -585,6 +593,22 @@ function getEmailHTML(tip, weekNum) {
       </div>`).join('')}
       <div style="text-align:center">
         <a href="https://gradescope.app" class="cta">Open GradeScope &rarr;</a>
+      </div>
+      <div class="pro-box">
+        <h3>&#10024; Want to take it further?</h3>
+        <p>With <strong>GradeScope Pro</strong>, you get tools most students don't have access to:</p>
+        <ul>
+          <li>&#10003; <strong>AI Essay Coach</strong> &mdash; real-time feedback on your essays</li>
+          <li>&#10003; <strong>Scholarship Finder</strong> &mdash; matched to your profile</li>
+          <li>&#10003; <strong>Study Planner</strong> &mdash; never miss a deadline again</li>
+          <li>&#10003; <strong>College Compatibility Quiz</strong> &mdash; find your perfect fit</li>
+        </ul>
+        <a href="https://gradescope.app" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
+      </div>
+      <div class="signoff">
+        <p>Regards,</p>
+        <p class="name">Shriyan Avadhanula</p>
+        <p style="color:#8a847b;font-size:13px">A student just like you.</p>
       </div>
     </div>
     <div class="footer">
