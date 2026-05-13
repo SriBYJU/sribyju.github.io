@@ -1779,28 +1779,32 @@ onAuthStateChanged(auth, async (user) => {
   window.currentUser = user || null;
   window._gsUser = user || null;
 
-  // DB calls are in a try/catch so a Firestore error never prevents UI updates
+  // Expose DB helpers for dashboard (sync — no await needed)
+  window._dbGetSaved = (uid) => DB.getSaved(uid);
+  window._dbDeleteSaved = (uid, id) => DB.deleteSaved(uid, id);
+
+  // Update UI immediately so nav/dashboard/profile respond without
+  // waiting on Firestore (which may be slow or offline).
+  if (typeof updateNavForUser === 'function') updateNavForUser();
+  if (typeof updateEssayPage === 'function') updateEssayPage();
+  if (typeof renderDashboard === 'function') renderDashboard();
+  if (typeof renderProfilePage === 'function') renderProfilePage();
+
+  // DB sync runs in the background; on success re-render profile-
+  // sensitive views so plan badges etc. pick up the Firestore data.
   if (user) {
     try {
       await DB.setCurrentUser(user);
       const profile = await DB.getUserProfile(user.uid);
       window._gsProfile = profile;
+      if (typeof renderProfilePage === 'function') renderProfilePage();
+      if (typeof renderDashboard === 'function') renderDashboard();
     } catch (e) {
       console.error('Auth-state DB sync error:', e);
     }
   } else {
     window._gsProfile = null;
   }
-
-  // Expose DB helpers for dashboard
-  window._dbGetSaved = (uid) => DB.getSaved(uid);
-  window._dbDeleteSaved = (uid, id) => DB.deleteSaved(uid, id);
-
-  // Re-run the nav + UI update that the rest of the code uses
-  if (typeof updateNavForUser === 'function') updateNavForUser();
-  if (typeof updateEssayPage === 'function') updateEssayPage();
-  if (typeof renderDashboard === 'function') renderDashboard();
-  if (typeof renderProfilePage === 'function') renderProfilePage();
 });
 
 /* ============================================================
