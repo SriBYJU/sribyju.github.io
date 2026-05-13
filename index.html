@@ -1641,6 +1641,8 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import {
@@ -1860,9 +1862,22 @@ window.handleGoogleAuth = async function() {
     closeAuth();
     showToast('✓ Signed in with Google!');
   } catch (e) {
-    if (e.code !== 'auth/popup-closed-by-user') showErr(firebaseErrMsg(e.code));
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+      try { await signInWithRedirect(auth, googleProvider); } catch (e2) { showErr(firebaseErrMsg(e2.code)); }
+    } else if (e.code !== 'auth/popup-closed-by-user') {
+      showErr(firebaseErrMsg(e.code));
+    }
   }
 };
+
+// Handle Google redirect result on page load
+getRedirectResult(auth).then(result => {
+  if (result?.user) {
+    DB.setCurrentUser(result.user);
+    closeAuth();
+    showToast('✓ Signed in with Google!');
+  }
+}).catch(() => {});
 
 // Sign out
 window.handleSignOut = async function() {
@@ -1881,6 +1896,9 @@ function firebaseErrMsg(code) {
     'auth/invalid-credential':      'Incorrect email or password.',
     'auth/too-many-requests':       'Too many attempts. Please wait a moment.',
     'auth/popup-closed-by-user':    'Google sign-in was cancelled.',
+    'auth/popup-blocked':            'Popup was blocked. Allow popups for this site or try again.',
+    'auth/unauthorized-domain':      'This domain is not authorized for Google sign-in. Add it in Firebase Console → Authentication → Settings.',
+    'auth/operation-not-allowed':    'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.',
     'auth/network-request-failed':  'Network error. Check your connection.'
   };
   return map[code] || 'Something went wrong. Please try again.';
@@ -1891,7 +1909,11 @@ function firebaseErrMsg(code) {
    Reads from window._gsProfile (set by onAuthStateChanged)
    so they stay synchronous like the original code expects.
 ============================================================ */
+const ADMIN_EMAILS = ['admin@gradescope.app'];
+
 window.getUserPlan = function() {
+  const email = window.currentUser?.email;
+  if (email && ADMIN_EMAILS.includes(email.toLowerCase())) return 'pro';
   return window._gsProfile?.plan || 'free';
 };
 
