@@ -1,74 +1,57 @@
 ---
 name: testing-gradescope
-description: Test GradeScope features end-to-end in the browser. Use when verifying UI, Pro gating, calculators, or new feature PRs.
+description: Test GradeScope app end-to-end. Covers local server setup, auth flows, Pro feature gating, SAT/ACT Prep, essay save/load, and UI verification.
 ---
 
 # Testing GradeScope
 
-## Architecture
+## Local Server Setup
 
-- **Single-file app**: Everything is in `index.html` (~4700+ lines of HTML/CSS/JS)
-- **Backend**: Firebase Auth + Firestore (client-side SDK)
-- **Storage**: localStorage for transient state (SAT Prep progress, dark mode, email subs), Firestore for user profiles
-- **Feature gating**: `isPro()` function checks `getUserPlan()` which returns `'pro'` for admin emails
+1. Start a local server from the repo root:
+   ```bash
+   cd /home/ubuntu/repos/GradeScope && python3 -m http.server 8080 &
+   ```
+2. Verify: `curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/index.html` should return `200`
+3. The entire app is a single `index.html` file — all HTML, CSS, and JS in one file
 
-## Running Locally
+## Auth Testing
 
-```bash
-cd /home/ubuntu/repos/GradeScope
-python3 -m http.server 8080
-# Open http://localhost:8080/index.html
-```
+- **Admin account**: `admin@gradescope.app` / `GradeScope2026!` (has Pro access)
+- `isPro()` checks `window.currentUser?.email === 'admin@gradescope.app'`
+- After login, nav should show "Admin ▾" (or display name + ▾) instead of "Sign In"
+- Auth state comes from Firebase — the `onAuthStateChanged` handler updates `window.currentUser`
+- **Gotcha**: If you sign in/out without navigating away from the current page section, some UI elements (like exam card onclick handlers) may have stale state. Navigate away and back to force re-render via the section's `init` function
+
+## Pro Feature Gating
+
+- Pro features: AI Essay Coach, College Quiz, AI Counselor, Full Practice Exams (SAT/ACT)
+- Non-Pro users should see a toast: "This feature requires a Pro subscription. Upgrade to access full practice exams!"
+- Pro gate exists in two layers: (1) card onclick handler in render functions, (2) defensive check inside the feature function itself (e.g. `startExam()`)
+- To test Pro gate: sign out → navigate to feature → click the locked card → verify toast appears and feature does NOT activate
+
+## SAT/ACT Prep Testing
+
+- **Practice questions**: 66 total (26 easy, 20 medium, 20 hard) across Math, Reading, Writing
+- **Difficulty filters**: Easy (🟢 1x XP), Medium (🟡 1.5x XP), Hard (🔴 2x XP)
+- **XP tracking**: Correct answer = 10 × multiplier. Stats stored in `localStorage` key `gs_prep_state`
+- **Full SAT Exam** (Pro): 20 questions, 50 min timer
+- **Full ACT Exam** (Pro): 40 questions, 55 min timer
+- **Gotcha**: Native `confirm()` dialogs (e.g. "End Exam" button) block browser tool interactions. Dismiss with `xdotool key Return` from shell
+- To clear prep state for fresh testing: `localStorage.removeItem('gs_prep_state')` in browser console
+
+## Essay Save/Load Testing
+
+- Essays save to `localStorage` keyed by user UID
+- Test flow: write essay → save → sign out → sign in → verify essay in saved list → load → verify text restored → delete → verify removed
+- Firestore sync may hang due to security rules — localStorage is the primary storage
+
+## Common Gotchas
+
+- **Stale UI after auth change**: Section-specific UI (exam cards, Pro badges) doesn't auto-update on sign-in/out. Navigate away and back to trigger the section's init function
+- **Firestore offline errors**: Firestore may show offline/timeout errors in console — this is expected if security rules aren't configured. Features fall back to localStorage
+- **Dark mode**: Toggle at bottom-right corner. State persists in localStorage key `gs_dark_mode`
+- **Mobile testing**: Use browser DevTools to set viewport to 375px width for phone simulation
 
 ## Devin Secrets Needed
 
-No secrets required for basic testing. The app uses Firebase client-side auth which works without server credentials.
-
-## Test Accounts
-
-- **Admin (Pro)**: `admin@gradescope.app` / `GradeScope2026!`
-  - Has all Pro features unlocked via `ADMIN_EMAILS` constant
-  - No trial/subscription needed — `getUserPlan()` returns `'pro'` immediately
-- You can create test accounts via the signup form (free tier)
-
-## Key Testing Patterns
-
-### Pro Feature Gating
-- Pro features: AI Essay Coach, AI Counselor, Study Planner, Scholarship Finder, College Quiz (full results)
-- Free features: GPA calculators, SAT Prep, College Comparison, Dark Mode, Community Q&A
-- Gate check: `isPro()` → `getUserPlan()` → checks `ADMIN_EMAILS` array first, then `window._gsProfile?.plan`
-- Admin email bypasses all plan checks
-
-### localStorage-Dependent Features
-- **SAT Prep**: State stored in `gs_prep_state` key — clear with `localStorage.removeItem('gs_prep_state')` before testing to get fresh state
-- **Dark Mode**: Stored in `gs_dark_mode` key
-- **Email subscriptions**: Stored in `gs_email_subs` key
-- Always clear relevant localStorage before testing to ensure clean initial state
-
-### Navigation Entry Points
-All features are accessible from 3 places:
-1. **Nav bar** (top): Direct buttons for major features
-2. **Hero section** (home page): "Jump to a calculator" cards
-3. **Profile dropdown** (when logged in): Full feature menu
-
-### Known Issues
-- **AI features (Essay Coach, AI Counselor) lack API keys**: The fetch calls to `api.anthropic.com` are missing the `x-api-key` header. They will fail with a graceful error message. Test the UI flow and error handling, not the AI response content.
-- **Firestore may timeout**: If Firestore rules aren't configured, DB calls may hang. The app uses localStorage fallbacks for most features, so core functionality still works.
-- **Google Sign-In**: Requires the Google provider to be enabled in Firebase Console. If not enabled, the popup will fail (but error message should be visible).
-
-## Testing Checklist
-
-1. **Auth flow**: Sign up → verify modal closes + nav updates → sign out → sign in → verify persistence
-2. **Pro gating**: Sign in as admin → verify Pro features show content (not upgrade prompt)
-3. **SAT Prep**: Clear localStorage → answer 5+ questions → verify XP/streak/accuracy math → verify score prediction appears after exactly 5 questions
-4. **College Comparison**: Select 2 colleges → verify radar chart renders (non-blank canvas) → verify data table matches `COLLEGE_DATA` constants → verify reset clears state
-5. **Mobile**: Test at 375px viewport width — verify no horizontal overflow, inputs stack properly
-6. **Dark mode**: Toggle → verify persistence after refresh
-
-## Tips
-
-- The app is a single HTML file — use browser search or grep with line numbers to find specific functions
-- `showPage('pagename')` is the navigation function — each feature has a page ID
-- Score prediction formula: `min(400 + (accuracy% / 100) * 1200, 1600)` — verify with known inputs
-- When testing newsletter checkbox on signup, it's required — unchecking blocks account creation
-- No CI is configured on this repo, so all testing is manual browser-based
+No secrets required for local testing. Firebase auth works client-side with the embedded config.
