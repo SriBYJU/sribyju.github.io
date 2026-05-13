@@ -22,6 +22,22 @@
   --font-display:'Playfair Display',serif;--font-body:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace;
   --transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
 }
+/* DARK MODE */
+[data-theme="dark"]{
+  --bg:#1a1714;--bg2:#252220;--bg3:#302d28;
+  --ink:#f0ede8;--ink2:#b8b3ab;--ink3:#8a847b;
+  --accent:#e8a87c;--accent2:#c8622a;--accent-light:#3d2a1f;
+  --green-light:#1a3326;--blue-light:#1a2a40;--red-light:#3d1a1a;--gold-light:#3d3010;
+  --border:rgba(240,237,232,0.12);--border2:rgba(240,237,232,0.06);
+  --shadow:0 2px 12px rgba(0,0,0,0.3);--shadow-lg:0 8px 32px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] nav{background:rgba(26,23,20,0.92)}
+[data-theme="dark"] .pricing-card{background:var(--bg2)}
+[data-theme="dark"] .auth-modal{background:var(--bg)}
+[data-theme="dark"] .profile-menu{background:var(--bg2)}
+[data-theme="dark"] input,[data-theme="dark"] textarea,[data-theme="dark"] select{background:var(--bg2);color:var(--ink);border-color:var(--border)}
+.dark-toggle{position:fixed;bottom:24px;right:24px;z-index:999;width:44px;height:44px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow);transition:var(--transition)}
+.dark-toggle:hover{transform:scale(1.1);box-shadow:var(--shadow-lg)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
@@ -419,6 +435,180 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   nav .nav-links .nav-link:not(.active){display:none}
   .trial-banner{padding:10px 20px;flex-wrap:wrap;gap:6px}
 }
+
+/* ── NEW FEATURE STYLES ───────────────────────────────── */
+/* FEATURE SECTION (reusable) */
+.feat-section{max-width:900px;margin:0 auto;padding:40px}
+.feat-header{text-align:center;margin-bottom:32px}
+.feat-header h1{font-family:var(--font-display);font-size:36px;color:var(--ink);margin-bottom:8px}
+.feat-header p{font-size:15px;color:var(--ink2);max-width:600px;margin:0 auto}
+.feat-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+[data-theme="dark"] .feat-card{background:var(--bg2)}
+.feat-card h3{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px}
+.feat-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em}
+.feat-badge.pro{background:var(--gold-light);color:var(--gold);border:1px solid rgba(184,134,11,.2)}
+.feat-badge.free{background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,.2)}
+.feat-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font-body);transition:var(--transition)}
+.feat-btn-primary{background:var(--accent);color:white}.feat-btn-primary:hover{background:#b5571f}
+.feat-btn-secondary{background:var(--bg2);color:var(--ink2);border:1px solid var(--border)}.feat-btn-secondary:hover{background:var(--bg3)}
+.feat-btn-danger{background:var(--red-light);color:var(--red)}.feat-btn-danger:hover{background:#f8d0d0}
+.feat-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:var(--transition)}
+.feat-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.feat-select{padding:8px 12px;border-radius:8px;border:1px solid var(--border);font-family:var(--font-body);font-size:13px;color:var(--ink);background:var(--bg);cursor:pointer;outline:none}
+.feat-grid{display:grid;gap:16px}
+.feat-grid-2{grid-template-columns:1fr 1fr}
+.feat-grid-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:768px){.feat-grid-2,.feat-grid-3{grid-template-columns:1fr}}
+.feat-empty{text-align:center;padding:40px 20px;color:var(--ink3);font-size:14px}
+.feat-empty span{font-size:40px;display:block;margin-bottom:12px}
+.premium-gate{text-align:center;padding:60px 24px;background:var(--bg2);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.premium-gate h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px}
+.premium-gate p{color:var(--ink2);font-size:14px;margin-bottom:16px}
+
+/* GPA GOAL TRACKER */
+.goal-meter{position:relative;width:200px;height:200px;margin:0 auto 20px}
+.goal-meter svg{transform:rotate(-90deg)}
+.goal-meter-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.goal-meter-val{font-size:32px;font-weight:700;font-family:var(--font-mono);color:var(--ink)}
+.goal-meter-label{font-size:12px;color:var(--ink3)}
+.goal-scenario{display:flex;gap:8px;align-items:center;padding:10px;border-radius:8px;background:var(--bg2);margin-bottom:8px;font-size:13px}
+.goal-scenario input,.goal-scenario select{padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-family:var(--font-body);font-size:13px;flex:1;min-width:0}
+
+/* STUDY PLANNER */
+.planner-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px}
+.planner-day{padding:8px 4px;text-align:center;font-size:12px;border-radius:6px;cursor:pointer;transition:var(--transition);min-height:60px}
+.planner-day:hover{background:var(--bg3)}
+.planner-day.today{background:var(--accent-light);font-weight:700;color:var(--accent)}
+.planner-day.has-task{position:relative}.planner-day.has-task::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.planner-day-head{font-weight:600;color:var(--ink3);font-size:11px;text-transform:uppercase}
+.task-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;transition:var(--transition)}
+.task-item:hover{border-color:var(--accent)}
+.task-item.done{opacity:.5;text-decoration:line-through}
+.task-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.task-check.checked{background:var(--green);border-color:var(--green);color:white;font-size:11px}
+.task-priority{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-priority.high{background:var(--red)}.task-priority.medium{background:var(--gold)}.task-priority.low{background:var(--green)}
+
+/* APPLICATION TRACKER */
+.app-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;background:white;transition:var(--transition)}
+[data-theme="dark"] .app-card{background:var(--bg2)}
+.app-card:hover{box-shadow:var(--shadow)}
+.app-status{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600}
+.app-status.not-started{background:var(--bg2);color:var(--ink3)}
+.app-status.in-progress{background:var(--blue-light);color:var(--blue)}
+.app-status.submitted{background:var(--gold-light);color:var(--gold)}
+.app-status.accepted{background:var(--green-light);color:var(--green)}
+.app-status.rejected{background:var(--red-light);color:var(--red)}
+.app-status.waitlisted{background:#f0e8ff;color:#6b3fa0}
+.app-deadline{font-size:12px;color:var(--ink3)}
+.app-deadline.urgent{color:var(--red);font-weight:600}
+
+/* SCHOLARSHIP FINDER */
+.scholarship-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:white}
+[data-theme="dark"] .scholarship-card{background:var(--bg2)}
+.scholarship-amount{font-size:24px;font-weight:700;font-family:var(--font-mono);color:var(--green)}
+.scholarship-match{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;background:var(--green-light);color:var(--green)}
+
+/* SHARE CARD */
+.share-card{width:400px;max-width:100%;padding:32px;border-radius:var(--radius-lg);text-align:center;margin:0 auto}
+.share-card-gradient{background:linear-gradient(135deg,#c8622a,#e8a87c,#b8860b)}
+.share-card h2{font-family:var(--font-display);color:white;font-size:28px;margin-bottom:4px}
+.share-card p{color:rgba(255,255,255,.85);font-size:13px}
+.share-card .share-val{font-size:48px;font-weight:700;color:white;font-family:var(--font-mono);margin:16px 0}
+.share-card .share-sub{font-size:12px;color:rgba(255,255,255,.7)}
+.share-actions{display:flex;gap:8px;justify-content:center;margin-top:16px}
+
+/* PROGRESS DASHBOARD */
+.streak-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:100px;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:14px;border:1px solid rgba(200,98,42,.2)}
+.streak-fire{font-size:20px}
+.progress-stat{text-align:center;padding:20px}
+.progress-stat .stat-val{font-size:28px;font-weight:700;color:var(--ink);font-family:var(--font-mono)}
+.progress-stat .stat-label{font-size:12px;color:var(--ink3);margin-top:2px}
+.activity-dot{width:12px;height:12px;border-radius:2px;display:inline-block}
+.activity-grid{display:flex;gap:3px;flex-wrap:wrap}
+
+/* COMMUNITY Q&A */
+.qa-post{border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;background:white;transition:var(--transition)}
+[data-theme="dark"] .qa-post{background:var(--bg2)}
+.qa-post:hover{box-shadow:var(--shadow)}
+.qa-votes{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px}
+.qa-vote-btn{background:none;border:none;cursor:pointer;font-size:16px;color:var(--ink3);transition:var(--transition);padding:2px}
+.qa-vote-btn:hover{color:var(--accent)}
+.qa-vote-btn.voted{color:var(--accent)}
+.qa-vote-count{font-weight:700;font-size:14px;color:var(--ink)}
+.qa-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg2);color:var(--ink3);margin-right:4px}
+.qa-reply{margin-left:40px;padding:12px;border-left:2px solid var(--border);margin-top:8px}
+
+/* EMAIL CAPTURE */
+.email-capture{background:linear-gradient(135deg,var(--accent-light),var(--blue-light));border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;text-align:center;margin:32px 0}
+.email-capture h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px}
+.email-capture p{color:var(--ink2);font-size:14px;margin-bottom:16px}
+.email-capture-form{display:flex;gap:8px;max-width:400px;margin:0 auto}
+
+/* COLLEGE QUIZ */
+.quiz-progress{height:6px;background:var(--bg3);border-radius:100px;margin-bottom:24px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease}
+.quiz-question{font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:20px;text-align:center}
+.quiz-options{display:grid;gap:10px;max-width:500px;margin:0 auto}
+.quiz-option{padding:14px 20px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;text-align:left;background:white;transition:var(--transition);font-family:var(--font-body)}
+[data-theme="dark"] .quiz-option{background:var(--bg2)}
+.quiz-option:hover{border-color:var(--accent);background:var(--accent-light)}
+.quiz-option.selected{border-color:var(--accent);background:var(--accent-light);font-weight:600}
+.quiz-result-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:center;transition:var(--transition)}
+.quiz-result-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.quiz-match-pct{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.quiz-match-bar{height:6px;background:var(--bg3);border-radius:100px;margin:8px 0;overflow:hidden}
+.quiz-match-bar-fill{height:100%;border-radius:100px;background:var(--accent);transition:width 1s ease}
+
+/* SIGNUP CHECKBOX */
+.signup-checkbox-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink2);cursor:pointer;text-align:left}
+.signup-checkbox-row input[type="checkbox"]{margin-top:2px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+
+/* ── MOBILE RESPONSIVE — NEW FEATURES ─────────────────── */
+@media(max-width:768px){
+  .feat-section{padding:24px 16px}
+  .feat-header h1{font-size:26px}
+  .feat-header p{font-size:13px}
+  .feat-card{padding:16px}
+  .goal-meter{width:160px;height:160px}
+  .goal-meter-val{font-size:26px}
+  .goal-scenario{flex-wrap:wrap}
+  .goal-scenario input,.goal-scenario select{min-width:60px}
+  .planner-cal{gap:1px}
+  .planner-day{padding:6px 2px;font-size:10px;min-height:44px}
+  .planner-day-head{font-size:9px}
+  .app-card{padding:12px}
+  .share-card{width:100%;padding:24px}
+  .share-card .share-val{font-size:36px}
+  .share-actions{flex-wrap:wrap}
+  .qa-reply{margin-left:16px;padding:10px}
+  .qa-post{padding:12px}
+  .quiz-question{font-size:18px}
+  .quiz-option{padding:12px 16px;font-size:13px}
+  .quiz-result-card{padding:14px}
+  .quiz-match-pct{font-size:22px}
+  .email-capture{padding:20px}
+  .email-capture h3{font-size:20px}
+  .email-capture-form{flex-direction:column}
+  .scholarship-card{padding:12px}
+  .scholarship-amount{font-size:20px}
+  .streak-badge{font-size:12px;padding:4px 12px}
+  .progress-stat .stat-val{font-size:22px}
+  .activity-dot{width:10px;height:10px}
+  .premium-gate{padding:40px 16px}
+  .premium-gate h3{font-size:20px}
+}
+@media(max-width:480px){
+  .feat-section{padding:16px 12px}
+  .feat-header h1{font-size:22px}
+  .planner-day{padding:4px 1px;font-size:9px;min-height:36px}
+  .goal-meter{width:140px;height:140px}
+  .goal-meter-val{font-size:22px}
+  .quiz-options{gap:8px}
+  .quiz-option{padding:10px 12px;font-size:12px}
+  nav .nav-links{gap:4px}
+  .modal-box{padding:20px}
+}
 </style>
 </head>
 <body>
@@ -451,6 +641,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <label class="field-label">Password</label>
         <input type="password" id="signup-password" placeholder="Min. 6 characters">
       </div>
+      <label class="signup-checkbox-row">
+        <input type="checkbox" id="signup-newsletter" checked>
+        <span>Send me weekly college tips & deadline reminders (you can unsubscribe anytime)</span>
+      </label>
       <button class="auth-btn" onclick="handleSignup()">Create Free Account →</button>
       <div class="auth-divider">or</div>
       <button class="auth-social-btn" onclick="handleGoogleAuth()">
@@ -525,6 +719,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button>
     <button class="nav-link" id="nav-tools" onclick="goToTools()">Calculators</button>
     <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay AI ✦</button>
+    <button class="nav-link" id="nav-goals" onclick="showPage('goals')">Goals</button>
     <button class="nav-link" id="nav-premium" onclick="showPage('premium')">Pricing</button>
     <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
     <button class="nav-link" id="nav-dashboard" onclick="goDashboard()" style="display:none">Dashboard</button>
@@ -534,6 +729,13 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <div class="profile-menu" id="profile-menu">
         <button class="profile-menu-item" onclick="showPage('profile');toggleProfileMenu()">👤 Profile</button>
         <button class="profile-menu-item" onclick="goDashboard();toggleProfileMenu()">📊 Dashboard</button>
+        <button class="profile-menu-item" onclick="showPage('progress');toggleProfileMenu()">📈 Progress</button>
+        <button class="profile-menu-item" onclick="showPage('planner');initPlanner();toggleProfileMenu()">📅 Study Planner</button>
+        <button class="profile-menu-item" onclick="showPage('apps');renderApps();toggleProfileMenu()">🎓 Applications</button>
+        <button class="profile-menu-item" onclick="showPage('scholarships');initScholarships();toggleProfileMenu()">💰 Scholarships</button>
+        <button class="profile-menu-item" onclick="showPage('quiz');initQuiz();toggleProfileMenu()">🧩 College Quiz</button>
+        <button class="profile-menu-item" onclick="showPage('community');renderQA();toggleProfileMenu()">💬 Community</button>
+        <div class="profile-menu-divider"></div>
         <button class="profile-menu-item" onclick="showPage('premium');toggleProfileMenu()">⭐ Upgrade to Pro</button>
         <div class="profile-menu-divider"></div>
         <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
@@ -579,6 +781,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="hero-tool-item" onclick="showTool('chances')"><div class="hero-tool-icon" style="background:#fef8e1">🏫</div><div><div class="hero-tool-name">College Chances</div><div class="hero-tool-desc">Compare vs 200+ real universities</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="goToEssay()"><div class="hero-tool-icon" style="background:#e8eef8">✍️</div><div><div class="hero-tool-name">AI Essay Coach <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Live feedback as you write</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showTool('loan')"><div class="hero-tool-icon" style="background:#fce8e8">💰</div><div><div class="hero-tool-name">Student Loan Calc</div><div class="hero-tool-desc">Monthly payment & total cost</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('goals')"><div class="hero-tool-icon" style="background:#e8f5ee">🎯</div><div><div class="hero-tool-name">GPA Goal Tracker</div><div class="hero-tool-desc">Set targets & track progress</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('quiz');initQuiz()"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
       </div>
     </div>
   </div>
@@ -592,6 +796,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo">GradeScope</div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
+      <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('community')">Community</a><a onclick="showPage('quiz');initQuiz()">College Quiz</a></div>
       <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay AI</a></div>
       <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a><a href="#">Cookie Policy</a></div>
     </div>
@@ -1129,10 +1334,14 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <li><span class="feat-check">✓</span> College Chances Estimator</li>
         <li><span class="feat-check">✓</span> Student Loan Calculator</li>
         <li><span class="feat-check">✓</span> SAT/ACT Converter</li>
+        <li><span class="feat-check">✓</span> GPA Goal Tracker</li>
+        <li><span class="feat-check">✓</span> Application Tracker (3 schools)</li>
+        <li><span class="feat-check">✓</span> Dark Mode</li>
+        <li><span class="feat-check">✓</span> Community Q&A (read-only)</li>
         <li><span class="feat-x">—</span> AI Essay Coach</li>
-        <li><span class="feat-x">—</span> Save calculations</li>
-        <li><span class="feat-x">—</span> College comparison</li>
-        <li><span class="feat-x">—</span> PDF export</li>
+        <li><span class="feat-x">—</span> Study Planner</li>
+        <li><span class="feat-x">—</span> Scholarship Finder</li>
+        <li><span class="feat-x">—</span> College Quiz</li>
       </ul>
       <button class="btn-pricing outline" onclick="goToTools()">Use Free Tools →</button>
     </div>
@@ -1144,14 +1353,14 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <ul class="pricing-features">
         <li><span class="feat-check">✓</span> Everything in Free</li>
         <li><span class="feat-check">✓</span> <strong>AI Essay Coach</strong> (live feedback)</li>
-        <li><span class="feat-check">✓</span> Save & reload calculations</li>
-        <li><span class="feat-check">✓</span> 200+ university chance comparison</li>
-        <li><span class="feat-check">✓</span> Export PDF reports</li>
-        <li><span class="feat-check">✓</span> Scholarship match engine</li>
-        <li><span class="feat-check">✓</span> Multi-year GPA projector</li>
-        <li><span class="feat-check">✓</span> Financial aid letter analyzer</li>
+        <li><span class="feat-check">✓</span> <strong>Study Planner</strong> (assignments & calendar)</li>
+        <li><span class="feat-check">✓</span> <strong>Scholarship Finder</strong> (matched to you)</li>
+        <li><span class="feat-check">✓</span> <strong>College Compatibility Quiz</strong></li>
+        <li><span class="feat-check">✓</span> Unlimited applications tracker</li>
+        <li><span class="feat-check">✓</span> Share results & social cards</li>
+        <li><span class="feat-check">✓</span> Progress dashboard & streaks</li>
+        <li><span class="feat-check">✓</span> Community Q&A (post & reply)</li>
         <li><span class="feat-check">✓</span> Ad-free experience</li>
-        <li><span class="feat-check">✓</span> Priority support</li>
       </ul>
       <button class="btn-pricing filled" onclick="openPayment('pro')">Start Free Trial — $4.99/mo</button>
     </div>
@@ -1163,10 +1372,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <li><span class="feat-check">✓</span> Everything in Pro</li>
         <li><span class="feat-check">✓</span> Lifetime access</li>
         <li><span class="feat-check">✓</span> All future features</li>
-        <li><span class="feat-check">✓</span> College list builder</li>
-        <li><span class="feat-check">✓</span> Application tracker</li>
-        <li><span class="feat-check">✓</span> Deadline reminders</li>
-        <li><span class="feat-check">✓</span> Transcript analyzer</li>
+        <li><span class="feat-check">✓</span> Advanced essay rubric scoring</li>
+        <li><span class="feat-check">✓</span> Essay draft comparison</li>
+        <li><span class="feat-check">✓</span> Priority scholarship alerts</li>
+        <li><span class="feat-check">✓</span> Unlimited college quiz retakes</li>
         <li><span class="feat-check">✓</span> 1 free consult call</li>
         <li><span class="feat-check">✓</span> VIP support</li>
       </ul>
@@ -1188,6 +1397,327 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <span>© 2026 GradeScope · <a href="#" style="color:rgba(255,255,255,.4)">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4)">Terms</a></span>
     </div>
   </footer>
+</div>
+
+<!-- GPA GOAL TRACKER PAGE -->
+<div class="page" id="page-goals">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>🎯 GPA Goal Tracker</h1>
+      <p>Set your target GPA and see exactly what grades you need in remaining classes to hit it.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-grid feat-grid-2" style="margin-bottom:20px">
+        <div>
+          <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Current GPA</label>
+          <input type="number" class="feat-input" id="goal-current-gpa" placeholder="3.2" step="0.01" min="0" max="4" oninput="calcGoal()">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Credits Completed</label>
+          <input type="number" class="feat-input" id="goal-credits-done" placeholder="60" min="0" oninput="calcGoal()">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Target GPA</label>
+          <input type="number" class="feat-input" id="goal-target-gpa" placeholder="3.5" step="0.01" min="0" max="4" oninput="calcGoal()">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Credits Remaining</label>
+          <input type="number" class="feat-input" id="goal-credits-left" placeholder="60" min="0" oninput="calcGoal()">
+        </div>
+      </div>
+      <div class="goal-meter">
+        <svg width="200" height="200"><circle cx="100" cy="100" r="85" fill="none" stroke="var(--bg3)" stroke-width="12"/><circle id="goal-arc" cx="100" cy="100" r="85" fill="none" stroke="var(--accent)" stroke-width="12" stroke-dasharray="534" stroke-dashoffset="534" stroke-linecap="round"/></svg>
+        <div class="goal-meter-text"><div class="goal-meter-val" id="goal-needed-gpa">—</div><div class="goal-meter-label">needed GPA</div></div>
+      </div>
+      <div id="goal-result" style="text-align:center;font-size:14px;color:var(--ink2)">Enter your GPA details above to see what you need.</div>
+    </div>
+    <div class="feat-card">
+      <h3>📊 What-If Scenarios</h3>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:12px">Add upcoming classes and see how different grades affect your GPA.</p>
+      <div id="goal-scenarios"></div>
+      <button class="feat-btn feat-btn-secondary" onclick="addGoalScenario()" style="margin-top:8px">+ Add Class</button>
+      <div id="goal-projection" style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:8px;display:none">
+        <div style="font-size:13px;color:var(--ink3)">Projected GPA with these grades:</div>
+        <div style="font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--ink)" id="goal-projected">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDY PLANNER PAGE (Premium) -->
+<div class="page" id="page-planner">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>📅 Study Planner <span class="feat-badge pro">✦ Pro</span></h1>
+      <p>Track assignments, set deadlines, and never miss a due date. Your personal academic command center.</p>
+    </div>
+    <div id="planner-gate"></div>
+    <div id="planner-content" style="display:none">
+      <div class="feat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 id="planner-month">May 2026</h3>
+          <div style="display:flex;gap:8px">
+            <button class="feat-btn feat-btn-secondary" onclick="plannerNav(-1)">←</button>
+            <button class="feat-btn feat-btn-secondary" onclick="plannerNav(0)">Today</button>
+            <button class="feat-btn feat-btn-secondary" onclick="plannerNav(1)">→</button>
+          </div>
+        </div>
+        <div class="planner-cal" id="planner-cal"></div>
+      </div>
+      <div class="feat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h3>📋 Tasks</h3>
+          <button class="feat-btn feat-btn-primary" onclick="openAddTask()">+ Add Task</button>
+        </div>
+        <div id="task-form" style="display:none;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:8px">
+          <div class="feat-grid feat-grid-2" style="margin-bottom:8px">
+            <input type="text" class="feat-input" id="task-title" placeholder="Assignment title">
+            <input type="text" class="feat-input" id="task-class" placeholder="Class name">
+          </div>
+          <div class="feat-grid feat-grid-3" style="margin-bottom:8px">
+            <input type="date" class="feat-input" id="task-due">
+            <select class="feat-input" id="task-priority"><option value="low">Low Priority</option><option value="medium" selected>Medium Priority</option><option value="high">High Priority</option></select>
+            <select class="feat-input" id="task-type"><option value="homework">Homework</option><option value="exam">Exam</option><option value="project">Project</option><option value="reading">Reading</option><option value="other">Other</option></select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="feat-btn feat-btn-primary" onclick="addTask()">Add Task</button>
+            <button class="feat-btn feat-btn-secondary" onclick="closeAddTask()">Cancel</button>
+          </div>
+        </div>
+        <div id="task-filters" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="feat-btn feat-btn-secondary" onclick="filterTasks('all')" style="font-size:12px">All</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterTasks('today')" style="font-size:12px">Today</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterTasks('week')" style="font-size:12px">This Week</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterTasks('overdue')" style="font-size:12px">Overdue</button>
+        </div>
+        <div id="task-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLEGE APPLICATION TRACKER PAGE -->
+<div class="page" id="page-apps">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>🎓 Application Tracker</h1>
+      <p>Track every college application from start to decision day. Stay organized and never miss a deadline.</p>
+    </div>
+    <div class="feat-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3>My Applications</h3>
+        <button class="feat-btn feat-btn-primary" onclick="openAddApp()">+ Add School</button>
+      </div>
+      <div id="app-form" style="display:none;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:8px">
+        <div class="feat-grid feat-grid-2" style="margin-bottom:8px">
+          <input type="text" class="feat-input" id="app-school" placeholder="University name">
+          <select class="feat-input" id="app-type"><option value="rd">Regular Decision</option><option value="ea">Early Action</option><option value="ed">Early Decision</option><option value="rolling">Rolling</option></select>
+        </div>
+        <div class="feat-grid feat-grid-3" style="margin-bottom:8px">
+          <input type="date" class="feat-input" id="app-deadline">
+          <select class="feat-input" id="app-status-sel"><option value="not-started">Not Started</option><option value="in-progress">In Progress</option><option value="submitted">Submitted</option></select>
+          <input type="text" class="feat-input" id="app-notes" placeholder="Notes (optional)">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="feat-btn feat-btn-primary" onclick="addApp()">Add Application</button>
+          <button class="feat-btn feat-btn-secondary" onclick="closeAddApp()">Cancel</button>
+        </div>
+      </div>
+      <div id="app-stats" style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap"></div>
+      <div id="app-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCHOLARSHIP FINDER PAGE (Premium) -->
+<div class="page" id="page-scholarships">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>💰 Scholarship Finder <span class="feat-badge pro">✦ Pro</span></h1>
+      <p>Find scholarships matched to your profile. Answer a few questions and discover opportunities you qualify for.</p>
+    </div>
+    <div id="scholarship-gate"></div>
+    <div id="scholarship-content" style="display:none">
+      <div class="feat-card">
+        <h3>Your Profile</h3>
+        <p style="font-size:13px;color:var(--ink3);margin-bottom:12px">Fill in your details to find matching scholarships.</p>
+        <div class="feat-grid feat-grid-2" style="margin-bottom:12px">
+          <div>
+            <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">GPA</label>
+            <input type="number" class="feat-input" id="schol-gpa" placeholder="3.5" step="0.01" min="0" max="4">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Major / Interest</label>
+            <select class="feat-input" id="schol-major"><option value="">Select...</option><option value="stem">STEM</option><option value="business">Business</option><option value="arts">Arts & Humanities</option><option value="social">Social Sciences</option><option value="health">Health Sciences</option><option value="education">Education</option><option value="engineering">Engineering</option><option value="other">Other</option></select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">State</label>
+            <select class="feat-input" id="schol-state"><option value="">Any State</option><option value="CA">California</option><option value="TX">Texas</option><option value="NY">New York</option><option value="FL">Florida</option><option value="IL">Illinois</option><option value="PA">Pennsylvania</option><option value="OH">Ohio</option><option value="GA">Georgia</option><option value="NC">North Carolina</option><option value="MI">Michigan</option><option value="other">Other</option></select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Year</label>
+            <select class="feat-input" id="schol-year"><option value="hs-junior">High School Junior</option><option value="hs-senior">High School Senior</option><option value="college-fresh">College Freshman</option><option value="college-soph">College Sophomore</option><option value="college-jr">College Junior</option><option value="college-sr">College Senior</option></select>
+          </div>
+        </div>
+        <button class="feat-btn feat-btn-primary" onclick="findScholarships()">🔍 Find Scholarships</button>
+      </div>
+      <div id="scholarship-results" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="font-size:18px">Matching Scholarships</h3>
+          <div id="scholarship-count" style="font-size:13px;color:var(--ink3)"></div>
+        </div>
+        <div class="feat-grid" id="scholarship-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE RESULTS PAGE -->
+<div class="page" id="page-share">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>📤 Share Your Results</h1>
+      <p>Create a beautiful card to share your GPA, college chances, or achievements on social media.</p>
+    </div>
+    <div class="feat-card" style="text-align:center">
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px">What do you want to share?</label>
+        <select class="feat-select" id="share-type" onchange="updateShareCard()" style="min-width:200px">
+          <option value="gpa">My GPA</option>
+          <option value="goals">GPA Goal Progress</option>
+          <option value="apps">Application Status</option>
+          <option value="streak">Study Streak</option>
+          <option value="quiz">Quiz Results</option>
+        </select>
+      </div>
+      <div class="share-card share-card-gradient" id="share-card-preview">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:.1em">GradeScope</p>
+        <h2 id="share-card-title">My GPA</h2>
+        <div class="share-val" id="share-card-value">3.85</div>
+        <div class="share-sub" id="share-card-sub">Cumulative GPA · 120 credits</div>
+      </div>
+      <div class="share-actions">
+        <button class="feat-btn feat-btn-primary" onclick="copyShareCard()">📋 Copy Image</button>
+        <button class="feat-btn feat-btn-secondary" onclick="downloadShareCard()">💾 Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS DASHBOARD PAGE -->
+<div class="page" id="page-progress">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>📈 Progress & Streaks</h1>
+      <p>Track your study habits, see your growth, and maintain your streak.</p>
+    </div>
+    <div class="feat-card" style="text-align:center;padding:32px">
+      <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streak-count">0</span> Day Streak</div>
+      <p style="font-size:13px;color:var(--ink3);margin-top:8px" id="streak-msg">Use GradeScope daily to build your streak!</p>
+    </div>
+    <div class="feat-grid feat-grid-3" style="margin-bottom:16px">
+      <div class="feat-card progress-stat"><div class="stat-val" id="prog-calcs">0</div><div class="stat-label">Calculations</div></div>
+      <div class="feat-card progress-stat"><div class="stat-val" id="prog-essays">0</div><div class="stat-label">Essays Written</div></div>
+      <div class="feat-card progress-stat"><div class="stat-val" id="prog-tasks">0</div><div class="stat-label">Tasks Completed</div></div>
+    </div>
+    <div class="feat-card">
+      <h3>📅 Activity Heatmap</h3>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:12px">Your usage over the last 12 weeks</p>
+      <div class="activity-grid" id="activity-heatmap"></div>
+      <div style="display:flex;gap:4px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:11px;color:var(--ink3)">
+        Less <span class="activity-dot" style="background:var(--bg3)"></span><span class="activity-dot" style="background:var(--green-light)"></span><span class="activity-dot" style="background:var(--green);opacity:.5"></span><span class="activity-dot" style="background:var(--green)"></span> More
+      </div>
+    </div>
+    <div class="feat-card">
+      <h3>🏆 GPA Trend</h3>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:12px">Your GPA over time</p>
+      <div id="gpa-trend-chart" style="height:200px;display:flex;align-items:flex-end;gap:4px;padding:0 8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY Q&A PAGE -->
+<div class="page" id="page-community">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>💬 Community Q&A</h1>
+      <p>Ask questions, share advice, and connect with other students navigating college admissions.</p>
+    </div>
+    <div class="feat-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="feat-btn feat-btn-secondary" onclick="filterQA('all')" style="font-size:12px">All</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterQA('admissions')" style="font-size:12px">Admissions</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterQA('gpa')" style="font-size:12px">GPA</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterQA('essays')" style="font-size:12px">Essays</button>
+          <button class="feat-btn feat-btn-secondary" onclick="filterQA('financial')" style="font-size:12px">Financial Aid</button>
+        </div>
+        <button class="feat-btn feat-btn-primary" onclick="openAskQuestion()">Ask Question</button>
+      </div>
+      <div id="qa-form" style="display:none;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:8px">
+        <input type="text" class="feat-input" id="qa-question-title" placeholder="Your question..." style="margin-bottom:8px">
+        <textarea class="feat-input" id="qa-question-body" placeholder="Add details..." rows="3" style="margin-bottom:8px;resize:vertical"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="feat-select" id="qa-question-tag"><option value="admissions">Admissions</option><option value="gpa">GPA</option><option value="essays">Essays</option><option value="financial">Financial Aid</option><option value="general">General</option></select>
+          <button class="feat-btn feat-btn-primary" onclick="postQuestion()">Post Question</button>
+          <button class="feat-btn feat-btn-secondary" onclick="closeAskQuestion()">Cancel</button>
+        </div>
+      </div>
+      <div id="qa-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLEGE COMPATIBILITY QUIZ PAGE (Premium) -->
+<div class="page" id="page-quiz">
+  <div class="feat-section">
+    <div class="feat-header">
+      <h1>🧩 College Compatibility Quiz <span class="feat-badge pro">✦ Pro</span></h1>
+      <p>Discover your ideal college match based on your personality, preferences, and academic goals.</p>
+    </div>
+    <div id="quiz-gate"></div>
+    <div id="quiz-content" style="display:none">
+      <div class="feat-card" id="quiz-card">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+        <div id="quiz-question-area">
+          <div class="quiz-question" id="quiz-q-text"></div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:20px">
+            <button class="feat-btn feat-btn-secondary" id="quiz-back-btn" onclick="quizBack()" style="display:none">← Back</button>
+            <button class="feat-btn feat-btn-primary" id="quiz-next-btn" onclick="quizNext()" style="display:none">Next →</button>
+          </div>
+        </div>
+        <div id="quiz-results" style="display:none">
+          <div style="text-align:center;margin-bottom:24px">
+            <div style="font-size:48px;margin-bottom:8px">🎓</div>
+            <h2 style="font-family:var(--font-display);font-size:28px;margin-bottom:4px">Your College Matches</h2>
+            <p style="color:var(--ink2);font-size:14px">Based on your personality and preferences</p>
+          </div>
+          <div class="feat-grid feat-grid-2" id="quiz-results-list"></div>
+          <div style="text-align:center;margin-top:20px">
+            <button class="feat-btn feat-btn-primary" onclick="shareQuizResults()">📤 Share Results</button>
+            <button class="feat-btn feat-btn-secondary" onclick="startQuiz()" style="margin-left:8px">🔄 Retake Quiz</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DARK MODE TOGGLE -->
+<button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
+
+<!-- EMAIL CAPTURE BANNER (shown on home page) -->
+<div id="email-capture-banner" style="display:none">
+  <div class="email-capture">
+    <h3>📬 Weekly College Tips</h3>
+    <p>Get actionable college prep advice, deadline reminders, and scholarship alerts delivered to your inbox.</p>
+    <div class="email-capture-form">
+      <input type="email" class="feat-input" id="email-capture-input" placeholder="you@email.com" style="flex:1">
+      <button class="feat-btn feat-btn-primary" onclick="subscribeEmail()">Subscribe</button>
+    </div>
+    <div id="email-capture-msg" style="font-size:12px;color:var(--green);margin-top:8px;display:none"></div>
+  </div>
 </div>
 
 <!-- ABOUT PAGE -->
@@ -1823,12 +2353,17 @@ window.handleSignup = async function() {
   const pass  = document.getElementById('signup-password')?.value;
   const errEl = document.getElementById('auth-error');
   function showErr(msg) { if(errEl) { errEl.textContent = msg; errEl.classList.add('show'); } }
+  const newsletterChecked = document.getElementById('signup-newsletter')?.checked;
   if (!name || !email || !pass) { showErr('Please fill in all fields.'); return; }
   if (pass.length < 6)          { showErr('Password must be at least 6 characters.'); return; }
+  if (!newsletterChecked)        { showErr('Please subscribe to our weekly newsletter to create an account.'); return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await DB.setCurrentUser(cred.user, { name });
+    if (newsletterChecked && email) {
+      subscribeEmailToFirestore(email, cred.user.displayName || name);
+    }
     closeAuth();
     showToast('✓ Account created! Welcome to GradeScope.');
   } catch (e) {
@@ -2777,6 +3312,638 @@ function updateEssayPage() {
 function toggleFAQ(el) { el.classList.toggle('open'); }
 
 /* ============================================================
+   DARK MODE
+============================================================ */
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.getElementById('dark-toggle').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('gs_theme', isDark ? 'light' : 'dark');
+}
+function initDarkMode() {
+  const saved = localStorage.getItem('gs_theme');
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('dark-toggle').textContent = '☀️'; }
+}
+
+/* ============================================================
+   GPA GOAL TRACKER
+============================================================ */
+function calcGoal() {
+  const cur = parseFloat(document.getElementById('goal-current-gpa').value);
+  const done = parseFloat(document.getElementById('goal-credits-done').value);
+  const target = parseFloat(document.getElementById('goal-target-gpa').value);
+  const left = parseFloat(document.getElementById('goal-credits-left').value);
+  if ([cur, done, target, left].some(isNaN) || done + left === 0) return;
+  const needed = ((target * (done + left)) - (cur * done)) / left;
+  const arc = document.getElementById('goal-arc');
+  const valEl = document.getElementById('goal-needed-gpa');
+  const resultEl = document.getElementById('goal-result');
+  const pct = Math.min(Math.max(needed / 4, 0), 1);
+  arc.style.strokeDashoffset = 534 - (534 * pct);
+  valEl.textContent = needed.toFixed(2);
+  if (needed > 4.0) { resultEl.innerHTML = '⚠️ <strong style="color:var(--red)">Not achievable</strong> — you would need above a 4.0 in all remaining classes.'; arc.style.stroke = 'var(--red)'; }
+  else if (needed > 3.7) { resultEl.innerHTML = '💪 <strong style="color:var(--gold)">Very challenging</strong> — you need nearly straight A\'s in remaining classes.'; arc.style.stroke = 'var(--gold)'; }
+  else if (needed > 3.0) { resultEl.innerHTML = '📈 <strong style="color:var(--blue)">Achievable</strong> — aim for mostly A\'s and B\'s.'; arc.style.stroke = 'var(--blue)'; }
+  else { resultEl.innerHTML = '✅ <strong style="color:var(--green)">Very achievable</strong> — you\'re on track!'; arc.style.stroke = 'var(--green)'; }
+  calcGoalProjection();
+  trackActivity('goal_calc');
+}
+
+let goalScenarios = [];
+function addGoalScenario() {
+  goalScenarios.push({ name: '', credits: 3, grade: '4.0' });
+  renderGoalScenarios();
+}
+function renderGoalScenarios() {
+  const el = document.getElementById('goal-scenarios');
+  el.innerHTML = goalScenarios.map((s, i) => `
+    <div class="goal-scenario">
+      <input type="text" placeholder="Class name" value="${s.name}" onchange="goalScenarios[${i}].name=this.value;calcGoalProjection()">
+      <input type="number" placeholder="Credits" value="${s.credits}" min="1" max="6" style="max-width:80px" onchange="goalScenarios[${i}].credits=+this.value;calcGoalProjection()">
+      <select onchange="goalScenarios[${i}].grade=this.value;calcGoalProjection()">
+        <option value="4.0" ${s.grade==='4.0'?'selected':''}>A (4.0)</option>
+        <option value="3.7" ${s.grade==='3.7'?'selected':''}>A- (3.7)</option>
+        <option value="3.3" ${s.grade==='3.3'?'selected':''}>B+ (3.3)</option>
+        <option value="3.0" ${s.grade==='3.0'?'selected':''}>B (3.0)</option>
+        <option value="2.7" ${s.grade==='2.7'?'selected':''}>B- (2.7)</option>
+        <option value="2.3" ${s.grade==='2.3'?'selected':''}>C+ (2.3)</option>
+        <option value="2.0" ${s.grade==='2.0'?'selected':''}>C (2.0)</option>
+        <option value="1.0" ${s.grade==='1.0'?'selected':''}>D (1.0)</option>
+        <option value="0" ${s.grade==='0'?'selected':''}>F (0.0)</option>
+      </select>
+      <button class="feat-btn feat-btn-danger" onclick="goalScenarios.splice(${i},1);renderGoalScenarios()" style="padding:4px 10px;font-size:12px">✕</button>
+    </div>
+  `).join('');
+  calcGoalProjection();
+}
+function calcGoalProjection() {
+  const cur = parseFloat(document.getElementById('goal-current-gpa').value);
+  const done = parseFloat(document.getElementById('goal-credits-done').value);
+  const projEl = document.getElementById('goal-projection');
+  const projVal = document.getElementById('goal-projected');
+  if (isNaN(cur) || isNaN(done) || !goalScenarios.length) { projEl.style.display = 'none'; return; }
+  let totalPoints = cur * done, totalCredits = done;
+  goalScenarios.forEach(s => { totalPoints += parseFloat(s.grade) * s.credits; totalCredits += s.credits; });
+  const projected = totalPoints / totalCredits;
+  projVal.textContent = projected.toFixed(2);
+  projEl.style.display = 'block';
+}
+
+/* ============================================================
+   STUDY PLANNER (Premium)
+============================================================ */
+let plannerDate = new Date();
+let tasks = [];
+let taskFilter = 'all';
+
+function initPlanner() {
+  if (!isPro()) {
+    document.getElementById('planner-gate').innerHTML = '<div class="premium-gate"><h3>📅 Study Planner</h3><p>Upgrade to Pro to track assignments, set deadlines, and stay organized.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock Study Planner — Start Free Trial</button></div>';
+    document.getElementById('planner-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('planner-gate').innerHTML = '';
+  document.getElementById('planner-content').style.display = 'block';
+  tasks = JSON.parse(localStorage.getItem('gs_tasks_' + (window.currentUser?.uid || 'anon')) || '[]');
+  renderCalendar();
+  renderTasks();
+}
+
+function renderCalendar() {
+  const cal = document.getElementById('planner-cal');
+  const y = plannerDate.getFullYear(), m = plannerDate.getMonth();
+  document.getElementById('planner-month').textContent = new Date(y, m).toLocaleString('default', { month: 'long', year: 'numeric' });
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const today = new Date();
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="planner-day planner-day-head">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += '<div class="planner-day"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
+    const hasTask = tasks.some(t => t.due === dateStr);
+    html += `<div class="planner-day${isToday?' today':''}${hasTask?' has-task':''}" onclick="showDayTasks('${dateStr}')">${d}</div>`;
+  }
+  cal.innerHTML = html;
+}
+
+function plannerNav(dir) {
+  if (dir === 0) plannerDate = new Date();
+  else plannerDate.setMonth(plannerDate.getMonth() + dir);
+  renderCalendar();
+}
+function openAddTask() { document.getElementById('task-form').style.display = 'block'; }
+function closeAddTask() { document.getElementById('task-form').style.display = 'none'; }
+
+function addTask() {
+  const title = document.getElementById('task-title').value.trim();
+  const cls = document.getElementById('task-class').value.trim();
+  const due = document.getElementById('task-due').value;
+  const priority = document.getElementById('task-priority').value;
+  const type = document.getElementById('task-type').value;
+  if (!title) { showToast('Enter a task title!', 'error'); return; }
+  tasks.push({ id: Date.now().toString(), title, class: cls, due, priority, type, done: false, createdAt: new Date().toISOString() });
+  saveTasks();
+  closeAddTask();
+  document.getElementById('task-title').value = '';
+  document.getElementById('task-class').value = '';
+  renderCalendar(); renderTasks();
+  showToast('Task added!');
+  trackActivity('task_add');
+}
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; saveTasks(); renderTasks(); if(t.done) trackActivity('task_done'); }
+}
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks(); renderCalendar(); renderTasks();
+  showToast('Task deleted.');
+}
+function saveTasks() {
+  localStorage.setItem('gs_tasks_' + (window.currentUser?.uid || 'anon'), JSON.stringify(tasks));
+}
+function filterTasks(f) { taskFilter = f; renderTasks(); }
+function showDayTasks(dateStr) { taskFilter = dateStr; renderTasks(); }
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  const today = new Date().toISOString().split('T')[0];
+  let filtered = [...tasks];
+  if (taskFilter === 'today') filtered = filtered.filter(t => t.due === today);
+  else if (taskFilter === 'week') { const week = new Date(); week.setDate(week.getDate() + 7); filtered = filtered.filter(t => t.due >= today && t.due <= week.toISOString().split('T')[0]); }
+  else if (taskFilter === 'overdue') filtered = filtered.filter(t => t.due < today && !t.done);
+  else if (taskFilter !== 'all') filtered = filtered.filter(t => t.due === taskFilter);
+  filtered.sort((a, b) => { if (a.done !== b.done) return a.done ? 1 : -1; return (a.due || '').localeCompare(b.due || ''); });
+  if (!filtered.length) { list.innerHTML = '<div class="feat-empty"><span>📋</span>No tasks found. Add one above!</div>'; return; }
+  list.innerHTML = filtered.map(t => {
+    const isOverdue = t.due < today && !t.done;
+    return `<div class="task-item${t.done?' done':''}">
+      <div class="task-check${t.done?' checked':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
+      <div class="task-priority ${t.priority}"></div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">${t.title}</div><div style="font-size:12px;color:var(--ink3)">${t.class?t.class+' · ':''}${t.type}${t.due?' · Due '+t.due:''}</div></div>
+      ${isOverdue?'<span style="font-size:11px;color:var(--red);font-weight:600">OVERDUE</span>':''}
+      <button class="feat-btn feat-btn-danger" onclick="deleteTask('${t.id}')" style="padding:4px 10px;font-size:11px">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   COLLEGE APPLICATION TRACKER
+============================================================ */
+let apps = [];
+function loadApps() { apps = JSON.parse(localStorage.getItem('gs_apps_' + (window.currentUser?.uid || 'anon')) || '[]'); }
+function saveApps() { localStorage.setItem('gs_apps_' + (window.currentUser?.uid || 'anon'), JSON.stringify(apps)); }
+function openAddApp() { document.getElementById('app-form').style.display = 'block'; }
+function closeAddApp() { document.getElementById('app-form').style.display = 'none'; }
+
+function addApp() {
+  const school = document.getElementById('app-school').value.trim();
+  const type = document.getElementById('app-type').value;
+  const deadline = document.getElementById('app-deadline').value;
+  const status = document.getElementById('app-status-sel').value;
+  const notes = document.getElementById('app-notes').value.trim();
+  if (!school) { showToast('Enter a school name!', 'error'); return; }
+  apps.push({ id: Date.now().toString(), school, type, deadline, status, notes, createdAt: new Date().toISOString() });
+  saveApps(); closeAddApp();
+  document.getElementById('app-school').value = '';
+  document.getElementById('app-notes').value = '';
+  renderApps();
+  showToast('Application added!');
+  trackActivity('app_add');
+}
+function updateAppStatus(id, status) {
+  const app = apps.find(a => a.id === id);
+  if (app) { app.status = status; saveApps(); renderApps(); }
+}
+function deleteApp(id) {
+  apps = apps.filter(a => a.id !== id);
+  saveApps(); renderApps();
+  showToast('Application removed.');
+}
+function renderApps() {
+  loadApps();
+  const list = document.getElementById('app-list');
+  const stats = document.getElementById('app-stats');
+  const counts = { 'not-started': 0, 'in-progress': 0, 'submitted': 0, 'accepted': 0, 'rejected': 0, 'waitlisted': 0 };
+  apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+  stats.innerHTML = Object.entries(counts).filter(([,v]) => v > 0).map(([k,v]) => `<div class="app-status ${k}" style="font-size:13px">${v} ${k.replace('-',' ')}</div>`).join('');
+  if (!apps.length) { list.innerHTML = '<div class="feat-empty"><span>🎓</span>No applications yet. Add a school to get started!</div>'; return; }
+  const today = new Date().toISOString().split('T')[0];
+  list.innerHTML = apps.map(a => {
+    const daysLeft = a.deadline ? Math.ceil((new Date(a.deadline) - new Date()) / 86400000) : null;
+    const urgent = daysLeft !== null && daysLeft <= 7 && daysLeft >= 0;
+    return `<div class="app-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><strong style="font-size:15px">${a.school}</strong> <span style="font-size:12px;color:var(--ink3)">${{rd:'Regular Decision',ea:'Early Action',ed:'Early Decision',rolling:'Rolling'}[a.type]||a.type}</span></div>
+        <button class="feat-btn feat-btn-danger" onclick="deleteApp('${a.id}')" style="padding:4px 10px;font-size:11px">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select class="feat-select" onchange="updateAppStatus('${a.id}',this.value)" style="font-size:12px">
+          ${['not-started','in-progress','submitted','accepted','rejected','waitlisted'].map(s => `<option value="${s}" ${a.status===s?'selected':''}>${s.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('')}
+        </select>
+        ${a.deadline ? `<span class="app-deadline${urgent?' urgent':''}">📅 ${a.deadline}${daysLeft!==null?(daysLeft<0?' (passed)':' ('+daysLeft+' days)'):''}</span>` : ''}
+        ${a.notes ? `<span style="font-size:12px;color:var(--ink3)">📝 ${a.notes}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   SCHOLARSHIP FINDER (Premium)
+============================================================ */
+const SCHOLARSHIPS_DB = [
+  {name:'National Merit Scholarship',amount:'$2,500',gpa:3.5,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-senior'],desc:'Awarded to high school seniors based on PSAT/NMSQT scores.'},
+  {name:'Gates Scholarship',amount:'Full Tuition',gpa:3.3,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-senior'],desc:'Full cost of attendance for exceptional minority students.'},
+  {name:'Coca-Cola Scholars Program',amount:'$20,000',gpa:3.0,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-senior'],desc:'150 scholarships awarded annually for leadership and service.'},
+  {name:'STEM Excellence Award',amount:'$10,000',gpa:3.5,majors:['stem','engineering'],states:[],years:['hs-senior','college-fresh','college-soph'],desc:'For students pursuing STEM degrees with strong academic records.'},
+  {name:'Future Business Leaders',amount:'$5,000',gpa:3.2,majors:['business'],states:[],years:['hs-senior','college-fresh'],desc:'For students planning to major in business or entrepreneurship.'},
+  {name:'Creative Arts Scholarship',amount:'$7,500',gpa:2.8,majors:['arts'],states:[],years:['hs-senior','college-fresh','college-soph'],desc:'For students in visual arts, performing arts, or creative writing.'},
+  {name:'Healthcare Heroes Award',amount:'$8,000',gpa:3.4,majors:['health'],states:[],years:['college-fresh','college-soph','college-jr'],desc:'For students pursuing healthcare or nursing degrees.'},
+  {name:'California Dream Scholarship',amount:'$5,000',gpa:3.0,majors:['stem','engineering','business','arts','social','health','education','other'],states:['CA'],years:['hs-senior','college-fresh'],desc:'For California residents attending in-state colleges.'},
+  {name:'Texas Tomorrow Fund',amount:'$3,000',gpa:3.0,majors:['stem','engineering','business','arts','social','health','education','other'],states:['TX'],years:['hs-senior'],desc:'For Texas high school seniors planning to attend Texas colleges.'},
+  {name:'New York Promise Scholarship',amount:'$6,000',gpa:3.2,majors:['stem','engineering','business','arts','social','health','education','other'],states:['NY'],years:['hs-senior','college-fresh'],desc:'For New York students with demonstrated financial need.'},
+  {name:'First Generation College Fund',amount:'$4,000',gpa:2.5,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-junior','hs-senior','college-fresh'],desc:'For first-generation college students from any background.'},
+  {name:'Community Service Award',amount:'$2,000',gpa:2.8,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-junior','hs-senior','college-fresh','college-soph'],desc:'For students with 100+ hours of community service.'},
+  {name:'Engineering Innovation Grant',amount:'$15,000',gpa:3.6,majors:['engineering'],states:[],years:['college-fresh','college-soph','college-jr'],desc:'For engineering students working on innovative projects.'},
+  {name:'Education Future Scholarship',amount:'$5,000',gpa:3.0,majors:['education'],states:[],years:['college-fresh','college-soph','college-jr','college-sr'],desc:'For students pursuing education degrees who plan to teach.'},
+  {name:'Social Science Research Award',amount:'$3,500',gpa:3.3,majors:['social'],states:[],years:['college-soph','college-jr','college-sr'],desc:'For social science students conducting original research.'},
+];
+
+function initScholarships() {
+  if (!isPro()) {
+    document.getElementById('scholarship-gate').innerHTML = '<div class="premium-gate"><h3>💰 Scholarship Finder</h3><p>Upgrade to Pro to search thousands of scholarships matched to your profile.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock Scholarships — Start Free Trial</button></div>';
+    document.getElementById('scholarship-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('scholarship-gate').innerHTML = '';
+  document.getElementById('scholarship-content').style.display = 'block';
+}
+
+function findScholarships() {
+  const gpa = parseFloat(document.getElementById('schol-gpa').value) || 0;
+  const major = document.getElementById('schol-major').value;
+  const state = document.getElementById('schol-state').value;
+  const year = document.getElementById('schol-year').value;
+  const matched = SCHOLARSHIPS_DB.filter(s => {
+    if (gpa < s.gpa) return false;
+    if (major && !s.majors.includes(major)) return false;
+    if (s.states.length && state && !s.states.includes(state)) return false;
+    if (!s.years.includes(year)) return false;
+    return true;
+  }).map(s => {
+    let score = 70 + Math.floor(Math.random() * 25);
+    if (gpa >= s.gpa + 0.5) score = Math.min(99, score + 10);
+    return { ...s, match: score };
+  }).sort((a, b) => b.match - a.match);
+  document.getElementById('scholarship-results').style.display = 'block';
+  document.getElementById('scholarship-count').textContent = matched.length + ' scholarships found';
+  document.getElementById('scholarship-list').innerHTML = matched.length ? matched.map(s => `
+    <div class="scholarship-card">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+        <div><strong style="font-size:15px">${s.name}</strong></div>
+        <span class="scholarship-match">${s.match}% match</span>
+      </div>
+      <div class="scholarship-amount" style="margin-bottom:4px">${s.amount}</div>
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:8px">${s.desc}</p>
+      <div style="font-size:12px;color:var(--ink3)">Min GPA: ${s.gpa} · ${s.years.map(y=>y.replace('-',' ')).join(', ')}</div>
+    </div>
+  `).join('') : '<div class="feat-empty"><span>🔍</span>No matching scholarships found. Try adjusting your filters.</div>';
+  trackActivity('scholarship_search');
+}
+
+/* ============================================================
+   SHARE RESULTS
+============================================================ */
+function updateShareCard() {
+  const type = document.getElementById('share-type').value;
+  const title = document.getElementById('share-card-title');
+  const value = document.getElementById('share-card-value');
+  const sub = document.getElementById('share-card-sub');
+  if (type === 'gpa') { title.textContent = 'My GPA'; value.textContent = document.getElementById('gpa-result')?.textContent || '—'; sub.textContent = 'Cumulative GPA · GradeScope'; }
+  else if (type === 'goals') { title.textContent = 'GPA Goal'; value.textContent = document.getElementById('goal-needed-gpa')?.textContent || '—'; sub.textContent = 'Target GPA · GradeScope'; }
+  else if (type === 'apps') { title.textContent = 'Applications'; value.textContent = apps.length; sub.textContent = apps.filter(a=>a.status==='accepted').length + ' accepted · GradeScope'; }
+  else if (type === 'streak') { title.textContent = 'Study Streak'; value.textContent = (getStreak() || 0) + ' 🔥'; sub.textContent = 'Days in a row · GradeScope'; }
+  else if (type === 'quiz') { title.textContent = 'College Match'; value.textContent = '🎓'; sub.textContent = 'Take the quiz! · GradeScope'; }
+}
+function copyShareCard() {
+  const card = document.getElementById('share-card-preview');
+  import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js').then(mod => {
+    mod.default(card).then(canvas => {
+      canvas.toBlob(blob => { navigator.clipboard.write([new ClipboardItem({'image/png': blob})]); showToast('Card copied to clipboard!'); });
+    });
+  }).catch(() => { showToast('Copy the screenshot manually.', 'error'); });
+}
+function downloadShareCard() {
+  const card = document.getElementById('share-card-preview');
+  import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js').then(mod => {
+    mod.default(card).then(canvas => {
+      const link = document.createElement('a'); link.download = 'gradescope-results.png'; link.href = canvas.toDataURL(); link.click();
+      showToast('Image downloaded!');
+    });
+  }).catch(() => { showToast('Download failed.', 'error'); });
+}
+
+/* ============================================================
+   PROGRESS & STREAKS
+============================================================ */
+function _actKey(uid) { return 'gs_activity_' + (uid || 'anon'); }
+function _getActivity(uid) { try { return JSON.parse(localStorage.getItem(_actKey(uid)) || '{}'); } catch { return {}; } }
+
+function trackActivity(type) {
+  const uid = window.currentUser?.uid;
+  const today = new Date().toISOString().split('T')[0];
+  const act = _getActivity(uid);
+  if (!act[today]) act[today] = { count: 0, types: {} };
+  act[today].count++;
+  act[today].types[type] = (act[today].types[type] || 0) + 1;
+  localStorage.setItem(_actKey(uid), JSON.stringify(act));
+}
+
+function getStreak() {
+  const uid = window.currentUser?.uid;
+  const act = _getActivity(uid);
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const key = d.toISOString().split('T')[0];
+    if (act[key]) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+
+function renderProgress() {
+  const uid = window.currentUser?.uid;
+  const act = _getActivity(uid);
+  const streak = getStreak();
+  document.getElementById('streak-count').textContent = streak;
+  const msgs = ['Use GradeScope daily to build your streak!','Nice start! Keep it going!','Great consistency!','You\'re on fire!','Incredible dedication!'];
+  document.getElementById('streak-msg').textContent = msgs[Math.min(Math.floor(streak/3), msgs.length-1)];
+  let calcs = 0, essays = 0, tasksDone = 0;
+  Object.values(act).forEach(day => {
+    const t = day.types || {};
+    calcs += (t.gpa_calc||0) + (t.goal_calc||0) + (t.scholarship_search||0);
+    essays += (t.essay_save||0);
+    tasksDone += (t.task_done||0);
+  });
+  document.getElementById('prog-calcs').textContent = calcs;
+  document.getElementById('prog-essays').textContent = essays;
+  document.getElementById('prog-tasks').textContent = tasksDone;
+  const heatmap = document.getElementById('activity-heatmap');
+  let hmHtml = '';
+  for (let i = 83; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const count = act[key]?.count || 0;
+    const color = count === 0 ? 'var(--bg3)' : count <= 2 ? 'var(--green-light)' : count <= 5 ? 'rgba(42,110,69,0.5)' : 'var(--green)';
+    hmHtml += `<span class="activity-dot" style="background:${color}" title="${key}: ${count} actions"></span>`;
+  }
+  heatmap.innerHTML = hmHtml;
+  const trend = document.getElementById('gpa-trend-chart');
+  const gpaHistory = JSON.parse(localStorage.getItem('gs_gpa_history_' + (uid||'anon')) || '[]');
+  if (gpaHistory.length) {
+    trend.innerHTML = gpaHistory.slice(-20).map(g => {
+      const h = (g.gpa / 4) * 180;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="height:${h}px;width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-width:8px"></div><div style="font-size:10px;color:var(--ink3)">${g.gpa.toFixed(1)}</div></div>`;
+    }).join('');
+  } else { trend.innerHTML = '<div class="feat-empty"><span>📊</span>Calculate your GPA to see trends here.</div>'; }
+}
+
+/* ============================================================
+   COMMUNITY Q&A
+============================================================ */
+let qaFilter = 'all';
+function _qaKey() { return 'gs_qa'; }
+function _getQA() { try { return JSON.parse(localStorage.getItem(_qaKey()) || '[]'); } catch { return []; } }
+function _saveQA(posts) { localStorage.setItem(_qaKey(), JSON.stringify(posts)); }
+
+const SAMPLE_QA = [
+  {id:'s1',title:'What GPA do I need for Ivy League schools?',body:'I have a 3.7 unweighted GPA and I\'m wondering if it\'s competitive for Harvard, Yale, or Princeton.',tag:'admissions',author:'StudentA',votes:24,replies:[{author:'CollegeAdvisor',body:'A 3.7 UW is competitive but Ivies are holistic — your essays, extracurriculars, and recommendations matter just as much. Focus on showing passion and depth.',votes:15}],createdAt:'2026-05-10'},
+  {id:'s2',title:'How do I raise my GPA from 3.2 to 3.5?',body:'I\'m a junior with a 3.2 GPA. Is it possible to bring it up to 3.5 by the end of senior year?',tag:'gpa',author:'HopefulJunior',votes:18,replies:[{author:'MathTutor',body:'Definitely possible! Use the GPA Goal Tracker here to see exactly what grades you need. Focus on getting A\'s in your remaining classes.',votes:8}],createdAt:'2026-05-08'},
+  {id:'s3',title:'Tips for writing the Common App essay?',body:'I\'m struggling to pick a topic for my Common App personal statement. Any advice?',tag:'essays',author:'EssayStressed',votes:31,replies:[{author:'EnglishTeacher',body:'Pick a moment that changed how you see the world. It doesn\'t have to be dramatic — small moments often make the best essays. Be authentic and specific.',votes:22}],createdAt:'2026-05-05'},
+  {id:'s4',title:'Should I apply for FAFSA even if my family earns a lot?',body:'My family income is around $150k. Is it even worth filling out the FAFSA?',tag:'financial',author:'ConfusedParent',votes:15,replies:[{author:'FinAidExpert',body:'YES, always fill out the FAFSA. Many merit-based scholarships and some institutional aid require it regardless of income. It takes about 30 minutes.',votes:19}],createdAt:'2026-05-03'},
+];
+
+function renderQA() {
+  let posts = _getQA();
+  if (!posts.length) { posts = SAMPLE_QA; _saveQA(posts); }
+  const list = document.getElementById('qa-list');
+  let filtered = qaFilter === 'all' ? posts : posts.filter(p => p.tag === qaFilter);
+  filtered.sort((a, b) => b.votes - a.votes);
+  list.innerHTML = filtered.map(p => `
+    <div class="qa-post">
+      <div style="display:flex;gap:12px">
+        <div class="qa-votes">
+          <button class="qa-vote-btn" onclick="voteQA('${p.id}',1)">▲</button>
+          <span class="qa-vote-count">${p.votes}</span>
+          <button class="qa-vote-btn" onclick="voteQA('${p.id}',-1)">▼</button>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px">${p.title}</div>
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">${p.body}</div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink3)">
+            <span class="qa-tag">${p.tag}</span>
+            <span>by ${p.author}</span>
+            <span>· ${p.createdAt}</span>
+            <span>· ${p.replies?.length || 0} replies</span>
+          </div>
+          ${(p.replies||[]).map(r => `
+            <div class="qa-reply">
+              <div style="font-size:13px;color:var(--ink)">${r.body}</div>
+              <div style="font-size:11px;color:var(--ink3);margin-top:4px">— ${r.author} · ${r.votes} upvotes</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function filterQA(tag) { qaFilter = tag; renderQA(); }
+function voteQA(id, dir) {
+  const posts = _getQA();
+  const p = posts.find(p => p.id === id);
+  if (p) { p.votes += dir; _saveQA(posts); renderQA(); }
+}
+function openAskQuestion() {
+  if (!window.currentUser) { openAuth('signup', 'Sign up to ask questions.'); return; }
+  document.getElementById('qa-form').style.display = 'block';
+}
+function closeAskQuestion() { document.getElementById('qa-form').style.display = 'none'; }
+function postQuestion() {
+  const title = document.getElementById('qa-question-title').value.trim();
+  const body = document.getElementById('qa-question-body').value.trim();
+  const tag = document.getElementById('qa-question-tag').value;
+  if (!title) { showToast('Enter a question!', 'error'); return; }
+  const posts = _getQA();
+  posts.unshift({ id: Date.now().toString(), title, body, tag, author: window.currentUser?.displayName || 'Anonymous', votes: 0, replies: [], createdAt: new Date().toISOString().split('T')[0] });
+  _saveQA(posts);
+  closeAskQuestion();
+  document.getElementById('qa-question-title').value = '';
+  document.getElementById('qa-question-body').value = '';
+  renderQA();
+  showToast('Question posted!');
+  trackActivity('qa_post');
+}
+
+/* ============================================================
+   EMAIL CAPTURE
+============================================================ */
+function subscribeEmailToFirestore(email, name) {
+  try {
+    const subRef = doc(db, 'email_subscribers', email);
+    setDoc(subRef, {
+      email: email,
+      name: name || '',
+      subscribedAt: serverTimestamp(),
+      active: true,
+      source: 'app'
+    }, { merge: true });
+  } catch(e) { console.error('Firestore subscribe error', e); }
+}
+function subscribeEmail() {
+  const email = document.getElementById('email-capture-input').value.trim();
+  if (!email || !email.includes('@')) { showToast('Enter a valid email!', 'error'); return; }
+  const subs = JSON.parse(localStorage.getItem('gs_email_subs') || '[]');
+  if (subs.includes(email)) { showToast('You\'re already subscribed!'); return; }
+  subs.push(email);
+  localStorage.setItem('gs_email_subs', JSON.stringify(subs));
+  subscribeEmailToFirestore(email, window.currentUser?.displayName || '');
+  const msg = document.getElementById('email-capture-msg');
+  msg.textContent = '✓ Subscribed! Check your inbox for a welcome email.';
+  msg.style.display = 'block';
+  document.getElementById('email-capture-input').value = '';
+  showToast('Subscribed to weekly tips!');
+}
+function initEmailCapture() {
+  const dismissed = localStorage.getItem('gs_email_dismissed');
+  if (!dismissed) {
+    const banner = document.getElementById('email-capture-banner');
+    if (banner) banner.style.display = 'block';
+  }
+}
+
+/* ============================================================
+   COLLEGE COMPATIBILITY QUIZ (Premium)
+============================================================ */
+const QUIZ_QUESTIONS = [
+  { q: 'What kind of campus setting appeals to you most?', opts: ['Big city with endless things to do', 'College town with a strong community', 'Suburban — best of both worlds', 'Rural — peaceful and focused'] },
+  { q: 'How important is school spirit and athletics?', opts: ['Essential — I want game days and school pride', 'Nice to have but not a dealbreaker', 'Not important — I\'m focused on academics', 'I prefer a more chill, independent vibe'] },
+  { q: 'What\'s your ideal class size?', opts: ['Small (under 20) — I want to know my professors', 'Medium (20-50) — good balance', 'Large lectures are fine — I\'m self-motivated', 'Mix of both — small seminars + large lectures'] },
+  { q: 'Which extracurricular area excites you most?', opts: ['Research and academic clubs', 'Arts, music, or theater', 'Community service and social justice', 'Entrepreneurship and leadership'] },
+  { q: 'What weather do you prefer?', opts: ['Warm and sunny year-round', 'Four distinct seasons', 'Mild — not too hot, not too cold', 'I don\'t care about weather'] },
+  { q: 'How do you learn best?', opts: ['Hands-on projects and labs', 'Discussion-based seminars', 'Lecture + independent study', 'Group collaboration and teamwork'] },
+  { q: 'What matters most in your college experience?', opts: ['Career preparation and internships', 'Personal growth and self-discovery', 'Building a strong network', 'Exploring diverse interests'] },
+  { q: 'How important is diversity and inclusion?', opts: ['Very important — I want a diverse community', 'Somewhat important', 'I care more about academics', 'Important but not my top priority'] },
+  { q: 'What\'s your approach to social life?', opts: ['Greek life and big social scene', 'Tight-knit friend groups', 'Balanced — some social, lots of study', 'I\'m more introverted and independent'] },
+  { q: 'What kind of financial situation are you considering?', opts: ['Cost is my top concern — need aid', 'Willing to invest in a top school', 'Looking for good value (quality + affordability)', 'I have a full budget — money isn\'t the issue'] },
+];
+
+const QUIZ_COLLEGES = [
+  { name: 'Stanford University', loc: 'Stanford, CA', traits: [0,1,0,3,0,0,2,0,2,1], tagline: 'Innovation meets sunshine' },
+  { name: 'MIT', loc: 'Cambridge, MA', traits: [0,2,0,0,1,0,0,0,3,1], tagline: 'Where nerds change the world' },
+  { name: 'University of Michigan', loc: 'Ann Arbor, MI', traits: [1,0,3,2,1,3,2,0,0,2], tagline: 'Big Ten spirit + academic excellence' },
+  { name: 'NYU', loc: 'New York, NY', traits: [0,3,2,1,2,1,2,0,1,1], tagline: 'The city is your campus' },
+  { name: 'Pomona College', loc: 'Claremont, CA', traits: [2,2,0,2,0,1,3,0,1,2], tagline: 'Small school, big opportunities' },
+  { name: 'University of Virginia', loc: 'Charlottesville, VA', traits: [1,0,1,2,1,1,2,1,0,2], tagline: 'Jefferson\'s legacy of excellence' },
+  { name: 'UC Berkeley', loc: 'Berkeley, CA', traits: [0,1,3,0,0,2,0,0,2,2], tagline: 'Public university powerhouse' },
+  { name: 'Oberlin College', loc: 'Oberlin, OH', traits: [3,3,0,1,1,1,3,0,3,2], tagline: 'Creative, progressive, unique' },
+  { name: 'Georgia Tech', loc: 'Atlanta, GA', traits: [0,0,1,0,0,0,0,1,2,2], tagline: 'Engineering + innovation hub' },
+  { name: 'Vanderbilt University', loc: 'Nashville, TN', traits: [1,0,1,2,2,3,1,1,0,1], tagline: 'Southern charm meets top academics' },
+  { name: 'Williams College', loc: 'Williamstown, MA', traits: [3,1,0,2,1,1,3,0,1,1], tagline: 'Top liberal arts in a mountain setting' },
+  { name: 'University of Texas', loc: 'Austin, TX', traits: [0,0,3,3,0,2,0,1,0,2], tagline: 'Everything is bigger — including opportunity' },
+];
+
+let quizAnswers = [];
+let quizStep = 0;
+
+function initQuiz() {
+  if (!isPro()) {
+    document.getElementById('quiz-gate').innerHTML = '<div class="premium-gate"><h3>🧩 College Compatibility Quiz</h3><p>Upgrade to Pro to discover your ideal college match based on your personality and preferences.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock College Quiz — Start Free Trial</button></div>';
+    document.getElementById('quiz-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('quiz-gate').innerHTML = '';
+  document.getElementById('quiz-content').style.display = 'block';
+  startQuiz();
+}
+
+function startQuiz() {
+  quizAnswers = [];
+  quizStep = 0;
+  document.getElementById('quiz-results').style.display = 'none';
+  document.getElementById('quiz-question-area').style.display = 'block';
+  renderQuizStep();
+}
+
+function renderQuizStep() {
+  const q = QUIZ_QUESTIONS[quizStep];
+  document.getElementById('quiz-progress-fill').style.width = ((quizStep / QUIZ_QUESTIONS.length) * 100) + '%';
+  document.getElementById('quiz-q-text').textContent = q.q;
+  document.getElementById('quiz-options').innerHTML = q.opts.map((o, i) => `<div class="quiz-option${quizAnswers[quizStep]===i?' selected':''}" onclick="selectQuizOption(${i})">${o}</div>`).join('');
+  document.getElementById('quiz-back-btn').style.display = quizStep > 0 ? '' : 'none';
+  document.getElementById('quiz-next-btn').style.display = quizAnswers[quizStep] !== undefined ? '' : 'none';
+  document.getElementById('quiz-next-btn').textContent = quizStep === QUIZ_QUESTIONS.length - 1 ? 'See Results ✨' : 'Next →';
+}
+
+function selectQuizOption(idx) {
+  quizAnswers[quizStep] = idx;
+  renderQuizStep();
+}
+
+function quizBack() { if (quizStep > 0) { quizStep--; renderQuizStep(); } }
+
+function quizNext() {
+  if (quizAnswers[quizStep] === undefined) return;
+  if (quizStep < QUIZ_QUESTIONS.length - 1) { quizStep++; renderQuizStep(); }
+  else showQuizResults();
+}
+
+function showQuizResults() {
+  document.getElementById('quiz-progress-fill').style.width = '100%';
+  document.getElementById('quiz-question-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'block';
+  const scores = QUIZ_COLLEGES.map(college => {
+    let match = 0, total = 0;
+    quizAnswers.forEach((ans, qi) => {
+      const dist = Math.abs(ans - college.traits[qi]);
+      match += (3 - dist);
+      total += 3;
+    });
+    const pct = Math.round((match / total) * 100);
+    return { ...college, pct: Math.min(99, Math.max(40, pct)) };
+  }).sort((a, b) => b.pct - a.pct).slice(0, 6);
+  document.getElementById('quiz-results-list').innerHTML = scores.map((c, i) => `
+    <div class="quiz-result-card" style="border-color:${i===0?'var(--accent)':'var(--border)'}">
+      <div style="font-size:${i===0?'20px':'16px'};margin-bottom:4px">${i===0?'🏆':''} ${c.name}</div>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:8px">${c.loc}</div>
+      <div class="quiz-match-pct">${c.pct}%</div>
+      <div class="quiz-match-bar"><div class="quiz-match-bar-fill" style="width:${c.pct}%"></div></div>
+      <div style="font-size:12px;color:var(--ink2);font-style:italic">${c.tagline}</div>
+    </div>
+  `).join('');
+  trackActivity('quiz_complete');
+}
+
+function shareQuizResults() { showPage('share'); document.getElementById('share-type').value = 'quiz'; updateShareCard(); }
+
+/* ============================================================
+   SHOWPAGE UPDATES (hook new pages)
+============================================================ */
+const _origShowPage = showPage;
+showPage = function(name) {
+  _origShowPage(name);
+  if (name === 'progress') renderProgress();
+  if (name === 'planner') initPlanner();
+  if (name === 'apps') renderApps();
+  if (name === 'scholarships') initScholarships();
+  if (name === 'quiz') initQuiz();
+  if (name === 'community') renderQA();
+  if (name === 'home') initEmailCapture();
+};
+
+/* ============================================================
    EXPOSE MODULE FUNCTIONS TO WINDOW (for onclick= attributes)
 ============================================================ */
 window.addGPARow = addGPARow;
@@ -2804,6 +3971,44 @@ window.deleteEssay = deleteEssay;
 window.updateEssayPage = updateEssayPage;
 window.toggleFAQ = toggleFAQ;
 window.renderSavedEssays = renderSavedEssays;
+// New feature functions
+window.toggleDarkMode = toggleDarkMode;
+window.calcGoal = calcGoal;
+window.addGoalScenario = addGoalScenario;
+window.initPlanner = initPlanner;
+window.plannerNav = plannerNav;
+window.openAddTask = openAddTask;
+window.closeAddTask = closeAddTask;
+window.addTask = addTask;
+window.toggleTask = toggleTask;
+window.deleteTask = deleteTask;
+window.filterTasks = filterTasks;
+window.openAddApp = openAddApp;
+window.closeAddApp = closeAddApp;
+window.addApp = addApp;
+window.updateAppStatus = updateAppStatus;
+window.deleteApp = deleteApp;
+window.renderApps = renderApps;
+window.initScholarships = initScholarships;
+window.findScholarships = findScholarships;
+window.updateShareCard = updateShareCard;
+window.copyShareCard = copyShareCard;
+window.downloadShareCard = downloadShareCard;
+window.renderProgress = renderProgress;
+window.filterQA = filterQA;
+window.voteQA = voteQA;
+window.openAskQuestion = openAskQuestion;
+window.closeAskQuestion = closeAskQuestion;
+window.postQuestion = postQuestion;
+window.renderQA = renderQA;
+window.subscribeEmail = subscribeEmail;
+window.initQuiz = initQuiz;
+window.startQuiz = startQuiz;
+window.selectQuizOption = selectQuizOption;
+window.quizBack = quizBack;
+window.quizNext = quizNext;
+window.shareQuizResults = shareQuizResults;
+window.goalScenarios = goalScenarios;
 
 /* ============================================================
    INIT
@@ -2812,6 +4017,8 @@ window.onload = function() {
   resetGPA(); resetWGPA(); buildSATTable();
   document.getElementById('l-type').value = '6.53';
   updateNavForUser();
+  initDarkMode();
+  initEmailCapture();
   // Show sign-in button if not logged in
   if(!currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
