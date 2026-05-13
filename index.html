@@ -1787,8 +1787,13 @@ onAuthStateChanged(auth, async (user) => {
   // waiting on Firestore (which may be slow or offline).
   if (typeof updateNavForUser === 'function') updateNavForUser();
   if (typeof updateEssayPage === 'function') updateEssayPage();
-  if (typeof renderDashboard === 'function') renderDashboard();
-  if (typeof renderProfilePage === 'function') renderProfilePage();
+
+  // Only re-render page-specific views when that page is active,
+  // otherwise renderProfilePage opens the auth modal on every load.
+  const dashActive  = document.getElementById('page-dashboard')?.classList.contains('active');
+  const profActive  = document.getElementById('page-profile')?.classList.contains('active');
+  if (dashActive  && typeof renderDashboard   === 'function') renderDashboard();
+  if (profActive  && typeof renderProfilePage === 'function') renderProfilePage();
 
   // DB sync runs in the background; on success re-render profile-
   // sensitive views so plan badges etc. pick up the Firestore data.
@@ -1797,8 +1802,8 @@ onAuthStateChanged(auth, async (user) => {
       await DB.setCurrentUser(user);
       const profile = await DB.getUserProfile(user.uid);
       window._gsProfile = profile;
-      if (typeof renderProfilePage === 'function') renderProfilePage();
-      if (typeof renderDashboard === 'function') renderDashboard();
+      if (profActive && typeof renderProfilePage === 'function') renderProfilePage();
+      if (dashActive && typeof renderDashboard   === 'function') renderDashboard();
     } catch (e) {
       console.error('Auth-state DB sync error:', e);
     }
