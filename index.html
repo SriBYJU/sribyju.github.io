@@ -1365,12 +1365,12 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <button class="btn-pricing filled" onclick="openPayment('pro')">Start Free Trial — $4.99/mo</button>
     </div>
     <div class="pricing-card">
-      <div class="pricing-tier">Lifetime</div>
-      <div class="pricing-price"><span>$</span>39</div>
-      <div class="pricing-period">one-time · all future updates</div>
+      <div class="pricing-tier">Annual</div>
+      <div class="pricing-price"><span>$</span>45</div>
+      <div class="pricing-period">per year · all updates included</div>
       <ul class="pricing-features">
         <li><span class="feat-check">✓</span> Everything in Pro</li>
-        <li><span class="feat-check">✓</span> Lifetime access</li>
+        <li><span class="feat-check">✓</span> Full year of access</li>
         <li><span class="feat-check">✓</span> All future features</li>
         <li><span class="feat-check">✓</span> Advanced essay rubric scoring</li>
         <li><span class="feat-check">✓</span> Essay draft comparison</li>
@@ -1379,7 +1379,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <li><span class="feat-check">✓</span> 1 free consult call</li>
         <li><span class="feat-check">✓</span> VIP support</li>
       </ul>
-      <button class="btn-pricing dark" onclick="openPayment('lifetime')">Get Lifetime — $39</button>
+      <button class="btn-pricing dark" onclick="openPayment('annual')">Get Annual — $45/yr</button>
     </div>
   </div>
   <div style="max-width:700px;margin:0 auto;padding:0 40px;text-align:center;margin-bottom:32px">
@@ -1870,7 +1870,7 @@ function openPayment(plan) {
   if (!modal) return;
   modal.classList.add('open');
   const label = document.getElementById('payment-plan-label');
-  if (label) label.textContent = plan === 'lifetime' ? 'GradeScope Lifetime — $39 one-time' : 'GradeScope Pro — $4.99/month';
+  if (label) label.textContent = plan === 'annual' ? 'GradeScope Annual — $45/year' : 'GradeScope Pro — $4.99/month';
   const emailEl = document.getElementById('payment-email');
   if (emailEl && window.currentUser) emailEl.value = window.currentUser.email || '';
 }
@@ -2022,7 +2022,7 @@ function renderDashboard() {
   const upgradeBtn = document.getElementById('dash-upgrade-btn');
   const plan = typeof getUserPlan === 'function' ? getUserPlan() : 'free';
   if (planBadge) {
-    if (plan === 'pro' || plan === 'lifetime') { planBadge.textContent = '✦ Pro'; planBadge.classList.add('pro'); }
+    if (plan === 'pro' || plan === 'annual') { planBadge.textContent = '✦ Pro'; planBadge.classList.add('pro'); }
     else if (plan === 'trial') { planBadge.textContent = '🎁 Trial'; planBadge.classList.add('pro'); }
     else { planBadge.textContent = 'Free'; planBadge.classList.remove('pro'); }
   }
@@ -2121,9 +2121,9 @@ function renderProfilePage() {
   const upgradeBtn = document.getElementById('profile-upgrade-btn');
   const trialInfo = document.getElementById('profile-trial-info');
 
-  if (plan === 'pro' || plan === 'lifetime') {
+  if (plan === 'pro' || plan === 'annual') {
     if (planIcon) { planIcon.textContent = '\u2726'; planIcon.style.background = 'var(--gold-light)'; }
-    if (planName) planName.textContent = plan === 'lifetime' ? 'Lifetime Plan' : 'Pro Plan';
+    if (planName) planName.textContent = plan === 'annual' ? 'Annual Plan' : 'Pro Plan';
     if (planDesc) planDesc.textContent = 'All features unlocked';
     if (upgradeBtn) upgradeBtn.style.display = 'none';
     if (trialInfo) trialInfo.style.display = 'none';
@@ -2454,7 +2454,7 @@ window.getUserPlan = function() {
 
 window.isPro = function() {
   const plan = getUserPlan();
-  if (plan === 'pro' || plan === 'lifetime') return true;
+  if (plan === 'pro' || plan === 'annual') return true;
   // Check trial
   if (plan === 'trial' && window._gsProfile?.trialStart) {
     const start = window._gsProfile.trialStart.toDate?.() || new Date(window._gsProfile.trialStart);
