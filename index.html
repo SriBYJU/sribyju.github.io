@@ -1779,6 +1779,7 @@ const DB = {
 ============================================================ */
 onAuthStateChanged(auth, async (user) => {
   // Expose current user to global scripts
+  window.currentUser = user || null;
   window._gsUser = user || null;
   if (user) {
     // Ensure profile doc exists
