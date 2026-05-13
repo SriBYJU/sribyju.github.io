@@ -1,0 +1,2570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GradeScope — Free College GPA & Admissions Calculator 2026</title>
+<meta name="description" content="The most complete free college planning toolkit. GPA calculator, weighted GPA, grade needed, college chances estimator, student loan calculator, SAT score converter, and scholarship finder. Trusted by 100,000+ students.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf9f6;--bg2:#f3f1ec;--bg3:#ebe8e0;
+  --ink:#1a1714;--ink2:#4a453e;--ink3:#8a847b;
+  --accent:#c8622a;--accent2:#e8a87c;--accent-light:#fdf0e8;
+  --green:#2a6e45;--green-light:#e8f5ee;
+  --blue:#1e4fa3;--blue-light:#e8eef8;
+  --red:#c0312b;--red-light:#fce8e8;
+  --gold:#b8860b;--gold-light:#fef8e1;
+  --border:rgba(26,23,20,0.1);--border2:rgba(26,23,20,0.06);
+  --radius:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow:0 2px 12px rgba(26,23,20,0.08);--shadow-lg:0 8px 32px rgba(26,23,20,0.12);
+  --font-display:'Playfair Display',serif;--font-body:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+.page{display:none}.page.active{display:block}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:1000;background:rgba(250,249,246,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;animation:fadeDown .4s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--ink);text-decoration:none}
+.nav-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink2);background:none;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
+.nav-link:hover{background:var(--bg2);color:var(--ink)}
+.nav-link.active{background:var(--ink);color:var(--bg)}
+.nav-premium{padding:7px 18px;border-radius:8px;background:var(--accent);color:white;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body);margin-left:8px}
+.nav-premium:hover{background:#b5571f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(200,98,42,0.3)}
+.nav-user-btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid rgba(200,98,42,0.2);cursor:pointer;font-family:var(--font-body);margin-left:6px;transition:var(--transition)}
+.nav-user-btn:hover{background:rgba(200,98,42,0.15)}
+.trial-badge{background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,0.2);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;margin-left:8px}
+
+/* AD BANNER */
+.ad-banner{background:var(--bg2);border-bottom:1px solid var(--border2);height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink3);letter-spacing:.05em;text-transform:uppercase}
+.ad-banner-label{background:var(--bg3);border-radius:4px;padding:2px 8px;font-size:10px;color:var(--ink3);margin-right:10px}
+
+/* HERO */
+.hero{max-width:1100px;margin:0 auto;padding:80px 40px 60px;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(200,98,42,0.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-family:var(--font-display);font-size:clamp(38px,5vw,60px);line-height:1.1;letter-spacing:-.02em;margin-bottom:18px;color:var(--ink)}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-desc{font-size:17px;color:var(--ink2);line-height:1.7;margin-bottom:28px}
+.hero-stats{display:flex;gap:28px;margin-bottom:32px;flex-wrap:wrap}
+.hero-stat-num{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ink);line-height:1}
+.hero-stat-label{font-size:12px;color:var(--ink3);margin-top:2px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{padding:13px 28px;border-radius:10px;background:var(--accent);color:white;font-family:var(--font-body);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:var(--transition)}
+.btn-primary:hover{background:#b5571f;transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,98,42,0.3)}
+.btn-secondary{padding:13px 28px;border-radius:10px;background:var(--bg2);color:var(--ink);font-family:var(--font-body);font-size:15px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:var(--transition)}
+.btn-secondary:hover{background:var(--bg3);transform:translateY(-1px)}
+.hero-card{background:white;border-radius:var(--radius-xl);border:1px solid var(--border);padding:28px;box-shadow:var(--shadow-lg);animation:floatIn .6s ease .2s both}
+@keyframes floatIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-card-title{font-family:var(--font-display);font-size:18px;margin-bottom:18px;color:var(--ink)}
+.hero-tool-list{display:flex;flex-direction:column;gap:10px}
+.hero-tool-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border-radius:10px;cursor:pointer;transition:var(--transition);border:1px solid transparent}
+.hero-tool-item:hover{background:var(--accent-light);border-color:rgba(200,98,42,0.2)}
+.hero-tool-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hero-tool-name{font-size:14px;font-weight:600;color:var(--ink)}
+.hero-tool-desc{font-size:12px;color:var(--ink3);margin-top:1px}
+.hero-tool-arrow{margin-left:auto;color:var(--ink3);font-size:16px}
+
+/* MAIN LAYOUT */
+.main-layout{max-width:1100px;margin:0 auto;padding:0 40px 80px;display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+.tool-tabs{max-width:1100px;margin:0 auto;padding:0 40px 24px;display:flex;gap:8px;flex-wrap:wrap}
+.tab-btn{padding:9px 20px;border-radius:100px;border:1px solid var(--border);background:white;color:var(--ink2);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:var(--transition)}
+.tab-btn:hover{border-color:var(--accent);color:var(--ink)}
+.tab-btn.active{background:var(--ink);color:white;border-color:var(--ink)}
+.tab-btn .tab-icon{margin-right:5px}
+
+/* CARDS */
+.card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;box-shadow:var(--shadow);animation:cardIn .35s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card-header{margin-bottom:20px}
+.card-title{font-family:var(--font-display);font-size:24px;color:var(--ink);margin-bottom:4px}
+.card-subtitle{font-size:14px;color:var(--ink3);line-height:1.5}
+
+/* RESULT BOX */
+.result-box{background:var(--accent-light);border:1px solid rgba(200,98,42,0.15);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:16px;transition:var(--transition)}
+.result-box.green-result{background:var(--green-light);border-color:rgba(42,110,69,0.15)}
+.result-box.red-result{background:var(--red-light);border-color:rgba(192,49,43,0.15)}
+.result-box.blue-result{background:var(--blue-light);border-color:rgba(30,79,163,0.15)}
+.result-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.result-value{font-family:var(--font-mono);font-size:44px;font-weight:500;color:var(--accent);line-height:1}
+.result-value.green{color:var(--green)}.result-value.red{color:var(--red)}.result-value.blue{color:var(--blue)}
+.result-badge{padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+.result-hidden{display:none!important}
+
+/* FORM */
+.field-group{margin-bottom:16px}
+.field-label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
+input[type=text],input[type=number],input[type=email],input[type=password],select,textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--ink);font-family:var(--font-body);font-size:14px;outline:none;transition:var(--transition);-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(200,98,42,0.1)}
+input::placeholder{color:var(--ink3)}
+select option{background:white}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.course-row-header{display:grid;grid-template-columns:1fr 110px 90px 36px;gap:8px;align-items:center;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding:0 2px}
+.course-row{display:grid;grid-template-columns:1fr 110px 90px 36px;gap:8px;align-items:center;margin-bottom:8px;animation:rowSlide .2s ease}
+@keyframes rowSlide{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.course-row input,.course-row select{margin:0}
+.btn-remove{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:var(--transition)}
+.btn-remove:hover{border-color:#c0312b;color:#c0312b;background:var(--red-light)}
+.btn-add{width:100%;padding:10px;background:none;border:1px dashed var(--border);border-radius:10px;color:var(--ink3);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.btn-calc{padding:13px 28px;border-radius:10px;background:var(--accent);color:white;font-family:var(--font-body);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:var(--transition);margin-top:12px}
+.btn-calc:hover{background:#b5571f;transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,98,42,0.3)}
+.btn-reset{padding:13px 20px;border-radius:10px;background:var(--bg2);color:var(--ink2);font-family:var(--font-body);font-size:14px;font-weight:500;border:1px solid var(--border);cursor:pointer;transition:var(--transition);margin-top:12px;margin-left:10px}
+.btn-reset:hover{background:var(--bg3)}
+
+/* SIDEBAR */
+.sidebar{position:sticky;top:80px}
+.sidebar-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+.sidebar-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+.ad-slot{background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--ink3)}
+.ad-slot-text{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.ad-slot-size{font-size:10px;color:var(--ink3);opacity:.6}
+.scale-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.scale-item{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg2);border-radius:7px;font-size:12px}
+.scale-grade{font-weight:700;color:var(--accent);font-family:var(--font-mono)}
+.scale-pts{color:var(--ink3);font-family:var(--font-mono)}
+.prog-wrap{margin-bottom:12px}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink3);margin-bottom:5px}
+.prog-bar{background:var(--bg2);border-radius:100px;height:7px;overflow:hidden}
+.prog-fill{height:100%;border-radius:100px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.chance-meter{background:var(--bg2);border-radius:100px;height:12px;overflow:hidden;margin:10px 0 16px}
+.chance-fill{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.tip-item{display:flex;gap:12px;margin-bottom:12px;font-size:13px;color:var(--ink2);line-height:1.5}
+.tip-icon{flex-shrink:0;margin-top:1px;font-size:16px}
+.info-box{background:var(--blue-light);border:1px solid rgba(30,79,163,0.12);border-radius:10px;padding:14px 16px;font-size:13px;color:#1a3c7a;line-height:1.6;margin-top:14px}
+.success-box{background:var(--green-light);border:1px solid rgba(42,110,69,0.12);border-radius:10px;padding:14px 16px;font-size:13px;color:#1a4d2e;line-height:1.6;margin-top:14px}
+.warn-box{background:var(--gold-light);border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:#7a5800;line-height:1.6;margin-top:14px}
+hr{border:none;border-top:1px solid var(--border2);margin:20px 0}
+.tool-section-banner{background:var(--bg2);border-bottom:1px solid var(--border2);padding:24px 40px;margin-bottom:0}
+.tool-section-banner h2{font-family:var(--font-display);font-size:28px;color:var(--ink);max-width:1020px;margin:0 auto}
+.tool-panel{display:none}.tool-panel.active{display:block}
+.loan-breakdown{background:var(--bg2);border-radius:var(--radius);padding:16px 20px;margin-top:16px}
+.loan-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;border-bottom:1px solid var(--border2)}
+.loan-row:last-child{border-bottom:none;font-weight:700;padding-top:12px}
+.loan-row .key{color:var(--ink2)}.loan-row .value{font-family:var(--font-mono);color:var(--ink);font-weight:500}
+
+/* ABOUT */
+.about-hero{background:linear-gradient(135deg,#1a1714 0%,#2d2420 50%,#1a1714 100%);padding:80px 40px 60px;text-align:center;position:relative;overflow:hidden}
+.about-hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(200,98,42,.04) 40px,rgba(200,98,42,.04) 80px)}
+.about-hero-content{position:relative;z-index:1;max-width:700px;margin:0 auto}
+.about-avatar{width:100px;height:100px;border-radius:50%;overflow:hidden;margin:0 auto 20px;border:3px solid rgba(255,255,255,.15)}
+.about-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.about-hero h1{font-family:var(--font-display);font-size:42px;color:white;margin-bottom:12px}
+.about-hero .subtitle{font-size:16px;color:rgba(255,255,255,.65);line-height:1.6}
+.about-content{max-width:800px;margin:0 auto;padding:60px 40px}
+.about-section{margin-bottom:48px}
+.about-section h2{font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--bg3)}
+.about-section p{font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px}
+.badge-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.badge{padding:8px 16px;border-radius:100px;background:var(--bg2);border:1px solid var(--border);font-size:13px;font-weight:500;color:var(--ink2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.contact-card{background:var(--bg2);border-radius:var(--radius-lg);padding:20px;border:1px solid var(--border);text-align:center}
+.contact-card .icon{font-size:28px;margin-bottom:8px}
+.contact-card h3{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.contact-card p{font-size:13px;color:var(--ink3)}
+.contact-card a{color:var(--accent);text-decoration:none;font-weight:500}
+
+/* PRICING */
+.premium-hero{background:var(--bg2);padding:60px 40px;text-align:center;border-bottom:1px solid var(--border)}
+.premium-hero h1{font-family:var(--font-display);font-size:42px;color:var(--ink);margin-bottom:12px}
+.premium-hero p{font-size:16px;color:var(--ink2);max-width:520px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:50px auto;padding:0 40px}
+.pricing-card{background:white;border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow);transition:var(--transition);position:relative}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.pricing-card.featured{border:2px solid var(--accent);transform:scale(1.03)}
+.pricing-card.featured:hover{transform:scale(1.03) translateY(-4px)}
+.pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.05em;white-space:nowrap}
+.pricing-tier{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+.pricing-price{font-family:var(--font-display);font-size:48px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px}
+.pricing-price span{font-size:18px;vertical-align:top;margin-top:10px;display:inline-block}
+.pricing-period{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.pricing-features{list-style:none;margin-bottom:24px}
+.pricing-features li{padding:8px 0;font-size:14px;color:var(--ink2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px}
+.pricing-features li:last-child{border-bottom:none}
+.feat-check{color:var(--green);font-size:16px}.feat-x{color:var(--ink3);font-size:14px}
+.btn-pricing{width:100%;padding:13px;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);border:none}
+.btn-pricing.outline{background:none;border:1px solid var(--border);color:var(--ink)}
+.btn-pricing.outline:hover{background:var(--bg2)}
+.btn-pricing.filled{background:var(--accent);color:white}
+.btn-pricing.filled:hover{background:#b5571f;box-shadow:0 4px 16px rgba(200,98,42,.3)}
+.btn-pricing.dark{background:var(--ink);color:white}
+.btn-pricing.dark:hover{opacity:.9}
+
+/* FAQ */
+.faq-section{max-width:700px;margin:0 auto;padding:0 40px 60px}
+.faq-item{border-bottom:1px solid var(--border2);padding:18px 0;cursor:pointer}
+.faq-q{font-size:15px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.faq-toggle{font-size:20px;color:var(--ink3);transition:var(--transition)}
+.faq-a{font-size:14px;color:var(--ink2);line-height:1.7;margin-top:10px;display:none}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-toggle{transform:rotate(45deg);color:var(--accent)}
+
+/* TRUST BAR */
+.trust-bar{background:var(--ink);padding:14px 40px;display:flex;align-items:center;justify-content:center;gap:36px;flex-wrap:wrap}
+.trust-item{font-size:13px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:6px}
+.trust-item strong{color:white}
+
+/* FOOTER */
+footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
+.footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:36px}
+.footer-brand .logo{font-family:var(--font-display);font-size:22px;color:white;margin-bottom:10px}
+.footer-brand p{font-size:13px;line-height:1.7;max-width:260px}
+.footer-col h4{color:white;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.footer-col a{display:block;color:rgba(255,255,255,.55);font-size:13px;text-decoration:none;margin-bottom:8px;transition:var(--transition);cursor:pointer}
+.footer-col a:hover{color:white}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:8px}
+.footer-legal{display:flex;gap:16px}
+.footer-legal a{color:rgba(255,255,255,.4);text-decoration:none}
+.footer-legal a:hover{color:rgba(255,255,255,.7)}
+
+/* ===== AUTH MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(26,23,20,.6);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:white;border-radius:var(--radius-xl);padding:40px;max-width:440px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .3s cubic-bezier(.4,0,.2,1);position:relative}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink3);transition:var(--transition)}
+.modal-close:hover{color:var(--ink)}
+.modal-title{font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:6px}
+.modal-subtitle{font-size:14px;color:var(--ink3);margin-bottom:28px;line-height:1.5}
+.auth-tabs{display:flex;gap:0;margin-bottom:28px;background:var(--bg2);border-radius:10px;padding:4px}
+.auth-tab{flex:1;padding:9px;border-radius:8px;background:none;border:none;font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--ink3);cursor:pointer;transition:var(--transition)}
+.auth-tab.active{background:white;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.auth-form{display:flex;flex-direction:column;gap:14px}
+.auth-btn{width:100%;padding:14px;border-radius:10px;background:var(--accent);color:white;font-family:var(--font-body);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:var(--transition);margin-top:4px}
+.auth-btn:hover{background:#b5571f;box-shadow:0 6px 20px rgba(200,98,42,.3)}
+.auth-divider{text-align:center;font-size:12px;color:var(--ink3);margin:8px 0;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.auth-social-btn{width:100%;padding:12px;border-radius:10px;background:white;color:var(--ink);font-family:var(--font-body);font-size:14px;font-weight:600;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--transition)}
+.auth-social-btn:hover{background:var(--bg2)}
+.auth-switch{text-align:center;font-size:13px;color:var(--ink3);margin-top:16px}
+.auth-switch a{color:var(--accent);cursor:pointer;font-weight:600}
+.trial-info-box{background:var(--green-light);border:1px solid rgba(42,110,69,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--green);line-height:1.6;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.auth-error{background:var(--red-light);border:1px solid rgba(192,49,43,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);display:none}
+.auth-error.show{display:block}
+
+/* PAYMENT MODAL */
+.payment-modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(26,23,20,.6);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+.payment-modal.open{display:flex}
+.payment-box{background:white;border-radius:var(--radius-xl);padding:36px;max-width:480px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .3s cubic-bezier(.4,0,.2,1)}
+.payment-box h2{font-family:var(--font-display);font-size:26px;color:var(--ink);margin-bottom:6px}
+.payment-box .sub{font-size:14px;color:var(--ink3);margin-bottom:24px}
+.payment-methods{display:flex;gap:10px;margin-bottom:20px}
+.pay-method{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:var(--transition);text-align:center;font-size:13px;font-weight:600;color:var(--ink2)}
+.pay-method.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.stripe-field{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-family:var(--font-body);font-size:14px;color:var(--ink);margin-bottom:12px;width:100%;transition:var(--transition)}
+.stripe-field:focus{border-color:var(--accent);background:white;outline:none;box-shadow:0 0 0 3px rgba(200,98,42,.1)}
+.payment-row{display:flex;gap:12px}
+.payment-row .stripe-field{flex:1}
+.pay-btn{width:100%;padding:15px;border-radius:10px;background:var(--accent);color:white;font-family:var(--font-body);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:var(--transition);margin-top:8px}
+.pay-btn:hover{background:#b5571f;box-shadow:0 6px 20px rgba(200,98,42,.3)}
+.secure-note{text-align:center;font-size:11px;color:var(--ink3);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
+.close-modal{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink3);transition:var(--transition)}
+.close-modal:hover{color:var(--ink)}
+.paypal-btn{width:100%;padding:15px;border-radius:10px;background:#0070ba;color:white;font-family:var(--font-body);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:var(--transition);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px}
+.paypal-btn:hover{background:#005ea6}
+
+/* DASHBOARD */
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1100px;margin:0 auto;padding:40px}
+.dash-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow)}
+.dash-card-title{font-family:var(--font-display);font-size:18px;color:var(--ink);margin-bottom:4px}
+.dash-card-meta{font-size:12px;color:var(--ink3);margin-bottom:16px}
+.dash-stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border2);font-size:13px}
+.dash-stat:last-child{border-bottom:none}
+.dash-stat .k{color:var(--ink3)}.dash-stat .v{font-weight:600;font-family:var(--font-mono);color:var(--ink)}
+.dash-empty{text-align:center;padding:60px 40px;color:var(--ink3)}
+.dash-empty-icon{font-size:48px;margin-bottom:16px}
+.dash-empty h3{font-family:var(--font-display);font-size:22px;color:var(--ink);margin-bottom:8px}
+.dash-empty p{font-size:14px;line-height:1.6}
+.dash-header{max-width:1100px;margin:0 auto;padding:40px 40px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.dash-welcome{font-family:var(--font-display);font-size:32px;color:var(--ink)}
+.dash-plan-badge{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;background:var(--accent-light);color:var(--accent);border:1px solid rgba(200,98,42,.2)}
+.dash-plan-badge.pro{background:var(--gold-light);color:var(--gold);border-color:rgba(184,134,11,.2)}
+.dash-actions{display:flex;gap:10px;flex-wrap:wrap}
+.save-btn{padding:8px 18px;border-radius:8px;background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,.2);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition)}
+.save-btn:hover{background:rgba(42,110,69,.15)}
+.delete-btn{padding:6px 12px;border-radius:6px;background:none;color:var(--ink3);border:1px solid var(--border);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:var(--transition);margin-top:12px}
+.delete-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
+
+/* COLLEGE CHANCES - UNIVERSITY SEARCH */
+.uni-search-wrap{position:relative;margin-bottom:16px}
+.uni-results{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);z-index:100;max-height:260px;overflow-y:auto;display:none}
+.uni-results.show{display:block}
+.uni-result-item{padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2);transition:var(--transition);font-size:13px}
+.uni-result-item:last-child{border-bottom:none}
+.uni-result-item:hover{background:var(--accent-light)}
+.uni-result-name{font-weight:600;color:var(--ink)}
+.uni-result-rate{font-size:12px;color:var(--ink3);font-family:var(--font-mono)}
+.selected-uni{background:var(--blue-light);border:1px solid rgba(30,79,163,.15);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:none}
+.selected-uni.show{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.selected-uni-name{font-size:15px;font-weight:700;color:var(--blue)}
+.selected-uni-data{font-size:12px;color:var(--ink2);margin-top:2px}
+.comparison-bar-wrap{margin-top:16px}
+.comparison-label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink3);margin-bottom:5px}
+.comparison-bar{background:var(--bg2);border-radius:100px;height:10px;overflow:hidden;margin-bottom:8px;position:relative}
+.comparison-fill{height:100%;border-radius:100px;transition:width 1s ease}
+.comparison-fill.official{background:var(--blue)}
+.comparison-fill.user{background:var(--accent)}
+
+/* ESSAY ASSISTANT */
+.essay-editor-wrap{position:relative}
+.essay-textarea{width:100%;min-height:300px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.8;resize:vertical;transition:var(--transition)}
+.essay-textarea:focus{border-color:var(--accent);background:white;box-shadow:0 0 0 3px rgba(200,98,42,.1);outline:none}
+.essay-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.essay-word-count{font-size:12px;color:var(--ink3);font-family:var(--font-mono)}
+.essay-prompt-select{padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);font-family:var(--font-body);font-size:13px;color:var(--ink);cursor:pointer;outline:none;min-width:220px}
+.essay-prompt-select:focus{border-color:var(--accent)}
+.essay-ai-panel{background:var(--accent-light);border:1px solid rgba(200,98,42,.15);border-radius:12px;padding:20px;margin-top:16px;display:none}
+.essay-ai-panel.show{display:block}
+.essay-ai-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.essay-ai-title{font-family:var(--font-display);font-size:16px;color:var(--accent)}
+.essay-ai-pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:breathe 2s ease-in-out infinite}
+.essay-ai-content{font-size:14px;color:var(--ink2);line-height:1.8}
+.essay-ai-loading{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3)}
+.essay-ai-dots span{display:inline-block;animation:bounce 1.2s infinite;margin:0 1px}
+.essay-ai-dots span:nth-child(2){animation-delay:.2s}
+.essay-ai-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+.essay-get-feedback{padding:10px 20px;border-radius:8px;background:var(--accent);color:white;font-family:var(--font-body);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:var(--transition)}
+.essay-get-feedback:hover{background:#b5571f}
+.essay-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.essay-score-item{background:white;border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(200,98,42,.1)}
+.essay-score-num{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--accent)}
+.essay-score-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-top:3px}
+.essay-char-warning{font-size:12px;padding:6px 12px;border-radius:6px;background:var(--gold-light);color:var(--gold);border:1px solid rgba(184,134,11,.2);display:inline-block}
+
+/* GATE OVERLAY */
+.gate-overlay{background:linear-gradient(to bottom,rgba(250,249,246,0) 0%,rgba(250,249,246,.97) 40%,white 100%);position:absolute;bottom:0;left:0;right:0;height:280px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:28px;border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+.gate-card{background:white;border:1px solid var(--border);border-radius:16px;padding:24px 28px;text-align:center;max-width:400px;box-shadow:var(--shadow-lg)}
+.gate-card h3{font-family:var(--font-display);font-size:20px;margin-bottom:6px}
+.gate-card p{font-size:13px;color:var(--ink3);margin-bottom:16px}
+.locked-panel{position:relative;overflow:hidden;min-height:200px}
+.pro-tag{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid rgba(184,134,11,.2);border-radius:100px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-left:8px}
+
+/* TRIAL COUNTDOWN */
+.trial-banner{background:linear-gradient(90deg,#1a4d2e,#2a6e45);padding:10px 40px;display:flex;align-items:center;justify-content:center;gap:12px;color:white;font-size:13px;font-weight:500}
+.trial-days{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:100px;font-weight:700;font-family:var(--font-mono)}
+.trial-upgrade{background:white;color:var(--green);padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:var(--transition);margin-left:8px}
+.trial-upgrade:hover{background:var(--green-light)}
+
+/* PROFILE DROPDOWN */
+.profile-dropdown{position:relative}
+.profile-menu{display:none;position:absolute;top:calc(100%+8px);right:0;background:white;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);min-width:200px;z-index:500;animation:dropIn .15s ease}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.profile-dropdown.open .profile-menu{display:block}
+.profile-menu-item{display:block;width:100%;padding:11px 16px;background:none;border:none;text-align:left;font-family:var(--font-body);font-size:14px;color:var(--ink2);cursor:pointer;transition:var(--transition)}
+.profile-menu-item:hover{background:var(--bg2);color:var(--ink)}
+.profile-menu-divider{height:1px;background:var(--border2);margin:4px 0}
+.profile-menu-item.danger{color:var(--red)}
+.profile-menu-item.danger:hover{background:var(--red-light)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:50px 24px 40px}
+  .hero-card{display:none}
+  .main-layout{grid-template-columns:1fr;padding:0 24px 60px}
+  .sidebar{position:static}
+  .tool-tabs{padding:0 24px 20px}
+  .tool-section-banner{padding:20px 24px}
+  nav{padding:0 20px}
+  .pricing-grid{grid-template-columns:1fr;max-width:400px}
+  .pricing-card.featured{transform:none}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .course-row{grid-template-columns:1fr 90px 75px 36px}
+  .about-content{padding:40px 24px}
+  .contact-grid{grid-template-columns:1fr}
+  .faq-section{padding:0 24px 40px}
+  .dashboard-grid{padding:24px}
+  .dash-header{padding:24px 24px 0}
+  .essay-score-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  .two-col,.three-col{grid-template-columns:1fr}
+  .hero-stats{gap:16px}
+  .trust-bar{gap:16px;padding:12px 20px}
+  .footer-grid{grid-template-columns:1fr}
+  .premium-hero{padding:40px 24px}
+  .pricing-grid{padding:0 24px}
+  nav .nav-links .nav-link:not(.active){display:none}
+  .trial-banner{padding:10px 20px;flex-wrap:wrap;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="modal-title">Welcome to GradeScope</div>
+    <div class="modal-subtitle" id="auth-subtitle">Create a free account to save your results and unlock tools.</div>
+    <div class="trial-info-box" id="trial-info-box">
+      <span>🎁</span>
+      <span><strong>7-day free Pro trial</strong> — Sign up today and unlock all Pro features free for 7 days. No credit card required.</span>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+      <button class="auth-tab" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <div id="auth-form-signup" class="auth-form">
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Full Name</label>
+        <input type="text" id="signup-name" placeholder="Jane Smith">
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@school.edu">
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Password</label>
+        <input type="password" id="signup-password" placeholder="Min. 6 characters">
+      </div>
+      <button class="auth-btn" onclick="handleSignup()">Create Free Account →</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-social-btn" onclick="handleGoogleAuth()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+    </div>
+    <div id="auth-form-login" class="auth-form" style="display:none">
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Email Address</label>
+        <input type="email" id="login-email" placeholder="you@email.com">
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Password</label>
+        <input type="password" id="login-password" placeholder="Your password">
+      </div>
+      <button class="auth-btn" onclick="handleLogin()">Sign In →</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-social-btn" onclick="handleGoogleAuth()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+    </div>
+    <div class="auth-switch" id="auth-switch-text">
+      Already have an account? <a onclick="switchAuthTab('login')">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="payment-modal" id="paymentModal">
+  <div class="payment-box">
+    <button class="close-modal" onclick="closePayment()">✕</button>
+    <h2>Upgrade to Pro</h2>
+    <p class="sub" id="payment-plan-label">GradeScope Pro — $4.99/month</p>
+    <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:20px">
+      🎁 <strong>7-day free trial included</strong> — cancel anytime before the trial ends and pay nothing.
+    </div>
+    <div class="payment-methods">
+      <div class="pay-method selected" onclick="switchPay('card',this)">💳 Card</div>
+      <div class="pay-method" onclick="switchPay('paypal',this)">🅿️ PayPal</div>
+    </div>
+    <div id="card-form">
+      <input class="stripe-field" type="text" placeholder="Full name">
+      <input class="stripe-field" type="email" placeholder="Email address" id="payment-email">
+      <input class="stripe-field" type="text" placeholder="Card number" maxlength="19" oninput="fmtCard(this)">
+      <div class="payment-row">
+        <input class="stripe-field" type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)">
+        <input class="stripe-field" type="text" placeholder="CVC" maxlength="4">
+      </div>
+      <button class="pay-btn" onclick="handlePayment()">
+        <span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>
+      </button>
+    </div>
+    <div id="paypal-form" style="display:none">
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:16px;line-height:1.6">You'll be redirected to PayPal to complete your purchase securely.</p>
+      <button class="paypal-btn" onclick="handlePayPal()">
+        <span style="font-size:20px;font-weight:800;letter-spacing:-1px">Pay</span><span style="font-size:20px;font-weight:800;color:#009cde">Pal</span>
+      </button>
+    </div>
+    <p class="secure-note">🔒 Secured by Stripe · Cancel anytime · SSL encrypted</p>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="nav-logo-dot"></div>
+    GradeScope
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button>
+    <button class="nav-link" id="nav-tools" onclick="goToTools()">Calculators</button>
+    <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay AI ✦</button>
+    <button class="nav-link" id="nav-premium" onclick="showPage('premium')">Pricing</button>
+    <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
+    <button class="nav-link" id="nav-dashboard" onclick="goDashboard()" style="display:none">Dashboard</button>
+    <span class="trial-badge" id="trial-badge" style="display:none"></span>
+    <div class="profile-dropdown" id="profile-dropdown" style="display:none">
+      <button class="nav-user-btn" onclick="toggleProfileMenu()" id="nav-user-name">Account ▾</button>
+      <div class="profile-menu" id="profile-menu">
+        <button class="profile-menu-item" onclick="goDashboard();toggleProfileMenu()">📊 Dashboard</button>
+        <button class="profile-menu-item" onclick="showPage('premium');toggleProfileMenu()">⭐ Upgrade to Pro</button>
+        <div class="profile-menu-divider"></div>
+        <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+    <button class="nav-link" id="nav-signin-btn" onclick="openAuth('login')" style="display:none">Sign In</button>
+    <button class="nav-premium" id="nav-get-pro" onclick="openPayment('pro')">Get Pro ↗</button>
+  </div>
+</nav>
+
+<!-- TRIAL BANNER (shown when on trial) -->
+<div class="trial-banner" id="trial-banner" style="display:none">
+  <span>🎁 Free trial active —</span>
+  <span class="trial-days" id="trial-days-left">7 days left</span>
+  <span>remaining. Upgrade to keep Pro access.</span>
+  <button class="trial-upgrade" onclick="openPayment('pro')">Upgrade Now</button>
+</div>
+
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="ad-banner"><span class="ad-banner-label">Ad</span>Advertisement · 728×90</div>
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">⚡ Free · Instant results · AI-powered</div>
+      <h1>The College <em>Toolkit</em><br>Students Actually Use</h1>
+      <p class="hero-desc">Seven precision calculators + AI essay coach for every stage of your college journey. Used by 100,000+ students nationwide.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">100K+</div><div class="hero-stat-label">Students monthly</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">200+</div><div class="hero-stat-label">Universities tracked</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">4.9★</div><div class="hero-stat-label">User rating</div></div>
+      </div>
+      <div class="hero-ctas">
+        <button class="btn-primary" onclick="goToTools()">Open Calculators →</button>
+        <button class="btn-secondary" onclick="showPage('premium')">See Pro Plan</button>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">Jump to a calculator</div>
+      <div class="hero-tool-list">
+        <div class="hero-tool-item" onclick="showTool('gpa')"><div class="hero-tool-icon" style="background:#fdf0e8">📊</div><div><div class="hero-tool-name">GPA Calculator</div><div class="hero-tool-desc">Semester & cumulative GPA</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('weighted')"><div class="hero-tool-icon" style="background:#e8f5ee">⭐</div><div><div class="hero-tool-name">Weighted GPA</div><div class="hero-tool-desc">AP, IB, Honors on 5.0 scale</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('chances')"><div class="hero-tool-icon" style="background:#fef8e1">🏫</div><div><div class="hero-tool-name">College Chances</div><div class="hero-tool-desc">Compare vs 200+ real universities</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="goToEssay()"><div class="hero-tool-icon" style="background:#e8eef8">✍️</div><div><div class="hero-tool-name">AI Essay Coach <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Live feedback as you write</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('loan')"><div class="hero-tool-icon" style="background:#fce8e8">💰</div><div><div class="hero-tool-name">Student Loan Calc</div><div class="hero-tool-desc">Monthly payment & total cost</div></div><div class="hero-tool-arrow">→</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="trust-bar">
+    <div class="trust-item">✓ <strong>100% Free</strong> core tools</div>
+    <div class="trust-item">✓ <strong>200+</strong> real university acceptance rates</div>
+    <div class="trust-item">✓ <strong>AI Essay</strong> coach — live feedback</div>
+    <div class="trust-item">✓ <strong>7-day</strong> free Pro trial</div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="logo">GradeScope</div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
+      <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
+      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay AI</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a><a href="#">Cookie Policy</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 GradeScope. All rights reserved. Results are estimates only.</span><div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div></div>
+  </footer>
+</div>
+
+<!-- TOOLS PAGE -->
+<div class="page" id="page-tools">
+  <div class="ad-banner"><span class="ad-banner-label">Ad</span>Advertisement · 728×90</div>
+  <div class="tool-section-banner"><h2>Free College Calculators</h2></div>
+  <div class="tool-tabs">
+    <button class="tab-btn active" onclick="switchTab('gpa',this)"><span class="tab-icon">📊</span>GPA Calc</button>
+    <button class="tab-btn" onclick="switchTab('weighted',this)"><span class="tab-icon">⭐</span>Weighted GPA</button>
+    <button class="tab-btn" onclick="switchTab('needed',this)"><span class="tab-icon">🎯</span>Grade Needed</button>
+    <button class="tab-btn" onclick="switchTab('chances',this)"><span class="tab-icon">🏫</span>College Chances</button>
+    <button class="tab-btn" onclick="switchTab('loan',this)"><span class="tab-icon">💰</span>Student Loans</button>
+    <button class="tab-btn" onclick="switchTab('sat',this)"><span class="tab-icon">📝</span>SAT↔ACT</button>
+    <button class="tab-btn" onclick="switchTab('scholarship',this)"><span class="tab-icon">🎓</span>Scholarship $</button>
+  </div>
+  <div class="main-layout">
+    <div>
+
+      <!-- GPA CALCULATOR -->
+      <div id="tab-gpa" class="tool-panel active">
+        <div class="card">
+          <div class="card-header"><div class="card-title">GPA Calculator</div><div class="card-subtitle">Enter your courses, letter grades, and credit hours. Your GPA updates on the 4.0 scale.</div></div>
+          <div id="gpa-result" class="result-box result-hidden">
+            <div><div class="result-label">Your GPA</div><div class="result-value" id="gpa-val">0.00</div></div>
+            <div style="text-align:right"><div class="result-label">Total Credits</div><div style="font-family:var(--font-mono);font-size:22px;color:var(--ink2)" id="gpa-credits">0</div><div class="result-badge" id="gpa-badge" style="margin-top:8px"></div></div>
+          </div>
+          <div class="course-row-header"><div>Course Name</div><div>Grade</div><div>Credits</div><div></div></div>
+          <div id="gpa-courses"></div>
+          <button class="btn-add" onclick="addGPARow()">＋ Add Course</button><br>
+          <button class="btn-calc" onclick="calcGPAAndSave()">Calculate GPA</button>
+          <button class="btn-reset" onclick="resetGPA()">Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:18px;margin-bottom:16px">GPA Benchmarks</div>
+          <div class="prog-wrap"><div class="prog-label"><span>4.0 — Excellent (Dean's List)</span><span style="color:var(--accent);font-weight:600">4.0</span></div><div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--accent)"></div></div></div>
+          <div class="prog-wrap"><div class="prog-label"><span>3.7 — Magna Cum Laude</span><span>3.7</span></div><div class="prog-bar"><div class="prog-fill" style="width:92.5%;background:#2a6e45"></div></div></div>
+          <div class="prog-wrap"><div class="prog-label"><span>3.5 — Scholarship eligible</span><span>3.5</span></div><div class="prog-bar"><div class="prog-fill" style="width:87.5%;background:#1e4fa3"></div></div></div>
+          <div class="prog-wrap"><div class="prog-label"><span>3.0 — Good Standing</span><span>3.0</span></div><div class="prog-bar"><div class="prog-fill" style="width:75%;background:#8a847b"></div></div></div>
+          <div class="prog-wrap"><div class="prog-label"><span>2.0 — Academic probation risk</span><span>2.0</span></div><div class="prog-bar"><div class="prog-fill" style="width:50%;background:var(--red)"></div></div></div>
+        </div>
+      </div>
+
+      <!-- WEIGHTED GPA -->
+      <div id="tab-weighted" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Weighted GPA Calculator</div><div class="card-subtitle">Calculates your weighted GPA on a 5.0 scale with AP (+1.0), IB (+1.0), Honors (+0.5), and Dual Enrollment (+1.0) boosts.</div></div>
+          <div id="wgpa-result" class="result-box result-hidden">
+            <div><div class="result-label">Weighted GPA (5.0)</div><div class="result-value" id="wgpa-val">0.00</div></div>
+            <div style="text-align:right"><div class="result-label">Unweighted (4.0)</div><div style="font-family:var(--font-mono);font-size:24px;color:var(--ink2)" id="wgpa-unweighted">0.00</div></div>
+          </div>
+          <div class="course-row-header" style="grid-template-columns:1fr 110px 120px 36px"><div>Course Name</div><div>Grade</div><div>Course Type</div><div></div></div>
+          <div id="wgpa-courses"></div>
+          <button class="btn-add" onclick="addWGPARow()">＋ Add Course</button><br>
+          <button class="btn-calc" onclick="calcWGPAAndSave()">Calculate Weighted GPA</button>
+          <button class="btn-reset" onclick="resetWGPA()">Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:18px;margin-bottom:14px">Weighting Breakdown</div>
+          <div class="scale-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="scale-item"><span>AP Course</span><span class="scale-grade">+1.0</span></div>
+            <div class="scale-item"><span>IB Course</span><span class="scale-grade">+1.0</span></div>
+            <div class="scale-item"><span>Dual Enroll</span><span class="scale-grade">+1.0</span></div>
+            <div class="scale-item"><span>Honors</span><span class="scale-grade">+0.5</span></div>
+            <div class="scale-item"><span>Pre-AP</span><span class="scale-grade">+0.5</span></div>
+            <div class="scale-item"><span>Regular</span><span class="scale-grade">+0.0</span></div>
+          </div>
+          <div class="info-box" style="margin-top:14px">💡 Colleges recalculate your GPA on their own scale — your unweighted GPA is often what matters most.</div>
+        </div>
+      </div>
+
+      <!-- GRADE NEEDED -->
+      <div id="tab-needed" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">What Grade Do I Need?</div><div class="card-subtitle">Enter your current grade, exam weight, and target course grade.</div></div>
+          <div id="needed-result" class="result-box result-hidden">
+            <div><div class="result-label">Score Needed on Final</div><div class="result-value" id="needed-val">—</div></div>
+            <div id="needed-badge" class="result-badge"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Current Grade (%)</label><input type="number" id="n-current" placeholder="e.g. 84" min="0" max="105"></div>
+            <div class="field-group"><label class="field-label">Final / Exam Weight (%)</label><input type="number" id="n-weight" placeholder="e.g. 20" min="1" max="100"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Target Course Grade (%)</label><input type="number" id="n-target" placeholder="e.g. 90" min="0" max="100"></div>
+            <div class="field-group" style="display:flex;align-items:flex-end"><button class="btn-calc" style="width:100%;margin-top:0" onclick="calcNeeded()">Calculate</button></div>
+          </div>
+          <div id="needed-breakdown" style="display:none"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:18px;margin-bottom:14px">How The Formula Works</div>
+          <div class="tip-item"><span class="tip-icon">📐</span><span>Formula: <strong style="font-family:var(--font-mono);font-size:13px">Needed = (Target − Current × (1 − Weight)) / Weight</strong></span></div>
+          <div class="tip-item"><span class="tip-icon">💡</span><span>If your exam is worth 20% and you currently have an 84%, your pre-exam work contributes 80% of your final grade.</span></div>
+          <div class="tip-item"><span class="tip-icon">📈</span><span>If the needed score exceeds 100%, reaching your exact target is mathematically impossible — but you can still maximize your grade.</span></div>
+        </div>
+      </div>
+
+      <!-- COLLEGE CHANCES with University Search -->
+      <div id="tab-chances" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">College Admission Chance Estimator</div><div class="card-subtitle">Search 200+ real U.S. universities and compare your estimated admission probability against their actual acceptance rates.</div></div>
+          <div id="chances-result" class="result-box result-hidden" style="flex-direction:column;align-items:stretch;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div><div class="result-label">Your Estimated Chance</div><div class="result-value" id="chances-val">—</div></div>
+              <div id="chances-badge" class="result-badge"></div>
+            </div>
+            <div><div class="chance-meter"><div class="chance-fill" id="chances-bar" style="width:0%"></div></div></div>
+            <div id="comparison-section" style="display:none">
+              <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Your Chances vs Official Rate</div>
+              <div class="comparison-bar-wrap">
+                <div class="comparison-label"><span id="comp-uni-name">University</span><span id="comp-official-rate">—</span></div>
+                <div class="comparison-bar"><div class="comparison-fill official" id="comp-official-bar" style="width:0%"></div></div>
+                <div class="comparison-label" style="margin-top:6px"><span>Your estimated chance</span><span id="comp-user-rate">—</span></div>
+                <div class="comparison-bar"><div class="comparison-fill user" id="comp-user-bar" style="width:0%"></div></div>
+              </div>
+              <div id="comp-verdict" style="font-size:13px;margin-top:10px;padding:10px 14px;border-radius:8px;line-height:1.6"></div>
+            </div>
+            <div id="chances-notes" style="font-size:13px;color:var(--ink2);line-height:1.8"></div>
+          </div>
+
+          <!-- University Search -->
+          <div class="field-group">
+            <label class="field-label">Search University (optional — compare to a real school)</label>
+            <div class="uni-search-wrap">
+              <input type="text" id="uni-search" placeholder="Type a university name... e.g. Harvard, UCLA, UVA" oninput="searchUniversities(this.value)" autocomplete="off">
+              <div class="uni-results" id="uni-results"></div>
+            </div>
+            <div class="selected-uni" id="selected-uni">
+              <div><div class="selected-uni-name" id="sel-uni-name">—</div><div class="selected-uni-data" id="sel-uni-data">—</div></div>
+              <button onclick="clearUni()" style="background:none;border:1px solid rgba(30,79,163,.2);border-radius:6px;color:var(--blue);font-size:12px;padding:4px 10px;cursor:pointer">✕ Clear</button>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Unweighted GPA (4.0)</label><input type="number" id="c-gpa" placeholder="e.g. 3.8" min="0" max="4.0" step="0.01"></div>
+            <div class="field-group"><label class="field-label">Weighted GPA (5.0)</label><input type="number" id="c-wgpa" placeholder="e.g. 4.5" min="0" max="5.5" step="0.01"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">SAT Score (400–1600)</label><input type="number" id="c-sat" placeholder="e.g. 1380" min="400" max="1600"></div>
+            <div class="field-group"><label class="field-label">ACT Score (optional)</label><input type="number" id="c-act" placeholder="Leave blank if N/A" min="1" max="36"></div>
+          </div>
+          <div class="three-col">
+            <div class="field-group"><label class="field-label">School Selectivity</label>
+              <select id="c-school">
+                <option value="ivy">Ivy / MIT / Stanford (≤10%)</option>
+                <option value="high">Highly Selective (10–25%)</option>
+                <option value="select" selected>Selective (25–45%)</option>
+                <option value="mod">Moderate (45–65%)</option>
+                <option value="open">Less Selective (65%+)</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-label">Class Rank</label>
+              <select id="c-rank">
+                <option value="5">Top 5%</option>
+                <option value="10">Top 10%</option>
+                <option value="25" selected>Top 25%</option>
+                <option value="50">Top 50%</option>
+                <option value="bot">Bottom 50%</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-label">Extracurriculars</label>
+              <select id="c-ecs">
+                <option value="exc">Exceptional (national awards)</option>
+                <option value="str" selected>Strong (leadership + depth)</option>
+                <option value="avg">Average (some clubs)</option>
+                <option value="min">Minimal</option>
+              </select>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Legacy / Early Decision?</label>
+              <select id="c-legacy">
+                <option value="no" selected>No boost</option>
+                <option value="ed">Applying Early Decision</option>
+                <option value="leg">Legacy Applicant</option>
+                <option value="both">ED + Legacy</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-label">Application Essays</label>
+              <select id="c-essays">
+                <option value="str" selected>Strong & distinctive</option>
+                <option value="avg">Average</option>
+                <option value="wk">Weak</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-calc" onclick="calcChancesAndSave()">Estimate My Chances</button>
+        </div>
+      </div>
+
+      <!-- STUDENT LOAN -->
+      <div id="tab-loan" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Student Loan Calculator</div><div class="card-subtitle">Calculate your monthly payment, total cost, and see a full repayment breakdown. Uses 2026 federal loan rates.</div></div>
+          <div id="loan-result" class="result-box result-hidden blue-result">
+            <div><div class="result-label">Monthly Payment</div><div class="result-value blue" id="loan-monthly">$0</div></div>
+            <div style="text-align:right"><div class="result-label">Total Interest Paid</div><div style="font-family:var(--font-mono);font-size:22px;color:var(--red)" id="loan-interest">$0</div></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Total Loan Amount ($)</label><input type="number" id="l-amount" placeholder="e.g. 30000" min="0"></div>
+            <div class="field-group"><label class="field-label">Loan Type</label>
+              <select id="l-type" onchange="setLoanRate()">
+                <option value="6.53">Federal Subsidized (6.53% — 2026)</option>
+                <option value="6.53">Federal Unsubsidized Undergrad (6.53%)</option>
+                <option value="8.08">Federal Unsubsidized Grad (8.08%)</option>
+                <option value="9.08">Federal PLUS Loan (9.08%)</option>
+                <option value="custom">Custom / Private Rate</option>
+              </select>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Annual Interest Rate (%)</label><input type="number" id="l-rate" placeholder="e.g. 6.53" step="0.01" value="6.53"></div>
+            <div class="field-group"><label class="field-label">Repayment Term (years)</label><input type="number" id="l-term" placeholder="e.g. 10" value="10" min="1" max="30"></div>
+          </div>
+          <button class="btn-calc" onclick="calcLoan()">Calculate Payments</button>
+          <div id="loan-breakdown" class="loan-breakdown" style="display:none"></div>
+          <div id="loan-warn" style="display:none"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:18px;margin-bottom:14px">2026 Federal Loan Rates</div>
+          <div class="scale-grid" style="grid-template-columns:1fr">
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Subsidized (Undergrad)</span><span class="scale-grade">6.53%</span></div>
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Unsubsidized (Grad)</span><span class="scale-grade">8.08%</span></div>
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct PLUS Loans</span><span class="scale-grade">9.08%</span></div>
+          </div>
+          <div class="warn-box">⚠️ Federal loan limits: Dependent undergrads can borrow up to $31,000 total. Always exhaust federal options before taking private loans.</div>
+        </div>
+      </div>
+
+      <!-- SAT/ACT -->
+      <div id="tab-sat" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">SAT ↔ ACT Score Converter</div><div class="card-subtitle">Convert between SAT and ACT scores using the official College Board concordance table.</div></div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">SAT Score (400–1600)</label><input type="number" id="sat-input" placeholder="Enter SAT score" min="400" max="1600" oninput="convertSAT()"></div>
+            <div class="field-group"><label class="field-label">ACT Score (1–36)</label><input type="number" id="act-input" placeholder="Enter ACT score" min="1" max="36" oninput="convertACT()"></div>
+          </div>
+          <div id="sat-result" class="result-box result-hidden blue-result" style="flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div class="result-label">Equivalent Score</div><div class="result-value blue" id="sat-equiv">—</div></div>
+              <div style="text-align:right"><div class="result-label">National Percentile</div><div style="font-family:var(--font-mono);font-size:32px;color:var(--green)" id="sat-pct">—</div></div>
+            </div>
+            <div id="sat-context" style="font-size:13px;color:var(--ink2);line-height:1.7"></div>
+          </div>
+          <div class="info-box">💡 Both SAT and ACT are equally accepted at all U.S. colleges — choose the test that shows your best performance.</div>
+        </div>
+        <div class="card"><div class="card-title" style="font-size:18px;margin-bottom:14px">Quick Reference</div><div id="sat-table"></div></div>
+      </div>
+
+      <!-- SCHOLARSHIP -->
+      <div id="tab-scholarship" class="tool-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Scholarship & Financial Need Estimator</div><div class="card-subtitle">Estimate your Expected Family Contribution (EFC / SAI), potential scholarship eligibility, and unmet financial need.</div></div>
+          <div id="sch-result" class="result-box result-hidden green-result" style="flex-direction:column;gap:14px;align-items:stretch">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div><div class="result-label">Est. Unmet Financial Need / Year</div><div class="result-value green" id="sch-need">$0</div></div>
+              <div style="text-align:right"><div class="result-label">Est. Merit Aid Eligible</div><div style="font-family:var(--font-mono);font-size:24px;color:var(--accent)" id="sch-merit">$0</div></div>
+            </div>
+            <div id="sch-breakdown" style="font-size:13px;color:var(--ink2);line-height:1.8"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Annual Family Income ($)</label><input type="number" id="s-income" placeholder="e.g. 80000"></div>
+            <div class="field-group"><label class="field-label">Family Assets ($)</label><input type="number" id="s-assets" placeholder="e.g. 50000"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">Number of Family Members</label><input type="number" id="s-family" placeholder="e.g. 4" value="4" min="1" max="20"></div>
+            <div class="field-group"><label class="field-label">Number in College</label><input type="number" id="s-incollege" placeholder="e.g. 1" value="1" min="1" max="5"></div>
+          </div>
+          <div class="two-col">
+            <div class="field-group"><label class="field-label">School Type</label>
+              <select id="s-school">
+                <option value="55000">Private 4-Year ($55,000/yr avg)</option>
+                <option value="28000" selected>Public In-State ($28,000/yr avg)</option>
+                <option value="44000">Public Out-of-State ($44,000/yr avg)</option>
+                <option value="20000">Community College ($20,000/yr avg)</option>
+              </select>
+            </div>
+            <div class="field-group"><label class="field-label">Your GPA (Unweighted)</label><input type="number" id="s-gpa" placeholder="e.g. 3.7" step="0.01" min="0" max="4.0"></div>
+          </div>
+          <button class="btn-calc" onclick="calcScholarship()">Estimate Financial Aid</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:18px;margin-bottom:14px">Aid Tips</div>
+          <div class="tip-item"><span class="tip-icon">📋</span><span>File your FAFSA as early as possible — October 1. Many aid programs are first-come, first-served.</span></div>
+          <div class="tip-item"><span class="tip-icon">💡</span><span>A GPA of 3.5+ qualifies you for most merit scholarships. A 3.7+ opens National Merit worth $5,000–$30,000+.</span></div>
+          <div class="tip-item"><span class="tip-icon">📞</span><span>Always appeal your financial aid award. 67% of students who appeal receive a better offer.</span></div>
+        </div>
+      </div>
+
+    </div><!-- end left col -->
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-card" style="padding:0;overflow:hidden"><div class="ad-slot"><div class="ad-slot-text">Advertisement</div><div class="ad-slot-size">300 × 250</div></div></div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">4.0 Grade Scale</div>
+        <div class="scale-grid">
+          <div class="scale-item"><span class="scale-grade">A+ / A</span><span class="scale-pts">4.0</span></div>
+          <div class="scale-item"><span class="scale-grade">A−</span><span class="scale-pts">3.7</span></div>
+          <div class="scale-item"><span class="scale-grade">B+</span><span class="scale-pts">3.3</span></div>
+          <div class="scale-item"><span class="scale-grade">B</span><span class="scale-pts">3.0</span></div>
+          <div class="scale-item"><span class="scale-grade">B−</span><span class="scale-pts">2.7</span></div>
+          <div class="scale-item"><span class="scale-grade">C+</span><span class="scale-pts">2.3</span></div>
+          <div class="scale-item"><span class="scale-grade">C</span><span class="scale-pts">2.0</span></div>
+          <div class="scale-item"><span class="scale-grade">D</span><span class="scale-pts">1.0</span></div>
+          <div class="scale-item"><span class="scale-grade">F</span><span class="scale-pts">0.0</span></div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-title">Quick Tips</div>
+        <div class="tip-item" style="font-size:12px"><span class="tip-icon">🎯</span><span>Focus on high-credit courses — a 4-credit A moves your GPA more than a 1-credit A.</span></div>
+        <div class="tip-item" style="font-size:12px"><span class="tip-icon">📚</span><span>AP/IB courses only help if you earn a B or better.</span></div>
+        <div class="tip-item" style="font-size:12px"><span class="tip-icon">📅</span><span>Junior year GPA is weighted most heavily by admissions officers.</span></div>
+      </div>
+      <div class="sidebar-card" style="background:var(--ink);border-color:var(--ink)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">GradeScope Pro</div>
+        <div style="font-family:var(--font-display);font-size:20px;color:white;margin-bottom:8px">Unlock the full suite</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:16px;line-height:1.6">AI Essay Coach, college comparison, save calculations, PDF reports, and more.</div>
+        <button class="btn-primary" style="width:100%;font-size:13px" onclick="openPayment('pro')">Start Free Trial →</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="logo">GradeScope</div><p>Free college planning tools for high school and college students. Up-to-date with 2026 rates.</p></div>
+      <div class="footer-col"><h4>Calculators</h4><a onclick="switchTab('gpa',null)">GPA Calculator</a><a onclick="switchTab('weighted',null)">Weighted GPA</a><a onclick="switchTab('needed',null)">Grade Needed</a><a onclick="switchTab('chances',null)">College Chances</a></div>
+      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 GradeScope. Estimates only — not professional advice.</span></div>
+  </footer>
+</div>
+
+
+<!-- ESSAY AI PAGE -->
+<div class="page" id="page-essay">
+  <div class="tool-section-banner" style="background:linear-gradient(135deg,#1a1714,#2d2420)">
+    <div style="max-width:1020px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <h2 style="color:white;margin-bottom:4px">✦ AI Essay Coach <span class="pro-tag">Pro</span></h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.6);margin:0">Write your college essay with real-time AI feedback — as you type.</p>
+      </div>
+      <div id="essay-trial-note" style="font-size:13px;color:rgba(255,255,255,.6)"></div>
+    </div>
+  </div>
+
+  <div style="max-width:1000px;margin:0 auto;padding:32px 40px 80px" id="essay-content">
+
+    <!-- LOGIN GATE (shown when not logged in) -->
+    <div id="essay-gate" style="display:none;text-align:center;padding:80px 40px">
+      <div style="font-size:56px;margin-bottom:20px">✍️</div>
+      <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:12px">AI Essay Coach</div>
+      <p style="font-size:16px;color:var(--ink2);max-width:460px;margin:0 auto 28px;line-height:1.7">Get real-time AI feedback on your college essays — structure, voice, word choice, and more. Create a free account to start your 7-day Pro trial.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-primary" onclick="openAuth('signup')" style="font-size:15px">Create Free Account →</button>
+        <button class="btn-secondary" onclick="openAuth('login')">Sign In</button>
+      </div>
+    </div>
+
+    <!-- ESSAY EDITOR (shown when logged in + Pro/trial) -->
+    <div id="essay-editor" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Your College Essay</div>
+          <div class="card-subtitle">Write or paste your essay below. Use the prompts dropdown to align with Common App or Coalition prompts. AI feedback updates automatically.</div>
+        </div>
+        <div class="essay-toolbar">
+          <select class="essay-prompt-select" id="essay-prompt" onchange="updatePromptHint()">
+            <option value="">— Select a prompt (optional) —</option>
+            <option value="ca1">Common App #1: Background & Identity</option>
+            <option value="ca2">Common App #2: Lessons from Obstacles</option>
+            <option value="ca3">Common App #3: Challenging a Belief</option>
+            <option value="ca4">Common App #4: Problem You've Solved</option>
+            <option value="ca5">Common App #5: Personal Growth Moment</option>
+            <option value="ca6">Common App #6: Captivating Topic</option>
+            <option value="ca7">Common App #7: Write Your Own Topic</option>
+            <option value="why">Why This College? (Supplemental)</option>
+            <option value="activity">Extracurricular / Activities Essay</option>
+            <option value="diversity">Diversity & Perspective Essay</option>
+          </select>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="essay-word-count" id="essay-word-count">0 words / 650 max</span>
+            <button class="essay-get-feedback" onclick="getEssayFeedback()" id="feedback-btn">✦ Get AI Feedback</button>
+          </div>
+        </div>
+        <div id="prompt-hint" style="display:none;background:var(--blue-light);border:1px solid rgba(30,79,163,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:#1a3c7a;margin-bottom:12px;line-height:1.6"></div>
+        <textarea class="essay-textarea" id="essay-textarea" placeholder="Start writing your college essay here... The AI coach will analyze your writing and provide feedback on structure, voice, clarity, and how well you answer the prompt." oninput="onEssayInput()"></textarea>
+        <div id="essay-char-note" style="margin-top:8px"></div>
+      </div>
+
+      <!-- AI Feedback Panel -->
+      <div class="essay-ai-panel" id="essay-ai-panel">
+        <div class="essay-ai-header">
+          <div class="essay-ai-pulse"></div>
+          <div class="essay-ai-title">AI Coach Feedback</div>
+        </div>
+        <div id="essay-ai-content" class="essay-ai-content">
+          <div class="essay-ai-loading">Analyzing your essay<span class="essay-ai-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        </div>
+        <div class="essay-score-grid" id="essay-score-grid" style="display:none">
+          <div class="essay-score-item"><div class="essay-score-num" id="score-structure">—</div><div class="essay-score-label">Structure</div></div>
+          <div class="essay-score-item"><div class="essay-score-num" id="score-voice">—</div><div class="essay-score-label">Voice</div></div>
+          <div class="essay-score-item"><div class="essay-score-num" id="score-clarity">—</div><div class="essay-score-label">Clarity</div></div>
+          <div class="essay-score-item"><div class="essay-score-num" id="score-impact">—</div><div class="essay-score-label">Impact</div></div>
+        </div>
+      </div>
+
+      <!-- Saved essays -->
+      <div class="card" style="margin-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div><div class="card-title" style="font-size:18px">Saved Essays</div><div class="card-subtitle">Your essays are saved to your account.</div></div>
+          <button class="save-btn" onclick="saveEssay()">💾 Save Essay</button>
+        </div>
+        <div id="saved-essays-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
+  <div id="dash-gate" style="display:none;text-align:center;padding:80px 40px">
+    <div style="font-size:56px;margin-bottom:20px">📊</div>
+    <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:12px">Your Dashboard</div>
+    <p style="font-size:16px;color:var(--ink2);max-width:400px;margin:0 auto 28px">Sign in to save and access your calculations from anywhere.</p>
+    <button class="btn-primary" onclick="openAuth('signup')">Create Free Account →</button>
+  </div>
+  <div id="dash-content" style="display:none">
+    <div class="dash-header">
+      <div><div class="dash-welcome" id="dash-welcome">Welcome back!</div><div style="font-size:14px;color:var(--ink3);margin-top:4px" id="dash-email-display"></div></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="dash-plan-badge" id="dash-plan-badge">Free</div>
+        <button class="btn-primary" style="font-size:13px" onclick="openPayment('pro')" id="dash-upgrade-btn">Upgrade to Pro →</button>
+      </div>
+    </div>
+
+    <!-- Trial box -->
+    <div id="dash-trial-box" style="max-width:1100px;margin:20px auto 0;padding:0 40px;display:none">
+      <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="font-size:14px;color:var(--green)">🎁 <strong>Free trial active</strong> — <span id="dash-trial-days"></span> days remaining</div>
+        <button class="btn-calc" style="margin:0;padding:10px 20px;font-size:13px" onclick="openPayment('pro')">Upgrade Now</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" id="dash-saved-list">
+      <div class="dash-empty" style="grid-column:1/-1">
+        <div class="dash-empty-icon">📂</div>
+        <h3>No saved results yet</h3>
+        <p>Use the calculators and save your results to see them here. Your data stays private and synced to your account.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM PAGE -->
+<div class="page" id="page-premium">
+  <div class="premium-hero">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(200,98,42,.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px">✦ Simple, Honest Pricing</div>
+    <h1>Start Free.<br>Upgrade When Ready.</h1>
+    <p>All core calculators are free forever. Pro unlocks the AI Essay Coach, reports, history, and advanced tools. <strong>7-day free trial — no card required.</strong></p>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-tier">Free</div>
+      <div class="pricing-price"><span>$</span>0</div>
+      <div class="pricing-period">forever, no credit card</div>
+      <ul class="pricing-features">
+        <li><span class="feat-check">✓</span> GPA Calculator</li>
+        <li><span class="feat-check">✓</span> Weighted GPA (5.0)</li>
+        <li><span class="feat-check">✓</span> Grade Needed Calculator</li>
+        <li><span class="feat-check">✓</span> College Chances Estimator</li>
+        <li><span class="feat-check">✓</span> Student Loan Calculator</li>
+        <li><span class="feat-check">✓</span> SAT/ACT Converter</li>
+        <li><span class="feat-x">—</span> AI Essay Coach</li>
+        <li><span class="feat-x">—</span> Save calculations</li>
+        <li><span class="feat-x">—</span> College comparison</li>
+        <li><span class="feat-x">—</span> PDF export</li>
+      </ul>
+      <button class="btn-pricing outline" onclick="goToTools()">Use Free Tools →</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Most Popular</div>
+      <div class="pricing-tier">Pro</div>
+      <div class="pricing-price"><span>$</span>4.99</div>
+      <div class="pricing-period">per month · 7-day free trial</div>
+      <ul class="pricing-features">
+        <li><span class="feat-check">✓</span> Everything in Free</li>
+        <li><span class="feat-check">✓</span> <strong>AI Essay Coach</strong> (live feedback)</li>
+        <li><span class="feat-check">✓</span> Save & reload calculations</li>
+        <li><span class="feat-check">✓</span> 200+ university chance comparison</li>
+        <li><span class="feat-check">✓</span> Export PDF reports</li>
+        <li><span class="feat-check">✓</span> Scholarship match engine</li>
+        <li><span class="feat-check">✓</span> Multi-year GPA projector</li>
+        <li><span class="feat-check">✓</span> Financial aid letter analyzer</li>
+        <li><span class="feat-check">✓</span> Ad-free experience</li>
+        <li><span class="feat-check">✓</span> Priority support</li>
+      </ul>
+      <button class="btn-pricing filled" onclick="openPayment('pro')">Start Free Trial — $4.99/mo</button>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-tier">Lifetime</div>
+      <div class="pricing-price"><span>$</span>39</div>
+      <div class="pricing-period">one-time · all future updates</div>
+      <ul class="pricing-features">
+        <li><span class="feat-check">✓</span> Everything in Pro</li>
+        <li><span class="feat-check">✓</span> Lifetime access</li>
+        <li><span class="feat-check">✓</span> All future features</li>
+        <li><span class="feat-check">✓</span> College list builder</li>
+        <li><span class="feat-check">✓</span> Application tracker</li>
+        <li><span class="feat-check">✓</span> Deadline reminders</li>
+        <li><span class="feat-check">✓</span> Transcript analyzer</li>
+        <li><span class="feat-check">✓</span> 1 free consult call</li>
+        <li><span class="feat-check">✓</span> VIP support</li>
+      </ul>
+      <button class="btn-pricing dark" onclick="openPayment('lifetime')">Get Lifetime — $39</button>
+    </div>
+  </div>
+  <div style="max-width:700px;margin:0 auto;padding:0 40px;text-align:center;margin-bottom:32px">
+    <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:8px">Frequently Asked Questions</div>
+  </div>
+  <div class="faq-section">
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Are the free tools really free forever? <span class="faq-toggle">+</span></div><div class="faq-a">Yes. All 7 calculators are 100% free with no signup, no email required, and no time limit. Pro is for students who want the AI Essay Coach and extra power features.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">How does the 7-day free trial work? <span class="faq-toggle">+</span></div><div class="faq-a">Sign up with your email and you get 7 days of full Pro access — no credit card required. After 7 days, you'll be prompted to subscribe if you want to keep Pro features. You'll never be charged without explicitly entering your payment information.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">How accurate are the results? <span class="faq-toggle">+</span></div><div class="faq-a">GPA, grade needed, and loan calculations are mathematically exact. College chances and financial aid estimates are based on publicly available admissions data — they're directional guides, not guarantees.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Can I cancel my Pro subscription anytime? <span class="faq-toggle">+</span></div><div class="faq-a">Yes, absolutely. Cancel any time from your account dashboard with one click. No cancellation fees, no questions asked.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Is my data safe? <span class="faq-toggle">+</span></div><div class="faq-a">All calculations happen locally in your browser. Account data is stored securely. Payments are processed by Stripe — we never see your card number.</div></div>
+  </div>
+  <footer>
+    <div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;font-size:12px">
+      <span>© 2026 GradeScope · <a href="#" style="color:rgba(255,255,255,.4)">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4)">Terms</a></span>
+    </div>
+  </footer>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <div class="about-hero-content">
+      <div class="about-avatar"><img src="IMG_7529.png" alt="Profile Picture"></div>
+      <h1>Built by a Student,<br>for Students</h1>
+      <p class="subtitle">GradeScope was created by Shriyan Avadhanula, a 10th-grade student who got tired of juggling spreadsheets and clunky calculators.</p>
+    </div>
+  </div>
+  <div class="about-content">
+    <div class="about-section">
+      <h2>The Story</h2>
+      <p>Every college prep tool online was either buried behind a signup form, littered with irrelevant ads, or just plain ugly. The ones that were good cost money. So I built GradeScope — a clean, fast, actually useful set of calculators that every student deserves for free.</p>
+      <p>What started as a personal GPA tracker for my own IB MYP coursework turned into a full platform when friends kept asking to use it.</p>
+    </div>
+    <div class="about-section">
+      <h2>About the Creator</h2>
+      <p>Shriyan Avadhanula, a high schooler in Virginia, enrolled in an IB program, targeting UVA McIntire and Virginia Tech's Computing and Management program. Outside school, I founded and run a data privacy organization called DataShadow to help people manage and monetize their data, and I've also filed a patent on specific AI claims, and run finance/business initiatives through Fund Flow RVA.</p>
+      <div class="badge-grid">
+        <div class="badge">📊 IB Student</div>
+        <div class="badge">🎾 Founded DataShadow</div>
+        <div class="badge">💼 Finance Co-President</div>
+        <div class="badge">🔐 Cybersecurity Researcher</div>
+        <div class="badge">🎓 2x Presidential Educational Award</div>
+        <div class="badge">📈 M&A Mentorship</div>
+      </div>
+    </div>
+    <div class="about-section">
+      <h2>Get In Touch</h2>
+      <div class="contact-grid">
+        <div class="contact-card"><div class="icon">✉️</div><h3>Email</h3><p><a href="mailto:avadhanula.shriyan@gmail.com">avadhanula.shriyan@gmail.com</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Response within 24 hours</p></div>
+        <div class="contact-card"><div class="icon">🐦</div><h3>Twitter / X</h3><p><a href="#">@gradescope</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Updates & announcements</p></div>
+        <div class="contact-card"><div class="icon">📸</div><h3>Instagram</h3><p><a href="#">@gradescope.app</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Student tips & features</p></div>
+        <div class="contact-card"><div class="icon">💼</div><h3>Partnerships</h3><p><a href="mailto:partnerships@gradescope.app">partnerships@gradescope.app</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Sponsorships & collabs</p></div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px 0;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;font-size:12px;text-align:center">
+      <span style="color:rgba(255,255,255,.4)">© 2026 GradeScope · Made by a student, for students · <a href="#" style="color:rgba(255,255,255,.4)">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4)">Terms</a></span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   UI NAVIGATION & MODAL FUNCTIONS
+   These must be in a regular (non-module) script so that
+   inline onclick= attributes can find them on window.
+============================================================ */
+
+// currentUser proxy — reads from window._gsUser set by module
+Object.defineProperty(window, 'currentUser', {
+  get: () => window._gsUser || null,
+  configurable: true
+});
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+  // update nav active state
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navBtn = document.getElementById('nav-' + name);
+  if (navBtn) navBtn.classList.add('active');
+  window.scrollTo(0, 0);
+  if (name === 'essay' && typeof updateEssayPage === 'function') updateEssayPage();
+  if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('tab-' + tab);
+  if (panel) panel.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + tab + "'")) b.classList.add('active');
+    });
+  }
+}
+
+function showTool(tab) {
+  showPage('tools');
+  // find the button matching this tab and pass it
+  const btn = document.querySelector('.tab-btn[onclick*="' + tab + '"]');
+  switchTab(tab, btn);
+}
+
+function goToTools() {
+  showPage('tools');
+}
+
+function goToEssay() {
+  showPage('essay');
+}
+
+function goDashboard() {
+  showPage('dashboard');
+}
+
+function openAuth(mode, subtitle) {
+  const modal = document.getElementById('authModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('show'), 10);
+  if (mode === 'login') switchAuthTab('login');
+  else switchAuthTab('signup');
+  if (subtitle) {
+    const s = document.getElementById('auth-subtitle');
+    if (s) s.textContent = subtitle;
+  }
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.textContent = '';
+}
+
+function closeAuth() {
+  const modal = document.getElementById('authModal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  modal.style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+  const signup = document.getElementById('auth-form-signup');
+  const login = document.getElementById('auth-form-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const tabLogin = document.getElementById('tab-login');
+  const switchText = document.getElementById('auth-switch-text');
+  const trialBox = document.getElementById('trial-info-box');
+  if (tab === 'login') {
+    if (signup) signup.style.display = 'none';
+    if (login) login.style.display = '';
+    if (tabSignup) tabSignup.classList.remove('active');
+    if (tabLogin) tabLogin.classList.add('active');
+    if (switchText) switchText.innerHTML = 'New here? <a onclick="switchAuthTab(\'signup\')">Create an account</a>';
+    if (trialBox) trialBox.style.display = 'none';
+  } else {
+    if (signup) signup.style.display = '';
+    if (login) login.style.display = 'none';
+    if (tabSignup) tabSignup.classList.add('active');
+    if (tabLogin) tabLogin.classList.remove('active');
+    if (switchText) switchText.innerHTML = 'Already have an account? <a onclick="switchAuthTab(\'login\')">Sign in</a>';
+    if (trialBox) trialBox.style.display = '';
+  }
+}
+
+function openPayment(plan) {
+  if (!window.currentUser) { openAuth('signup', 'Create a free account first, then upgrade.'); return; }
+  const modal = document.getElementById('paymentModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('show'), 10);
+  const label = document.getElementById('payment-plan-label');
+  if (label) label.textContent = plan === 'lifetime' ? 'GradeScope Lifetime — $39 one-time' : 'GradeScope Pro — $4.99/month';
+  const emailEl = document.getElementById('payment-email');
+  if (emailEl && window.currentUser) emailEl.value = window.currentUser.email || '';
+}
+
+function closePayment() {
+  const modal = document.getElementById('paymentModal');
+  if (!modal) return;
+  modal.classList.remove('show');
+  modal.style.display = 'none';
+}
+
+function switchPay(method, el) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const card = document.getElementById('card-form');
+  const paypal = document.getElementById('paypal-form');
+  if (method === 'paypal') {
+    if (card) card.style.display = 'none';
+    if (paypal) paypal.style.display = '';
+  } else {
+    if (card) card.style.display = '';
+    if (paypal) paypal.style.display = 'none';
+  }
+}
+
+function handlePayment() {
+  const btn = document.querySelector('.pay-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span>Processing...</span>'; }
+  setTimeout(() => {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>'; }
+    closePayment();
+    showToast('✓ Payment processed! Pro features are now active.', 'success');
+    // In production, update plan via backend
+  }, 1800);
+}
+
+function handlePayPal() {
+  showToast('Redirecting to PayPal...', 'info');
+  setTimeout(closePayment, 1500);
+}
+
+function fmtCard(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 16);
+  input.value = v.replace(/(.{4})/g, '$1 ').trim();
+}
+
+function fmtExpiry(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 4);
+  if (v.length > 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
+  input.value = v;
+}
+
+function showToast(msg, type) {
+  let toast = document.getElementById('gs-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'gs-toast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1714;color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;font-family:var(--font-body)';
+    document.body.appendChild(toast);
+  }
+  if (type === 'error') toast.style.background = '#c0312b';
+  else if (type === 'info') toast.style.background = '#1e4fa3';
+  else toast.style.background = '#1a1714';
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 3000);
+}
+
+function toggleFAQ(el) {
+  el.classList.toggle('open');
+}
+
+function toggleProfileMenu() {
+  const dd = document.querySelector('.profile-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+
+// Close profile menu on outside click
+document.addEventListener('click', function(e) {
+  const dd = document.querySelector('.profile-dropdown');
+  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+});
+
+function updateNavForUser() {
+  const user = window.currentUser;
+  const signinBtn = document.getElementById('nav-signin-btn');
+  const userNameBtn = document.getElementById('nav-user-name');
+  const profileDrop = document.querySelector('.profile-dropdown');
+  const trialBanner = document.getElementById('trial-banner');
+  const getProBtn = document.getElementById('nav-get-pro');
+
+  if (user) {
+    if (signinBtn) signinBtn.style.display = 'none';
+    if (profileDrop) profileDrop.style.display = '';
+    if (userNameBtn) {
+      const name = user.displayName || user.email?.split('@')[0] || 'Account';
+      userNameBtn.textContent = name.split(' ')[0] + ' ▾';
+    }
+    // Show trial banner if on trial
+    if (trialBanner && window._gsProfile?.plan === 'trial') {
+      trialBanner.style.display = 'flex';
+      const daysEl = trialBanner.querySelector('.trial-days');
+      if (daysEl && typeof getTrialDaysLeft === 'function') daysEl.textContent = getTrialDaysLeft() + ' days left';
+    } else if (trialBanner) {
+      trialBanner.style.display = 'none';
+    }
+    // Hide "Get Pro" if already pro
+    if (getProBtn && typeof isPro === 'function' && isPro()) getProBtn.style.display = 'none';
+    else if (getProBtn) getProBtn.style.display = '';
+  } else {
+    if (signinBtn) signinBtn.style.display = '';
+    if (profileDrop) profileDrop.style.display = 'none';
+    if (trialBanner) trialBanner.style.display = 'none';
+    if (getProBtn) getProBtn.style.display = '';
+  }
+}
+
+function renderDashboard() {
+  // update welcome name
+  const nameEl = document.getElementById('dash-user-name');
+  const user = window.currentUser;
+  if (nameEl && user) nameEl.textContent = user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'there';
+  // Show/hide upgrade prompt
+  const upgradeBtn = document.getElementById('dash-upgrade-btn');
+  if (upgradeBtn && typeof isPro === 'function') upgradeBtn.style.display = isPro() ? 'none' : '';
+  // Load saved results list
+  if (user && window._dbGetSaved) {
+    window._dbGetSaved(user.uid).then(items => {
+      const list = document.getElementById('dash-saved-list');
+      if (!list) return;
+      if (!items || !items.length) {
+        list.innerHTML = '<p style="font-size:13px;color:var(--ink3)">No saved results yet. Use a calculator and your results will appear here.</p>';
+        return;
+      }
+      list.innerHTML = items.map(item => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border2);gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--ink)">${item.title || item.tool}</div>
+            <div style="font-size:12px;color:var(--ink3)">${item.date || ''} · ${Object.entries(item.data || {}).map(([k,v]) => k + ': ' + v).join(' · ')}</div>
+          </div>
+          <button onclick="deleteSavedItem('${item.id}')" style="padding:5px 12px;border-radius:6px;background:none;color:var(--ink3);border:1px solid var(--border);font-size:12px;cursor:pointer;font-family:var(--font-body)">Delete</button>
+        </div>
+      `).join('');
+    }).catch(() => {});
+  }
+}
+
+window.deleteSavedItem = function(id) {
+  const user = window.currentUser;
+  if (!user || !window._dbDeleteSaved) return;
+  window._dbDeleteSaved(user.uid, id).then(() => {
+    renderDashboard();
+    showToast('Deleted.');
+  });
+};
+
+// Init: show home page on load
+document.addEventListener('DOMContentLoaded', function() {
+  showPage('home');
+  // make sure profile dropdown is hidden initially
+  const dd = document.querySelector('.profile-dropdown');
+  if (dd) dd.style.display = 'none';
+  updateNavForUser();
+});
+</script>
+
+<script type="module">
+/* ============================================================
+   FIREBASE INIT
+============================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBHeTI0yxvZDoRD8cW4gjUTblK9OvGIEfY",
+  authDomain: "gradescope-539dd.firebaseapp.com",
+  projectId: "gradescope-539dd",
+  storageBucket: "gradescope-539dd.firebasestorage.app",
+  messagingSenderId: "798320743689",
+  appId: "1:798320743689:web:8b0c41460e61e5fc33afd8",
+  measurementId: "G-88E9156Q9J"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+/* ============================================================
+   DATABASE (Firebase Firestore — replaces localStorage)
+   Same method names so the rest of the code works unchanged.
+============================================================ */
+const DB = {
+  // ── User profile ──────────────────────────────────────────
+  getCurrentUser: () => auth.currentUser,
+
+  // Create or update a user profile doc in Firestore
+  setCurrentUser: async (user, extraData = {}) => {
+    if (!user) return;
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      // New user — write full profile
+      await setDoc(ref, {
+        name: user.displayName || extraData.name || '',
+        email: user.email,
+        createdAt: serverTimestamp(),
+        plan: 'free',
+        trialStart: serverTimestamp(),
+        ...extraData
+      });
+    }
+  },
+
+  // Fetch the stored profile from Firestore
+  getUserProfile: async (uid) => {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      return snap.exists() ? snap.data() : null;
+    } catch { return null; }
+  },
+
+  // Update a field on the user profile
+  updateUserProfile: async (uid, data) => {
+    try { await updateDoc(doc(db, 'users', uid), data); } catch {}
+  },
+
+  // ── Saved results ─────────────────────────────────────────
+  getSaved: async (uid) => {
+    try {
+      const q = query(collection(db, 'users', uid, 'saved'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch { return []; }
+  },
+
+  addSaved: async (uid, item) => {
+    try {
+      await addDoc(collection(db, 'users', uid, 'saved'), {
+        ...item,
+        createdAt: serverTimestamp(),
+        date: new Date().toLocaleDateString()
+      });
+    } catch (e) { console.error('addSaved error', e); }
+  },
+
+  deleteSaved: async (uid, id) => {
+    try { await deleteDoc(doc(db, 'users', uid, 'saved', id)); } catch {}
+  },
+
+  // ── Essays ────────────────────────────────────────────────
+  getEssays: async (uid) => {
+    try {
+      const q = query(collection(db, 'users', uid, 'essays'), orderBy('savedAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
+    } catch { return []; }
+  },
+
+  saveEssay: async (uid, essay) => {
+    try {
+      if (essay.firestoreId) {
+        // Update existing
+        const ref = doc(db, 'users', uid, 'essays', essay.firestoreId);
+        await setDoc(ref, { ...essay, savedAt: serverTimestamp() }, { merge: true });
+      } else {
+        // New essay
+        await addDoc(collection(db, 'users', uid, 'essays'), {
+          ...essay,
+          savedAt: serverTimestamp()
+        });
+      }
+    } catch (e) { console.error('saveEssay error', e); }
+  },
+
+  deleteEssay: async (uid, firestoreId) => {
+    try { await deleteDoc(doc(db, 'users', uid, 'essays', firestoreId)); } catch {}
+  }
+};
+
+/* ============================================================
+   AUTH STATE LISTENER
+   Fires whenever a user signs in or out — keeps currentUser
+   in sync and updates the UI automatically.
+============================================================ */
+onAuthStateChanged(auth, async (user) => {
+  // Expose current user to global scripts
+  window._gsUser = user || null;
+  if (user) {
+    // Ensure profile doc exists
+    await DB.setCurrentUser(user);
+    // Load plan info from Firestore and cache on window
+    const profile = await DB.getUserProfile(user.uid);
+    window._gsProfile = profile;
+  } else {
+    window._gsProfile = null;
+  }
+  // Expose DB helpers for dashboard
+  window._dbGetSaved = (uid) => DB.getSaved(uid);
+  window._dbDeleteSaved = (uid, id) => DB.deleteSaved(uid, id);
+  // Re-run the nav + UI update that the rest of the code uses
+  if (typeof updateNavForUser === 'function') updateNavForUser();
+  if (typeof updateEssayPage === 'function') updateEssayPage();
+  if (typeof renderDashboard === 'function') renderDashboard();
+});
+
+/* ============================================================
+   AUTH HELPERS — hoisted to window so inline onclick= works
+============================================================ */
+
+// Sign up with email + password
+window.handleSignup = async function() {
+  const name  = document.getElementById('signup-name')?.value.trim();
+  const email = document.getElementById('signup-email')?.value.trim();
+  const pass  = document.getElementById('signup-password')?.value;
+  const errEl = document.getElementById('auth-error');
+  if (!name || !email || !pass) { if(errEl) errEl.textContent = 'Please fill in all fields.'; return; }
+  if (pass.length < 6)          { if(errEl) errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await DB.setCurrentUser(cred.user, { name });
+    closeAuth();
+    showToast('✓ Account created! Welcome to GradeScope.');
+  } catch (e) {
+    if(errEl) errEl.textContent = firebaseErrMsg(e.code);
+  }
+};
+
+// Sign in with email + password
+window.handleLogin = async function() {
+  const email = document.getElementById('login-email')?.value.trim();
+  const pass  = document.getElementById('login-password')?.value;
+  const errEl = document.getElementById('auth-error');
+  if (!email || !pass) { if(errEl) errEl.textContent = 'Please enter your email and password.'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    closeAuth();
+    showToast('✓ Welcome back!');
+  } catch (e) {
+    if(errEl) errEl.textContent = firebaseErrMsg(e.code);
+  }
+};
+
+// Sign in / sign up with Google
+window.handleGoogleAuth = async function() {
+  const errEl = document.getElementById('auth-error');
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    await DB.setCurrentUser(result.user);
+    closeAuth();
+    showToast('✓ Signed in with Google!');
+  } catch (e) {
+    if(errEl) errEl.textContent = firebaseErrMsg(e.code);
+  }
+};
+
+// Sign out
+window.handleSignOut = async function() {
+  await signOut(auth);
+  showToast('Signed out.');
+};
+
+// Translate Firebase error codes into friendly messages
+function firebaseErrMsg(code) {
+  const map = {
+    'auth/email-already-in-use':    'That email is already registered. Try signing in.',
+    'auth/invalid-email':           'Please enter a valid email address.',
+    'auth/weak-password':           'Password must be at least 6 characters.',
+    'auth/user-not-found':          'No account found with that email.',
+    'auth/wrong-password':          'Incorrect password. Try again.',
+    'auth/invalid-credential':      'Incorrect email or password.',
+    'auth/too-many-requests':       'Too many attempts. Please wait a moment.',
+    'auth/popup-closed-by-user':    'Google sign-in was cancelled.',
+    'auth/network-request-failed':  'Network error. Check your connection.'
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+/* ============================================================
+   PLAN HELPERS
+   Reads from window._gsProfile (set by onAuthStateChanged)
+   so they stay synchronous like the original code expects.
+============================================================ */
+window.getUserPlan = function() {
+  return window._gsProfile?.plan || 'free';
+};
+
+window.isPro = function() {
+  const plan = getUserPlan();
+  if (plan === 'pro' || plan === 'lifetime') return true;
+  // Check trial
+  if (plan === 'trial' && window._gsProfile?.trialStart) {
+    const start = window._gsProfile.trialStart.toDate?.() || new Date(window._gsProfile.trialStart);
+    const daysElapsed = (Date.now() - start.getTime()) / 86400000;
+    return daysElapsed < 7;
+  }
+  return false;
+};
+
+window.getTrialDaysLeft = function() {
+  if (!window._gsProfile?.trialStart) return 0;
+  const start = window._gsProfile.trialStart.toDate?.() || new Date(window._gsProfile.trialStart);
+  return Math.max(0, 7 - Math.floor((Date.now() - start.getTime()) / 86400000));
+};
+
+/* ============================================================
+   SAVE RESULT (async wrapper used by calcGPAAndSave etc.)
+============================================================ */
+window.saveResult = async function(tool, title, data) {
+  const user = auth.currentUser;
+  if (!user) return;
+  await DB.addSaved(user.uid, { tool, title, data });
+  showToast('✓ Saved to your dashboard!');
+  if (typeof renderDashboard === 'function') renderDashboard();
+};
+
+/* ============================================================
+   DATABASE — legacy shim so old synchronous calls don't crash.
+   Any call that expects synchronous data falls back gracefully.
+============================================================ */
+
+const UNIVERSITIES = [
+  {name:'Harvard University',state:'MA',rate:3.4,tier:'ivy'},
+  {name:'Yale University',state:'CT',rate:4.6,tier:'ivy'},
+  {name:'Princeton University',state:'NJ',rate:4.4,tier:'ivy'},
+  {name:'Columbia University',state:'NY',rate:3.9,tier:'ivy'},
+  {name:'University of Pennsylvania',state:'PA',rate:7.7,tier:'ivy'},
+  {name:'Brown University',state:'RI',rate:5.1,tier:'ivy'},
+  {name:'Dartmouth College',state:'NH',rate:6.2,tier:'ivy'},
+  {name:'Cornell University',state:'NY',rate:8.7,tier:'ivy'},
+  // Elite non-Ivy
+  {name:'MIT',state:'MA',rate:3.9,tier:'ivy'},
+  {name:'Stanford University',state:'CA',rate:3.7,tier:'ivy'},
+  {name:'Caltech',state:'CA',rate:2.7,tier:'ivy'},
+  {name:'Duke University',state:'NC',rate:6.6,tier:'ivy'},
+  {name:'Johns Hopkins University',state:'MD',rate:7.4,tier:'ivy'},
+  {name:'Northwestern University',state:'IL',rate:7.0,tier:'ivy'},
+  {name:'Vanderbilt University',state:'TN',rate:6.7,tier:'ivy'},
+  {name:'Rice University',state:'TX',rate:8.0,tier:'ivy'},
+  {name:'Notre Dame',state:'IN',rate:13.0,tier:'high'},
+  {name:'Georgetown University',state:'DC',rate:12.0,tier:'high'},
+  {name:'Tufts University',state:'MA',rate:11.0,tier:'high'},
+  {name:'Washington University in St. Louis',state:'MO',rate:12.0,tier:'high'},
+  {name:'Emory University',state:'GA',rate:19.0,tier:'high'},
+  {name:'Carnegie Mellon University',state:'PA',rate:11.0,tier:'high'},
+  {name:'University of Southern California',state:'CA',rate:12.0,tier:'high'},
+  {name:'Boston College',state:'MA',rate:18.0,tier:'high'},
+  {name:'Northeastern University',state:'MA',rate:6.8,tier:'high'},
+  {name:'Case Western Reserve University',state:'OH',rate:30.0,tier:'select'},
+  {name:'Tulane University',state:'LA',rate:13.0,tier:'high'},
+  {name:'Lehigh University',state:'PA',rate:36.0,tier:'select'},
+  {name:'Boston University',state:'MA',rate:18.0,tier:'high'},
+  {name:'Rensselaer Polytechnic Institute',state:'NY',rate:51.0,tier:'mod'},
+  {name:'Rochester University',state:'NY',rate:34.0,tier:'select'},
+  {name:'Wake Forest University',state:'NC',rate:25.0,tier:'select'},
+  {name:'University of Miami',state:'FL',rate:19.0,tier:'high'},
+  {name:'Fordham University',state:'NY',rate:54.0,tier:'mod'},
+  // Top Public Universities
+  {name:'UC Berkeley',state:'CA',rate:11.4,tier:'high'},
+  {name:'UCLA',state:'CA',rate:8.6,tier:'ivy'},
+  {name:'University of Michigan',state:'MI',rate:17.0,tier:'high'},
+  {name:'University of Virginia',state:'VA',rate:20.0,tier:'high'},
+  {name:'University of North Carolina Chapel Hill',state:'NC',rate:19.0,tier:'high'},
+  {name:'Georgia Tech',state:'GA',rate:16.0,tier:'high'},
+  {name:'University of Florida',state:'FL',rate:24.0,tier:'select'},
+  {name:'University of Texas Austin',state:'TX',rate:31.0,tier:'select'},
+  {name:'University of Wisconsin Madison',state:'WI',rate:44.0,tier:'select'},
+  {name:'Penn State University',state:'PA',rate:56.0,tier:'mod'},
+  {name:'Purdue University',state:'IN',rate:53.0,tier:'mod'},
+  {name:'Ohio State University',state:'OH',rate:53.0,tier:'mod'},
+  {name:'University of Illinois Urbana-Champaign',state:'IL',rate:45.0,tier:'select'},
+  {name:'UC San Diego',state:'CA',rate:24.0,tier:'select'},
+  {name:'UC Davis',state:'CA',rate:37.0,tier:'select'},
+  {name:'UC Santa Barbara',state:'CA',rate:28.0,tier:'select'},
+  {name:'UC Irvine',state:'CA',rate:26.0,tier:'select'},
+  {name:'UC Santa Cruz',state:'CA',rate:47.0,tier:'select'},
+  {name:'UC Riverside',state:'CA',rate:57.0,tier:'mod'},
+  {name:'Michigan State University',state:'MI',rate:71.0,tier:'open'},
+  {name:'Indiana University Bloomington',state:'IN',rate:80.0,tier:'open'},
+  {name:'University of Iowa',state:'IA',rate:84.0,tier:'open'},
+  {name:'University of Minnesota',state:'MN',rate:57.0,tier:'mod'},
+  {name:'University of Colorado Boulder',state:'CO',rate:84.0,tier:'open'},
+  {name:'University of Arizona',state:'AZ',rate:82.0,tier:'open'},
+  {name:'Arizona State University',state:'AZ',rate:64.0,tier:'mod'},
+  {name:'University of Oregon',state:'OR',rate:82.0,tier:'open'},
+  {name:'University of Washington',state:'WA',rate:49.0,tier:'select'},
+  {name:'University of Maryland',state:'MD',rate:44.0,tier:'select'},
+  {name:'Rutgers University',state:'NJ',rate:61.0,tier:'mod'},
+  {name:'Virginia Tech',state:'VA',rate:57.0,tier:'mod'},
+  {name:'University of Georgia',state:'GA',rate:40.0,tier:'select'},
+  {name:'North Carolina State University',state:'NC',rate:47.0,tier:'select'},
+  {name:'Clemson University',state:'SC',rate:44.0,tier:'select'},
+  {name:'University of Tennessee',state:'TN',rate:68.0,tier:'mod'},
+  {name:'University of Alabama',state:'AL',rate:79.0,tier:'open'},
+  {name:'Auburn University',state:'AL',rate:75.0,tier:'open'},
+  {name:'Louisiana State University',state:'LA',rate:74.0,tier:'open'},
+  {name:'University of South Carolina',state:'SC',rate:65.0,tier:'mod'},
+  {name:'University of Kentucky',state:'KY',rate:93.0,tier:'open'},
+  {name:'University of Nebraska',state:'NE',rate:77.0,tier:'open'},
+  {name:'Kansas State University',state:'KS',rate:95.0,tier:'open'},
+  {name:'University of Kansas',state:'KS',rate:90.0,tier:'open'},
+  {name:'Iowa State University',state:'IA',rate:91.0,tier:'open'},
+  {name:'University of Missouri',state:'MO',rate:77.0,tier:'open'},
+  {name:'University of Arkansas',state:'AR',rate:71.0,tier:'open'},
+  {name:'Oklahoma State University',state:'OK',rate:71.0,tier:'open'},
+  {name:'University of Oklahoma',state:'OK',rate:72.0,tier:'open'},
+  {name:'Texas A&M University',state:'TX',rate:63.0,tier:'mod'},
+  {name:'University of Houston',state:'TX',rate:62.0,tier:'mod'},
+  {name:'Texas Tech University',state:'TX',rate:70.0,tier:'mod'},
+  {name:'Baylor University',state:'TX',rate:40.0,tier:'select'},
+  {name:'Southern Methodist University',state:'TX',rate:49.0,tier:'select'},
+  {name:'Texas Christian University',state:'TX',rate:43.0,tier:'select'},
+  {name:'University of Nevada Las Vegas',state:'NV',rate:85.0,tier:'open'},
+  {name:'University of Utah',state:'UT',rate:79.0,tier:'open'},
+  {name:'Brigham Young University',state:'UT',rate:67.0,tier:'mod'},
+  {name:'University of New Mexico',state:'NM',rate:95.0,tier:'open'},
+  {name:'Colorado State University',state:'CO',rate:84.0,tier:'open'},
+  {name:'University of Montana',state:'MT',rate:94.0,tier:'open'},
+  {name:'Florida State University',state:'FL',rate:25.0,tier:'select'},
+  {name:'University of Central Florida',state:'FL',rate:41.0,tier:'select'},
+  {name:'University of South Florida',state:'FL',rate:44.0,tier:'select'},
+  {name:'Florida International University',state:'FL',rate:57.0,tier:'mod'},
+  // Top Liberal Arts
+  {name:'Williams College',state:'MA',rate:8.4,tier:'ivy'},
+  {name:'Amherst College',state:'MA',rate:9.0,tier:'ivy'},
+  {name:'Swarthmore College',state:'PA',rate:7.7,tier:'ivy'},
+  {name:'Pomona College',state:'CA',rate:7.6,tier:'ivy'},
+  {name:'Wellesley College',state:'MA',rate:15.0,tier:'high'},
+  {name:'Bowdoin College',state:'ME',rate:9.0,tier:'ivy'},
+  {name:'Carleton College',state:'MN',rate:17.0,tier:'high'},
+  {name:'Middlebury College',state:'VT',rate:15.0,tier:'high'},
+  {name:'Vassar College',state:'NY',rate:22.0,tier:'select'},
+  {name:'Hamilton College',state:'NY',rate:15.0,tier:'high'},
+  {name:'Colgate University',state:'NY',rate:22.0,tier:'select'},
+  {name:'Colby College',state:'ME',rate:11.0,tier:'high'},
+  {name:'Bates College',state:'ME',rate:11.0,tier:'high'},
+  {name:'Trinity College',state:'CT',rate:37.0,tier:'select'},
+  {name:'Bryn Mawr College',state:'PA',rate:34.0,tier:'select'},
+  {name:'Smith College',state:'MA',rate:32.0,tier:'select'},
+  {name:'Mount Holyoke College',state:'MA',rate:52.0,tier:'mod'},
+  {name:'Connecticut College',state:'CT',rate:37.0,tier:'select'},
+  {name:'Bucknell University',state:'PA',rate:32.0,tier:'select'},
+  {name:'Lafayette College',state:'PA',rate:38.0,tier:'select'},
+  {name:'Grinnell College',state:'IA',rate:10.0,tier:'high'},
+  {name:'Oberlin College',state:'OH',rate:29.0,tier:'select'},
+  {name:'Macalester College',state:'MN',rate:30.0,tier:'select'},
+  {name:'Haverford College',state:'PA',rate:11.0,tier:'high'},
+  {name:'Claremont McKenna College',state:'CA',rate:9.0,tier:'ivy'},
+  {name:'Harvey Mudd College',state:'CA',rate:14.0,tier:'high'},
+  {name:'Scripps College',state:'CA',rate:26.0,tier:'select'},
+  {name:'Davidson College',state:'NC',rate:17.0,tier:'high'},
+  {name:'College of the Holy Cross',state:'MA',rate:35.0,tier:'select'},
+  {name:'Furman University',state:'SC',rate:62.0,tier:'mod'},
+  // Additional well-known schools
+  {name:'New York University',state:'NY',rate:12.0,tier:'high'},
+  {name:'Syracuse University',state:'NY',rate:60.0,tier:'mod'},
+  {name:'George Washington University',state:'DC',rate:43.0,tier:'select'},
+  {name:'American University',state:'DC',rate:37.0,tier:'select'},
+  {name:'Howard University',state:'DC',rate:35.0,tier:'select'},
+  {name:'Morehouse College',state:'GA',rate:53.0,tier:'mod'},
+  {name:'Spelman College',state:'GA',rate:37.0,tier:'select'},
+  {name:'Hampton University',state:'VA',rate:38.0,tier:'select'},
+  {name:'Xavier University of Louisiana',state:'LA',rate:51.0,tier:'mod'},
+  {name:'Drexel University',state:'PA',rate:75.0,tier:'open'},
+  {name:'Temple University',state:'PA',rate:67.0,tier:'mod'},
+  {name:'Marquette University',state:'WI',rate:83.0,tier:'open'},
+  {name:'Villanova University',state:'PA',rate:28.0,tier:'select'},
+  {name:'Saint Louis University',state:'MO',rate:57.0,tier:'mod'},
+  {name:'University of Denver',state:'CO',rate:68.0,tier:'mod'},
+  {name:'Creighton University',state:'NE',rate:71.0,tier:'open'},
+  {name:'Gonzaga University',state:'WA',rate:72.0,tier:'open'},
+  {name:'Loyola University Chicago',state:'IL',rate:73.0,tier:'open'},
+  {name:'Santa Clara University',state:'CA',rate:49.0,tier:'select'},
+  {name:'University of San Diego',state:'CA',rate:52.0,tier:'mod'},
+  {name:'Chapman University',state:'CA',rate:58.0,tier:'mod'},
+  {name:'Pepperdine University',state:'CA',rate:51.0,tier:'mod'},
+  {name:'University of the Pacific',state:'CA',rate:67.0,tier:'mod'},
+  {name:'Occidental College',state:'CA',rate:38.0,tier:'select'},
+  {name:'University of Redlands',state:'CA',rate:77.0,tier:'open'},
+  {name:'Whitman College',state:'WA',rate:47.0,tier:'select'},
+  {name:'Reed College',state:'OR',rate:35.0,tier:'select'},
+  {name:'Lewis & Clark College',state:'OR',rate:74.0,tier:'open'},
+  {name:'University of Puget Sound',state:'WA',rate:83.0,tier:'open'},
+  {name:'Elon University',state:'NC',rate:72.0,tier:'open'},
+  {name:'High Point University',state:'NC',rate:73.0,tier:'open'},
+  {name:'Belmont University',state:'TN',rate:72.0,tier:'open'},
+  {name:'Stetson University',state:'FL',rate:64.0,tier:'mod'},
+  {name:'Rollins College',state:'FL',rate:64.0,tier:'mod'},
+  {name:'University of Tampa',state:'FL',rate:49.0,tier:'select'},
+  {name:'Quinnipiac University',state:'CT',rate:73.0,tier:'open'},
+  {name:'Providence College',state:'RI',rate:49.0,tier:'select'},
+  {name:'Stonehill College',state:'MA',rate:73.0,tier:'open'},
+  {name:'Fairfield University',state:'CT',rate:55.0,tier:'mod'},
+  {name:'Marist College',state:'NY',rate:48.0,tier:'select'},
+  {name:'Ithaca College',state:'NY',rate:68.0,tier:'mod'},
+  {name:'Alfred University',state:'NY',rate:71.0,tier:'open'},
+  {name:'Union College',state:'NY',rate:41.0,tier:'select'},
+  {name:'St. Lawrence University',state:'NY',rate:56.0,tier:'mod'},
+  {name:'Hobart and William Smith Colleges',state:'NY',rate:61.0,tier:'mod'},
+  {name:'Skidmore College',state:'NY',rate:25.0,tier:'select'},
+  {name:'Sarah Lawrence College',state:'NY',rate:46.0,tier:'select'},
+  {name:'The New School',state:'NY',rate:60.0,tier:'mod'},
+  {name:'Pratt Institute',state:'NY',rate:51.0,tier:'mod'},
+  {name:'Fashion Institute of Technology',state:'NY',rate:43.0,tier:'select'},
+  {name:'Parsons School of Design',state:'NY',rate:41.0,tier:'select'},
+  {name:'Savannah College of Art and Design',state:'GA',rate:77.0,tier:'open'},
+  {name:'Rhode Island School of Design',state:'RI',rate:21.0,tier:'high'},
+  {name:'School of the Art Institute Chicago',state:'IL',rate:81.0,tier:'open'},
+];
+
+function searchUniversities(query) {
+  const box = document.getElementById('uni-results');
+  if(query.length < 2) { box.classList.remove('show'); return; }
+  const matches = UNIVERSITIES.filter(u =>
+    u.name.toLowerCase().includes(query.toLowerCase()) ||
+    u.state.toLowerCase().includes(query.toLowerCase())
+  ).slice(0, 8);
+  if(!matches.length) { box.classList.remove('show'); return; }
+  box.innerHTML = matches.map(u => `
+    <div class="uni-result-item" onclick="selectUniversity('${u.name.replace(/'/g,"\\'")}')">
+      <div>
+        <div class="uni-result-name">${u.name}</div>
+        <div style="font-size:11px;color:var(--ink3)">${u.state}</div>
+      </div>
+      <span class="uni-result-rate">${u.rate}% accept rate</span>
+    </div>
+  `).join('');
+  box.classList.add('show');
+}
+
+let selectedUni = null;
+function selectUniversity(name) {
+  const u = UNIVERSITIES.find(x => x.name === name);
+  if(!u) return;
+  selectedUni = u;
+  document.getElementById('uni-search').value = u.name;
+  document.getElementById('uni-results').classList.remove('show');
+  document.getElementById('sel-uni-name').textContent = u.name + ' (' + u.state + ')';
+  document.getElementById('sel-uni-data').textContent = 'Official acceptance rate: ' + u.rate + '% · Tier: ' + u.tier.charAt(0).toUpperCase() + u.tier.slice(1);
+  document.getElementById('selected-uni').classList.add('show');
+  // Auto-set selectivity dropdown to match tier
+  const tierMap = {ivy:'ivy',high:'high',select:'select',mod:'mod',open:'open'};
+  document.getElementById('c-school').value = tierMap[u.tier] || 'select';
+}
+
+function clearUni() {
+  selectedUni = null;
+  document.getElementById('uni-search').value = '';
+  document.getElementById('selected-uni').classList.remove('show');
+  document.getElementById('comparison-section').style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.uni-search-wrap')) document.getElementById('uni-results').classList.remove('show');
+});
+
+/* ============================================================
+   CORE CALC DATA
+============================================================ */
+const GP = {'A+':4.0,'A':4.0,'A-':3.7,'B+':3.3,'B':3.0,'B-':2.7,'C+':2.3,'C':2.0,'C-':1.7,'D+':1.3,'D':1.0,'F':0.0};
+const GRADES = Object.keys(GP);
+const TYPES = {Regular:0,Honors:.5,AP:1,IB:1,'Dual Enrollment':1,'Pre-AP':.5};
+const gradeOpts = GRADES.map(g=>`<option value="${g}">${g}</option>`).join('');
+const typeOpts = Object.keys(TYPES).map(t=>`<option value="${t}">${t}</option>`).join('');
+const CONCORDANCE = [
+  [1600,36,99],[1570,36,99],[1550,36,99],[1530,35,98],[1510,35,98],
+  [1490,34,97],[1470,34,96],[1450,33,95],[1430,33,94],[1410,32,93],
+  [1390,31,92],[1370,31,91],[1350,30,90],[1330,29,88],[1310,29,87],
+  [1290,28,85],[1270,27,83],[1250,27,82],[1230,26,80],[1210,26,78],
+  [1190,25,75],[1170,24,72],[1150,24,70],[1130,23,67],[1110,22,64],
+  [1090,21,61],[1070,21,58],[1050,20,55],[1030,19,51],[1010,19,48],
+  [990,18,44],[970,18,40],[950,17,37],[930,16,33],[910,16,30],
+  [890,15,26],[870,14,23],[850,13,19],[830,13,16],[810,12,13]
+];
+
+/* ============================================================
+   GPA CALCULATOR
+============================================================ */
+let gpaCount=0;
+function addGPARow(name='',grade='A',credits=3) {
+  gpaCount++;
+  const id=gpaCount;
+  const div=document.createElement('div');
+  div.className='course-row'; div.id='gr-'+id;
+  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${name}" style="font-size:13px">
+    <select style="font-size:13px">${gradeOpts.replace(`"${grade}"`,`"${grade}" selected`)}</select>
+    <input type="number" value="${credits}" min=".5" max="6" step=".5" style="font-size:13px">
+    <button class="btn-remove" onclick="this.closest('.course-row').remove()">×</button>`;
+  document.getElementById('gpa-courses').appendChild(div);
+}
+function calcGPA() {
+  const rows=document.querySelectorAll('#gpa-courses .course-row');
+  let pts=0,creds=0;
+  rows.forEach(r=>{
+    const g=r.querySelectorAll('select')[0].value;
+    const c=parseFloat(r.querySelectorAll('input[type=number]')[0].value)||0;
+    pts+=(GP[g]||0)*c; creds+=c;
+  });
+  if(!creds) return null;
+  const gpa=pts/creds;
+  const info=gpaInfo(gpa);
+  const box=document.getElementById('gpa-result');
+  box.classList.remove('result-hidden');
+  box.className='result-box '+info.boxClass;
+  document.getElementById('gpa-val').textContent=gpa.toFixed(2);
+  document.getElementById('gpa-val').className='result-value '+info.valClass;
+  document.getElementById('gpa-credits').textContent=creds.toFixed(1)+' cr';
+  const badge=document.getElementById('gpa-badge');
+  badge.textContent=info.label;
+  badge.style.cssText=`background:${info.bg};color:${info.color};padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700`;
+  return {gpa, creds, label: info.label};
+}
+function calcGPAAndSave() {
+  const result = calcGPA();
+  if(result && auth.currentUser) {
+    saveResult('GPA Calc', 'GPA Calculation', {'GPA': result.gpa.toFixed(2), 'Credits': result.creds.toFixed(1), 'Standing': result.label});
+  } else if(result) {
+    showToast('Sign up to save your results!');
+  }
+}
+function gpaInfo(g) {
+  if(g>=3.7) return {label:'Excellent',bg:'#2a6e45',color:'white',boxClass:'green-result',valClass:'green'};
+  if(g>=3.3) return {label:'Very Good',bg:'#1e4fa3',color:'white',boxClass:'blue-result',valClass:'blue'};
+  if(g>=3.0) return {label:'Good',bg:'#b8860b',color:'white',boxClass:'',valClass:''};
+  if(g>=2.0) return {label:'Average',bg:'#8a847b',color:'white',boxClass:'',valClass:''};
+  return {label:'Needs Work',bg:'#c0312b',color:'white',boxClass:'red-result',valClass:'red'};
+}
+function resetGPA() {
+  document.getElementById('gpa-courses').innerHTML='';
+  document.getElementById('gpa-result').classList.add('result-hidden');
+  gpaCount=0;
+  addGPARow('English','A',4); addGPARow('Math','B+',4);
+  addGPARow('History','A-',3); addGPARow('Science','B',3); addGPARow('Elective','A',2);
+}
+
+/* ============================================================
+   WEIGHTED GPA
+============================================================ */
+let wgpaCount=0;
+function addWGPARow(name='',grade='A',type='Regular') {
+  wgpaCount++;
+  const id=wgpaCount;
+  const div=document.createElement('div');
+  div.className='course-row'; div.style.gridTemplateColumns='1fr 110px 120px 36px'; div.id='wgr-'+id;
+  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${name}" style="font-size:13px">
+    <select style="font-size:13px">${gradeOpts.replace(`"${grade}"`,`"${grade}" selected`)}</select>
+    <select style="font-size:13px">${typeOpts.replace(`"${type}"`,`"${type}" selected`)}</select>
+    <button class="btn-remove" onclick="this.closest('.course-row').remove()">×</button>`;
+  document.getElementById('wgpa-courses').appendChild(div);
+}
+function calcWGPA() {
+  const rows=document.querySelectorAll('#wgpa-courses .course-row');
+  let wpts=0,upts=0,count=0;
+  rows.forEach(r=>{
+    const sels=r.querySelectorAll('select');
+    const g=sels[0].value, t=sels[1].value;
+    const base=GP[g]||0, boost=TYPES[t]||0;
+    wpts+=base+boost; upts+=base; count++;
+  });
+  if(!count) return null;
+  const wgpa=wpts/count, ugpa=upts/count;
+  document.getElementById('wgpa-result').classList.remove('result-hidden');
+  document.getElementById('wgpa-val').textContent=wgpa.toFixed(2);
+  document.getElementById('wgpa-unweighted').textContent=ugpa.toFixed(2);
+  return {wgpa, ugpa};
+}
+function calcWGPAAndSave() {
+  const r = calcWGPA();
+  if(r && auth.currentUser) saveResult('Weighted GPA', 'Weighted GPA Calculation', {'Weighted GPA (5.0)': r.wgpa.toFixed(2), 'Unweighted GPA (4.0)': r.ugpa.toFixed(2)});
+}
+function resetWGPA() {
+  document.getElementById('wgpa-courses').innerHTML='';
+  document.getElementById('wgpa-result').classList.add('result-hidden');
+  wgpaCount=0;
+  addWGPARow('AP US History','A','AP'); addWGPARow('IB Math','B+','IB');
+  addWGPARow('Honors English','A-','Honors'); addWGPARow('Regular Science','B','Regular');
+}
+
+/* ============================================================
+   GRADE NEEDED
+============================================================ */
+function calcNeeded() {
+  const cur=parseFloat(document.getElementById('n-current').value);
+  const w=parseFloat(document.getElementById('n-weight').value)/100;
+  const tgt=parseFloat(document.getElementById('n-target').value);
+  if(isNaN(cur)||isNaN(w)||isNaN(tgt)) return;
+  const needed=(tgt - cur*(1-w)) / w;
+  const box=document.getElementById('needed-result');
+  box.classList.remove('result-hidden');
+  const val=document.getElementById('needed-val');
+  const badge=document.getElementById('needed-badge');
+  if(needed<=0) {
+    val.textContent='0%'; box.className='result-box green-result';
+    val.className='result-value green';
+    badge.textContent="Already locked in!"; badge.style.cssText='background:#2a6e45;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700';
+  } else if(needed>100) {
+    val.textContent=Math.round(needed)+'%'; box.className='result-box red-result';
+    val.className='result-value red';
+    badge.textContent="Not possible (>100%)"; badge.style.cssText='background:#c0312b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700';
+  } else {
+    val.textContent=Math.round(needed)+'%'; box.className='result-box';
+    val.className='result-value';
+    badge.textContent="Achievable!"; badge.style.cssText='background:#b8860b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700';
+  }
+}
+
+/* ============================================================
+   COLLEGE CHANCES + UNIVERSITY COMPARISON
+============================================================ */
+function calcChances() {
+  const gpa=parseFloat(document.getElementById('c-gpa').value)||0;
+  const wgpa=parseFloat(document.getElementById('c-wgpa').value)||0;
+  const sat=parseFloat(document.getElementById('c-sat').value)||0;
+  const act=parseFloat(document.getElementById('c-act').value)||0;
+  const school=document.getElementById('c-school').value;
+  const rank=document.getElementById('c-rank').value;
+  const ecs=document.getElementById('c-ecs').value;
+  const legacy=document.getElementById('c-legacy').value;
+  const essays=document.getElementById('c-essays').value;
+  let score=0, notes=[];
+
+  // GPA
+  if(gpa>=3.9){score+=28;notes.push('✅ Excellent GPA — very competitive')}
+  else if(gpa>=3.7){score+=24;notes.push('✅ Strong GPA')}
+  else if(gpa>=3.5){score+=19;notes.push('📊 Good GPA — solid foundation')}
+  else if(gpa>=3.0){score+=13;notes.push('⚠️ Average GPA — strong test scores help')}
+  else{score+=5;notes.push('⚠️ GPA may be a challenge for selective schools')}
+
+  // SAT/ACT (use best)
+  let testScore=0;
+  if(sat>=1550){testScore=24;notes.push('✅ Outstanding SAT — 99th percentile')}
+  else if(sat>=1450){testScore=20;notes.push('✅ Strong SAT — top 5%')}
+  else if(sat>=1300){testScore=15;notes.push('📊 Good SAT score')}
+  else if(sat>=1100){testScore=9}
+  else if(sat>=400){testScore=4}
+  if(act>=34){testScore=Math.max(testScore,24);notes.push('✅ Outstanding ACT score')}
+  else if(act>=30){testScore=Math.max(testScore,20)}
+  else if(act>=25){testScore=Math.max(testScore,15)}
+  score+=testScore;
+
+  // Class rank
+  const rankScore={5:18,10:14,25:10,50:5,bot:1};
+  score+=rankScore[rank]||10;
+  if(rank==='5'||rank==='10') notes.push('✅ Top class rank significantly boosts your profile');
+
+  // Extracurriculars
+  const ecScore={exc:22,str:16,avg:9,min:3};
+  score+=ecScore[ecs]||9;
+  if(ecs==='exc') notes.push('✅ Exceptional ECs — national recognition is a major differentiator');
+  else if(ecs==='str') notes.push('✅ Strong extracurriculars — depth matters more than breadth');
+
+  // Essays
+  const esScore={str:7,avg:4,wk:1};
+  score+=esScore[essays]||4;
+  if(essays==='str') notes.push('✅ Strong essays can tip borderline applications');
+  else notes.push('⚠️ Essay quality significantly impacts borderline decisions');
+
+  // Legacy / ED
+  const legBonus={no:0,ed:0.3,leg:0.2,both:0.45};
+  const legMult=1+(legBonus[legacy]||0);
+  if(legacy==='ed') notes.push('📌 Early Decision can increase chances by ~25-35%');
+  else if(legacy==='leg') notes.push('📌 Legacy status provides a modest boost');
+
+  // School tier
+  const tiers={ivy:0.20,high:0.42,select:0.68,mod:0.88,open:1.0};
+  const mult=(tiers[school]||0.68)*legMult;
+  let chance=Math.min(Math.max((score/100)*mult*100,2),97);
+
+  const box=document.getElementById('chances-result');
+  box.classList.remove('result-hidden');
+  document.getElementById('chances-val').textContent=Math.round(chance)+'%';
+  const bar=document.getElementById('chances-bar');
+  bar.style.width=chance+'%';
+  bar.style.background=chance>60?'#2a6e45':chance>30?'#b8860b':'#c0312b';
+  const badge=document.getElementById('chances-badge');
+  if(chance>70){badge.textContent='Safety School';badge.style.cssText='background:#2a6e45;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
+  else if(chance>40){badge.textContent='Match School';badge.style.cssText='background:#b8860b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
+  else if(chance>18){badge.textContent='Reach School';badge.style.cssText='background:#b5571f;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
+  else{badge.textContent='Far Reach';badge.style.cssText='background:#c0312b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
+
+  // University comparison
+  const compSection = document.getElementById('comparison-section');
+  if(selectedUni) {
+    compSection.style.display = 'block';
+    document.getElementById('comp-uni-name').textContent = selectedUni.name + ' (Official)';
+    document.getElementById('comp-official-rate').textContent = selectedUni.rate + '%';
+    document.getElementById('comp-official-bar').style.width = Math.min(selectedUni.rate, 100) + '%';
+    document.getElementById('comp-user-rate').textContent = Math.round(chance) + '%';
+    document.getElementById('comp-user-bar').style.width = Math.min(chance, 100) + '%';
+    const verdict = document.getElementById('comp-verdict');
+    if(chance >= selectedUni.rate * 1.2) {
+      verdict.style.background = '#e8f5ee'; verdict.style.color = '#1a4d2e';
+      verdict.innerHTML = '✅ <strong>Good match!</strong> Your estimated admission chance (' + Math.round(chance) + '%) is above the official acceptance rate (' + selectedUni.rate + '%). This looks like a strong target or safety school for you.';
+    } else if(chance >= selectedUni.rate * 0.7) {
+      verdict.style.background = '#fef8e1'; verdict.style.color = '#7a5800';
+      verdict.innerHTML = '📊 <strong>Competitive match.</strong> Your estimated chance (' + Math.round(chance) + '%) is close to the official rate (' + selectedUni.rate + '%). This is a solid target school — apply with a strong application.';
+    } else {
+      verdict.style.background = '#fce8e8'; verdict.style.color = '#7a1a1a';
+      verdict.innerHTML = '⚠️ <strong>Reach school.</strong> Your estimated chance (' + Math.round(chance) + '%) is below the official acceptance rate (' + selectedUni.rate + '%). This is a reach — still worth applying but have backups.';
+    }
+  } else {
+    compSection.style.display = 'none';
+  }
+
+  document.getElementById('chances-notes').innerHTML = notes.join('<br>') +
+    '<br><br><em style="font-size:12px;color:var(--ink3)">⚠️ Estimates based on aggregate data. Individual results depend on essays, recommendations, demographics, and institutional priorities.</em>';
+  return {chance: Math.round(chance), school: selectedUni?.name || school};
+}
+
+function calcChancesAndSave() {
+  const result = calcChances();
+  if(result && auth.currentUser) {
+    saveResult('College Chances', 'College Chances — ' + (selectedUni?.name || result.school), {
+      'Estimated Chance': result.chance + '%',
+      'University': selectedUni?.name || 'Custom tier',
+      'Official Rate': selectedUni ? selectedUni.rate + '%' : 'N/A'
+    });
+  }
+}
+
+/* ============================================================
+   LOAN CALCULATOR
+============================================================ */
+function setLoanRate() {
+  const sel=document.getElementById('l-type');
+  const val=sel.value;
+  if(val!=='custom') document.getElementById('l-rate').value=val;
+}
+function calcLoan() {
+  const P=parseFloat(document.getElementById('l-amount').value)||0;
+  const r=parseFloat(document.getElementById('l-rate').value)/100/12;
+  const n=parseFloat(document.getElementById('l-term').value)*12;
+  if(!P||!r||!n) return;
+  const M=P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  const total=M*n, interest=total-P;
+  document.getElementById('loan-result').classList.remove('result-hidden');
+  document.getElementById('loan-monthly').textContent='$'+M.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  document.getElementById('loan-interest').textContent='$'+interest.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  const bd=document.getElementById('loan-breakdown'); bd.style.display='block';
+  bd.innerHTML=`<div class="loan-row"><span class="key">Principal borrowed</span><span class="value">$${P.toLocaleString()}</span></div>
+    <div class="loan-row"><span class="key">Monthly payment</span><span class="value">$${M.toFixed(2)}</span></div>
+    <div class="loan-row"><span class="key">Total amount repaid</span><span class="value">$${total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</span></div>
+    <div class="loan-row"><span class="key">Total interest paid</span><span class="value" style="color:var(--red)">$${interest.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</span></div>
+    <div class="loan-row"><span class="key">Interest-to-Principal Ratio</span><span class="value">${((interest/P)*100).toFixed(1)}%</span></div>`;
+  const warn=document.getElementById('loan-warn');
+  if(P>31000&&document.getElementById('l-type').value==='6.53'){
+    warn.style.display='block';
+    warn.innerHTML='<div class="warn-box" style="margin-top:12px">⚠️ This exceeds the federal dependent undergrad loan limit of $31,000. Amounts above this require private loans.</div>';
+  } else { warn.style.display='none'; }
+}
+
+/* ============================================================
+   SAT/ACT CONVERTER
+============================================================ */
+function convertSAT() {
+  const sat=parseInt(document.getElementById('sat-input').value)||0;
+  if(sat<400||sat>1600) return;
+  let best=CONCORDANCE[0];
+  CONCORDANCE.forEach(row=>{ if(Math.abs(row[0]-sat)<Math.abs(best[0]-sat)) best=row; });
+  showSATResult(`ACT Equivalent: ${best[1]}`,`${best[2]}th`,best,`Your SAT of ${sat} is roughly equivalent to ACT ${best[1]}. You're in the <strong>${best[2]}th percentile</strong> nationally.`);
+  document.getElementById('act-input').value='';
+}
+function convertACT() {
+  const act=parseInt(document.getElementById('act-input').value)||0;
+  if(act<1||act>36) return;
+  let best=CONCORDANCE[0];
+  CONCORDANCE.forEach(row=>{ if(Math.abs(row[1]-act)<Math.abs(best[1]-act)) best=row; });
+  showSATResult(`SAT Equivalent: ${best[0]}`,`${best[2]}th`,best,`Your ACT of ${act} is roughly equivalent to SAT ${best[0]}. You're in the <strong>${best[2]}th percentile</strong> nationally.`);
+  document.getElementById('sat-input').value='';
+}
+function showSATResult(equiv,pct,row,ctx) {
+  const box=document.getElementById('sat-result'); box.classList.remove('result-hidden');
+  document.getElementById('sat-equiv').textContent=equiv;
+  document.getElementById('sat-pct').textContent=pct;
+  document.getElementById('sat-context').innerHTML=ctx+`<br><br>This score is competitive for <strong>${row[2]>=90?'Ivy League and highly selective':'selective'}</strong> colleges.`;
+}
+function buildSATTable() {
+  const rows=[[1600,36,99],[1550,36,99],[1500,34,98],[1450,33,95],[1400,31,92],[1350,29,88],[1300,28,84],[1250,26,79],[1200,25,73],[1150,23,68],[1100,22,63],[1050,20,54],[1000,19,45],[950,17,37],[900,15,26]];
+  const tbl=document.getElementById('sat-table'); if(!tbl) return;
+  tbl.innerHTML='<div class="scale-grid" style="grid-template-columns:1fr 1fr 1fr"><div class="scale-item" style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3)"><span>SAT</span><span>ACT</span><span style="text-align:right">%ile</span></div>'+
+    rows.map(r=>`<div class="scale-item"><span class="scale-grade">${r[0]}</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--ink2)">${r[1]}</span><span class="scale-pts">${r[2]}th</span></div>`).join('')+'</div>';
+}
+
+/* ============================================================
+   SCHOLARSHIP CALCULATOR
+============================================================ */
+function calcScholarship() {
+  const income=parseFloat(document.getElementById('s-income').value)||0;
+  const assets=parseFloat(document.getElementById('s-assets').value)||0;
+  const family=parseInt(document.getElementById('s-family').value)||4;
+  const inCollege=parseInt(document.getElementById('s-incollege').value)||1;
+  const coa=parseInt(document.getElementById('s-school').value)||28000;
+  const gpa=parseFloat(document.getElementById('s-gpa').value)||0;
+  let sai=0;
+  const incomeAfterAllowance=Math.max(income-([0,20000,25000,29000,32000,36000][Math.min(family,5)]||36000),0);
+  sai+=incomeAfterAllowance*0.22;
+  sai+=Math.max(assets-12000,0)*0.05;
+  sai/=inCollege; sai=Math.max(0,Math.round(sai));
+  const need=Math.max(coa-sai,0);
+  const pellMax=income<30000?7395:income<50000?5000:income<75000?2000:0;
+  const needBased=Math.min(need,pellMax+12000);
+  let merit=0;
+  if(gpa>=3.9)merit=15000; else if(gpa>=3.7)merit=10000; else if(gpa>=3.5)merit=6000; else if(gpa>=3.3)merit=3000; else if(gpa>=3.0)merit=1000;
+  const box=document.getElementById('sch-result'); box.classList.remove('result-hidden');
+  document.getElementById('sch-need').textContent='$'+need.toLocaleString();
+  document.getElementById('sch-merit').textContent='$'+merit.toLocaleString();
+  document.getElementById('sch-breakdown').innerHTML=`<strong>Estimated SAI / EFC:</strong> $${sai.toLocaleString()} &nbsp;·&nbsp;
+     <strong>Cost of Attendance:</strong> $${coa.toLocaleString()}/yr<br>
+     <strong>Pell Grant Estimate:</strong> $${pellMax.toLocaleString()}/yr &nbsp;·&nbsp;
+     <strong>Need-Based Aid Est.:</strong> $${needBased.toLocaleString()}/yr<br>
+     <em style="font-size:12px;color:var(--ink3)">Estimates only. Actual awards depend on your school and FAFSA verification.</em>`;
+}
+
+/* ============================================================
+   ESSAY AI COACH
+============================================================ */
+const PROMPT_HINTS = {
+  ca1: 'Prompt: Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. Tell us your story.',
+  ca2: 'Prompt: The lessons we take from obstacles we encounter can be fundamental to our success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn?',
+  ca3: 'Prompt: Reflect on a time when you questioned or challenged a belief or idea important to you. What prompted your thinking? What was the outcome?',
+  ca4: 'Prompt: Describe a problem you\'ve solved or a problem you\'d like to solve. It can be intellectual, research-based, ethical, or local/global in scope.',
+  ca5: 'Prompt: Discuss an accomplishment, event, or realization that sparked a period of personal growth and understanding.',
+  ca6: 'Prompt: Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time.',
+  ca7: 'Prompt: Share an essay on any topic of your choice — it can be one you\'ve already written, one that responds to a different prompt, or one of your own design.',
+  why: 'Prompt: Why are you interested in this college? What specifically about its programs, culture, and opportunities aligns with your goals?',
+  activity: 'Prompt: Describe one of your extracurricular activities, jobs, or family responsibilities. What does it mean to you?',
+  diversity: 'Prompt: How do your unique experiences, background, or perspective contribute to the diversity of our community?'
+};
+
+function updatePromptHint() {
+  const val = document.getElementById('essay-prompt').value;
+  const hint = document.getElementById('prompt-hint');
+  if(val && PROMPT_HINTS[val]) {
+    hint.style.display = 'block';
+    hint.textContent = PROMPT_HINTS[val];
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+let essayFeedbackTimeout = null;
+function onEssayInput() {
+  const text = document.getElementById('essay-textarea').value;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const chars = text.length;
+  const wc = document.getElementById('essay-word-count');
+  wc.textContent = words + ' words / 650 max';
+  wc.style.color = words > 650 ? 'var(--red)' : words > 550 ? 'var(--gold)' : 'var(--ink3)';
+  const note = document.getElementById('essay-char-note');
+  if(words > 650) {
+    note.innerHTML = '<span class="essay-char-warning">⚠️ Over the 650-word limit — trim ' + (words - 650) + ' words</span>';
+  } else if(words > 550) {
+    note.innerHTML = '<span class="essay-char-warning" style="background:var(--gold-light);color:var(--gold)">You\'re close to the limit — ' + (650-words) + ' words remaining</span>';
+  } else { note.innerHTML = ''; }
+}
+
+async function getEssayFeedback() {
+  const text = document.getElementById('essay-textarea').value.trim();
+  if(text.length < 100) { showToast('Write at least 100 characters before getting feedback.', 'error'); return; }
+  if(!isPro()) { openPayment('pro'); return; }
+
+  const panel = document.getElementById('essay-ai-panel');
+  const content = document.getElementById('essay-ai-content');
+  const scoreGrid = document.getElementById('essay-score-grid');
+  panel.classList.add('show');
+  scoreGrid.style.display = 'none';
+  content.innerHTML = '<div class="essay-ai-loading">Analyzing your essay<span class="essay-ai-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  document.getElementById('feedback-btn').disabled = true;
+  document.getElementById('feedback-btn').textContent = 'Analyzing...';
+
+  const prompt = document.getElementById('essay-prompt').value;
+  const promptHint = PROMPT_HINTS[prompt] || '';
+  const words = text.split(/\s+/).length;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `You are an expert college admissions essay coach. Analyze this student's college essay and provide actionable, specific feedback.
+
+${promptHint ? 'PROMPT: ' + promptHint + '\n\n' : ''}ESSAY (${words} words):
+${text}
+
+Respond in this EXACT JSON format (no markdown, just raw JSON):
+{
+  "scores": {"structure": 8, "voice": 7, "clarity": 9, "impact": 6},
+  "summary": "2-3 sentence overall assessment",
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "improvements": ["specific actionable improvement 1", "specific actionable improvement 2", "specific actionable improvement 3"],
+  "opening_note": "one sentence about how the opening hooks the reader",
+  "closing_note": "one sentence about how the conclusion lands",
+  "word_count_note": "${words > 650 ? 'OVER LIMIT - must cut ' + (words-650) + ' words' : words < 250 ? 'Too short - expand your story' : 'Good length'}"
+}`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '{}';
+    let feedback;
+    try { feedback = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch(e) { throw new Error('Could not parse AI response'); }
+
+    const s = feedback.scores || {};
+    document.getElementById('score-structure').textContent = s.structure || '—';
+    document.getElementById('score-voice').textContent = s.voice || '—';
+    document.getElementById('score-clarity').textContent = s.clarity || '—';
+    document.getElementById('score-impact').textContent = s.impact || '—';
+    ['score-structure','score-voice','score-clarity','score-impact'].forEach(id => {
+      const el = document.getElementById(id);
+      const v = parseInt(el.textContent);
+      el.style.color = v >= 8 ? 'var(--green)' : v >= 6 ? 'var(--gold)' : 'var(--red)';
+    });
+    scoreGrid.style.display = 'grid';
+
+    content.innerHTML = `
+      <p style="margin-bottom:14px;font-weight:600;color:var(--ink)">${feedback.summary || ''}</p>
+      ${feedback.word_count_note ? `<div style="background:${feedback.word_count_note.includes('OVER') ? 'var(--red-light)' : 'var(--blue-light)'};border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:14px;color:${feedback.word_count_note.includes('OVER') ? 'var(--red)' : 'var(--blue)'}">${feedback.word_count_note}</div>` : ''}
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:6px">✅ Strengths</div>
+        ${(feedback.strengths||[]).map(s=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)">${s}</div>`).join('')}
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:6px">🎯 Improve Next</div>
+        ${(feedback.improvements||[]).map((s,i)=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)"><strong>${i+1}.</strong> ${s}</div>`).join('')}
+      </div>
+      ${feedback.opening_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:8px">Opening: ${feedback.opening_note}</div>` : ''}
+      ${feedback.closing_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:4px">Closing: ${feedback.closing_note}</div>` : ''}
+    `;
+  } catch(err) {
+    content.innerHTML = '<div style="color:var(--red);font-size:13px">⚠️ Could not get feedback right now. Please try again in a moment.</div>';
+  }
+  document.getElementById('feedback-btn').disabled = false;
+  document.getElementById('feedback-btn').textContent = '✦ Get AI Feedback';
+}
+
+function saveEssay() {
+  if(!auth.currentUser) { openAuth('signup', 'Sign up to save your essays.'); return; }
+  const text = document.getElementById('essay-textarea').value.trim();
+  if(!text) { showToast('Write something first!', 'error'); return; }
+  const prompt = document.getElementById('essay-prompt').value;
+  const words = text.split(/\s+/).length;
+  const essay = {
+    id: Date.now(),
+    title: PROMPT_HINTS[prompt] ? prompt.toUpperCase() + ' Essay' : 'My Essay',
+    prompt: prompt || 'custom',
+    text,
+    words,
+    savedAt: new Date().toLocaleString()
+  };
+  DB.saveEssay(auth.currentUser.uid, essay);
+  renderSavedEssays();
+  showToast('✓ Essay saved!');
+}
+
+function renderSavedEssays() {
+  const list = document.getElementById('saved-essays-list');
+  if(!list || !auth.currentUser) return;
+  DB.getEssays(auth.currentUser.uid).then(essays => {
+    if(!essays || !essays.length) {
+      list.innerHTML = '<p style="font-size:13px;color:var(--ink3)">No saved essays yet. Write something and hit Save!</p>';
+      return;
+    }
+    list.innerHTML = essays.map(e => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border2);gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink)">${e.title}</div>
+          <div style="font-size:12px;color:var(--ink3)">${e.words} words · Saved ${e.savedAt}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="loadEssay('${e.firestoreId}')" style="padding:6px 14px;border-radius:6px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(30,79,163,.2);font-size:12px;cursor:pointer;font-family:var(--font-body)">Load</button>
+          <button onclick="deleteEssay('${e.firestoreId}')" style="padding:6px 12px;border-radius:6px;background:none;color:var(--ink3);border:1px solid var(--border);font-size:12px;cursor:pointer;font-family:var(--font-body)">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }).catch(() => {});
+}
+
+function loadEssay(id) {
+  if(!currentUser) return;
+  const essays = DB.getEssays(currentUser.email);
+  const essay = essays.find(e => e.id === id);
+  if(!essay) return;
+  document.getElementById('essay-textarea').value = essay.text;
+  document.getElementById('essay-prompt').value = essay.prompt || '';
+  onEssayInput(); updatePromptHint();
+  showToast('Essay loaded!');
+}
+
+function deleteEssay(id) {
+  if(!currentUser) return;
+  DB.deleteEssay(currentUser.email, id);
+  renderSavedEssays();
+  showToast('Deleted.');
+}
+
+function updateEssayPage() {
+  const gate = document.getElementById('essay-gate');
+  const editor = document.getElementById('essay-editor');
+  if(!currentUser) {
+    if(gate) gate.style.display = 'block';
+    if(editor) editor.style.display = 'none';
+    return;
+  }
+  if(gate) gate.style.display = 'none';
+  if(editor) editor.style.display = 'block';
+  const note = document.getElementById('essay-trial-note');
+  const plan = getUserPlan();
+  if(note) {
+    if(plan === 'trial') note.textContent = '🎁 Trial active — ' + getTrialDaysLeft() + ' days left';
+    else if(isPro()) note.textContent = '✦ Pro member';
+    else note.textContent = 'Upgrade to Pro to use the AI coach';
+  }
+  renderSavedEssays();
+}
+
+/* ============================================================
+   FAQ
+============================================================ */
+function toggleFAQ(el) { el.classList.toggle('open'); }
+
+/* ============================================================
+   EXPOSE MODULE FUNCTIONS TO WINDOW (for onclick= attributes)
+============================================================ */
+window.addGPARow = addGPARow;
+window.calcGPAAndSave = calcGPAAndSave;
+window.resetGPA = resetGPA;
+window.addWGPARow = addWGPARow;
+window.calcWGPAAndSave = calcWGPAAndSave;
+window.resetWGPA = resetWGPA;
+window.calcNeeded = calcNeeded;
+window.calcChancesAndSave = calcChancesAndSave;
+window.setLoanRate = setLoanRate;
+window.calcLoan = calcLoan;
+window.convertSAT = convertSAT;
+window.convertACT = convertACT;
+window.calcScholarship = calcScholarship;
+window.searchUniversities = searchUniversities;
+window.selectUniversity = selectUniversity;
+window.clearUni = clearUni;
+window.updatePromptHint = updatePromptHint;
+window.onEssayInput = onEssayInput;
+window.getEssayFeedback = getEssayFeedback;
+window.saveEssay = saveEssay;
+window.loadEssay = loadEssay;
+window.deleteEssay = deleteEssay;
+window.updateEssayPage = updateEssayPage;
+window.toggleFAQ = toggleFAQ;
+window.renderSavedEssays = renderSavedEssays;
+
+/* ============================================================
+   INIT
+============================================================ */
+window.onload = function() {
+  resetGPA(); resetWGPA(); buildSATTable();
+  document.getElementById('l-type').value = '6.53';
+  updateNavForUser();
+  // Show sign-in button if not logged in
+  if(!currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
+};
+</script>
+</body>
+</html>
