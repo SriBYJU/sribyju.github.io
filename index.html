@@ -1655,7 +1655,8 @@ import {
   deleteDoc,
   query,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1672,6 +1673,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch(() => {});
 const googleProvider = new GoogleAuthProvider();
 
 // Expose auth globally so non-module scripts can use window.currentUser
@@ -1741,31 +1743,25 @@ const DB = {
 
   // ── Essays ────────────────────────────────────────────────
   getEssays: async (uid) => {
-    try {
-      const q = query(collection(db, 'users', uid, 'essays'), orderBy('savedAt', 'desc'));
-      const snap = await getDocs(q);
-      return snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
-    } catch { return []; }
+    const q = query(collection(db, 'users', uid, 'essays'), orderBy('savedAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
   },
 
   saveEssay: async (uid, essay) => {
-    try {
-      if (essay.firestoreId) {
-        // Update existing
-        const ref = doc(db, 'users', uid, 'essays', essay.firestoreId);
-        await setDoc(ref, { ...essay, savedAt: serverTimestamp() }, { merge: true });
-      } else {
-        // New essay
-        await addDoc(collection(db, 'users', uid, 'essays'), {
-          ...essay,
-          savedAt: serverTimestamp()
-        });
-      }
-    } catch (e) { console.error('saveEssay error', e); }
+    if (essay.firestoreId) {
+      const ref = doc(db, 'users', uid, 'essays', essay.firestoreId);
+      await setDoc(ref, { ...essay, savedAt: serverTimestamp() }, { merge: true });
+    } else {
+      await addDoc(collection(db, 'users', uid, 'essays'), {
+        ...essay,
+        savedAt: serverTimestamp()
+      });
+    }
   },
 
   deleteEssay: async (uid, firestoreId) => {
-    try { await deleteDoc(doc(db, 'users', uid, 'essays', firestoreId)); } catch {}
+    await deleteDoc(doc(db, 'users', uid, 'essays', firestoreId));
   }
 };
 
@@ -2654,7 +2650,7 @@ Respond in this EXACT JSON format (no markdown, just raw JSON):
   document.getElementById('feedback-btn').textContent = '✦ Get AI Feedback';
 }
 
-function saveEssay() {
+async function saveEssay() {
   if(!window.currentUser) { openAuth('signup', 'Sign up to save your essays.'); return; }
   const text = document.getElementById('essay-textarea').value.trim();
   if(!text) { showToast('Write something first!', 'error'); return; }
@@ -2668,52 +2664,79 @@ function saveEssay() {
     words,
     savedAt: new Date().toLocaleString()
   };
-  DB.saveEssay(window.currentUser.uid, essay);
-  renderSavedEssays();
-  showToast('✓ Essay saved!');
+  try {
+    await DB.saveEssay(window.currentUser.uid, essay);
+    await renderSavedEssays();
+    showToast('✓ Essay saved!');
+  } catch (e) {
+    console.error('saveEssay error', e);
+    showToast('Could not save essay. Please try again.', 'error');
+  }
 }
 
-function renderSavedEssays() {
+async function renderSavedEssays() {
   const list = document.getElementById('saved-essays-list');
   if(!list || !window.currentUser) return;
-  DB.getEssays(window.currentUser.uid).then(essays => {
+  try {
+    const essays = await DB.getEssays(window.currentUser.uid);
     if(!essays || !essays.length) {
       list.innerHTML = '<p style="font-size:13px;color:var(--ink3)">No saved essays yet. Write something and hit Save!</p>';
       return;
     }
-    list.innerHTML = essays.map(e => `
+    list.innerHTML = essays.map(e => {
+      let dateStr = '';
+      if (e.savedAt && typeof e.savedAt.toDate === 'function') {
+        dateStr = e.savedAt.toDate().toLocaleString();
+      } else if (typeof e.savedAt === 'string') {
+        dateStr = e.savedAt;
+      }
+      return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border2);gap:12px;flex-wrap:wrap">
         <div>
           <div style="font-size:14px;font-weight:600;color:var(--ink)">${e.title}</div>
-          <div style="font-size:12px;color:var(--ink3)">${e.words} words · Saved ${e.savedAt}</div>
+          <div style="font-size:12px;color:var(--ink3)">${e.words} words${dateStr ? ' · Saved ' + dateStr : ''}</div>
         </div>
         <div style="display:flex;gap:8px">
           <button onclick="loadEssay('${e.firestoreId}')" style="padding:6px 14px;border-radius:6px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(30,79,163,.2);font-size:12px;cursor:pointer;font-family:var(--font-body)">Load</button>
           <button onclick="deleteEssay('${e.firestoreId}')" style="padding:6px 12px;border-radius:6px;background:none;color:var(--ink3);border:1px solid var(--border);font-size:12px;cursor:pointer;font-family:var(--font-body)">Delete</button>
         </div>
       </div>
-    `).join('');
-  }).catch(() => {});
+    `;
+    }).join('');
+  } catch (e) {
+    console.error('renderSavedEssays error', e);
+    list.innerHTML = '<p style="font-size:13px;color:var(--ink3)">Could not load saved essays. Please try again later.</p>';
+  }
 }
 
 async function loadEssay(id) {
   const user = window._gsUser || (window._gsAuth && window._gsAuth.currentUser);
   if(!user) return;
-  const essays = await DB.getEssays(user.uid);
-  const essay = essays.find(e => e.firestoreId === id);
-  if(!essay) { showToast('Essay not found.', 'error'); return; }
-  document.getElementById('essay-textarea').value = essay.text;
-  document.getElementById('essay-prompt').value = essay.prompt || '';
-  onEssayInput(); updatePromptHint();
-  showToast('Essay loaded!');
+  try {
+    const essays = await DB.getEssays(user.uid);
+    const essay = essays.find(e => e.firestoreId === id);
+    if(!essay) { showToast('Essay not found.', 'error'); return; }
+    document.getElementById('essay-textarea').value = essay.text;
+    document.getElementById('essay-prompt').value = essay.prompt || '';
+    onEssayInput(); updatePromptHint();
+    showToast('Essay loaded!');
+  } catch (e) {
+    console.error('loadEssay error', e);
+    showToast('Could not load essay.', 'error');
+  }
 }
 
 async function deleteEssay(id) {
   const user = window._gsUser || (window._gsAuth && window._gsAuth.currentUser);
   if(!user) return;
-  await DB.deleteEssay(user.uid, id);
-  renderSavedEssays();
-  showToast('Deleted.');
+  try {
+    await DB.deleteEssay(user.uid, id);
+    await renderSavedEssays();
+    showToast('Deleted.');
+  } catch (e) {
+    console.error('deleteEssay error', e);
+    showToast('Could not delete essay.', 'error');
+  }
 }
 
 function updateEssayPage() {
