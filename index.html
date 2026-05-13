@@ -1489,7 +1489,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <li><span class="feat-check">✓</span> Share results & social cards</li>
         <li><span class="feat-check">✓</span> Progress dashboard & streaks</li>
         <li><span class="feat-check">✓</span> Community Q&A (post & reply)</li>
-        <li><span class="feat-check">✓</span> Ad-free experience</li>
+        <li><span class="feat-check">✓</span> Priority email support</li>
       </ul>
       <button class="btn-pricing filled" onclick="openPayment('pro')">Start Free Trial — $4.99/mo</button>
     </div>
@@ -2266,18 +2266,11 @@ function updateNavForUser() {
     // Hide "Get Pro" if already pro
     if (getProBtn && typeof isPro === 'function' && isPro()) getProBtn.style.display = 'none';
     else if (getProBtn) getProBtn.style.display = '';
-    // Ad-free experience for Pro users
-    const isProUser = typeof isPro === 'function' && isPro();
-    document.querySelectorAll('.ad-banner, .adsbygoogle').forEach(el => {
-      el.style.display = isProUser ? 'none' : '';
-    });
   } else {
     if (signinBtn) signinBtn.style.display = '';
     if (profileDrop) profileDrop.style.display = 'none';
     if (trialBanner) trialBanner.style.display = 'none';
     if (getProBtn) getProBtn.style.display = '';
-    // Show ads for non-logged-in users
-    document.querySelectorAll('.ad-banner').forEach(el => { el.style.display = ''; });
   }
 }
 
