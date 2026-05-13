@@ -656,10 +656,35 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .prep-score-predict{text-align:center;padding:20px;background:var(--bg2);border-radius:var(--radius);margin-top:16px;border:1px solid var(--border)}
 .prep-score-val{font-size:36px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
 .prep-score-label{font-size:12px;color:var(--ink3);margin-top:4px}
-.prep-mode-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.prep-mode-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .prep-mode-tab{padding:8px 16px;border-radius:100px;border:1px solid var(--border);background:var(--bg);color:var(--ink2);font-size:13px;cursor:pointer;font-family:var(--font-body);font-weight:500;transition:var(--transition)}
 .prep-mode-tab.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .prep-mode-tab:hover:not(.active){background:var(--bg2)}
+.prep-diff-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.prep-diff-tab{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:var(--bg);color:var(--ink2);font-size:12px;cursor:pointer;font-family:var(--font-body);font-weight:500;transition:var(--transition)}
+.prep-diff-tab.active{font-weight:700}
+.prep-diff-tab.active[data-diff="easy"]{background:#e8f5e9;color:#2e7d32;border-color:#66bb6a}
+.prep-diff-tab.active[data-diff="medium"]{background:#fff3e0;color:#e65100;border-color:#ffa726}
+.prep-diff-tab.active[data-diff="hard"]{background:#fce4ec;color:#c62828;border-color:#ef5350}
+.prep-diff-tab.active[data-diff="all"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.prep-diff-tab:hover:not(.active){background:var(--bg2)}
+.prep-diff-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;margin-left:8px}
+.prep-diff-badge.easy{background:#e8f5e9;color:#2e7d32}
+.prep-diff-badge.medium{background:#fff3e0;color:#e65100}
+.prep-diff-badge.hard{background:#fce4ec;color:#c62828}
+.prep-exam-section{margin-top:24px;padding:20px;background:var(--bg2);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.prep-exam-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.prep-exam-card{padding:20px;background:var(--bg);border-radius:var(--radius);border:2px solid var(--border);cursor:pointer;transition:var(--transition);text-align:center}
+.prep-exam-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.prep-exam-card h3{margin:0 0 8px;font-size:18px}
+.prep-exam-card p{margin:0;font-size:13px;color:var(--ink3)}
+.prep-exam-timer{font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.prep-exam-progress{height:6px;background:var(--border);border-radius:100px;margin:12px 0;overflow:hidden}
+.prep-exam-progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width 0.3s ease}
+.prep-exam-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border)}
+.prep-exam-quit{padding:6px 14px;border-radius:100px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:var(--font-body);font-weight:600}
+.prep-exam-quit:hover{background:var(--red-light)}
+@media(max-width:600px){.prep-exam-cards{grid-template-columns:1fr}}
 
 /* ── COLLEGE COMPARISON TOOL ─────────────────────────── */
 .compare-selector{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
@@ -706,7 +731,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .counselor-chat{height:350px}
   .prep-mode-tabs{gap:4px}
   .prep-mode-tab{padding:6px 12px;font-size:12px}
+  .prep-diff-tabs{gap:4px}
+  .prep-diff-tab{padding:4px 10px;font-size:11px}
   .prep-stat-val{font-size:18px}
+  .prep-exam-timer{font-size:18px}
+  .prep-exam-header{flex-direction:column;gap:8px;text-align:center}
   .compare-radar-wrap canvas{width:100%!important;height:auto!important}
 }
 </style>
@@ -1873,11 +1902,22 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <button class="prep-mode-tab" onclick="setPrepSubject('reading')">Reading</button>
       <button class="prep-mode-tab" onclick="setPrepSubject('writing')">Writing</button>
     </div>
+    <div class="prep-diff-tabs" id="prep-diff-tabs">
+      <button class="prep-diff-tab active" data-diff="all" onclick="setPrepDifficulty('all')">All Levels</button>
+      <button class="prep-diff-tab" data-diff="easy" onclick="setPrepDifficulty('easy')">🟢 Easy</button>
+      <button class="prep-diff-tab" data-diff="medium" onclick="setPrepDifficulty('medium')">🟡 Medium</button>
+      <button class="prep-diff-tab" data-diff="hard" onclick="setPrepDifficulty('hard')">🔴 Hard</button>
+    </div>
     <div id="prep-question-area"></div>
     <div class="prep-score-predict" id="prep-score-predict" style="display:none">
       <div class="prep-score-label">Predicted SAT Score</div>
       <div class="prep-score-val" id="prep-predicted-score">—</div>
       <div style="font-size:12px;color:var(--ink3);margin-top:4px">Based on your accuracy across all subjects</div>
+    </div>
+    <div class="prep-exam-section" id="prep-exam-section">
+      <h2 style="margin:0 0 4px">📋 Full Practice Exams <span class="feat-badge pro">Pro</span></h2>
+      <p style="margin:0;font-size:13px;color:var(--ink3)">Timed, full-length practice tests with score reports</p>
+      <div class="prep-exam-cards" id="prep-exam-cards"></div>
     </div>
   </div>
 </div>
@@ -4297,45 +4337,159 @@ window.sendCounselorMsg = sendCounselorMsg;
    SAT/ACT PREP MODE
 ============================================================ */
 const PREP_QUESTIONS = [
-  // MATH
-  {subject:'math',q:'If 3x + 7 = 22, what is the value of x?',opts:['3','4','5','6'],answer:2,explain:'Subtract 7 from both sides: 3x = 15. Divide by 3: x = 5.'},
-  {subject:'math',q:'A circle has a radius of 6. What is its area?',opts:['36π','12π','6π','18π'],answer:0,explain:'Area = πr² = π(6²) = 36π.'},
-  {subject:'math',q:'If f(x) = 2x² - 3x + 1, what is f(3)?',opts:['10','8','12','14'],answer:0,explain:'f(3) = 2(9) - 3(3) + 1 = 18 - 9 + 1 = 10.'},
-  {subject:'math',q:'What is the slope of the line passing through (2, 5) and (6, 13)?',opts:['2','3','4','1'],answer:0,explain:'Slope = (13-5)/(6-2) = 8/4 = 2.'},
-  {subject:'math',q:'If a triangle has sides 3, 4, and 5, what is its area?',opts:['6','10','7.5','12'],answer:0,explain:'This is a right triangle (3-4-5). Area = ½ × base × height = ½ × 3 × 4 = 6.'},
-  {subject:'math',q:'What is the value of √(144) + √(25)?',opts:['17','15','13','19'],answer:0,explain:'√144 = 12, √25 = 5. So 12 + 5 = 17.'},
-  {subject:'math',q:'In a class of 30 students, 18 play soccer. What percentage play soccer?',opts:['55%','60%','65%','50%'],answer:1,explain:'18/30 = 0.60 = 60%.'},
-  {subject:'math',q:'If 2^x = 32, what is x?',opts:['4','5','6','3'],answer:1,explain:'2^5 = 32, so x = 5.'},
-  {subject:'math',q:'What is the median of: 3, 7, 9, 12, 15?',opts:['7','9','10','12'],answer:1,explain:'The middle value of the sorted list is 9.'},
-  {subject:'math',q:'A car travels 180 miles in 3 hours. What is its average speed?',opts:['50 mph','55 mph','60 mph','65 mph'],answer:2,explain:'Speed = Distance/Time = 180/3 = 60 mph.'},
-  // READING
-  {subject:'reading',q:'In the context of a passage about climate change, "mitigate" most nearly means:',opts:['Worsen','Reduce the severity of','Ignore','Celebrate'],answer:1,explain:'"Mitigate" means to make less severe, serious, or painful — to reduce the impact.'},
-  {subject:'reading',q:'A passage states: "The author\'s tone shifted from optimistic to somber." What does this imply?',opts:['The author became more hopeful','The author became more serious and sad','The author became angry','The author became confused'],answer:1,explain:'"Somber" means dark, gloomy, or serious — a shift from optimism indicates growing concern.'},
-  {subject:'reading',q:'Which best describes the purpose of an anecdote in an argumentative essay?',opts:['To provide statistical evidence','To illustrate a point through a personal story','To refute the opposing view','To summarize the conclusion'],answer:1,explain:'Anecdotes are brief personal stories used to illustrate or support a point in an argument.'},
-  {subject:'reading',q:'If an author uses the phrase "a double-edged sword," they are suggesting:',opts:['Something is purely beneficial','Something has both advantages and disadvantages','Something is dangerous','Something is old-fashioned'],answer:1,explain:'"Double-edged sword" is an idiom meaning something has both positive and negative consequences.'},
-  {subject:'reading',q:'The word "ubiquitous" most nearly means:',opts:['Rare','Present everywhere','Dangerous','Beautiful'],answer:1,explain:'"Ubiquitous" means found or existing everywhere, being very common.'},
-  {subject:'reading',q:'An author writes: "The silence was deafening." This is an example of:',opts:['Simile','Metaphor','Oxymoron','Alliteration'],answer:2,explain:'An oxymoron combines two contradictory terms — silence cannot literally be deafening.'},
-  {subject:'reading',q:'What is the primary purpose of a thesis statement?',opts:['To entertain the reader','To present the main argument of an essay','To provide background information','To list sources'],answer:1,explain:'A thesis statement declares the main point or argument that the essay will support.'},
-  {subject:'reading',q:'"The data suggests a correlation, not causation." This means:',opts:['One thing directly causes another','Two things occur together but one doesn\'t necessarily cause the other','The data is unreliable','There is no relationship between the variables'],answer:1,explain:'Correlation means two variables are related, but one does not necessarily cause the other.'},
-  // WRITING
-  {subject:'writing',q:'Which sentence is grammatically correct?',opts:['Me and him went to the store.','Him and I went to the store.','He and I went to the store.','Me and he went to the store.'],answer:2,explain:'"He and I" uses subject pronouns correctly as the subject of the sentence.'},
-  {subject:'writing',q:'Choose the correct word: "The team celebrated _____ victory."',opts:['they\'re','there','their','its'],answer:2,explain:'"Their" is the possessive pronoun for "team" (referring to the members).'},
-  {subject:'writing',q:'Which transition best shows contrast?',opts:['Furthermore','However','Additionally','Similarly'],answer:1,explain:'"However" is a contrast transition that signals an opposing or different idea.'},
-  {subject:'writing',q:'Identify the error: "Each of the students have completed their assignment."',opts:['"Each" should be "All"','"have" should be "has"','"their" should be "his"','No error'],answer:1,explain:'"Each" is singular and requires "has" — "Each of the students has completed..."'},
-  {subject:'writing',q:'Which is the most concise version?',opts:['Due to the fact that it was raining','Because it was raining','On account of the fact that rain was occurring','In light of the rainy conditions'],answer:1,explain:'"Because it was raining" is the most concise and direct way to express this idea.'},
-  {subject:'writing',q:'A semicolon is correctly used to:',opts:['Introduce a list','Join two independent clauses','End a question','Separate a dependent and independent clause'],answer:1,explain:'Semicolons join two closely related independent clauses that could each stand alone as sentences.'},
-  {subject:'writing',q:'Which word best replaces "very tired"?',opts:['Exhausted','Sleepy','Lazy','Bored'],answer:0,explain:'"Exhausted" is a stronger, more precise word that replaces the weak "very tired" combination.'},
-  {subject:'writing',q:'"The dog chased it\'s tail." What is wrong with this sentence?',opts:['Nothing is wrong','"it\'s" should be "its"','"chased" should be "chases"','"tail" should be "tale"'],answer:1,explain:'"Its" (no apostrophe) is possessive. "It\'s" is a contraction of "it is."'},
+  // ── EASY MATH ──
+  {subject:'math',difficulty:'easy',q:'If 3x + 7 = 22, what is the value of x?',opts:['3','4','5','6'],answer:2,explain:'Subtract 7 from both sides: 3x = 15. Divide by 3: x = 5.'},
+  {subject:'math',difficulty:'easy',q:'A circle has a radius of 6. What is its area?',opts:['36π','12π','6π','18π'],answer:0,explain:'Area = πr² = π(6²) = 36π.'},
+  {subject:'math',difficulty:'easy',q:'If f(x) = 2x² - 3x + 1, what is f(3)?',opts:['10','8','12','14'],answer:0,explain:'f(3) = 2(9) - 3(3) + 1 = 18 - 9 + 1 = 10.'},
+  {subject:'math',difficulty:'easy',q:'What is the slope of the line passing through (2, 5) and (6, 13)?',opts:['2','3','4','1'],answer:0,explain:'Slope = (13-5)/(6-2) = 8/4 = 2.'},
+  {subject:'math',difficulty:'easy',q:'If a triangle has sides 3, 4, and 5, what is its area?',opts:['6','10','7.5','12'],answer:0,explain:'This is a right triangle (3-4-5). Area = ½ × base × height = ½ × 3 × 4 = 6.'},
+  {subject:'math',difficulty:'easy',q:'What is the value of √(144) + √(25)?',opts:['17','15','13','19'],answer:0,explain:'√144 = 12, √25 = 5. So 12 + 5 = 17.'},
+  {subject:'math',difficulty:'easy',q:'In a class of 30 students, 18 play soccer. What percentage play soccer?',opts:['55%','60%','65%','50%'],answer:1,explain:'18/30 = 0.60 = 60%.'},
+  {subject:'math',difficulty:'easy',q:'If 2^x = 32, what is x?',opts:['4','5','6','3'],answer:1,explain:'2^5 = 32, so x = 5.'},
+  {subject:'math',difficulty:'easy',q:'What is the median of: 3, 7, 9, 12, 15?',opts:['7','9','10','12'],answer:1,explain:'The middle value of the sorted list is 9.'},
+  {subject:'math',difficulty:'easy',q:'A car travels 180 miles in 3 hours. What is its average speed?',opts:['50 mph','55 mph','60 mph','65 mph'],answer:2,explain:'Speed = Distance/Time = 180/3 = 60 mph.'},
+  // ── MEDIUM MATH ──
+  {subject:'math',difficulty:'medium',q:'If log₂(x) = 6, what is x?',opts:['32','64','128','36'],answer:1,explain:'log₂(x) = 6 means 2⁶ = 64, so x = 64.'},
+  {subject:'math',difficulty:'medium',q:'What is the equation of the line perpendicular to y = 2x + 3 passing through (0, 1)?',opts:['y = -½x + 1','y = 2x + 1','y = -2x + 1','y = ½x + 1'],answer:0,explain:'Perpendicular slope is the negative reciprocal: -1/2. Using point (0,1): y = -½x + 1.'},
+  {subject:'math',difficulty:'medium',q:'A bag has 5 red and 3 blue marbles. Two are drawn without replacement. P(both red)?',opts:['5/14','5/8','25/64','10/28'],answer:0,explain:'P(1st red) = 5/8, P(2nd red) = 4/7. P(both) = 5/8 × 4/7 = 20/56 = 5/14.'},
+  {subject:'math',difficulty:'medium',q:'Simplify: (x² - 9) / (x + 3)',opts:['x - 3','x + 3','x² - 3','x - 9'],answer:0,explain:'x² - 9 = (x+3)(x-3). Divided by (x+3) gives (x-3).'},
+  {subject:'math',difficulty:'medium',q:'What is the sum of the interior angles of a hexagon?',opts:['540°','720°','900°','1080°'],answer:1,explain:'Sum = (n-2) × 180° = (6-2) × 180° = 4 × 180° = 720°.'},
+  {subject:'math',difficulty:'medium',q:'If sin(θ) = 3/5, what is cos(θ) in the first quadrant?',opts:['4/5','3/4','5/3','2/5'],answer:0,explain:'Using sin²θ + cos²θ = 1: cos²θ = 1 - 9/25 = 16/25, so cosθ = 4/5.'},
+  {subject:'math',difficulty:'medium',q:'What is the vertex of the parabola y = x² - 6x + 11?',opts:['(3, 2)','(3, 11)','(-3, 2)','(6, 11)'],answer:0,explain:'Complete the square: y = (x-3)² + 2. Vertex is at (3, 2).'},
+  {subject:'math',difficulty:'medium',q:'A sequence starts: 2, 6, 18, 54, ... What is the 6th term?',opts:['162','486','324','972'],answer:1,explain:'Geometric sequence with ratio 3. a₆ = 2 × 3⁵ = 2 × 243 = 486.'},
+  // ── HARD MATH ──
+  {subject:'math',difficulty:'hard',q:'What is the remainder when x³ + 2x² - 5x + 3 is divided by (x - 1)?',opts:['1','0','3','-1'],answer:0,explain:'By the Remainder Theorem, substitute x=1: 1 + 2 - 5 + 3 = 1.'},
+  {subject:'math',difficulty:'hard',q:'How many distinct permutations of the letters in "MISSISSIPPI"?',opts:['34,650','39,916,800','11!','4,989,600'],answer:0,explain:'11!/(4!×4!×2!) = 39916800/(24×24×2) = 34,650. Account for repeated letters.'},
+  {subject:'math',difficulty:'hard',q:'If the determinant of [[a,b],[c,d]] is 5 and [[2a,2b],[c,d]]\'s determinant is:',opts:['10','5','20','2.5'],answer:0,explain:'Multiplying one row by k multiplies the determinant by k. 2×5 = 10.'},
+  {subject:'math',difficulty:'hard',q:'What is lim(x→0) [sin(3x)/x]?',opts:['3','1','0','∞'],answer:0,explain:'lim(x→0) sin(3x)/x = lim 3·sin(3x)/(3x) = 3·1 = 3, using lim sin(u)/u = 1.'},
+  {subject:'math',difficulty:'hard',q:'Find the area between y = x² and y = x from x = 0 to x = 1.',opts:['1/6','1/3','1/2','1/4'],answer:0,explain:'∫₀¹(x - x²)dx = [x²/2 - x³/3]₀¹ = 1/2 - 1/3 = 1/6.'},
+  {subject:'math',difficulty:'hard',q:'A complex number z satisfies |z - 3i| = |z + 1|. This describes a:',opts:['Line','Circle','Parabola','Ellipse'],answer:0,explain:'The locus of points equidistant from a point (0,3) and (-1,0) is the perpendicular bisector — a line.'},
+  {subject:'math',difficulty:'hard',q:'What is the sum of the infinite series 1 + 1/2 + 1/4 + 1/8 + ...?',opts:['2','1.5','∞','3'],answer:0,explain:'Geometric series with a=1, r=1/2. Sum = a/(1-r) = 1/(1-0.5) = 2.'},
+  {subject:'math',difficulty:'hard',q:'If f(x) = eˣ·sin(x), what is f\'(x)?',opts:['eˣ(sin x + cos x)','eˣ·cos x','eˣ·sin x','eˣ(sin x - cos x)'],answer:0,explain:'Product rule: f\'(x) = eˣ·sin x + eˣ·cos x = eˣ(sin x + cos x).'},
+  // ── EASY READING ──
+  {subject:'reading',difficulty:'easy',q:'In the context of a passage about climate change, "mitigate" most nearly means:',opts:['Worsen','Reduce the severity of','Ignore','Celebrate'],answer:1,explain:'"Mitigate" means to make less severe, serious, or painful — to reduce the impact.'},
+  {subject:'reading',difficulty:'easy',q:'A passage states: "The author\'s tone shifted from optimistic to somber." What does this imply?',opts:['The author became more hopeful','The author became more serious and sad','The author became angry','The author became confused'],answer:1,explain:'"Somber" means dark, gloomy, or serious — a shift from optimism indicates growing concern.'},
+  {subject:'reading',difficulty:'easy',q:'Which best describes the purpose of an anecdote in an argumentative essay?',opts:['To provide statistical evidence','To illustrate a point through a personal story','To refute the opposing view','To summarize the conclusion'],answer:1,explain:'Anecdotes are brief personal stories used to illustrate or support a point in an argument.'},
+  {subject:'reading',difficulty:'easy',q:'If an author uses the phrase "a double-edged sword," they are suggesting:',opts:['Something is purely beneficial','Something has both advantages and disadvantages','Something is dangerous','Something is old-fashioned'],answer:1,explain:'"Double-edged sword" is an idiom meaning something has both positive and negative consequences.'},
+  {subject:'reading',difficulty:'easy',q:'The word "ubiquitous" most nearly means:',opts:['Rare','Present everywhere','Dangerous','Beautiful'],answer:1,explain:'"Ubiquitous" means found or existing everywhere, being very common.'},
+  {subject:'reading',difficulty:'easy',q:'An author writes: "The silence was deafening." This is an example of:',opts:['Simile','Metaphor','Oxymoron','Alliteration'],answer:2,explain:'An oxymoron combines two contradictory terms — silence cannot literally be deafening.'},
+  {subject:'reading',difficulty:'easy',q:'What is the primary purpose of a thesis statement?',opts:['To entertain the reader','To present the main argument of an essay','To provide background information','To list sources'],answer:1,explain:'A thesis statement declares the main point or argument that the essay will support.'},
+  {subject:'reading',difficulty:'easy',q:'"The data suggests a correlation, not causation." This means:',opts:['One thing directly causes another','Two things occur together but one doesn\'t necessarily cause the other','The data is unreliable','There is no relationship between the variables'],answer:1,explain:'Correlation means two variables are related, but one does not necessarily cause the other.'},
+  // ── MEDIUM READING ──
+  {subject:'reading',difficulty:'medium',q:'An author argues that social media harms teens but acknowledges its benefits for connectivity. This technique is called:',opts:['Red herring','Concession','Hyperbole','Ad hominem'],answer:1,explain:'A concession acknowledges an opposing point before reinforcing your own argument.'},
+  {subject:'reading',difficulty:'medium',q:'"The company\'s profits were anemic." In context, "anemic" most nearly means:',opts:['Sick','Weak or lacking vitality','Bloody','Powerful'],answer:1,explain:'"Anemic" figuratively means weak, pale, or lacking force — profits were disappointingly low.'},
+  {subject:'reading',difficulty:'medium',q:'A historian writes: "The revolution was inevitable, yet its timing surprised everyone." The juxtaposition suggests:',opts:['The revolution was unexpected','The cause was clear but the trigger was not','The historian disagrees with the revolution','The revolution failed'],answer:1,explain:'The "yet" creates contrast between the known inevitability and the surprising specific timing.'},
+  {subject:'reading',difficulty:'medium',q:'Which rhetorical device does "Ask not what your country can do for you — ask what you can do for your country" use?',opts:['Alliteration','Chiasmus','Simile','Understatement'],answer:1,explain:'Chiasmus reverses the structure of a phrase: "country...you" becomes "you...country."'},
+  {subject:'reading',difficulty:'medium',q:'An author describes a character who "wore her confidence like armor." This suggests the character:',opts:['Is physically strong','Uses confidence as protection','Is arrogant','Literally wears armor'],answer:1,explain:'The simile "like armor" implies confidence serves a defensive, protective purpose for her.'},
+  {subject:'reading',difficulty:'medium',q:'In a passage, an unreliable narrator is one who:',opts:['Tells the story in third person','Cannot be fully trusted by the reader','Uses complex vocabulary','Speaks directly to the reader'],answer:1,explain:'An unreliable narrator\'s account may be biased, incomplete, or deliberately misleading.'},
+  // ── HARD READING ──
+  {subject:'reading',difficulty:'hard',q:'A passage argues: "Democracy requires an informed citizenry, yet information overload breeds apathy." The author\'s central paradox is:',opts:['Democracy is impossible','More information doesn\'t guarantee better outcomes','Citizens are always apathetic','Information should be restricted'],answer:1,explain:'The paradox is that the abundance of information — theoretically good for democracy — can actually undermine engagement.'},
+  {subject:'reading',difficulty:'hard',q:'An author consistently uses passive voice when describing corporate decisions but active voice for employee actions. This choice most likely serves to:',opts:['Vary sentence structure','Obscure corporate accountability while emphasizing worker responsibility','Show poor writing skills','Follow academic conventions'],answer:1,explain:'Passive voice ("mistakes were made") deflects blame from corporations, while active voice assigns clear agency to employees.'},
+  {subject:'reading',difficulty:'hard',q:'A literary critic describes a novel as "a palimpsest of cultural anxieties." "Palimpsest" here implies:',opts:['A simple narrative','Layered meanings written over earlier ones','A geographical metaphor','A chronological retelling'],answer:1,explain:'A palimpsest is a manuscript with layers of writing; metaphorically, the novel contains multiple layers of meaning overwriting each other.'},
+  {subject:'reading',difficulty:'hard',q:'Two passages discuss urban planning. Passage A uses data-driven analysis; Passage B uses personal narratives. A reader evaluating their relative strength should consider:',opts:['Only data is valid evidence','Narratives always outweigh data','The context determines which form of evidence is more persuasive','Both are equally weak'],answer:2,explain:'Evaluating evidence requires considering the argument\'s context, audience, and purpose — neither form is inherently superior.'},
+  {subject:'reading',difficulty:'hard',q:'An essay\'s conclusion introduces a new metaphor not present in the introduction. This structural choice most likely:',opts:['Is a writing error','Signals a shift in the author\'s understanding through the essay','Weakens the argument','Is purely decorative'],answer:1,explain:'A new concluding metaphor often reflects intellectual development — the author\'s thinking has evolved through the argument.'},
+  {subject:'reading',difficulty:'hard',q:'A satirical essay praises a politician\'s "remarkable ability to say nothing with extraordinary eloquence." The function of this irony is to:',opts:['Compliment the politician','Criticize substance-free rhetoric','Describe public speaking skills','Remain neutral'],answer:1,explain:'The irony lies in praising a negative quality (empty rhetoric) — the "praise" is actually sharp criticism.'},
+  // ── EASY WRITING ──
+  {subject:'writing',difficulty:'easy',q:'Which sentence is grammatically correct?',opts:['Me and him went to the store.','Him and I went to the store.','He and I went to the store.','Me and he went to the store.'],answer:2,explain:'"He and I" uses subject pronouns correctly as the subject of the sentence.'},
+  {subject:'writing',difficulty:'easy',q:'Choose the correct word: "The team celebrated _____ victory."',opts:['they\'re','there','their','its'],answer:2,explain:'"Their" is the possessive pronoun for "team" (referring to the members).'},
+  {subject:'writing',difficulty:'easy',q:'Which transition best shows contrast?',opts:['Furthermore','However','Additionally','Similarly'],answer:1,explain:'"However" is a contrast transition that signals an opposing or different idea.'},
+  {subject:'writing',difficulty:'easy',q:'Identify the error: "Each of the students have completed their assignment."',opts:['"Each" should be "All"','"have" should be "has"','"their" should be "his"','No error'],answer:1,explain:'"Each" is singular and requires "has" — "Each of the students has completed..."'},
+  {subject:'writing',difficulty:'easy',q:'Which is the most concise version?',opts:['Due to the fact that it was raining','Because it was raining','On account of the fact that rain was occurring','In light of the rainy conditions'],answer:1,explain:'"Because it was raining" is the most concise and direct way to express this idea.'},
+  {subject:'writing',difficulty:'easy',q:'A semicolon is correctly used to:',opts:['Introduce a list','Join two independent clauses','End a question','Separate a dependent and independent clause'],answer:1,explain:'Semicolons join two closely related independent clauses that could each stand alone as sentences.'},
+  {subject:'writing',difficulty:'easy',q:'Which word best replaces "very tired"?',opts:['Exhausted','Sleepy','Lazy','Bored'],answer:0,explain:'"Exhausted" is a stronger, more precise word that replaces the weak "very tired" combination.'},
+  {subject:'writing',difficulty:'easy',q:'"The dog chased it\'s tail." What is wrong with this sentence?',opts:['Nothing is wrong','"it\'s" should be "its"','"chased" should be "chases"','"tail" should be "tale"'],answer:1,explain:'"Its" (no apostrophe) is possessive. "It\'s" is a contraction of "it is."'},
+  // ── MEDIUM WRITING ──
+  {subject:'writing',difficulty:'medium',q:'Which sentence demonstrates correct parallel structure?',opts:['She likes hiking, to swim, and biking.','She likes hiking, swimming, and biking.','She likes to hike, swimming, and to bike.','She likes hiking, swimming, and to bike.'],answer:1,explain:'Parallel structure requires consistent grammatical form: all gerunds (hiking, swimming, biking).'},
+  {subject:'writing',difficulty:'medium',q:'"The council voted; moreover, they implemented the policy immediately." Is this punctuation correct?',opts:['Yes, the semicolon is used correctly','No, a comma should replace the semicolon','No, "moreover" doesn\'t need a semicolon before it','No, remove "moreover" entirely'],answer:0,explain:'A semicolon before a conjunctive adverb (moreover) joining two independent clauses is correct.'},
+  {subject:'writing',difficulty:'medium',q:'Which revision eliminates the dangling modifier? "Walking to school, the rain started pouring."',opts:['Walking to school, it started raining.','While I was walking to school, the rain started pouring.','The rain started pouring, walking to school.','Walking to school started the rain pouring.'],answer:1,explain:'The original has a dangling modifier — "Walking" has no proper subject. Adding "While I was" fixes it.'},
+  {subject:'writing',difficulty:'medium',q:'In academic writing, which is the strongest thesis statement?',opts:['"Social media is bad."','"This paper will discuss social media."','"Social media platforms erode adolescent mental health by promoting unrealistic comparison."','"Some people think social media is harmful."'],answer:2,explain:'A strong thesis is specific, arguable, and states a clear claim with reasoning.'},
+  {subject:'writing',difficulty:'medium',q:'"Neither the teacher nor the students _____ prepared." Choose the correct verb.',opts:['was','were','is','has been'],answer:1,explain:'With "neither...nor," the verb agrees with the nearer subject ("students" = plural), so "were."'},
+  {subject:'writing',difficulty:'medium',q:'Which sentence correctly uses a colon?',opts:['She needed: eggs, milk, and bread.','She needed one thing: determination.','She: needed to focus on her work.','She needed to: buy groceries.'],answer:1,explain:'A colon follows an independent clause and introduces an explanation, example, or list elaboration.'},
+  // ── HARD WRITING ──
+  {subject:'writing',difficulty:'hard',q:'"The data shows that students who study collaboratively perform better; however, this correlation may reflect selection bias rather than a causal relationship." The function of the semicolon clause is to:',opts:['Support the initial claim','Qualify the claim with a methodological limitation','Contradict the data','Introduce new evidence'],answer:1,explain:'The "however" clause qualifies the claim by raising selection bias as an alternative explanation — a nuanced academic move.'},
+  {subject:'writing',difficulty:'hard',q:'Restructure for maximum impact: "Climate change is a problem that affects many ecosystems and is caused by human activity and has been getting worse over time."',opts:['Human-driven climate change, accelerating over decades, threatens ecosystems worldwide.','Climate change, which humans cause, is a worsening problem for ecosystems.','Many ecosystems are affected by climate change which is caused by humans and getting worse.','The problem of climate change affects ecosystems and is getting worse because of humans.'],answer:0,explain:'The best revision uses a participial phrase for concision, front-loads the cause, and ends with impact.'},
+  {subject:'writing',difficulty:'hard',q:'A student writes: "The protagonist\'s development is effected by the antagonist\'s machinations." The error is:',opts:['No error','"effected" should be "affected"','"protagonist\'s" should be "protagonists"','"machinations" is the wrong word'],answer:1,explain:'"Affect" (verb) means to influence. "Effect" as a verb means to bring about/cause. The protagonist is influenced, not caused.'},
+  {subject:'writing',difficulty:'hard',q:'Which revision best maintains formal academic register? "Scientists totally proved that the old theory was wrong."',opts:['Scientists definitively demonstrated that the previous theory was inaccurate.','Scientists completely showed the old theory to be incorrect.','Scientists for sure proved the prior theory wrong.','It was totally shown by scientists that the theory was wrong.'],answer:0,explain:'"Definitively demonstrated" and "previous theory was inaccurate" maintain formal academic register without colloquialisms.'},
+  {subject:'writing',difficulty:'hard',q:'"While the study\'s methodology was rigorous, its sample size—limited to 47 participants—undermines the generalizability of its conclusions." The em dashes serve to:',opts:['Replace parentheses for emphasis on a limiting detail','Indicate a grammatical error','Separate independent clauses','Show dialogue'],answer:0,explain:'Em dashes set off an appositive phrase with more emphasis than parentheses, highlighting the limitation.'},
+  {subject:'writing',difficulty:'hard',q:'In which sentence does the subjunctive mood correctly express a hypothetical? ',opts:['If I was rich, I would travel.','If I were rich, I would travel.','If I am rich, I would travel.','If I be rich, I would travel.'],answer:1,explain:'The subjunctive "were" (not "was") is used for hypothetical/contrary-to-fact conditions: "If I were..."'},
 ];
 
-let prepState = { subject: 'all', current: 0, answered: [], xp: 0, streak: 0, lastDate: null, correct: 0, total: 0, history: [] };
+// ── FULL PRACTICE EXAM QUESTION BANKS (Pro) ──
+const SAT_EXAM_QUESTIONS = [
+  // Reading & Writing (27 questions, 64 min in real SAT — we use 20 questions, ~30 min)
+  {section:'Reading & Writing',q:'Based on the passage excerpt: "The author argues that urbanization, while economically beneficial, creates ecological debt." Which choice best describes the author\'s position?',opts:['Urbanization should be stopped','Economic growth and ecology are inherently opposed','Cities create environmental costs that offset economic gains','Ecological debt is a myth'],answer:2,explain:'The author acknowledges economic benefits but emphasizes ecological costs — a balanced critique.'},
+  {section:'Reading & Writing',q:'The word "precipitous" in "a precipitous decline in biodiversity" most nearly means:',opts:['Gradual','Steep and dramatic','Unexpected','Temporary'],answer:1,explain:'"Precipitous" means extremely steep, rapid, or dramatic — here describing a severe decline.'},
+  {section:'Reading & Writing',q:'A researcher studying ocean acidification writes: "The pH levels have decreased by 0.1 units since the industrial revolution—a 30% increase in acidity." The purpose of the dash is to:',opts:['Correct a previous error','Provide a surprising clarification','Introduce a new topic','End the sentence'],answer:1,explain:'The dash introduces a startling restatement — 0.1 pH units sounds small, but equals 30% more acidity.'},
+  {section:'Reading & Writing',q:'Which choice best combines: "Marie Curie discovered radium. She was the first woman to win a Nobel Prize. Her work transformed physics."',opts:['Marie Curie discovered radium, was the first woman to win a Nobel Prize, and her work transformed physics.','Marie Curie, who discovered radium and became the first woman to win a Nobel Prize, transformed physics with her work.','Marie Curie discovered radium and she was the first woman to win a Nobel Prize and transformed physics.','Discovering radium, Marie Curie won a Nobel Prize first for women and transformed physics.'],answer:1,explain:'Option B uses a relative clause to embed details concisely while maintaining a clear main clause.'},
+  {section:'Reading & Writing',q:'"The novelist\'s prose, at once sparse and evocative, _____ readers to construct vivid mental landscapes from minimal description." Which completes the sentence?',opts:['compels','compel','compelling','are compelling'],answer:0,explain:'The subject is "prose" (singular), requiring the singular verb "compels."'},
+  {section:'Reading & Writing',q:'A study finds that students who eat breakfast score 15% higher on tests. Which additional finding would most weaken this conclusion?',opts:['Students who eat breakfast also sleep more and have higher-income parents','Breakfast foods contain nutrients that aid cognition','The study was conducted over three years','Similar results were found in other countries'],answer:0,explain:'Confounding variables (more sleep, higher income) suggest breakfast may not be the actual cause.'},
+  {section:'Reading & Writing',q:'An editorial states: "We cannot afford to wait for perfect data before acting on climate change." This argument assumes that:',opts:['Climate data will never be perfect','Inaction carries greater risk than imperfect action','Scientists are unreliable','Climate change is not serious'],answer:1,explain:'The argument implicitly assumes the cost of delay exceeds the cost of acting on imperfect information.'},
+  {section:'Reading & Writing',q:'"The filibuster, a procedural mechanism originally designed to protect minority viewpoints, has increasingly become a tool for legislative obstruction." The sentence structure serves to:',opts:['Define "filibuster" for unfamiliar readers','Contrast original purpose with current use','Argue for eliminating the filibuster','Present two equal interpretations'],answer:1,explain:'The appositive phrase sets up the contrast between original intent ("protect") and current reality ("obstruction").'},
+  {section:'Reading & Writing',q:'Which transition best connects: "Renewable energy costs have dropped 90% in a decade. _____, fossil fuels still receive $5.9 trillion in annual subsidies."',opts:['Therefore','Similarly','Nevertheless','Specifically'],answer:2,explain:'"Nevertheless" signals contrast: despite renewables being cheaper, fossil fuels still get massive subsidies.'},
+  {section:'Reading & Writing',q:'A chart shows that countries with higher GDP spend more on healthcare but don\'t necessarily have better health outcomes. The data best supports which claim?',opts:['Spending more on healthcare is wasteful','Healthcare spending has diminishing returns beyond a certain point','Poor countries have better health outcomes','GDP and healthcare are unrelated'],answer:1,explain:'The data shows spending helps up to a point but doesn\'t guarantee proportionally better outcomes.'},
+  // Math (22 questions, 70 min in real SAT — we use 10 questions, ~20 min)
+  {section:'Math',q:'If the function f(x) = ax² + bx + c has roots at x = -2 and x = 5, and f(0) = -30, what is the value of a?',opts:['3','-3','6','-6'],answer:0,explain:'f(x) = a(x+2)(x-5). f(0) = a(2)(-5) = -10a = -30, so a = 3.'},
+  {section:'Math',q:'A circle in the xy-plane has equation (x-3)² + (y+2)² = 25. Which point lies ON the circle?',opts:['(3, 3)','(0, 2)','(8, -2)','(3, -7)'],answer:2,explain:'(8-3)² + (-2+2)² = 25 + 0 = 25. Point (8,-2) satisfies the equation.'},
+  {section:'Math',q:'If 3ⁿ⁺¹ = 81 × 3², what is n?',opts:['5','6','7','4'],answer:0,explain:'81 = 3⁴, so 81 × 3² = 3⁴ × 3² = 3⁶. Thus 3ⁿ⁺¹ = 3⁶, so n + 1 = 6 and n = 5.'},
+  {section:'Math',q:'A right triangle has legs of length 8 and 15. What is the length of the hypotenuse?',opts:['17','19','23','20'],answer:0,explain:'c² = 8² + 15² = 64 + 225 = 289. c = √289 = 17.'},
+  {section:'Math',q:'The mean of five numbers is 12. When a sixth number is added, the mean becomes 15. What is the sixth number?',opts:['27','30','33','18'],answer:1,explain:'Sum of 5 numbers = 60. New sum = 6 × 15 = 90. Sixth number = 90 - 60 = 30.'},
+  {section:'Math',q:'If |2x - 7| ≤ 3, what is the solution set?',opts:['2 ≤ x ≤ 5','x ≤ 2 or x ≥ 5','-5 ≤ x ≤ 2','4 ≤ x ≤ 10'],answer:0,explain:'-3 ≤ 2x-7 ≤ 3 → 4 ≤ 2x ≤ 10 → 2 ≤ x ≤ 5.'},
+  {section:'Math',q:'A store offers 20% off, then an additional 10% off the sale price. What is the total percent discount?',opts:['30%','28%','32%','25%'],answer:1,explain:'After 20% off: 0.80. After additional 10%: 0.80 × 0.90 = 0.72. Discount = 1 - 0.72 = 28%.'},
+  {section:'Math',q:'What is the value of (2 + 3i)(4 - i) where i = √(-1)?',opts:['11 + 10i','5 + 2i','11 + 14i','8 - 3i²'],answer:0,explain:'8 - 2i + 12i - 3i² = 8 + 10i + 3 = 11 + 10i (since i² = -1).'},
+  {section:'Math',q:'The graph of y = -2(x-1)² + 8 opens in which direction, and what is its maximum value?',opts:['Downward, max = 8','Upward, max = 8','Downward, max = 1','Upward, min = 8'],answer:0,explain:'Negative leading coefficient means it opens downward. Vertex at (1, 8), so maximum is 8.'},
+  {section:'Math',q:'A population doubles every 5 years. If it starts at 1,000, what will it be after 20 years?',opts:['8,000','16,000','32,000','4,000'],answer:1,explain:'20 years = 4 doubling periods. 1000 × 2⁴ = 1000 × 16 = 16,000.'},
+];
+
+const ACT_EXAM_QUESTIONS = [
+  // English (20 questions, ~15 min)
+  {section:'English',q:'"The students, along with their teacher, _____ planning the field trip." Select the correct verb.',opts:['are','is','were planning to be','has been'],answer:0,explain:'"Along with their teacher" is a parenthetical phrase, not part of the subject. The main subject is "students" (plural), so "are" is correct.'},
+  {section:'English',q:'Which punctuation correctly completes: "The experiment yielded unexpected results___ the team decided to replicate it."',opts:['; therefore,',', therefore','— therefore,','. Therefore'],answer:0,explain:'A semicolon joins two independent clauses. "Therefore" is a conjunctive adverb needing a semicolon before and comma after.'},
+  {section:'English',q:'"Having finished the marathon, a celebration was held by the runners." This sentence contains:',opts:['A split infinitive','A dangling modifier','Correct grammar','A run-on sentence'],answer:1,explain:'"Having finished the marathon" modifies "a celebration" — but celebrations don\'t finish marathons. It should modify "the runners."'},
+  {section:'English',q:'Choose the most effective revision: "The museum was old. It had paintings. The paintings were beautiful. People visited often."',opts:['The old museum had beautiful paintings that attracted frequent visitors.','The museum, which was old, had paintings that were beautiful, and people visited it often.','The museum was old and had paintings and they were beautiful and people visited often.','People often visited the old museum because it had beautiful paintings.'],answer:3,explain:'Option D is most effective: it establishes cause-effect, is concise, and flows naturally.'},
+  {section:'English',q:'"The committee has made _____ decision." Which correctly completes this?',opts:['it\'s','its','their','they\'re'],answer:1,explain:'"Committee" is singular in standard American English, requiring "its" (possessive, no apostrophe).'},
+  {section:'English',q:'In context: "The policy was implemented; _____, not all stakeholders were consulted." Which transition fits?',opts:['furthermore','however','therefore','similarly'],answer:1,explain:'"However" shows contrast between implementation and the lack of complete consultation.'},
+  {section:'English',q:'"Neither the CEO nor the board members _____ aware of the discrepancy." Choose the correct verb.',opts:['was','were','is','has been'],answer:1,explain:'With "neither...nor," the verb agrees with the nearer subject: "board members" is plural, so "were."'},
+  {section:'English',q:'Which sentence avoids redundancy?',opts:['The reason is because of budget cuts.','The annual yearly report is due Friday.','She returned back to her office.','Budget cuts caused the delay.'],answer:3,explain:'The others are redundant: "reason...because," "annual yearly," "returned back." Option D is clean.'},
+  {section:'English',q:'"Students whom the professor mentored often went on to publish research." Is "whom" used correctly?',opts:['Yes — "whom" is the object of "mentored"','No — it should be "who"','No — it should be "which"','No — it should be "that"'],answer:0,explain:'"Whom" is correct as the object of the verb "mentored" (the professor mentored whom).'},
+  {section:'English',q:'Which revision best improves clarity? "The data was analyzed by the researchers using advanced statistical methods that produced significant results."',opts:['Using advanced statistical methods, the researchers analyzed the data and produced significant results.','The researchers, using advanced methods, analyzed data significantly.','Advanced statistical methods were used by researchers to analyze data that was significant.','Significant results were produced by data analyzed by researchers using methods.'],answer:0,explain:'Option A clarifies who did what by making "researchers" the subject and placing the method in a participial phrase.'},
+  // Math (20 questions, ~20 min)
+  {section:'Math',q:'If 5x - 3 = 2x + 9, what is x?',opts:['3','4','6','2'],answer:1,explain:'5x - 2x = 9 + 3 → 3x = 12 → x = 4.'},
+  {section:'Math',q:'A rectangle has a perimeter of 36 and a length that is twice its width. What is the area?',opts:['72','54','108','48'],answer:0,explain:'Let width = w. 2(2w + w) = 36 → 6w = 36 → w = 6. Length = 12. Area = 6 × 12 = 72.'},
+  {section:'Math',q:'What is the value of cos(60°)?',opts:['½','√3/2','√2/2','1'],answer:0,explain:'cos(60°) = ½. This is a standard trigonometric value.'},
+  {section:'Math',q:'If f(x) = 3x - 1 and g(x) = x² + 2, what is f(g(2))?',opts:['17','15','19','21'],answer:0,explain:'g(2) = 4 + 2 = 6. f(6) = 3(6) - 1 = 17.'},
+  {section:'Math',q:'A 30-60-90 triangle has a hypotenuse of 10. What is the length of the shorter leg?',opts:['5','5√3','5√2','10√3'],answer:0,explain:'In a 30-60-90 triangle, the shorter leg = hypotenuse/2 = 10/2 = 5.'},
+  {section:'Math',q:'The probability of event A is 0.3 and event B is 0.5. If they are independent, what is P(A and B)?',opts:['0.15','0.80','0.35','0.50'],answer:0,explain:'For independent events: P(A∩B) = P(A) × P(B) = 0.3 × 0.5 = 0.15.'},
+  {section:'Math',q:'What is the distance between points (-3, 4) and (5, -2)?',opts:['10','8','12','14'],answer:0,explain:'d = √[(5-(-3))² + (-2-4)²] = √[64 + 36] = √100 = 10.'},
+  {section:'Math',q:'If the ratio of boys to girls is 3:5 and there are 40 students total, how many boys are there?',opts:['15','24','18','12'],answer:0,explain:'Boys = (3/8) × 40 = 15.'},
+  {section:'Math',q:'What is the next term in the arithmetic sequence: 7, 13, 19, 25, ...?',opts:['29','31','33','27'],answer:1,explain:'Common difference = 6. Next term = 25 + 6 = 31.'},
+  {section:'Math',q:'A cone has a radius of 3 and a height of 4. What is its volume?',opts:['12π','36π','9π','16π'],answer:0,explain:'V = (1/3)πr²h = (1/3)π(9)(4) = 12π.'},
+  // Reading (5 questions, ~10 min)
+  {section:'Reading',q:'A passage discusses how coral reefs support 25% of marine species despite covering less than 1% of the ocean floor. The author\'s primary purpose is to:',opts:['Argue for ocean conservation funding','Highlight the disproportionate ecological importance of reefs','Describe coral biology','Compare reefs to other ecosystems'],answer:1,explain:'The contrast between 1% coverage and 25% species support emphasizes ecological significance.'},
+  {section:'Reading',q:'"The Industrial Revolution, far from being a clean break with the past, was rooted in centuries of incremental agricultural and commercial change." This statement challenges:',opts:['The idea that the Industrial Revolution was important','The narrative of sudden, revolutionary transformation','The role of agriculture in history','Commercial change theory'],answer:1,explain:'The author directly challenges the "clean break" narrative, arguing for gradual, evolutionary change.'},
+  {section:'Reading',q:'Two viewpoints: Author A says standardized testing measures achievement objectively. Author B says it measures test-taking ability, not knowledge. They fundamentally disagree about:',opts:['Whether tests should exist','What standardized tests actually measure','The difficulty of tests','How tests are graded'],answer:1,explain:'The core disagreement is about construct validity — whether tests measure achievement or test-taking skill.'},
+  {section:'Reading',q:'A study found that bilingual children show enhanced executive function. The researcher notes: "While our sample was limited to middle-class families..." This caveat suggests:',opts:['The finding is wrong','Results may not generalize to other socioeconomic groups','Middle-class children are smarter','Bilingualism only helps wealthy children'],answer:1,explain:'The researcher is acknowledging a limitation in generalizability due to restricted sample demographics.'},
+  {section:'Reading',q:'"The author\'s use of second person ("you") throughout the essay serves to:" (assuming it\'s an argumentative piece)',opts:['Show informality','Directly implicate the reader in the argument','Follow convention','Avoid using "I"'],answer:1,explain:'Second person draws the reader in as a participant, making the argument feel personally relevant.'},
+  // Science (5 questions, ~10 min)
+  {section:'Science',q:'A graph shows that as CO₂ concentration increases from 300 to 600 ppm, plant growth rate increases, then plateaus above 500 ppm. Which conclusion is best supported?',opts:['CO₂ is toxic to plants above 500 ppm','Other factors become limiting at high CO₂ levels','Plants cannot absorb CO₂ above 500 ppm','The data is inconclusive'],answer:1,explain:'The plateau suggests CO₂ is no longer the limiting factor — other resources (light, water, nutrients) constrain growth.'},
+  {section:'Science',q:'Two scientists disagree: Scientist 1 says a fossil is 65 million years old (K-Pg boundary). Scientist 2 says 70 million years old (late Cretaceous). Which evidence would resolve this?',opts:['The fossil\'s color','Radiometric dating of the surrounding rock layer','The fossil\'s size','Comparison to living species'],answer:1,explain:'Radiometric dating provides absolute ages for rock layers, directly resolving the age dispute.'},
+  {section:'Science',q:'An experiment tests whether fertilizer affects tomato growth. Group A gets fertilizer; Group B gets water only. Both are in identical conditions. Group B is the:',opts:['Independent variable','Dependent variable','Control group','Experimental error'],answer:2,explain:'Group B (no treatment) is the control group — it provides a baseline for comparison.'},
+  {section:'Science',q:'A table shows three metals with melting points: Al (660°C), Cu (1085°C), Fe (1538°C). A furnace reaches 1200°C. Which metals will melt?',opts:['Only Al','Al and Cu','All three','Only Fe'],answer:1,explain:'At 1200°C, aluminum (660°C) and copper (1085°C) will melt, but iron (1538°C) will not.'},
+  {section:'Science',q:'A pH test shows: Solution X = 2, Solution Y = 7, Solution Z = 12. Which statement is correct?',opts:['X is basic, Z is acidic','Y is neutral, X is strongly acidic','Z is neutral','All are acidic'],answer:1,explain:'pH 7 is neutral, pH 2 is strongly acidic, pH 12 is strongly basic.'},
+];
+
+let prepState = { subject: 'all', difficulty: 'all', current: 0, answered: [], xp: 0, streak: 0, lastDate: null, correct: 0, total: 0, history: [] };
+let examState = null;
+let examTimer = null;
+
+const XP_MULTIPLIER = { easy: 1, medium: 1.5, hard: 2 };
+const DIFF_LABELS = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
 
 function loadPrepState() {
   const saved = localStorage.getItem('gs_prep_state');
   if (saved) {
     const s = JSON.parse(saved);
     Object.assign(prepState, s);
-    // Check streak continuity
+    if (!prepState.difficulty) prepState.difficulty = 'all';
     const today = new Date().toDateString();
     if (prepState.lastDate && prepState.lastDate !== today) {
       const last = new Date(prepState.lastDate);
@@ -4351,8 +4505,12 @@ function savePrepState() {
 
 function initPrep() {
   loadPrepState();
+  document.querySelectorAll('.prep-diff-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.diff === prepState.difficulty);
+  });
   updatePrepStats();
   loadPrepQuestion();
+  renderExamCards();
 }
 
 function setPrepSubject(sub) {
@@ -4364,20 +4522,39 @@ function setPrepSubject(sub) {
   loadPrepQuestion();
 }
 
+function setPrepDifficulty(diff) {
+  prepState.difficulty = diff;
+  document.querySelectorAll('.prep-diff-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.diff === diff);
+  });
+  prepState.current = 0;
+  prepState.answered = [];
+  savePrepState();
+  loadPrepQuestion();
+}
+
 function getFilteredQuestions() {
-  if (prepState.subject === 'all') return PREP_QUESTIONS;
-  return PREP_QUESTIONS.filter(q => q.subject === prepState.subject);
+  return PREP_QUESTIONS.filter(q => {
+    const subMatch = prepState.subject === 'all' || q.subject === prepState.subject;
+    const diffMatch = prepState.difficulty === 'all' || q.difficulty === prepState.difficulty;
+    return subMatch && diffMatch;
+  });
 }
 
 function loadPrepQuestion() {
+  if (examState) return;
   const questions = getFilteredQuestions();
-  if (questions.length === 0) return;
+  if (questions.length === 0) {
+    document.getElementById('prep-question-area').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink3)">No questions match the selected filters. Try a different subject or difficulty level.</div>';
+    return;
+  }
   const idx = prepState.current % questions.length;
   const q = questions[idx];
+  const diffBadge = `<span class="prep-diff-badge ${q.difficulty}">${q.difficulty.toUpperCase()}</span>`;
   const area = document.getElementById('prep-question-area');
   area.innerHTML = `
     <div class="prep-question-card">
-      <span class="prep-q-subject ${q.subject}">${q.subject.toUpperCase()}</span>
+      <span class="prep-q-subject ${q.subject}">${q.subject.toUpperCase()}</span>${diffBadge}
       <div style="float:right;font-size:12px;color:var(--ink3)">Question ${idx+1} of ${questions.length}</div>
       <div class="prep-q-text">${q.q}</div>
       <div class="prep-options">
@@ -4391,6 +4568,7 @@ function loadPrepQuestion() {
 }
 
 function selectPrepAnswer(idx) {
+  if (examState) return selectExamAnswer(idx);
   const questions = getFilteredQuestions();
   const qIdx = prepState.current % questions.length;
   const q = questions[qIdx];
@@ -4405,9 +4583,11 @@ function selectPrepAnswer(idx) {
   const isCorrect = idx === q.answer;
   if (isCorrect) {
     prepState.correct++;
-    const xpGain = 10 + (prepState.streak * 2);
+    const mult = XP_MULTIPLIER[q.difficulty] || 1;
+    const baseXp = 10;
+    const xpGain = Math.round((baseXp + (prepState.streak * 2)) * mult);
     prepState.xp += xpGain;
-    showXPToast('+' + xpGain + ' XP');
+    showXPToast('+' + xpGain + ' XP' + (mult > 1 ? ' (' + mult + 'x)' : ''));
     const today = new Date().toDateString();
     if (prepState.lastDate !== today) {
       const last = prepState.lastDate ? new Date(prepState.lastDate) : null;
@@ -4428,6 +4608,7 @@ function selectPrepAnswer(idx) {
 }
 
 function nextPrepQuestion() {
+  if (examState) return nextExamQuestion();
   prepState.current++;
   loadPrepQuestion();
 }
@@ -4439,7 +4620,6 @@ function updatePrepStats() {
   document.getElementById('prep-correct').textContent = prepState.correct;
   const acc = prepState.total > 0 ? Math.round((prepState.correct / prepState.total) * 100) : 0;
   document.getElementById('prep-accuracy').textContent = acc + '%';
-  // Score prediction (show after 5+ questions)
   if (prepState.total >= 5) {
     const predict = document.getElementById('prep-score-predict');
     predict.style.display = '';
@@ -4456,10 +4636,206 @@ function showXPToast(text) {
   setTimeout(() => toast.remove(), 1600);
 }
 
+// ── Full Practice Exam Logic (Pro) ──
+function renderExamCards() {
+  const cards = document.getElementById('prep-exam-cards');
+  if (!cards) return;
+  const pro = isPro();
+  cards.innerHTML = `
+    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'sat\')' : 'showProGate()'}">
+      <h3>📝 Full SAT</h3>
+      <p><strong>20 questions</strong> · 50 min timer</p>
+      <p style="margin-top:8px;font-size:12px">Reading & Writing + Math sections</p>
+      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+    </div>
+    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'act\')' : 'showProGate()'}">
+      <h3>📋 Full ACT</h3>
+      <p><strong>40 questions</strong> · 55 min timer</p>
+      <p style="margin-top:8px;font-size:12px">English, Math, Reading & Science</p>
+      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+    </div>`;
+}
+
+function showProGate() {
+  showToast('This feature requires a Pro subscription. Upgrade to access full practice exams!', 'info');
+}
+
+function startExam(type) {
+  const questions = type === 'sat' ? [...SAT_EXAM_QUESTIONS] : [...ACT_EXAM_QUESTIONS];
+  const timeMinutes = type === 'sat' ? 50 : 55;
+  examState = {
+    type: type,
+    questions: questions,
+    current: 0,
+    answers: new Array(questions.length).fill(null),
+    correct: 0,
+    startTime: Date.now(),
+    timeLimit: timeMinutes * 60 * 1000,
+    finished: false
+  };
+  document.getElementById('prep-tabs').style.display = 'none';
+  document.getElementById('prep-diff-tabs').style.display = 'none';
+  document.getElementById('prep-exam-section').style.display = 'none';
+  document.getElementById('prep-score-predict').style.display = 'none';
+  startExamTimer();
+  loadExamQuestion();
+}
+
+function startExamTimer() {
+  if (examTimer) clearInterval(examTimer);
+  examTimer = setInterval(() => {
+    if (!examState || examState.finished) { clearInterval(examTimer); return; }
+    const elapsed = Date.now() - examState.startTime;
+    const remaining = Math.max(0, examState.timeLimit - elapsed);
+    if (remaining <= 0) { finishExam(); return; }
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const timerEl = document.getElementById('exam-timer-display');
+    if (timerEl) {
+      timerEl.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+      if (remaining < 300000) timerEl.style.color = 'var(--red)';
+    }
+  }, 1000);
+}
+
+function loadExamQuestion() {
+  const q = examState.questions[examState.current];
+  const progress = ((examState.current) / examState.questions.length * 100).toFixed(0);
+  const elapsed = Date.now() - examState.startTime;
+  const remaining = Math.max(0, examState.timeLimit - elapsed);
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  const area = document.getElementById('prep-question-area');
+  area.innerHTML = `
+    <div class="prep-exam-header">
+      <div>
+        <strong>${examState.type.toUpperCase()} Practice Exam</strong>
+        <span style="margin-left:12px;font-size:13px;color:var(--ink3)">${q.section}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="prep-exam-timer" id="exam-timer-display">${mins}:${secs.toString().padStart(2,'0')}</div>
+        <button class="prep-exam-quit" onclick="quitExam()">End Exam</button>
+      </div>
+    </div>
+    <div class="prep-exam-progress"><div class="prep-exam-progress-fill" style="width:${progress}%"></div></div>
+    <div class="prep-question-card">
+      <span class="prep-q-subject" style="background:var(--accent-light);color:var(--accent)">${q.section}</span>
+      <div style="float:right;font-size:12px;color:var(--ink3)">Question ${examState.current+1} of ${examState.questions.length}</div>
+      <div class="prep-q-text">${q.q}</div>
+      <div class="prep-options">
+        ${q.opts.map((o,i) => `<div class="prep-option" data-idx="${i}" onclick="selectPrepAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</div>`).join('')}
+      </div>
+      <div id="prep-explain" style="display:none"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="feat-btn feat-btn-primary" id="prep-next-btn" onclick="nextPrepQuestion()" style="display:none">${examState.current < examState.questions.length - 1 ? 'Next Question →' : 'Finish Exam'}</button>
+      </div>
+    </div>`;
+}
+
+function selectExamAnswer(idx) {
+  if (examState.answers[examState.current] !== null) return;
+  const q = examState.questions[examState.current];
+  examState.answers[examState.current] = idx;
+
+  const opts = document.querySelectorAll('.prep-option');
+  opts.forEach(o => { o.style.pointerEvents = 'none'; });
+  opts[q.answer].classList.add('correct');
+
+  const isCorrect = idx === q.answer;
+  if (isCorrect) examState.correct++;
+  else opts[idx].classList.add('wrong');
+
+  const explainDiv = document.getElementById('prep-explain');
+  explainDiv.style.display = 'block';
+  explainDiv.innerHTML = `<div class="prep-explanation">${isCorrect ? '✅ Correct!' : '❌ Incorrect.'} ${q.explain}</div>`;
+  document.getElementById('prep-next-btn').style.display = '';
+}
+
+function nextExamQuestion() {
+  if (examState.current >= examState.questions.length - 1) { finishExam(); return; }
+  examState.current++;
+  loadExamQuestion();
+}
+
+function finishExam() {
+  examState.finished = true;
+  if (examTimer) clearInterval(examTimer);
+  const total = examState.questions.length;
+  const correct = examState.correct;
+  const pct = Math.round((correct / total) * 100);
+  const elapsed = Date.now() - examState.startTime;
+  const minsUsed = Math.floor(elapsed / 60000);
+  const secsUsed = Math.floor((elapsed % 60000) / 1000);
+
+  let scoreDisplay = '';
+  if (examState.type === 'sat') {
+    const predicted = Math.min(Math.round(400 + (pct / 100) * 1200), 1600);
+    scoreDisplay = `<div class="prep-score-val">${predicted}</div><div class="prep-score-label">Predicted SAT Score (out of 1600)</div>`;
+  } else {
+    const predicted = Math.min(Math.round(1 + (pct / 100) * 35), 36);
+    scoreDisplay = `<div class="prep-score-val">${predicted}</div><div class="prep-score-label">Predicted ACT Score (out of 36)</div>`;
+  }
+
+  const sectionBreakdown = {};
+  examState.questions.forEach((q, i) => {
+    if (!sectionBreakdown[q.section]) sectionBreakdown[q.section] = { total: 0, correct: 0 };
+    sectionBreakdown[q.section].total++;
+    if (examState.answers[i] === q.answer) sectionBreakdown[q.section].correct++;
+  });
+  let breakdownHTML = Object.entries(sectionBreakdown).map(([sec, data]) => {
+    const secPct = Math.round((data.correct / data.total) * 100);
+    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${sec}</span><span><strong>${data.correct}/${data.total}</strong> (${secPct}%)</span></div>`;
+  }).join('');
+
+  const xpGain = Math.round(correct * 15 + (pct >= 80 ? 50 : 0));
+  prepState.xp += xpGain;
+  prepState.total += total;
+  prepState.correct += correct;
+  savePrepState();
+  updatePrepStats();
+
+  const area = document.getElementById('prep-question-area');
+  area.innerHTML = `
+    <div style="text-align:center;padding:30px">
+      <h2>${examState.type.toUpperCase()} Practice Exam Complete!</h2>
+      <div style="margin:20px 0">${scoreDisplay}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px auto;max-width:400px">
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${correct}/${total}</div><div style="font-size:12px;color:var(--ink3)">Correct</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${pct}%</div><div style="font-size:12px;color:var(--ink3)">Accuracy</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${minsUsed}m ${secsUsed}s</div><div style="font-size:12px;color:var(--ink3)">Time Used</div></div>
+      </div>
+      <div style="text-align:left;max-width:400px;margin:20px auto">
+        <h3 style="margin-bottom:8px">Section Breakdown</h3>
+        ${breakdownHTML}
+      </div>
+      <p style="margin-top:16px;color:var(--gold);font-weight:600">+${xpGain} XP earned${pct >= 80 ? ' (includes 50 XP bonus for 80%+ accuracy!)' : ''}</p>
+      <button class="feat-btn feat-btn-primary" onclick="exitExam()" style="margin-top:20px">Back to Practice</button>
+    </div>`;
+}
+
+function quitExam() {
+  if (confirm('Are you sure you want to end this exam? Your progress will be lost.')) finishExam();
+}
+
+function exitExam() {
+  examState = null;
+  if (examTimer) clearInterval(examTimer);
+  document.getElementById('prep-tabs').style.display = '';
+  document.getElementById('prep-diff-tabs').style.display = '';
+  document.getElementById('prep-exam-section').style.display = '';
+  loadPrepQuestion();
+  renderExamCards();
+}
+
 window.initPrep = initPrep;
 window.setPrepSubject = setPrepSubject;
+window.setPrepDifficulty = setPrepDifficulty;
 window.selectPrepAnswer = selectPrepAnswer;
 window.nextPrepQuestion = nextPrepQuestion;
+window.startExam = startExam;
+window.quitExam = quitExam;
+window.exitExam = exitExam;
+window.showProGate = showProGate;
 
 /* ============================================================
    COLLEGE HEAD-TO-HEAD COMPARISON
