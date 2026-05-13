@@ -276,20 +276,19 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .payment-box{background:white;border-radius:var(--radius-xl);padding:36px;max-width:480px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .3s cubic-bezier(.4,0,.2,1)}
 .payment-box h2{font-family:var(--font-display);font-size:26px;color:var(--ink);margin-bottom:6px}
 .payment-box .sub{font-size:14px;color:var(--ink3);margin-bottom:24px}
-.payment-methods{display:flex;gap:10px;margin-bottom:20px}
-.pay-method{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;transition:var(--transition);text-align:center;font-size:13px;font-weight:600;color:var(--ink2)}
-.pay-method.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
-.stripe-field{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 14px;font-family:var(--font-body);font-size:14px;color:var(--ink);margin-bottom:12px;width:100%;transition:var(--transition)}
-.stripe-field:focus{border-color:var(--accent);background:white;outline:none;box-shadow:0 0 0 3px rgba(200,98,42,.1)}
-.payment-row{display:flex;gap:12px}
-.payment-row .stripe-field{flex:1}
+.plan-toggle{display:flex;gap:10px;margin-bottom:20px}
+.plan-option{flex:1;padding:16px;border-radius:12px;border:2px solid var(--border);background:white;cursor:pointer;transition:var(--transition);text-align:center;position:relative}
+.plan-option.selected{border-color:var(--accent);background:var(--accent-light)}
+.plan-option-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.plan-option-price{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ink)}
+.plan-option-period{font-size:12px;color:var(--ink3)}
+.plan-option-save{position:absolute;top:-10px;right:10px;background:var(--green);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px}
 .pay-btn{width:100%;padding:15px;border-radius:10px;background:var(--accent);color:white;font-family:var(--font-body);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:var(--transition);margin-top:8px}
 .pay-btn:hover{background:#b5571f;box-shadow:0 6px 20px rgba(200,98,42,.3)}
+.pay-btn:disabled{opacity:.6;cursor:not-allowed}
 .secure-note{text-align:center;font-size:11px;color:var(--ink3);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
 .close-modal{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink3);transition:var(--transition)}
 .close-modal:hover{color:var(--ink)}
-.paypal-btn{width:100%;padding:15px;border-radius:10px;background:#0070ba;color:white;font-family:var(--font-body);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:var(--transition);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px}
-.paypal-btn:hover{background:#005ea6}
 
 /* DASHBOARD */
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1100px;margin:0 auto;padding:40px}
@@ -739,6 +738,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .compare-radar-wrap canvas{width:100%!important;height:auto!important}
 }
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
@@ -808,32 +809,26 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   <div class="payment-box">
     <button class="close-modal" onclick="closePayment()">✕</button>
     <h2>Upgrade to Pro</h2>
-    <p class="sub" id="payment-plan-label">GradeScope Pro — $4.99/month</p>
-    <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:20px">
+    <p class="sub">Choose your plan — 7-day free trial included on monthly.</p>
+    <div class="plan-toggle">
+      <div class="plan-option selected" id="plan-monthly" onclick="selectPlan('monthly')">
+        <div class="plan-option-name">Monthly</div>
+        <div class="plan-option-price">$4.99</div>
+        <div class="plan-option-period">per month</div>
+      </div>
+      <div class="plan-option" id="plan-annual" onclick="selectPlan('annual')">
+        <div class="plan-option-save">Save 25%</div>
+        <div class="plan-option-name">Annual</div>
+        <div class="plan-option-price">$45</div>
+        <div class="plan-option-period">per year</div>
+      </div>
+    </div>
+    <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:20px" id="trial-note">
       🎁 <strong>7-day free trial included</strong> — cancel anytime before the trial ends and pay nothing.
     </div>
-    <div class="payment-methods">
-      <div class="pay-method selected" onclick="switchPay('card',this)">💳 Card</div>
-      <div class="pay-method" onclick="switchPay('paypal',this)">🅿️ PayPal</div>
-    </div>
-    <div id="card-form">
-      <input class="stripe-field" type="text" placeholder="Full name">
-      <input class="stripe-field" type="email" placeholder="Email address" id="payment-email">
-      <input class="stripe-field" type="text" placeholder="Card number" maxlength="19" oninput="fmtCard(this)">
-      <div class="payment-row">
-        <input class="stripe-field" type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)">
-        <input class="stripe-field" type="text" placeholder="CVC" maxlength="4">
-      </div>
-      <button class="pay-btn" onclick="handlePayment()">
-        <span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>
-      </button>
-    </div>
-    <div id="paypal-form" style="display:none">
-      <p style="font-size:13px;color:var(--ink2);margin-bottom:16px;line-height:1.6">You'll be redirected to PayPal to complete your purchase securely.</p>
-      <button class="paypal-btn" onclick="handlePayPal()">
-        <span style="font-size:20px;font-weight:800;letter-spacing:-1px">Pay</span><span style="font-size:20px;font-weight:800;color:#009cde">Pal</span>
-      </button>
-    </div>
+    <button class="pay-btn" id="stripe-checkout-btn" onclick="handleStripeCheckout()">
+      <span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>
+    </button>
     <p class="secure-note">🔒 Secured by Stripe · Cancel anytime · SSL encrypted</p>
   </div>
 </div>
@@ -891,7 +886,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 <!-- HOME PAGE -->
 <div class="page active" id="page-home">
-  <div class="ad-banner"><span class="ad-banner-label">Ad</span>Advertisement · 728×90</div>
+  <div class="ad-banner" id="ad-banner-home"><ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="HOME_BANNER_SLOT"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>
   <div class="hero">
     <div>
       <div class="hero-eyebrow">⚡ Free · Instant results · AI-powered</div>
@@ -943,7 +938,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 <!-- TOOLS PAGE -->
 <div class="page" id="page-tools">
-  <div class="ad-banner"><span class="ad-banner-label">Ad</span>Advertisement · 728×90</div>
+  <div class="ad-banner" id="ad-banner-tools"><ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="TOOLS_BANNER_SLOT"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>
   <div class="tool-section-banner"><h2>Free College Calculators</h2></div>
   <div class="tool-tabs">
     <button class="tab-btn active" onclick="switchTab('gpa',this)"><span class="tab-icon">📊</span>GPA Calc</button>
@@ -1231,7 +1226,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <div class="sidebar-card" style="padding:0;overflow:hidden"><div class="ad-slot"><div class="ad-slot-text">Advertisement</div><div class="ad-slot-size">300 × 250</div></div></div>
+      <div class="sidebar-card" style="padding:0;overflow:hidden"><ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="SIDEBAR_AD_SLOT"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>
       <div class="sidebar-card">
         <div class="sidebar-title">4.0 Grade Scale</div>
         <div class="scale-grid">
@@ -2122,15 +2117,53 @@ function switchAuthTab(tab) {
   }
 }
 
+/* ============================================================
+   STRIPE CONFIGURATION
+   Replace these with your actual Stripe keys and Price IDs.
+   Get them from https://dashboard.stripe.com/apikeys and
+   https://dashboard.stripe.com/products
+============================================================ */
+const STRIPE_CONFIG = {
+  publishableKey: 'pk_test_REPLACE_WITH_YOUR_KEY',
+  prices: {
+    monthly: 'price_REPLACE_WITH_MONTHLY_PRICE_ID',
+    annual:  'price_REPLACE_WITH_ANNUAL_PRICE_ID'
+  },
+  successUrl: window.location.origin + window.location.pathname + '?payment=success&session_id={CHECKOUT_SESSION_ID}',
+  cancelUrl:  window.location.origin + window.location.pathname + '?payment=cancelled'
+};
+
+let selectedPlan = 'monthly';
+let stripeInstance = null;
+
+function getStripe() {
+  if (!stripeInstance && STRIPE_CONFIG.publishableKey !== 'pk_test_REPLACE_WITH_YOUR_KEY') {
+    stripeInstance = Stripe(STRIPE_CONFIG.publishableKey);
+  }
+  return stripeInstance;
+}
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('plan-monthly').classList.toggle('selected', plan === 'monthly');
+  document.getElementById('plan-annual').classList.toggle('selected', plan === 'annual');
+  const btnText = document.getElementById('pay-btn-text');
+  const trialNote = document.getElementById('trial-note');
+  if (plan === 'annual') {
+    if (btnText) btnText.textContent = '🔒 Subscribe — $45/year';
+    if (trialNote) trialNote.style.display = 'none';
+  } else {
+    if (btnText) btnText.textContent = '🔒 Start Free Trial — then $4.99/mo';
+    if (trialNote) trialNote.style.display = '';
+  }
+}
+
 function openPayment(plan) {
   if (!window.currentUser) { openAuth('signup', 'Create a free account first, then upgrade.'); return; }
   const modal = document.getElementById('paymentModal');
   if (!modal) return;
   modal.classList.add('open');
-  const label = document.getElementById('payment-plan-label');
-  if (label) label.textContent = plan === 'annual' ? 'GradeScope Annual — $45/year' : 'GradeScope Pro — $4.99/month';
-  const emailEl = document.getElementById('payment-email');
-  if (emailEl && window.currentUser) emailEl.value = window.currentUser.email || '';
+  selectPlan(plan === 'annual' ? 'annual' : 'monthly');
 }
 
 function closePayment() {
@@ -2139,45 +2172,33 @@ function closePayment() {
   modal.classList.remove('open');
 }
 
-function switchPay(method, el) {
-  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
-  if (el) el.classList.add('selected');
-  const card = document.getElementById('card-form');
-  const paypal = document.getElementById('paypal-form');
-  if (method === 'paypal') {
-    if (card) card.style.display = 'none';
-    if (paypal) paypal.style.display = '';
-  } else {
-    if (card) card.style.display = '';
-    if (paypal) paypal.style.display = 'none';
+async function handleStripeCheckout() {
+  const stripe = getStripe();
+  if (!stripe) {
+    showToast('Stripe is not configured yet. Contact support.', 'error');
+    return;
   }
-}
+  const btn = document.getElementById('stripe-checkout-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span>Redirecting to Stripe...</span>'; }
 
-function handlePayment() {
-  const btn = document.querySelector('.pay-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span>Processing...</span>'; }
-  setTimeout(() => {
+  try {
+    const priceId = STRIPE_CONFIG.prices[selectedPlan];
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [{ price: priceId, quantity: 1 }],
+      mode: 'subscription',
+      successUrl: STRIPE_CONFIG.successUrl,
+      cancelUrl: STRIPE_CONFIG.cancelUrl,
+      clientReferenceId: window.currentUser?.uid || '',
+      customerEmail: window.currentUser?.email || ''
+    });
+    if (error) {
+      showToast(error.message || 'Something went wrong.', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = '<span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>'; }
+    }
+  } catch (e) {
+    showToast('Could not connect to Stripe. Please try again.', 'error');
     if (btn) { btn.disabled = false; btn.innerHTML = '<span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>'; }
-    closePayment();
-    showToast('✓ Payment processed! Pro features are now active.', 'success');
-    // In production, update plan via backend
-  }, 1800);
-}
-
-function handlePayPal() {
-  showToast('Redirecting to PayPal...', 'info');
-  setTimeout(closePayment, 1500);
-}
-
-function fmtCard(input) {
-  let v = input.value.replace(/\D/g, '').substring(0, 16);
-  input.value = v.replace(/(.{4})/g, '$1 ').trim();
-}
-
-function fmtExpiry(input) {
-  let v = input.value.replace(/\D/g, '').substring(0, 4);
-  if (v.length > 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
-  input.value = v;
+  }
 }
 
 function showToast(msg, type) {
@@ -2248,11 +2269,18 @@ function updateNavForUser() {
     // Hide "Get Pro" if already pro
     if (getProBtn && typeof isPro === 'function' && isPro()) getProBtn.style.display = 'none';
     else if (getProBtn) getProBtn.style.display = '';
+    // Ad-free experience for Pro users
+    const isProUser = typeof isPro === 'function' && isPro();
+    document.querySelectorAll('.ad-banner, .adsbygoogle').forEach(el => {
+      el.style.display = isProUser ? 'none' : '';
+    });
   } else {
     if (signinBtn) signinBtn.style.display = '';
     if (profileDrop) profileDrop.style.display = 'none';
     if (trialBanner) trialBanner.style.display = 'none';
     if (getProBtn) getProBtn.style.display = '';
+    // Show ads for non-logged-in users
+    document.querySelectorAll('.ad-banner').forEach(el => { el.style.display = ''; });
   }
 }
 
@@ -2597,6 +2625,27 @@ onAuthStateChanged(auth, async (user) => {
     }
   } else {
     window._gsProfile = null;
+  }
+
+  // Handle Stripe payment success redirect
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('payment') === 'success' && user) {
+    try {
+      const plan = urlParams.get('plan') || 'pro';
+      await updateDoc(doc(db, 'users', user.uid), { plan: plan === 'annual' ? 'annual' : 'pro' });
+      window._gsProfile = { ...window._gsProfile, plan: plan === 'annual' ? 'annual' : 'pro' };
+      if (typeof updateNavForUser === 'function') updateNavForUser();
+      if (typeof renderDashboard === 'function') renderDashboard();
+      if (typeof renderProfilePage === 'function') renderProfilePage();
+      showToast('✓ Payment successful! Pro features are now active.', 'success');
+    } catch (e) {
+      console.error('Failed to activate Pro:', e);
+    }
+    // Clean URL params
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (urlParams.get('payment') === 'cancelled') {
+    showToast('Payment cancelled. No charges were made.', 'info');
+    window.history.replaceState({}, '', window.location.pathname);
   }
 });
 
