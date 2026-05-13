@@ -1355,7 +1355,7 @@ document.addEventListener('click', function(e) {
 });
 
 function updateNavForUser() {
-  const user = window.currentUser;
+  const user = window._gsUser || window.currentUser;
   const signinBtn = document.getElementById('nav-signin-btn');
   const userNameBtn = document.getElementById('nav-user-name');
   const profileDrop = document.querySelector('.profile-dropdown');
@@ -1645,13 +1645,20 @@ window.handleLogin = async function() {
 // Sign in / sign up with Google
 window.handleGoogleAuth = async function() {
   const errEl = document.getElementById('auth-error');
+  // Close the modal BEFORE opening the popup so it doesn't block focus
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.remove('open');
   try {
     const result = await signInWithPopup(auth, googleProvider);
     await DB.setCurrentUser(result.user);
-    closeAuth();
     showToast('✓ Signed in with Google!');
   } catch (e) {
-    if(errEl) errEl.textContent = firebaseErrMsg(e.code);
+    // If it failed, re-open the modal and show the error
+    if (modal) modal.classList.add('open');
+    if (errEl) {
+      errEl.classList.add('show');
+      errEl.textContent = firebaseErrMsg(e.code);
+    }
   }
 };
 
@@ -2485,10 +2492,10 @@ function renderSavedEssays() {
   }).catch(() => {});
 }
 
-function loadEssay(id) {
-  if(!currentUser) return;
-  const essays = DB.getEssays(currentUser.email);
-  const essay = essays.find(e => e.id === id);
+async function loadEssay(id) {
+  if(!auth.currentUser) return;
+  const essays = await DB.getEssays(auth.currentUser.uid);
+  const essay = essays.find(e => e.firestoreId === id);
   if(!essay) return;
   document.getElementById('essay-textarea').value = essay.text;
   document.getElementById('essay-prompt').value = essay.prompt || '';
@@ -2496,9 +2503,9 @@ function loadEssay(id) {
   showToast('Essay loaded!');
 }
 
-function deleteEssay(id) {
-  if(!currentUser) return;
-  DB.deleteEssay(currentUser.email, id);
+async function deleteEssay(id) {
+  if(!auth.currentUser) return;
+  await DB.deleteEssay(auth.currentUser.uid, id);
   renderSavedEssays();
   showToast('Deleted.');
 }
@@ -2506,7 +2513,7 @@ function deleteEssay(id) {
 function updateEssayPage() {
   const gate = document.getElementById('essay-gate');
   const editor = document.getElementById('essay-editor');
-  if(!currentUser) {
+  if(!auth.currentUser) {          // ← only this line changes
     if(gate) gate.style.display = 'block';
     if(editor) editor.style.display = 'none';
     return;
