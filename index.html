@@ -1241,11 +1241,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
    inline onclick= attributes can find them on window.
 ============================================================ */
 
-// currentUser proxy — reads from window._gsUser set by module
-Object.defineProperty(window, 'currentUser', {
-  get: () => window._gsUser || null,
-  configurable: true
-});
+// currentUser is set directly by the auth-state listener in the module below.
+// (Previously a getter proxy, now a plain property for simpler assignment.)
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1781,18 +1778,24 @@ onAuthStateChanged(auth, async (user) => {
   // Expose current user to global scripts
   window.currentUser = user || null;
   window._gsUser = user || null;
+
+  // DB calls are in a try/catch so a Firestore error never prevents UI updates
   if (user) {
-    // Ensure profile doc exists
-    await DB.setCurrentUser(user);
-    // Load plan info from Firestore and cache on window
-    const profile = await DB.getUserProfile(user.uid);
-    window._gsProfile = profile;
+    try {
+      await DB.setCurrentUser(user);
+      const profile = await DB.getUserProfile(user.uid);
+      window._gsProfile = profile;
+    } catch (e) {
+      console.error('Auth-state DB sync error:', e);
+    }
   } else {
     window._gsProfile = null;
   }
+
   // Expose DB helpers for dashboard
   window._dbGetSaved = (uid) => DB.getSaved(uid);
   window._dbDeleteSaved = (uid, id) => DB.deleteSaved(uid, id);
+
   // Re-run the nav + UI update that the rest of the code uses
   if (typeof updateNavForUser === 'function') updateNavForUser();
   if (typeof updateEssayPage === 'function') updateEssayPage();
