@@ -515,7 +515,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <button class="profile-menu-item" onclick="goDashboard();toggleProfileMenu()">📊 Dashboard</button>
         <button class="profile-menu-item" onclick="showPage('premium');toggleProfileMenu()">⭐ Upgrade to Pro</button>
         <div class="profile-menu-divider"></div>
-        <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
+        <button class="profile-menu-item danger" onclick="handleSignOut()">Sign Out</button>
       </div>
     </div>
     <button class="nav-link" id="nav-signin-btn" onclick="openAuth('login')" style="display:none">Sign In</button>
@@ -1257,7 +1257,7 @@ function switchAuthTab(tab) {
 }
 
 function openPayment(plan) {
-  if (!window.currentUser) { openAuth('signup', 'Create a free account first, then upgrade.'); return; }
+  if (!window._gsUser && !window.currentUser) { openAuth('signup', 'Create a free account first, then upgrade.'); return; }
   const modal = document.getElementById('paymentModal');
   if (!modal) return;
   modal.style.display = 'flex';
@@ -1361,6 +1361,8 @@ function updateNavForUser() {
   const getProBtn = document.getElementById('nav-get-pro');
 
   if (user) {
+    const dashBtn = document.getElementById('nav-dashboard');
+    if (dashBtn) dashBtn.style.display = '';
     if (signinBtn) signinBtn.style.display = 'none';
     if (profileDrop) profileDrop.style.display = '';
     if (userNameBtn) {
@@ -1379,6 +1381,8 @@ function updateNavForUser() {
     if (getProBtn && typeof isPro === 'function' && isPro()) getProBtn.style.display = 'none';
     else if (getProBtn) getProBtn.style.display = '';
   } else {
+    const dashBtn = document.getElementById('nav-dashboard');
+    if (dashBtn) dashBtn.style.display = 'none';
     if (signinBtn) signinBtn.style.display = '';
     if (profileDrop) profileDrop.style.display = 'none';
     if (trialBanner) trialBanner.style.display = 'none';
@@ -1608,6 +1612,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // Sign up with email + password
 window.handleSignup = async function() {
+  if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
   const name  = document.getElementById('signup-name')?.value.trim();
   const email = document.getElementById('signup-email')?.value.trim();
   const pass  = document.getElementById('signup-password')?.value;
@@ -1627,6 +1632,7 @@ window.handleSignup = async function() {
 
 // Sign in with email + password
 window.handleLogin = async function() {
+  if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
   const email = document.getElementById('login-email')?.value.trim();
   const pass  = document.getElementById('login-password')?.value;
   const errEl = document.getElementById('auth-error');
