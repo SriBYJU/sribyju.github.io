@@ -2353,14 +2353,15 @@ window.handleSignup = async function() {
   const pass  = document.getElementById('signup-password')?.value;
   const errEl = document.getElementById('auth-error');
   function showErr(msg) { if(errEl) { errEl.textContent = msg; errEl.classList.add('show'); } }
+  const newsletterChecked = document.getElementById('signup-newsletter')?.checked;
   if (!name || !email || !pass) { showErr('Please fill in all fields.'); return; }
   if (pass.length < 6)          { showErr('Password must be at least 6 characters.'); return; }
+  if (!newsletterChecked)        { showErr('Please subscribe to our weekly newsletter to create an account.'); return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await DB.setCurrentUser(cred.user, { name });
-    const wantsNewsletter = document.getElementById('signup-newsletter')?.checked;
-    if (wantsNewsletter && email) {
+    if (newsletterChecked && email) {
       subscribeEmailToFirestore(email, cred.user.displayName || name);
     }
     closeAuth();
