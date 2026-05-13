@@ -4661,6 +4661,7 @@ function showProGate() {
 }
 
 function startExam(type) {
+  if (!isPro()) { showProGate(); return; }
   const questions = type === 'sat' ? [...SAT_EXAM_QUESTIONS] : [...ACT_EXAM_QUESTIONS];
   const timeMinutes = type === 'sat' ? 50 : 55;
   examState = {
