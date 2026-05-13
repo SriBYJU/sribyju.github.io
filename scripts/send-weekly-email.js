@@ -118,7 +118,7 @@ const WEEKLY_TIPS = [
       "Provide a 'brag sheet' with your accomplishments, goals, and specific moments from their class.",
       "Ask in person first, then follow up with an email containing all deadlines and submission details.",
       "Choose recommenders from different areas — one STEM, one humanities gives a well-rounded picture.",
-      "Give at least 4 weeks' notice — rushed letters are generic letters."
+      "A counselor recommendation is usually required in addition to teacher recs — don't forget this one."
     ]
   },
   {
@@ -198,271 +198,321 @@ const WEEKLY_TIPS = [
       "Taking AP/Honors courses matters more than a perfect GPA in regular classes — rigor is key.",
       "An upward trend (improving grades over time) is viewed very favorably, even if your overall GPA isn't perfect.",
       "Some colleges only look at core academic courses — PE and electives may not count in their calculation.",
-      "When in doubt, focus on taking the hardest courses available to you AND getting good grades in them."
+      "Use our GPA Calculator and Weighted GPA tools to see where you stand with both scales."
     ]
   },
   {
-    subject: "How to Choose Between Two Colleges",
+    subject: "Navigating Test-Optional Admissions",
     tips: [
-      "Make a spreadsheet comparing: cost, programs, location, campus feel, career outcomes, and gut feeling.",
-      "Visit both campuses (if possible) and picture yourself living there for 4 years — which feels right?",
-      "Talk to current students and alumni — ask about their experience, not just statistics.",
-      "Don't let prestige be the deciding factor — the 'best' school is the one where you'll thrive.",
-      "If all else is equal, choose the school that offers the least debt — your future self will thank you."
+      "If your test scores are at or above the school's 50th percentile, submit them — they can only help.",
+      "If scores are below the 25th percentile, going test-optional is usually the stronger strategy.",
+      "Test-optional doesn't mean test-blind — some schools still consider scores if submitted.",
+      "Strengthen other parts of your application if going test-optional: essays, activities, and grades matter even more.",
+      "Check each school's specific policy — some are permanently test-optional, others are still temporary."
     ]
   },
   {
-    subject: "AP Classes: How Many Should You Take?",
+    subject: "Building Your College Résumé",
     tips: [
-      "Quality over quantity — getting 5s in 3 APs impresses more than getting 3s in 7 APs.",
-      "Take APs in subjects you're genuinely interested in — your enthusiasm will show in your grades and essays.",
-      "Most competitive colleges want to see 4–8 AP courses over your high school career.",
-      "Check if your target colleges accept AP credits — some top schools don't, which changes the calculus.",
-      "Don't sacrifice your mental health for one more AP — admissions officers can spot burnout in applications."
+      "Start with your most impressive activities — admissions officers may only spend 30 seconds scanning.",
+      "Quantify your impact: 'Raised $2,400 for local food bank' is stronger than 'participated in fundraising.'",
+      "Include paid work — jobs show responsibility, time management, and real-world skills.",
+      "Keep it to one page — concise and focused beats lengthy and padded.",
+      "Use action verbs: Led, Founded, Organized, Designed, Mentored — not 'was a member of.'"
     ]
   },
   {
-    subject: "Building Your College Resume",
+    subject: "Making the Most of Your First Semester",
     tips: [
-      "Your resume should be one page — admissions officers spend about 30 seconds scanning it.",
-      "Lead with your strongest activities, not chronological order — put your best foot forward.",
-      "Use numbers to quantify impact: 'Raised $2,500 for charity' beats 'Organized fundraisers.'",
-      "Include leadership roles, even small ones — 'trained 3 new volunteers' shows initiative.",
-      "Keep formatting clean and simple — no fancy fonts, colors, or graphics."
+      "Go to every class for the first two weeks — even if it's 'optional.' First impressions with professors matter.",
+      "Join 2–3 clubs during the activities fair, but commit seriously to just 1 — quality over quantity continues in college.",
+      "Visit the writing center, tutoring center, and career office in your first month — know what resources exist before you need them urgently.",
+      "Sit in the front half of the classroom — studies consistently show better grades and engagement.",
+      "Call home when you need to, but push yourself to build new friendships — homesickness peaks around week 3 and fades."
     ]
   },
   {
-    subject: "Dealing with Test Anxiety",
+    subject: "Scholarship Essays: What Judges Want to See",
     tips: [
-      "Practice deep breathing: 4 counts in, hold for 4, out for 4 — this activates your calm-down response.",
-      "Arrive early and get settled — rushing in increases cortisol, which blocks memory recall.",
-      "If you blank out, skip to easier questions first — momentum builds confidence.",
-      "Reframe anxiety as excitement — your body can't tell the difference, and 'I'm excited' performs better than 'I'm nervous.'",
-      "Progressive muscle relaxation (tensing and releasing muscle groups) can reduce anxiety by 40% in 5 minutes."
+      "Answer the actual prompt — many applicants write generic essays that don't address the specific question asked.",
+      "Show how the scholarship aligns with YOUR goals — judges want to invest in someone with a clear vision.",
+      "Include specific details about your background and experiences — vague statements don't win awards.",
+      "Proofread obsessively — typos signal carelessness and can disqualify an otherwise strong application.",
+      "Apply for scholarships that match your unique profile — niche awards (by major, state, heritage) have less competition."
     ]
   },
   {
-    subject: "Community Service That Makes a Difference",
+    subject: "AP Exam Strategy: Maximize Your Score",
     tips: [
-      "Choose causes you genuinely care about — authentic passion comes through in applications.",
-      "Commit to one organization long-term rather than random one-off events — consistency matters.",
-      "Take initiative to create your own project — founding something new shows leadership.",
-      "Document your impact with numbers: hours served, people helped, funds raised.",
-      "Reflect on what you learned — the best 'community service' essays focus on personal growth, not just the work."
+      "Focus on the free-response section — it's where most students lose points and where improvement is fastest.",
+      "Use released past exams to practice under timed conditions — the AP Central website has official materials.",
+      "A score of 3 earns credit at most state universities — you don't always need a 5 to benefit.",
+      "Register for exams by the early deadline to save $40 per test — and check for fee waivers if eligible.",
+      "Taking the exam even if you're unsure is worth it — there's no penalty for a low score, and you might surprise yourself."
     ]
   },
   {
-    subject: "Navigating the Common App: Tips & Tricks",
+    subject: "Mental Health Tips for College-Bound Students",
     tips: [
-      "Start your Common App in August — you'll need time for the personal statement and school-specific supplements.",
-      "Use the Additional Information section sparingly — only for context that doesn't fit elsewhere (family circumstances, gaps).",
-      "List activities in order of importance to you, not impressiveness — authenticity wins.",
-      "Have 3 people proofread everything — typos in your application look careless.",
-      "Save your work frequently and keep a backup document — technical glitches happen."
+      "College stress is normal — but persistent anxiety or sadness that affects daily life deserves professional support.",
+      "Most colleges offer free counseling — find your school's counseling center contact info before you need it.",
+      "Exercise 30 minutes a day — it's more effective than most people realize for managing stress and improving focus.",
+      "Limit social media comparison — everyone's highlight reel makes your behind-the-scenes feel worse.",
+      "Build a routine that includes sleep, meals, and downtime — structure is the foundation of mental health."
     ]
   },
   {
-    subject: "College Dorm Life: What to Expect",
+    subject: "Understanding College Rankings",
     tips: [
-      "Bring less than you think — dorm rooms are tiny, and you can always buy things locally.",
-      "Establish boundaries with your roommate early: quiet hours, guests, shared items, cleaning schedule.",
-      "Get a good mattress topper — dorm beds are notoriously uncomfortable and sleep affects your grades.",
-      "Leave your door open during the first few weeks — this is the easiest way to meet people on your floor.",
-      "Join the floor GroupChat or Discord — it's where you'll hear about free food, study groups, and events."
+      "Rankings measure institutional metrics (endowment, selectivity) — not your personal fit or happiness.",
+      "A school ranked #50 might be #1 for your specific major, career goals, or learning style.",
+      "Rankings change every year — a school at #20 today was probably at #25 last year. The differences are marginal.",
+      "Employer surveys consistently show that skills and experience matter more than school prestige for most careers.",
+      "Use rankings as one data point, not the deciding factor — visit, talk to students, and trust your gut."
     ]
   },
   {
-    subject: "Scholarship Essay Tips",
+    subject: "Part-Time Jobs in College: Balancing Work and School",
     tips: [
-      "Answer the prompt directly — the #1 reason scholarship essays lose is going off-topic.",
-      "Tell a specific story that connects your past experience to your future goals.",
-      "Show financial need without being melodramatic — committees respect dignity and determination.",
-      "Recycle and adapt strong essays across multiple scholarships — don't rewrite from scratch each time.",
-      "Follow word counts precisely — going over or under signals that you don't follow instructions."
+      "On-campus jobs (library, dining hall, research assistant) are designed around student schedules — start there.",
+      "Working 10–15 hours/week actually improves time management for most students; beyond 20 hours, grades often suffer.",
+      "Work-study awards are listed in your financial aid package — they guarantee you a campus job, so claim yours early.",
+      "Relevant work experience (internship in your field) is more valuable than any part-time job — seek these out by sophomore year.",
+      "Track your earnings and budget monthly — a simple spreadsheet prevents the 'where did my money go?' panic."
     ]
   },
   {
-    subject: "Senior Year: Don't Let Senioritis Tank Your Grades",
+    subject: "Transfer Applications: A Second Chance",
     tips: [
-      "Colleges CAN and DO rescind acceptances for significant grade drops — keep your grades within one letter grade.",
-      "Set small, weekly goals instead of semester-long ones — it's easier to stay motivated in short sprints.",
-      "Remember: your final transcript is sent to your college — D's and F's in senior year raise red flags.",
-      "Stay involved in your activities — quitting everything senior year looks bad to colleges.",
-      "Channel your energy into excitement for college rather than checking out of high school."
+      "Transfer acceptance rates at top schools range from 5–25% — competitive but definitely achievable with strong grades.",
+      "A 3.5+ GPA in challenging courses at your current school is the single most important factor for transfers.",
+      "Write a compelling 'Why Transfer?' essay that focuses on what you'll GAIN, not complaints about your current school.",
+      "Get involved at your current institution — transfer committees want to see engagement, not someone just waiting to leave.",
+      "Apply to a mix of schools and keep your current options open — don't put all your eggs in one transfer basket."
     ]
   },
   {
-    subject: "Making the Most of College Fairs",
+    subject: "Dorm Life Survival Guide",
     tips: [
-      "Research 5–10 schools before the fair — going in blind wastes everyone's time.",
-      "Prepare 3 questions you can't easily Google: 'What makes your engineering program unique?' beats 'How many students do you have?'",
-      "Collect business cards and email reps afterward — demonstrated interest matters at many schools.",
-      "Bring a notebook or use your phone to take notes — you'll forget details after talking to 10+ schools.",
-      "Dress neatly — first impressions matter, even at casual fairs."
+      "Have the roommate conversation early: sleep schedules, guest policies, noise preferences, and cleaning responsibilities.",
+      "Bring less than you think you need — dorm rooms are tiny and you can always buy things locally.",
+      "Invest in good headphones and an eye mask — they're essential for shared living spaces.",
+      "Keep your door open during the first few weeks — it's the easiest way to meet neighbors and make friends.",
+      "Learn the quiet hours policy and respect it — being the 'loud neighbor' burns bridges fast."
     ]
   },
   {
-    subject: "Understanding Financial Aid Packages",
+    subject: "Graduate School: To Go or Not to Go?",
     tips: [
-      "Compare 'net cost' (total cost minus grants/scholarships) — this is what you'll actually pay.",
-      "Grants and scholarships are free money; loans are not — prioritize schools that offer more gift aid.",
-      "Work-study is an earning opportunity, not a discount — you still have to work the hours.",
-      "Check if merit scholarships are renewable — some require maintaining a minimum GPA each year.",
-      "Ask about hidden costs: lab fees, technology fees, required meal plans, parking, and textbooks."
+      "For some careers (medicine, law, academia, counseling), grad school is required — research your field's norms early.",
+      "For business and tech, work experience first is usually the better path — many companies also offer tuition benefits.",
+      "Fully funded programs exist, especially in STEM and PhD tracks — never pay full price for a doctoral program.",
+      "Take a gap of 1–3 years between undergrad and grad school to gain clarity and strengthen your application.",
+      "Talk to people 5–10 years into the career you want — ask whether grad school was necessary for their path."
     ]
   },
   {
-    subject: "Mental Health in High School: Taking Care of Yourself",
+    subject: "Building Professional Relationships in College",
     tips: [
-      "Stress is normal during college prep, but constant anxiety isn't — talk to a counselor if you're struggling.",
-      "Exercise 30 minutes a day — it's one of the most effective natural anxiety reducers available.",
-      "Limit social media comparison — Instagram highlight reels of acceptances aren't the full story.",
-      "Celebrate small wins — finished an essay? Applied to a scholarship? That deserves recognition.",
-      "Remember: your worth isn't determined by where you go to college — it's determined by what you do there."
+      "Attend your professor's office hours at least 3 times per semester — even without questions, building rapport leads to opportunities.",
+      "LinkedIn isn't just for job seekers — start connecting with classmates, professors, and guest speakers now.",
+      "Join professional organizations in your field — many have student chapters with free or discounted membership.",
+      "Attend campus events with guest speakers and alumni — a 2-minute conversation can open unexpected doors.",
+      "Follow up after meeting someone: a simple 'It was great meeting you at [event]' email goes a long way."
     ]
   },
   {
-    subject: "Transfer Students: What You Need to Know",
+    subject: "Study Abroad: Planning and Benefits",
     tips: [
-      "Transfer acceptance rates are often higher than freshman rates at many schools.",
-      "Strong college grades matter most — your high school record becomes less important for transfers.",
-      "Get involved at your current school — transfer essays ask what you've contributed to your campus.",
-      "Research credit transfer policies BEFORE applying — losing credits extends your timeline and cost.",
-      "Apply to transfer by the end of your first year — sophomore transfers have the highest acceptance rates."
+      "Start researching programs at least a year in advance — popular destinations and terms fill up fast.",
+      "Financial aid and scholarships usually transfer to study abroad programs — check with your financial aid office.",
+      "Choose a program that offers courses counting toward your major — this keeps you on track to graduate on time.",
+      "Learning a language abroad accelerates fluency faster than years of classroom study — immersion works.",
+      "Employers value study abroad experience — it demonstrates adaptability, independence, and global awareness."
     ]
   },
   {
-    subject: "College Application Timeline: Month by Month",
+    subject: "How to Read a Financial Aid Award Letter",
     tips: [
-      "Summer before senior year: finalize your college list, start essays, request recommendation letters.",
-      "September–October: polish essays, submit Early Decision/Early Action applications.",
-      "November–January: submit Regular Decision applications, complete FAFSA and CSS Profile.",
-      "February–March: wait patiently, continue performing well in school, apply for scholarships.",
-      "April–May: compare offers, visit accepted schools, submit your deposit by May 1."
+      "Separate 'free money' (grants, scholarships) from 'borrowed money' (loans) — the total package number is misleading.",
+      "Calculate the actual out-of-pocket cost: Total Cost of Attendance minus grants/scholarships = what you really pay.",
+      "Federal Direct Loans have fixed interest rates and income-based repayment options — they're almost always better than private loans.",
+      "Work-study is an opportunity to earn, not free money — you still need to work the hours to receive it.",
+      "Compare award letters from multiple schools side by side — use a simple spreadsheet to see the real cost differences."
     ]
   },
   {
-    subject: "How to Research Colleges Effectively",
+    subject: "Internship Hunting: Start Early, Land Smart",
     tips: [
-      "Go beyond the website — Reddit, College Confidential, and YouTube vlogs show the real student experience.",
-      "Check the school's Common Data Set (CDS) — it reveals exactly what they prioritize in admissions.",
-      "Look at post-graduation outcomes: job placement rates, grad school acceptance, and average starting salaries.",
-      "Reach out to current students via LinkedIn — most are happy to share their experience.",
-      "Attend virtual info sessions — many schools track demonstrated interest and these count."
+      "Start looking for summer internships in September/October — top companies recruit 6–8 months ahead.",
+      "Your campus career center is an underused goldmine — they have employer connections, résumé reviews, and mock interviews.",
+      "Cold emailing professionals in your field for informational interviews has a surprisingly high success rate — be specific and brief.",
+      "Unpaid internships are worth it ONLY if they offer genuine learning and mentorship — don't accept glorified filing work.",
+      "After each internship, ask for a LinkedIn recommendation while the experience is fresh — these compound over time."
     ]
   },
   {
-    subject: "Study Abroad: Planning Ahead",
+    subject: "End-of-Year GPA Recovery Strategies",
     tips: [
-      "Research study abroad options BEFORE choosing a college — some schools have far better programs than others.",
-      "Start saving early — study abroad typically costs the same as a semester on campus, but flights and travel add up.",
-      "Learn some basics of the local language before you go — even 50 phrases make a huge difference.",
-      "Choose a program that offers transferable credits — you don't want to fall behind on graduation requirements.",
-      "Apply early for study abroad scholarships — organizations like Gilman and Boren fund thousands of students annually."
+      "Calculate exactly what grade you need on the final to hit your target — use our Grade Needed calculator.",
+      "Talk to your professor if you're struggling — many offer extra credit, grade replacement, or incomplete options.",
+      "Focus your remaining study time on the courses where improvement will have the biggest impact on your GPA.",
+      "Form a finals study group and teach each other — explaining concepts is the fastest path to mastery.",
+      "Take care of your body during finals: sleep, eat real food, exercise — burned-out brains don't perform well."
     ]
   },
   {
-    subject: "How to Ask for Help in College",
+    subject: "Community College to 4-Year Transfer Success",
     tips: [
-      "Visit office hours in the first two weeks — professors notice and remember early visitors.",
-      "Use your school's free tutoring center — it exists for exactly this purpose, and there's no shame in using it.",
-      "Form study groups for difficult classes — explaining concepts to peers strengthens your own understanding.",
-      "Talk to your academic advisor at least once per semester — they can spot issues before they become problems.",
-      "If you're struggling emotionally, use the campus counseling center — it's confidential and usually free."
+      "Research transfer agreements (articulation agreements) between your CC and target 4-year schools — these guarantee credit transfer.",
+      "Aim for a 3.5+ GPA at community college — this makes you competitive even at selective universities.",
+      "Get involved in campus activities and leadership at CC — transfer applications evaluate engagement, not just grades.",
+      "Meet with a transfer advisor in your first semester — they'll help you choose courses that transfer smoothly.",
+      "The TAG (Transfer Admission Guarantee) program in California guarantees admission to certain UCs — check if your state has something similar."
     ]
   },
   {
-    subject: "STEM Majors: What to Expect",
+    subject: "Dealing with Imposter Syndrome in College",
     tips: [
-      "The first two years are foundational — calculus, physics, and chemistry are gatekeepers, so get support early.",
-      "Join a STEM study group — the dropout rate for solo studiers is significantly higher.",
-      "Seek undergraduate research opportunities — these are the #1 differentiator for grad school applications.",
-      "Internships matter more than GPA for job placement — start applying sophomore year.",
-      "Don't be discouraged by a tough first exam — STEM curves are real, and persistence pays off."
+      "Almost everyone at a competitive school feels like they don't belong at first — you were admitted for real reasons.",
+      "Compare yourself to your past self, not to others — growth is personal and non-linear.",
+      "Share how you feel with a trusted friend or counselor — you'll be surprised how many people relate.",
+      "Document your achievements in a 'wins' journal — review it when self-doubt creeps in.",
+      "Remember that asking for help is a sign of strength, not weakness — every successful person had mentors and support."
     ]
   },
   {
-    subject: "Liberal Arts: Why They Still Matter",
+    subject: "Choosing Between Early Decision and Regular Decision",
     tips: [
-      "Liberal arts graduates develop critical thinking, writing, and communication skills that employers consistently rank as most desired.",
-      "Many CEOs and leaders majored in philosophy, history, or English — the skills transfer broadly.",
-      "Liberal arts colleges often have smaller class sizes and more professor interaction than large universities.",
-      "Pair a liberal arts major with practical experience (internships, coding bootcamps) for maximum career flexibility.",
-      "Graduate school in business, law, or medicine is accessible from almost any undergraduate major."
+      "ED acceptance rates are often 2–3x higher than RD — it's a real advantage if you have a clear top choice.",
+      "ED is binding — only apply ED if you're 100% sure about the school AND can afford it without comparing financial aid offers.",
+      "EA (Early Action) is non-binding and gives you an early answer — it's usually the best of both worlds.",
+      "Don't apply ED to a school you haven't researched thoroughly — the commitment is serious.",
+      "If you're wait-listed ED, you can (and should) apply RD to other schools immediately."
     ]
   },
   {
-    subject: "Social Life vs Academics: Finding Balance",
+    subject: "Technology Tools Every Student Needs",
     tips: [
-      "The students who thrive in college aren't the ones who study 24/7 — they're the ones who manage their time well.",
-      "Join 2–3 clubs or organizations — enough to have a social network, not so many that you're overwhelmed.",
-      "Schedule fun activities just like you schedule study time — balance prevents burnout.",
-      "Your closest college friends often come from shared activities, not random socializing — invest in communities.",
-      "It's okay to say no to parties or social events when you need to study — real friends will understand."
+      "Use Notion or Google Docs for note-taking and project management — searchability beats paper every time.",
+      "Grammarly (free version) catches writing errors your spell-checker misses — install the browser extension.",
+      "GradeScope's GPA Calculator helps you plan your semester grades strategically — bookmark it and use it weekly.",
+      "Flashcard apps like Anki use spaced repetition — scientifically proven to be the most efficient memorization method.",
+      "Set up automatic cloud backups for all schoolwork — losing a term paper to a laptop crash is preventable pain."
     ]
   },
   {
-    subject: "Pre-Med Track: Essential Tips",
+    subject: "What Admissions Officers Actually Look For",
     tips: [
-      "Start volunteering in healthcare settings early — clinical experience is required for most med school applications.",
-      "Get to know at least 2 science professors well enough that they can write detailed recommendation letters.",
-      "Shadow physicians in different specialties — this helps you write a compelling 'Why medicine?' essay.",
-      "Take the MCAT seriously — start studying 3–6 months before your test date with a structured plan.",
-      "Maintain a GPA above 3.5 in science courses — this is the most scrutinized part of your med school application."
+      "Intellectual curiosity — they want to see that you pursue interests beyond what's required for a grade.",
+      "Authenticity — admissions officers read thousands of essays and can spot manufactured stories instantly.",
+      "Community impact — how have you made your school, neighborhood, or online community better?",
+      "Resilience — how you've handled setbacks matters as much as your successes.",
+      "Fit — they're asking 'will this student thrive here AND contribute to our community?' Show them you will."
     ]
   },
   {
-    subject: "Digital Tools Every Student Needs",
+    subject: "College Application Timeline: Junior Year Checklist",
     tips: [
-      "Use Notion or Google Docs to organize college research, essay drafts, and application deadlines in one place.",
-      "Grammarly (free version) catches errors that spell-check misses — use it for every essay and email.",
-      "Khan Academy is genuinely one of the best free resources for SAT prep and academic subjects.",
-      "Google Calendar with color-coded events for school, activities, and applications keeps you on track.",
-      "Use Quizlet or Anki for flashcard-based studying — spaced repetition is proven to boost long-term retention."
+      "January–March: Research colleges, attend virtual info sessions, take the PSAT/SAT/ACT.",
+      "April–May: Visit campuses during spring break, finalize your college list, prepare for AP exams.",
+      "June–August: Draft your personal statement, build your activities list, ask for recommendation letters.",
+      "September–October: Finalize essays, submit early applications, complete FAFSA and CSS Profile.",
+      "November–December: Submit remaining applications, apply for scholarships, take final standardized tests if needed."
     ]
   },
   {
-    subject: "First-Generation College Students: You Belong",
+    subject: "Making Your Decision: How to Choose Your College",
     tips: [
-      "Many colleges actively seek first-gen students — highlight this in your applications, it's an asset.",
-      "Seek out first-gen student organizations and mentorship programs — they exist at most schools.",
-      "Don't be afraid to ask 'obvious' questions — the college process is confusing for everyone, and there's no shame in learning.",
-      "Apply for first-gen specific scholarships — QuestBridge, Gates Scholarship, and Dell Scholars are great starting points.",
-      "Your perspective and resilience are exactly what college campuses need — own your story."
+      "Create a weighted pros/cons list for your top 3 schools — assign points to factors that matter most to YOU.",
+      "Attend admitted students events (in-person or virtual) — these give you the most honest look at student life.",
+      "Talk to current students about what they wish they'd known before enrolling — Instagram DMs and Reddit are great for this.",
+      "Don't let prestige override fit — the 'best' school for you is the one where you'll thrive academically, socially, and financially.",
+      "Trust your gut after doing your research — if a school feels right, there's usually a reason."
     ]
   },
   {
-    subject: "Preparing for College-Level Writing",
+    subject: "Preparing for College Math and Science Courses",
     tips: [
-      "Read academic articles and opinion pieces regularly — exposure to strong writing improves your own.",
-      "Learn to write a clear thesis statement — every college paper starts with one.",
-      "Practice the 'PIE' paragraph structure: Point, Illustration, Explanation — it works for almost any assignment.",
-      "Get comfortable with citation formats (MLA, APA, Chicago) — incorrect citations lose easy points.",
-      "Visit the writing center for every major paper — even strong writers benefit from a second pair of eyes."
+      "Review prerequisite material before the semester starts — Khan Academy is perfect for refreshing algebra, calc, or chem basics.",
+      "Attend supplemental instruction (SI) sessions from day one — don't wait until you're behind.",
+      "Work through problems without looking at the solutions first — the struggle is where real learning happens.",
+      "Form a study group that meets at the same time each week — consistency builds understanding over time.",
+      "If you're struggling, switch to a different textbook or YouTube channel — sometimes a new explanation style clicks."
     ]
   },
   {
-    subject: "Networking in College: Start Early",
+    subject: "Social Media and College Admissions",
     tips: [
-      "Connect with professors during office hours — these relationships lead to research opportunities, recommendations, and mentorship.",
-      "Attend career fairs starting freshman year — even if you're not job hunting, practice introducing yourself.",
-      "LinkedIn is essential — create a profile and start connecting with professionals in your field of interest.",
-      "Join professional organizations related to your major — many have student chapters with networking events.",
-      "Alumni networks are powerful — most graduates are happy to help current students from their alma mater."
+      "Google yourself and clean up anything unprofessional — some admissions officers do check applicants' social media.",
+      "Use social media positively: share projects, volunteer work, or thoughtful perspectives — this can actually help.",
+      "Follow your target colleges' accounts — they share important deadlines, virtual events, and student stories.",
+      "Don't post about acceptance/rejection decisions in ways that could hurt others' feelings.",
+      "LinkedIn is appropriate for high schoolers — create a basic profile highlighting your activities and achievements."
     ]
   },
   {
-    subject: "Understanding Student Loans",
+    subject: "The Truth About College Prestige vs. Career Success",
     tips: [
-      "Federal loans (Direct Subsidized and Unsubsidized) should always be your first choice over private loans.",
-      "Subsidized loans don't accrue interest while you're in school — unsubsidized loans do, which adds up.",
-      "Know your total debt before graduating — the general rule is: don't borrow more than your expected first-year salary.",
-      "Income-driven repayment plans can lower your monthly payments after graduation if your salary is modest.",
-      "Public Service Loan Forgiveness (PSLF) forgives remaining federal loan balance after 10 years of qualifying payments in public service."
+      "Studies show that motivation and effort predict career success far better than college selectivity.",
+      "For most careers, your skills, network, and experience matter more than your diploma's logo.",
+      "State universities produce more Fortune 500 CEOs than Ivy League schools combined.",
+      "Graduate school (if needed) offers another chance to attend a 'name brand' institution — undergrad isn't your only shot.",
+      "The students who thrive most are those who fully engage wherever they are — not those who attend the 'best' school on paper."
     ]
   },
   {
-    subject: "How to Declare Your Major Wisely",
+    subject: "Year-End Reflection: Celebrate Your Progress",
+    tips: [
+      "Look back at where you started this year — you've grown more than you realize.",
+      "Write down 3 accomplishments you're proud of — big or small, they all count.",
+      "Identify one area where you want to grow next year — having a clear focus accelerates improvement.",
+      "Thank the people who helped you this year — teachers, parents, friends, mentors. Gratitude strengthens relationships.",
+      "Set one academic goal, one personal goal, and one 'just for fun' goal for the coming year. You've got this!"
+    ]
+  },
+  {
+    subject: "Hidden Costs of College (And How to Avoid Them)",
+    tips: [
+      "Textbooks can cost $500–$1,200/year — rent, buy used, or check if the library has copies before buying new.",
+      "Meal plan overspending is real — choose the smallest plan that fits your schedule and cook when possible.",
+      "Activity fees, lab fees, and technology fees add up — factor these into your budget beyond tuition and room/board.",
+      "Transportation costs (flights home, parking, rideshares) are often overlooked — plan ahead for breaks.",
+      "Build an emergency fund of at least $500 before starting college — unexpected costs always pop up."
+    ]
+  },
+  {
+    subject: "Effective Note-Taking Methods Compared",
+    tips: [
+      "Cornell Method: Divide pages into notes, cues, and summary sections — great for review and active recall.",
+      "Mind Mapping: Visual learners thrive with this — use colors and connections to organize information.",
+      "Outline Method: Best for structured lectures — indent subtopics under main headings for clear hierarchy.",
+      "Digital vs. handwritten: research shows handwriting improves retention, but searchability favors digital — try both.",
+      "Review and reorganize notes within 24 hours — this single habit separates A students from C students."
+    ]
+  },
+  {
+    subject: "How to Network as a College Student (Without Being Awkward)",
+    tips: [
+      "Networking isn't 'using people' — it's building genuine relationships based on shared interests and mutual help.",
+      "Start with alumni from your school — they're usually eager to help current students from their alma mater.",
+      "Prepare a 30-second 'elevator pitch' about yourself — who you are, what you study, and what interests you.",
+      "Follow up within 48 hours after meeting someone new — reference a specific thing you discussed.",
+      "Offer value before asking for favors — share an article, make an introduction, or volunteer your time."
+    ]
+  },
+  {
+    subject: "Burnout Prevention: Staying Energized All Semester",
+    tips: [
+      "Schedule 'rest days' just like you schedule study sessions — recovery isn't laziness, it's strategy.",
+      "Break long-term projects into weekly milestones — the 'wall of work' feeling causes more burnout than actual workload.",
+      "Find one hobby completely unrelated to school — music, cooking, hiking, gaming. Your brain needs variety.",
+      "Learn to recognize early burnout signs: irritability, loss of motivation, poor sleep, skipping meals.",
+      "Talk to an advisor if you're overwhelmed — they can help with course load adjustments, deadline extensions, or support services."
+    ]
+  },
+  {
+    subject: "Declaring Your Major: When and How",
     tips: [
       "Most schools don't require a declaration until end of sophomore year — use your first 2 years to explore.",
       "Talk to career services BEFORE declaring — they can show you what careers each major typically leads to.",
