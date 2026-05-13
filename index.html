@@ -1612,8 +1612,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // Sign up with email + password
 window.handleSignup = async function() {
-  const errEl = document.getElementById('auth-error');
-if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
+  if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
   const name  = document.getElementById('signup-name')?.value.trim();
   const email = document.getElementById('signup-email')?.value.trim();
   const pass  = document.getElementById('signup-password')?.value;
@@ -1633,8 +1632,7 @@ if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
 
 // Sign in with email + password
 window.handleLogin = async function() {
-  const errEl = document.getElementById('auth-error');
-if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
+  if(errEl) { errEl.classList.remove('show'); errEl.textContent = ''; }
   const email = document.getElementById('login-email')?.value.trim();
   const pass  = document.getElementById('login-password')?.value;
   const errEl = document.getElementById('auth-error');
@@ -2569,26 +2567,6 @@ window.deleteEssay = deleteEssay;
 window.updateEssayPage = updateEssayPage;
 window.toggleFAQ = toggleFAQ;
 window.renderSavedEssays = renderSavedEssays;
-  window.handleSignup = handleSignup;
-window.handleLogin = handleLogin;
-window.handleGoogleAuth = handleGoogleAuth;
-window.handleSignOut = handleSignOut;
-window.firebaseErrMsg = firebaseErrMsg;
-window.openAuth = openAuth;
-window.closeAuth = closeAuth;
-window.switchAuthTab = switchAuthTab;
-window.openPayment = openPayment;
-window.closePayment = closePayment;
-window.switchPay = switchPay;
-window.handlePayment = handlePayment;
-window.handlePayPal = handlePayPal;
-window.fmtCard = fmtCard;
-window.fmtExpiry = fmtExpiry;
-window.showToast = showToast;
-window.toggleFAQ = toggleFAQ;
-window.toggleProfileMenu = toggleProfileMenu;
-window.updateNavForUser = updateNavForUser;
-window.renderDashboard = renderDashboard;
 
 /* ============================================================
    INIT
