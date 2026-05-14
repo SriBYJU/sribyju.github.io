@@ -1,4 +1,4 @@
-# GradeScope — Automated Weekly Email System
+# Scholark — Automated Weekly Email System
 
 Sends AI-curated college prep tips to subscribers every **Monday at 8 AM ET** via GitHub Actions. **Completely free** — no Firebase Blaze plan needed.
 

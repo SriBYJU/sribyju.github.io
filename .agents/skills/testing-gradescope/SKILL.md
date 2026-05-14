@@ -1,9 +1,9 @@
 ---
-name: testing-gradescope
-description: Test GradeScope app end-to-end. Covers local server setup, auth flows, Pro feature gating, SAT/ACT Prep, essay save/load, and UI verification.
+name: testing-scholark
+description: Test Scholark app end-to-end. Covers local server setup, auth flows, Pro feature gating, SAT/ACT Prep, essay save/load, and UI verification.
 ---
 
-# Testing GradeScope
+# Testing Scholark
 
 ## Local Server Setup
 
@@ -16,8 +16,8 @@ description: Test GradeScope app end-to-end. Covers local server setup, auth flo
 
 ## Auth Testing
 
-- **Admin account**: `admin@gradescope.app` / `GradeScope2026!` (has Pro access)
-- `isPro()` checks `window.currentUser?.email === 'admin@gradescope.app'`
+- **Admin account**: `admin@scholark.app` / `Scholark2026!` (has Pro access)
+- `isPro()` checks `window.currentUser?.email === 'admin@scholark.app'`
 - After login, nav should show "Admin ▾" (or display name + ▾) instead of "Sign In"
 - Auth state comes from Firebase — the `onAuthStateChanged` handler updates `window.currentUser`
 - **Gotcha**: If you sign in/out without navigating away from the current page section, some UI elements (like exam card onclick handlers) may have stale state. Navigate away and back to force re-render via the section's `init` function
