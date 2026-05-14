@@ -1,5 +1,5 @@
 {
-  "name": "gradescope-email",
+  "name": "scholark-email",
   "private": true,
   "type": "module",
   "dependencies": {

@@ -1,5 +1,5 @@
 /**
- * GradeScope — Automated Weekly College Tips Email
+ * Scholark — Automated Weekly College Tips Email
  *
  * Runs via GitHub Actions every Monday at 8 AM ET (12:00 UTC).
  * Reads subscribers from Firestore, sends branded email via Gmail SMTP.
@@ -396,7 +396,7 @@ const WEEKLY_TIPS = [
     tips: [
       "Use Notion or Google Docs for note-taking and project management — searchability beats paper every time.",
       "Grammarly (free version) catches writing errors your spell-checker misses — install the browser extension.",
-      "GradeScope's GPA Calculator helps you plan your semester grades strategically — bookmark it and use it weekly.",
+      "Scholark's GPA Calculator helps you plan your semester grades strategically — bookmark it and use it weekly.",
       "Flashcard apps like Anki use spaced repetition — scientifically proven to be the most efficient memorization method.",
       "Set up automatic cloud backups for all schoolwork — losing a term paper to a laptop crash is preventable pain."
     ]
@@ -589,7 +589,7 @@ const WEEKLY_TIPS = [
       "Forest or Focus Timer for staying off your phone during study sessions — gamified focus works.",
       "Quizlet for flashcards — spaced repetition is one of the most research-backed study methods.",
       "Google Calendar with color-coded blocks — schedule study time, social time, and deadlines in one view.",
-      "GradeScope for GPA tracking, SAT prep, and college planning — everything in one place."
+      "Scholark for GPA tracking, SAT prep, and college planning — everything in one place."
     ]
   },
   {
@@ -708,7 +708,7 @@ const WEEKLY_TIPS = [
       "Start with College Scorecard (data.ed.gov) for graduation rates, average earnings, and actual costs.",
       "Read student reviews on Niche.com and Unigo — they're more honest than official marketing materials.",
       "Follow student-run social media accounts — campus Instagram and TikTok show real daily life.",
-      "Use GradeScope's College Comparison tool to compare schools side-by-side with radar charts.",
+      "Use Scholark's College Comparison tool to compare schools side-by-side with radar charts.",
       "Make a spreadsheet tracking: cost, location, size, programs, acceptance rate, and 'vibe' for each school."
     ]
   },
@@ -729,7 +729,7 @@ const WEEKLY_TIPS = [
       "The SAT emphasizes reasoning and evidence-based analysis — the ACT is more straightforward and fast-paced.",
       "The ACT has a science section (data interpretation, not bio/chem knowledge) — if you're strong at reading graphs, consider ACT.",
       "All colleges accept both equally — there is zero advantage to submitting one over the other.",
-      "Use GradeScope's SAT and ACT prep modes to practice both and see which format clicks for you."
+      "Use Scholark's SAT and ACT prep modes to practice both and see which format clicks for you."
     ]
   },
   {
@@ -739,7 +739,7 @@ const WEEKLY_TIPS = [
       "Set calendar reminders 2 weeks, 1 week, and 1 day before each deadline.",
       "Save all essays in one folder with clear naming: 'SchoolName_EssayPrompt_v1.docx'.",
       "Track recommendation letter requests: who you asked, when, and whether they've submitted.",
-      "Use GradeScope's College Application Tracker to manage everything in one place."
+      "Use Scholark's College Application Tracker to manage everything in one place."
     ]
   },
   {
@@ -896,7 +896,7 @@ const WEEKLY_TIPS = [
     subject: "Year-End Reflection: Celebrate Your Progress",
     tips: [
       "Look back at where you were a year ago — you've grown more than you realize.",
-      "Review your GPA trend on GradeScope — even small improvements compound over semesters.",
+      "Review your GPA trend on Scholark — even small improvements compound over semesters.",
       "Write down 3 accomplishments you're proud of — you'll reference these in future essays and interviews.",
       "Identify one area to improve next year and make a concrete plan — not a vague resolution.",
       "Thank the teachers, mentors, and friends who helped you this year — gratitude strengthens relationships and your own well-being."
@@ -1043,7 +1043,7 @@ const WEEKLY_TIPS = [
     ]
   },
   {
-    subject: "How to Use GradeScope to Ace Your Goals",
+    subject: "How to Use Scholark to Ace Your Goals",
     tips: [
       "Start with the GPA Calculator to know exactly where you stand — awareness is the first step to improvement.",
       "Use the SAT/ACT Prep daily — even 10 minutes of practice builds momentum and earns XP.",
@@ -1055,7 +1055,7 @@ const WEEKLY_TIPS = [
   {
     subject: "Looking Ahead: Your College Journey Starts Now",
     tips: [
-      "Every great achievement started with a single step — opening GradeScope today is yours.",
+      "Every great achievement started with a single step — opening Scholark today is yours.",
       "The students who succeed aren't the most talented — they're the most consistent. Show up every day.",
       "Your path doesn't need to look like anyone else's — the best outcomes come from authentic choices.",
       "Invest in relationships as much as grades — the people you meet will shape your life more than any GPA.",
@@ -1099,7 +1099,7 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo"><span class="logo-dot"></span>GradeScope</div>
+      <div class="logo"><span class="logo-dot"></span>Scholark</div>
       <div style="font-size:12px;color:#8a847b;margin-top:4px">Your weekly college prep tips</div>
     </div>
     <div class="content">
@@ -1113,18 +1113,18 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
         </div>
       </div>`).join('')}
       <div style="text-align:center">
-        <a href="https://gradescope.app" class="cta">Open GradeScope &rarr;</a>
+        <a href="https://scholark.app" class="cta">Open Scholark &rarr;</a>
       </div>
       <div class="pro-box">
         <h3>&#10024; Want to take it further?</h3>
-        <p>With <strong>GradeScope Pro</strong>, you get tools most students don't have access to:</p>
+        <p>With <strong>Scholark Pro</strong>, you get tools most students don't have access to:</p>
         <ul>
           <li>&#10003; <strong>AI Essay Coach</strong> &mdash; real-time feedback on your essays</li>
           <li>&#10003; <strong>Scholarship Finder</strong> &mdash; matched to your profile</li>
           <li>&#10003; <strong>Study Planner</strong> &mdash; never miss a deadline again</li>
           <li>&#10003; <strong>College Compatibility Quiz</strong> &mdash; find your perfect fit</li>
         </ul>
-        <a href="https://gradescope.app" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
+        <a href="https://scholark.app" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
       </div>
       <div class="signoff">
         <p>Regards,</p>
@@ -1133,8 +1133,8 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
       </div>
     </div>
     <div class="footer">
-      <p>You're receiving this because you signed up for GradeScope weekly tips.</p>
-      <p><a href="https://gradescope.app">GradeScope</a> &middot; Free college planning tools</p>
+      <p>You're receiving this because you signed up for Scholark weekly tips.</p>
+      <p><a href="https://scholark.app">Scholark</a> &middot; Free college planning tools</p>
     </div>
   </div>
 </body>
@@ -1193,9 +1193,9 @@ async function main() {
     const sub = docSnap.data();
     try {
       await transporter.sendMail({
-        from: `"GradeScope" <${emailUser}>`,
+        from: `"Scholark" <${emailUser}>`,
         to: sub.email,
-        subject: `\u{1F4DA} ${tip.subject} — GradeScope Weekly Tips`,
+        subject: `\u{1F4DA} ${tip.subject} — Scholark Weekly Tips`,
         html: emailHTML,
       });
       results.sent++;
