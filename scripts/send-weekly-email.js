@@ -1113,7 +1113,7 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
         </div>
       </div>`).join('')}
       <div style="text-align:center">
-        <a href="https://scholark.app" class="cta">Open Scholark &rarr;</a>
+        <a href="https://sribyju.github.io" class="cta">Open Scholark &rarr;</a>
       </div>
       <div class="pro-box">
         <h3>&#10024; Want to take it further?</h3>
@@ -1124,7 +1124,7 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
           <li>&#10003; <strong>Study Planner</strong> &mdash; never miss a deadline again</li>
           <li>&#10003; <strong>College Compatibility Quiz</strong> &mdash; find your perfect fit</li>
         </ul>
-        <a href="https://scholark.app" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
+        <a href="https://sribyju.github.io" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
       </div>
       <div class="signoff">
         <p>Regards,</p>
@@ -1134,7 +1134,7 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
     </div>
     <div class="footer">
       <p>You're receiving this because you signed up for Scholark weekly tips.</p>
-      <p><a href="https://scholark.app">Scholark</a> &middot; Free college planning tools</p>
+      <p><a href="https://sribyju.github.io">Scholark</a> &middot; Free college planning tools</p>
     </div>
   </div>
 </body>
