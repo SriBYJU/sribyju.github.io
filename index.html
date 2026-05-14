@@ -2980,10 +2980,11 @@ function firebaseErrMsg(code) {
    Reads from window._gsProfile (set by onAuthStateChanged)
    so they stay synchronous like the original code expects.
 ============================================================ */
-const ADMIN_EMAILS = ['admin@scholark.app'];
+const ADMIN_EMAILS = ['admin@gradescope.app'];
 
 window.getUserPlan = function() {
-  const email = window.currentUser?.email;
+  const user = window.currentUser || window._gsUser || window._gsAuth?.currentUser;
+  const email = user?.email;
   if (email && ADMIN_EMAILS.includes(email.toLowerCase())) return 'pro';
   return window._gsProfile?.plan || 'free';
 };
