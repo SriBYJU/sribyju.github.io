@@ -4,10 +4,15 @@
   "type": "module",
   "scripts": {
     "check": "node --check send-weekly-email.js",
-    "test": "node --test"
+    "test": "node --test",
+    "prep:audit": "node prep-quality-audit.js",
+    "prep:release": "node prep-quality-audit.js --release"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",
     "nodemailer": "^9.0.5"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

@@ -93,13 +93,36 @@
       return text;
     });
     const pairs = normalizedOptions.map((text, index) => ({ text, correct: index === correct }));
-    const mixed = shuffled(pairs, id);
-    return Object.assign({
+    const correctPair=pairs[correct],distractors=shuffled(pairs.filter(item=>!item.correct),`${id}-distractors`),correctPosition=(hash(`${id}-answer`)>>>8)%4;
+    const mixed=distractors.slice();mixed.splice(correctPosition,0,correctPair);
+    const priorDifficulty={1:-1.25,2:-0.45,3:0.4,4:1.2}[difficulty] ?? 0;
+    const explanationText=String(explanation||'').trim();
+    const completeExplanation=explanationText.length>=40?explanationText:`${explanationText} ${byId[skill].section==='Math'?'Substituting the result back into the stated relationship verifies the value.':'The other choices do not preserve the exact logic and scope of the text.'}`;
+    const sourceIds=exam === 'sat'
+      ? ['college-board-digital-sat-technical-manual-2024','college-board-digital-sat-content-domains']
+      : ['act-enhanced-design-framework-2026','act-enhanced-score-interpretation-2025'];
+    const base={
       id, exam, skill, section: byId[skill].section, domain: byId[skill].domain,
       difficulty, stem, options: mixed.map(item => item.text),
-      answer: mixed.findIndex(item => item.correct), explanation,
-      source: 'Scholark original', calculator: byId[skill].section === 'Math'
-    }, extra || {});
+      answer: mixed.findIndex(item => item.correct), explanation:completeExplanation,
+      source: 'Scholark original', calculator: byId[skill].section === 'Math',
+      calibration: {
+        version: 'public-prior-v1', status: 'provisional', sampleSize: 0,
+        difficulty: priorDifficulty, discrimination: 1,
+        guessing: 0.25,
+        sourceIds
+      },
+      validation: {
+        version:'content-audit-v1',
+        provenance:'Scholark original',
+        blueprintSourceIds:sourceIds,
+        checks:['schema','choice-uniqueness','blueprint-tag','explanation-presence']
+      }
+    };
+    const defaultValidation=base.validation;
+    const result=Object.assign(base,extra||{});
+    result.validation=Object.assign({},defaultValidation,extra?.validation||{});
+    return result;
   }
   const questions = [];
   const push = (...items) => questions.push(...items);
@@ -443,9 +466,258 @@
     }
   }
 
+  function rounded(value,digits=2){const factor=10**digits;return Math.round(value*factor)/factor;}
+  function numericPractice(id,exam,skill,difficulty,stem,expected,distractors,explanation,extra={}) {
+    return make(id,exam,skill,difficulty,stem,[expected,...distractors],0,explanation,Object.assign({},extra,{validation:Object.assign({},extra.validation||{},{expectedNumeric:Number(expected),verificationKind:'computed-numeric-v1'})}));
+  }
+
+  function generateAppliedMath(exam) {
+    const skills=exam==='sat'
+      ? ['sat-math-linear-one','sat-math-systems','sat-math-percent','sat-math-probability','sat-math-area-volume','sat-math-linear-two','sat-math-nonlinear-functions','sat-math-right-trig']
+      : ['act-math-algebra','act-math-algebra','act-math-essential','act-math-stats','act-math-geometry','act-math-functions','act-math-modeling','act-math-geometry'];
+    const settings=['community archive','school robotics lab','wetland field station','neighborhood food pantry','student-run theater','city bike program','museum conservation room','public health clinic'];
+    for(let i=1;i<=80;i++){
+      const context=settings[(i-1)%settings.length],difficulty=1+(i%4),rate=3+i%9,fixed=8+(i%7)*2,months=4+i%8,total=fixed+rate*months;
+      push(numericPractice(`${exam}-applied-linear-${i}`,exam,skills[0],difficulty,`A ${context} charges a one-time setup fee of $${fixed} and then $${rate} per month. A group paid $${total} in all. For how many months did the group use the service?`,months,[months+2,months-1,rounded(total/rate)],`Subtract the one-time fee before dividing by the monthly rate: (${total} − ${fixed}) ÷ ${rate} = ${months} months.`));
+
+      const meeting=5+i%10,slow=2+i%5,fast=slow+2,first=9+i%6,second=first+(fast-slow)*meeting;
+      push(numericPractice(`${exam}-applied-system-${i}`,exam,skills[1],Math.max(2,difficulty),`Two outreach teams track completed calls. Team A starts with ${first} calls and adds ${fast} per hour. Team B starts with ${second} calls and adds ${slow} per hour. After how many hours will their totals be equal?`,meeting,[meeting+2,meeting-2,rounded((first+second)/(fast+slow))],`Set the totals equal: ${first} + ${fast}h = ${second} + ${slow}h. The initial gap is ${second-first}, and Team A closes it by ${fast-slow} calls per hour, so h = ${meeting}.`));
+
+      const original=40+(i%12)*5,firstPct=5+(i%5)*5,secondPct=10+(i%4)*5,after=rounded(original*(1-firstPct/100)*(1+secondPct/100));
+      push(numericPractice(`${exam}-applied-percent-${i}`,exam,skills[2],difficulty,`A supply at the ${context} costs $${original}. Its price is reduced by ${firstPct}% and then the reduced price increases by ${secondPct}%. What is the final price, in dollars?`,after,[rounded(original*(1+(secondPct-firstPct)/100)),rounded(original*(1-firstPct/100)),rounded(original*(1+secondPct/100))],`Successive percent changes use successive multipliers: ${original}(1 − ${firstPct/100})(1 + ${secondPct/100}) = ${after}. The percentages should not simply be combined.`));
+
+      const groupA=12+i%9,successA=3+i%Math.max(2,groupA-4),groupB=10+(i*2)%8,successB=2+(i*3)%Math.max(2,groupB-3),conditionTotal=successA+successB,prob=rounded(successA/conditionTotal,3);
+      push(numericPractice(`${exam}-applied-probability-${i}`,exam,skills[3],Math.max(2,difficulty),`In a survey, ${successA} of ${groupA} students in Program A and ${successB} of ${groupB} students in Program B selected the evening session. If one student is chosen at random from only those who selected the evening session, what is the probability the student is from Program A?`,prob,[rounded(successA/(groupA+groupB),3),rounded(groupA/(groupA+groupB),3),rounded(successB/conditionTotal,3)],`The condition restricts the group to the ${conditionTotal} evening-session students. Of those, ${successA} are from Program A, so the probability is ${successA}/${conditionTotal} = ${prob}.`));
+
+      const length=6+i%10,width=4+(i*2)%7,border=1+i%3,outer=(length+2*border)*(width+2*border),inner=length*width,area=outer-inner;
+      push(numericPractice(`${exam}-applied-geometry-${i}`,exam,skills[4],difficulty,`A rectangular exhibit at the ${context} measures ${length} meters by ${width} meters. A uniform walkway ${border} meter${border===1?'':'s'} wide is built around the outside. What is the area of the walkway, in square meters?`,area,[outer,inner,2*(length+width)*border],`The outside dimensions are ${length+2*border} by ${width+2*border}. Subtract the exhibit area: ${outer} − ${inner} = ${area} square meters.`));
+
+      const x1=1+i%5,x2=x1+2+i%4,slope=2+i%6,y1=5+(i*3)%11,y2=y1+slope*(x2-x1);
+      push(numericPractice(`${exam}-applied-slope-${i}`,exam,skills[5],difficulty,`A sensor at the ${context} recorded ${y1} units at minute ${x1} and ${y2} units at minute ${x2}. A linear model is appropriate. What is the model's rate of change, in units per minute?`,slope,[y2-y1,rounded(y2/x2),rounded((y1+y2)/(x1+x2))],`The rate of change is the slope: (${y2} − ${y1}) ÷ (${x2} − ${x1}) = ${slope} units per minute.`));
+
+      const initial=100+(i%10)*20,growth=1.02+(i%6)*.01,years=2+i%5,future=rounded(initial*growth**years);
+      push(numericPractice(`${exam}-applied-growth-${i}`,exam,skills[6],Math.max(2,difficulty),`A digital collection at the ${context} begins with ${initial} records and grows by ${Math.round((growth-1)*100)}% each year. If the rate remains constant, approximately how many records will it contain after ${years} years?`,future,[rounded(initial*(1+(growth-1)*years)),rounded(initial*growth),rounded(initial+years)],`Constant percentage growth is exponential: ${initial}(${rounded(growth,2)})^${years} = ${future}. The linear-growth choice does not compound.`));
+
+      const triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]],triple=triples[i%triples.length],scale=1+i%4,legA=triple[0]*scale,legB=triple[1]*scale,hyp=triple[2]*scale;
+      push(numericPractice(`${exam}-applied-triangle-${i}`,exam,skills[7],difficulty,`A support cable forms the hypotenuse of a right triangle whose perpendicular legs measure ${legA} feet and ${legB} feet. How long is the cable, in feet?`,hyp,[legA+legB,Math.abs(legB-legA),hyp+scale],`Apply the Pythagorean theorem: √(${legA}² + ${legB}²) = ${hyp} feet.`));
+    }
+  }
+
+  function generateBalancedSatVerbal() {
+    const subjects=['urban tree canopies','coral nurseries','community archives','migrating songbirds','soil fungi','bilingual story hours','nighttime transit','river restoration','museum lighting','school gardens','coastal dunes','public art maps','heat-resilient pavement','local oral histories','pollinator corridors','library makerspaces','wetland grasses','music rehearsal methods','historic market records','neighborhood cooling centers'];
+    const methods=['a matched-site comparison','a preregistered field experiment','a multi-year observational study','a controlled laboratory trial','a repeated-measures survey'];
+    for(let i=1;i<=100;i++){
+      const subject=subjects[(i-1)%subjects.length],method=methods[i%methods.length],before=22+i%17,change=5+i%11,after=before+change,limit=['the study covered only one season','the sites were located in one region','participation was voluntary','the sample excluded extreme weather days'][i%4];
+      const base=`Using ${method}, a research team studied ${subject} across ${80+i} recorded observations. The primary measure averaged ${before} units under the comparison condition and ${after} units under the focal condition. The researchers concluded that the focal condition was associated with a higher measure in this sample. They also emphasized that ${limit}, so the result should be tested in additional settings before being treated as universal.`;
+      push(make(`sat-blueprint-central-${i}`,'sat','sat-rw-central',2+i%3,'Which choice best states the main idea of the text?',[
+        `The focal condition was associated with a higher measured outcome, although the study's stated limitation narrows the conclusion.`,
+        `The research proves that every use of ${subject} will create the same increase under all future conditions and in every region.`,
+        `No measurable pattern appeared in the sample.`,
+        `The team focused primarily on explaining why additional research would be unnecessary after this single sample.`
+      ],0,'The correct choice reports the observed direction and preserves the limitation. The other choices turn an association into a universal claim or contradict the described results.',{passage:base}));
+
+      const dataPassage=`A study of ${subject} reported ${80+i} observations and the following mean values for its primary measure: comparison condition, ${before} units; focal condition, ${after} units. The author argues that the focal condition produced a higher mean in the observed sample.`;
+      push(make(`sat-blueprint-data-${i}`,'sat','sat-rw-evidence-data',2+i%3,'Which choice most effectively uses the data to support the author’s argument?',[
+        `The focal-condition mean was ${change} units higher than the comparison-condition mean.`,
+        `The two conditions differed by ${after} units, which was the complete focal-condition mean rather than the difference between means.`,
+        `Both reported means were identical.`,
+        `Both conditions had a mean of ${before} units once the reported values were combined, even though the study reports them separately.`
+      ],0,`Subtract the comparison mean from the focal mean: ${after} − ${before} = ${change}. The correct choice states that difference and its direction exactly.`,{passage:dataPassage,figure:{type:'bar',labels:['Comparison','Focal'],values:[before,after],unit:'units'}}));
+
+      const inferencePassage=`The team studying ${subject} found a ${change}-unit difference across ${80+i} observations. Because ${limit}, the report's recommendations call for a second study that changes the setting while keeping the measurement method consistent.`;
+      push(make(`sat-blueprint-inference-${i}`,'sat','sat-rw-inference',3+i%2,'Which conclusion is best supported by the text?',[
+        `The team considers the observed difference promising but not yet sufficient for a broad generalization.`,
+        `The team believes the result already applies identically to every population, setting, season, and measurement method that could be studied.`,
+        `The team found no difference between conditions.`,
+        `The team expects a second study to remove the need to report any uncertainty or boundary on the interpretation of its evidence.`
+      ],0,'Recommending a new setting while retaining the method shows that the team wants to test generalizability. It does not reject the original evidence or treat it as universal.',{passage:inferencePassage}));
+
+      const rolePassage=`Researchers studying ${subject} observed a higher mean across ${80+i} observations under the focal condition. Several mechanisms could explain the difference, and the design did not isolate one mechanism from the others. For that reason, the report describes the result as a useful pattern rather than a complete causal explanation.`;
+      push(make(`sat-blueprint-role-${i}`,'sat','sat-rw-structure',3+i%2,'Which choice best describes the function of the final sentence in the text as a whole?',[
+        `It limits the interpretation of the result by distinguishing an observed pattern from a causal explanation.`,
+        `It introduces the subject for the first time and supplies every numerical measurement used by the researchers throughout the complete study.`,
+        `It introduces the study's topic for the first time.`,
+        `It argues that identifying a possible mechanism is unnecessary because a single observed pattern automatically establishes causation.`
+      ],0,'The final sentence qualifies what the evidence can establish: a pattern was observed, but the design did not isolate a cause.',{passage:rolePassage}));
+
+      const wordPassage=`After reviewing ${80+i} observations, the authors offered a qualified recommendation about ${subject}: expand the focal condition in a small number of additional sites, but continue measuring outcomes before adopting it everywhere.`;
+      push(make(`sat-blueprint-word-${i}`,'sat','sat-rw-words',1+i%4,'As used in the text, “qualified” most nearly means',[
+        'limited by stated conditions and reservations',
+        'certified through a permanent legal credential that applies in every possible setting',
+        'unclear in its wording',
+        'accepted without reservation'
+      ],0,'The recommendation includes a boundary—expand cautiously and keep measuring—so “qualified” means limited by conditions or reservations.',{passage:wordPassage}));
+
+      const crossPassage=`Text 1
+A field team argues that the observed ${change}-unit increase across ${80+i} observations associated with ${subject} justifies a carefully monitored pilot in several new sites.
+
+Text 2
+Another researcher agrees that the pattern deserves study but argues that the original design cannot yet show whether the focal condition itself caused the difference.`;
+      push(make(`sat-blueprint-cross-${i}`,'sat','sat-rw-cross-text',3+i%2,'Based on the texts, how would the author of Text 2 most likely respond to the proposed pilot in Text 1?',[
+        `The pilot may be reasonable if it is used to test causation rather than presented as proof already established.`,
+        `Text 2 would reject any new study as unnecessary.`,
+        `The pilot must be expanded immediately to every available site because both texts treat the existing evidence as a complete causal demonstration.`,
+        `The pilot should use no outcome measurements, since Text 2 argues that collecting further evidence would make the interpretation less reliable.`
+      ],0,'Text 2 accepts that the pattern is worth studying but questions causal certainty. A monitored pilot can address that concern if it is framed as a test.',{passage:crossPassage}));
+
+      const transitionPassage=`The focal condition in the ${subject} study had a higher mean across ${80+i} observations than the comparison condition. _____, the researchers cautioned that ${limit} and recommended replication before broad adoption.`;
+      push(make(`sat-blueprint-transition-${i}`,'sat','sat-rw-transitions',1+i%4,'Which choice completes the text with the most logical transition?',[
+        'Nevertheless,',
+        'For example,',
+        'Similarly,',
+        'Therefore,'
+      ],0,'The second sentence qualifies the encouraging result, so a contrast transition such as “Nevertheless” expresses the relationship.',{passage:transitionPassage}));
+    }
+  }
+
+  function generateActEnglishPassages() {
+    const projects=['restoring a courtyard mural','cataloging neighborhood photographs','testing a solar oven','mapping accessible sidewalks','recording local bird calls','building a rain garden','curating a student film night','translating museum labels','repairing donated bicycles','designing a quiet study room','monitoring creek temperature','staging a historical exhibit','organizing a seed library'];
+    for(let i=1;i<=130;i++){
+      const project=projects[(i-1)%projects.length],group=i%2?'A team of student volunteers':'Two student volunteers',verb=i%2?'meets':'meet',wrong=i%2?'meet':'meets',day=2+i%6;
+      const englishForm=`E${String(Math.ceil(i/5)).padStart(2,'0')}`,englishPassageSet=`${englishForm}-P${(i-1)%5+1}`;
+      const passage=[
+        `The school began ${project} during a weeklong community workshop with ${20+i} records to review. At first, the assignment seemed simple: complete the planned work and prepare a short public explanation. The students soon realized, however, that the original inventory mixed measurements, guesses, and notes copied from older files. They decided that a polished result would be less useful than a record showing which statements had actually been checked.`,
+        `On the first afternoon, the group divided the inventory into categories. Direct measurements went into one column, statements supported by a dated source went into another, and unresolved claims went into a third. This system slowed the initial work, but it revealed that several confident descriptions rested on the same unverified note. Rather than copying that note again, the students marked it as a question for the next site visit.`,
+        `The visit produced both answers and complications. A measurement confirmed one old description, while a photograph contradicted another. The group also spoke with a staff member who remembered why an earlier team had changed the layout. Because memory can shift, the students did not treat the interview as conclusive by itself. They compared it with the photograph and a maintenance log, using agreement among different sources to support a limited revision.`,
+        `As the public deadline approached, the students created a two-part display. The first part presented the completed work in clear language. The second explained one unresolved question and invited visitors with relevant records to contact the school. Some students worried that acknowledging uncertainty would make the project look unfinished. In practice, visitors spent more time with the display and supplied two useful leads for later research.`,
+        `The final reflection describes the project as an exercise in careful communication. Concision mattered because visitors needed to understand the display quickly, but brevity could not come at the cost of accuracy. The students removed repeated phrases, clarified pronouns, and used transitions to make the sequence of evidence easy to follow. They concluded that editing is not merely correcting punctuation after the thinking is complete; it is part of making the thinking visible to a reader.`
+      ].join('\n\n');
+      const extra={passage,englishForm,englishPassageSet,stimulusGroup:`act-english-${englishPassageSet}`};
+      push(make(`act-blueprint-agreement-${i}`,'act','act-eng-usage',1+i%4,`Which choice correctly completes the sentence “${group} _____ after school on day ${day} to review the evidence”?`,[verb,wrong,'are meeting have','were meets'],0,`The complete subject is ${i%2?'the singular noun “team”':'the plural phrase “Two student volunteers”'}, so the verb must be ${verb}.`,extra));
+      push(make(`act-blueprint-punctuation-${i}`,'act','act-eng-punctuation',2+i%3,'Which choice correctly punctuates the sentence “The group documented three constraints _____ time, materials, and user needs”?',[':',',',';','— and'],0,'A colon may introduce a list after the complete independent clause. A comma or semicolon cannot perform that job here.',extra));
+      push(make(`act-blueprint-modifier-${i}`,'act','act-eng-sentence',2+i%3,'Which choice most logically completes the sentence “After reviewing the final materials, _____”?',['the students corrected three inconsistent labels','three labels were corrected','there were three labels that the students considered inconsistent','the final materials contained labels that appeared inconsistent'],0,'The noun immediately after the introductory phrase must name who performed the reviewing. “The students” supplies that logical subject directly.',extra));
+      if(i%2)push(make(`act-blueprint-concise-${i}`,'act','act-eng-language',1+i%4,'Which choice preserves the necessary causal relationship while avoiding redundancy?',['because the records document local history','the records','because of history','documenting'],0,'The correct choice states both the cause and the specific reason. The shorter alternatives omit required information.',extra));
+      else push(make(`act-blueprint-concise-${i}`,'act','act-eng-language',1+i%4,'Which choice most concisely replaces “at the present time now” without changing the meaning?',['now','at the present time now','currently at this present point in time','now at the current time'],0,'“Now” expresses the full timing idea. Each other choice repeats that idea with unnecessary words.',extra));
+      push(make(`act-blueprint-transition-${i}`,'act','act-eng-production',1+i%4,'Which choice most logically completes this sequence: the group collected direct measurements; _____, it replaced the earlier estimates?',['consequently','nevertheless','for example','meanwhile'],0,'Using measurements is a result of collecting them, so “consequently” expresses the cause-and-effect relationship.',extra));
+      push(make(`act-blueprint-pronoun-${i}`,'act','act-eng-usage',2+i%3,'Which revision makes the pronoun reference clearest?',['The students compared the interview with the photograph before revising the record.','They compared it with that before revising it, which was the action that the group decided to take after considering it.','The students compared it with the photograph before revising it.','They compared the interview with it before making the revision to it.'],0,'Naming the students, interview, photograph, and record removes ambiguous pronouns while preserving the relationships.',extra));
+      push(make(`act-blueprint-parallel-${i}`,'act','act-eng-sentence',2+i%3,'Which choice completes the series with parallel structure: “The students measured the site, checked the records, and _____”?',['interviewed a staff member','a staff member was interviewed','conducting an interview with a staff member','they would interview a staff member'],0,'The series uses parallel past-tense verbs: measured, checked, and interviewed.',extra));
+      push(make(`act-blueprint-placement-${i}`,'act','act-eng-production',3+i%2,'Where should the sentence “That invitation produced two useful leads” be placed?',['after the sentence describing the invitation to visitors','before the passage introduces the workshop and explains why the students began examining the original inventory','between the sentences about inventory categories','after the final statement defining editing'],0,'The sentence refers directly to the invitation and its result, so it belongs immediately after that idea.',extra));
+      push(make(`act-blueprint-conclusion-${i}`,'act','act-eng-production',3+i%2,'Which concluding sentence most effectively reinforces the passage’s main point?',['Careful editing helped the students show both what they knew and how they knew it.','The workshop took place during one week on the school campus, where students from several classes worked during the afternoons.','Some records in the original inventory were older than others.','Many public displays use labels of different sizes and colors.'],0,'The correct sentence connects editing, evidence, and clear public communication—the passage’s central development.',extra));
+      push(make(`act-blueprint-purpose-${i}`,'act','act-eng-language',3+i%2,'The writer wants to emphasize that uncertainty can be communicated constructively. Which detail best accomplishes that goal?',['Visitors supplied useful leads after the display invited them to respond to an unresolved question.','The students sorted direct measurements into one inventory column and placed sourced statements and unresolved claims into two additional columns.','The assignment began during a weeklong community workshop.','The final reflection removed several repeated phrases.'],0,'The visitor response shows a constructive result of naming uncertainty rather than hiding it.',extra));
+    }
+  }
+
+  function generateActScienceSets() {
+    const investigations=[
+      ['water temperature','dissolved oxygen','°C','mg/L','decreased'],
+      ['salt concentration','seed germination','g/L','% germinated','decreased'],
+      ['light intensity','photosynthesis rate','lux','bubbles/min','increased'],
+      ['surface roughness','sliding time','roughness level','seconds','increased'],
+      ['soil moisture','plant mass','% water','grams','increased'],
+      ['solution acidity','enzyme activity','pH','reaction units','increased and then decreased'],
+      ['wire length','electrical resistance','cm','ohms','increased'],
+      ['insulation thickness','cooling time','mm','minutes','increased'],
+      ['fertilizer concentration','algal density','mg/L','cells/mL','increased and then decreased'],
+      ['pendulum length','swing period','cm','seconds','increased']
+    ];
+    for(let i=1;i<=130;i++){
+      const [independent,dependent,xUnit,yUnit,trend]=investigations[(i-1)%investigations.length],x1=1+i%4,x2=x1+2,x3=x2+2;
+      const peaked=trend.includes('then'),y1=10+i%9,y2=peaked?y1+6:y1+(trend==='increased'?4:-3),y3=peaked?y1+1:y2+(trend==='increased'?5:-2),control=['sample volume','trial duration','instrument model','starting material'][i%4];
+      const passage=`Students investigated how ${independent} affected ${dependent}. They tested three levels while keeping ${control} constant and repeating every condition four times. The table reports the mean of those repetitions.
+
+${independent} (${xUnit}) | ${dependent} (${yUnit})
+${x1} | ${y1}
+${x2} | ${y2}
+${x3} | ${y3}
+
+The students limited their conclusion to the tested range and recorded the same measurement procedure for every trial.`;
+      const figure={type:'line',xLabel:`${independent} (${xUnit})`,yLabel:`${dependent} (${yUnit})`,points:[[x1,y1],[x2,y2],[x3,y3]]};
+      push(make(`act-blueprint-science-trend-${i}`,'act','act-sci-data',1+i%4,`Across the tested values, ${dependent} generally`,[
+        `${trend}.`,
+        'remained exactly constant at every tested level.',
+        'changed in a pattern that cannot be determined from the reported means.',
+        `moved in the opposite direction from the one shown by the ${yUnit} measurements.`
+      ],0,`Reading the means in x-order (${y1}, ${y2}, ${y3}) shows that ${dependent} ${trend} across the tested levels.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-read-${i}`,'act','act-sci-data',2+i%3,`What mean value was recorded at ${x2} ${xUnit}?`,[
+        `${y2} ${yUnit}`,
+        `${y1} ${yUnit}`,
+        `${y3} ${yUnit}`,
+        `${x2} ${yUnit}`
+      ],0,`Locate the row for ${x2} ${xUnit}; its reported mean is ${y2} ${yUnit}. The units from the measured outcome belong with the answer.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-control-${i}`,'act','act-sci-investigation',2+i%3,'Which factor was held constant in the investigation?',[control,independent,dependent,'the three tested levels'],0,`The procedure says that ${control} was kept constant. The independent variable changed, and the dependent variable was measured.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-claim-${i}`,'act','act-sci-models',3+i%2,'Which conclusion is best supported by the investigation?',[
+        `Within the tested range, ${dependent} ${trend} as ${independent} changed.`,
+        `The same pattern must occur at every untested value and under every possible value of ${control}, without exception.`,
+        `${independent} had no relation to ${dependent}, because only three levels rather than every possible level were tested.`,
+        `Changing ${control} caused the reported pattern, even though the procedure says that factor was held constant across conditions.`
+      ],0,'The correct conclusion summarizes the reported pattern and stays within the tested range. The alternatives overgeneralize or contradict the procedure.',{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      const firstChange=y2-y1,secondChange=y3-y2;
+      push(make(`act-blueprint-science-change-${i}`,'act','act-sci-data',2+i%3,`What was the change in ${dependent} from ${x1} to ${x2} ${xUnit}?`,[
+        `${firstChange} ${yUnit}`,
+        `${secondChange} ${yUnit}`,
+        `${y2-y3} ${yUnit}`,
+        `${y3-y1} ${yUnit}`
+      ],0,`Subtract the first mean from the second: ${y2} − ${y1} = ${firstChange} ${yUnit}. The sign records the direction of the change.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-repeat-${i}`,'act','act-sci-investigation',2+i%3,'Why did the students repeat every condition four times?',[
+        'to reduce the influence of random trial-to-trial variation',
+        'to create four additional levels of the independent variable',
+        'to ensure that the measured outcome stayed exactly constant',
+        `to change ${control} once during every tested condition`
+      ],0,'Repeated trials allow the mean to be less dependent on one unusual measurement. Repetition does not create new independent-variable levels or change a controlled factor.',{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-range-${i}`,'act','act-sci-models',3+i%2,'Which proposed follow-up most directly tests whether the reported pattern continues beyond the tested range?',[
+        `test an additional ${independent} level above ${x3} ${xUnit} while keeping the original controls`,
+        `repeat only the ${x2} ${xUnit} condition but change ${control} at the same time`,
+        'remove the outcome measurement and record only the names of the materials',
+        'combine all three original levels into one condition and report no separate means'
+      ],0,`Testing a level beyond ${x3} ${xUnit} extends the range while retaining the controls, so any comparison targets the generalizability of the original trend.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+      push(make(`act-blueprint-science-method-${i}`,'act','act-sci-investigation',3+i%2,`A second team repeats the study but uses a different ${control} at every level. Why would its results be harder to interpret?`,[
+        `${control} would vary together with ${independent}, creating a confounding variable.`,
+        'The study would contain too many repeated measurements of the same dependent variable.',
+        `The independent variable would stop having units of ${xUnit} when the control changed.`,
+        'A dependent variable cannot be compared when a study includes more than one condition.'
+      ],0,`If ${control} changes along with ${independent}, a difference in the outcome cannot be attributed cleanly to one factor. That is a confound.`,{passage,figure,stimulusGroup:`act-science-set-${i}`}));
+    }
+  }
+
+  function generateActReadingForms() {
+    const profiles=[
+      ['Literary Narrative','Mara','apprentice conservator','a neighborhood theater','a hand-painted stage curtain','repairing the curtain before a reopening'],
+      ['Humanities','Dr. Amina Cole','public historian','a harbor archive','workers’ annotated route maps','interpreting how the maps were used in daily life'],
+      ['Social Science','Professor Daniel Ibarra','community researcher','a regional library network','records from mobile library stops','studying how schedule changes affected repeat visits'],
+      ['Natural Science','Dr. Leena Park','field ecologist','a restored marsh','sensor records and sediment cores','explaining why two nearby channels recovered differently']
+    ];
+    const variations=['seasonal storms','a staffing change','a delayed shipment','an unexpected temperature shift','a revised safety rule','a new volunteer cohort','a damaged instrument','an unusually dry month','a change in public hours','a second survey team','a construction closure','a software migration','a funding deadline'];
+    for(let formIndex=2;formIndex<15;formIndex++){
+      const form=String.fromCharCode(65+formIndex),variation=variations[formIndex-2];
+      profiles.forEach((profile,genreIndex)=>{
+        const [genre,lead,role,site,artifact,goal]=profile,code=`${form}-${genreIndex+1}`,sequence=11+formIndex*3+genreIndex;
+        const passage=[
+          `${lead} arrived at ${site} expecting the work to be mostly procedural. As ${role}, ${lead.split(' ')[0]} had been asked to focus on ${goal}. The initial plan divided the task into neat stages: inspect ${artifact}, document its condition, carry out a limited intervention, and compare the result with the original record. Yet ${variation} had disrupted the schedule before the first full day of work. That disruption seemed inconvenient, but it also exposed assumptions hidden inside the plan—especially the assumption that the surviving record described how people had actually used the place or material rather than how administrators expected it to be used.`,
+          `The first inspection produced an apparent pattern. Entries marked with sequence ${sequence} appeared near the most heavily handled parts of ${artifact}, while entries marked with sequence ${sequence+4} appeared in areas that showed less wear. A quick interpretation would have treated the labels as a direct map of use. ${lead}, however, noticed that several labels had been rewritten in different ink. Instead of averaging the entries immediately, the team photographed each layer, recorded the order in which marks crossed one another, and asked whether a later annotation might have changed the meaning of an earlier one.`,
+          `That slower method created tension. One colleague worried that the reopening deadline would pass before the team produced anything useful. Another argued that the rewritten labels were merely clerical corrections and should be treated as noise. ${lead} did not dismiss either concern. The deadline mattered, and not every variation deserved a theory. Still, removing the altered entries would also be a decision—one that could erase evidence before its importance was understood. The team therefore created two working models, one using only the earliest layer and another retaining every documented layer.`,
+          `The models agreed on the broad pattern but differed at three locations. To investigate those differences, the team compared the record with maintenance logs, photographs, and short interviews. Each source had a limitation. Logs named completed work but rarely explained why it was requested. Photographs captured a single moment and sometimes hid the relevant edge. Interviews supplied motives and routines, but memories had shifted over time. Because the weaknesses differed, agreement across sources carried more weight than repetition within any one source.`,
+          `At one disputed location, a photograph showed a temporary barrier that did not appear in the formal plan. A maintenance note mentioned moving equipment around the barrier for six weeks. Two interviewees independently recalled using an alternate route during that period. Together, these details explained why the later annotation crossed the earlier one. The revised mark was not a correction of a mistake; it recorded a temporary adaptation. That finding changed the team's recommendation at the location, though it did not settle every disagreement elsewhere.`,
+          `${lead} presented the result with deliberate reserve. The evidence supported a specific interpretation of the disputed location, but it did not prove that every rewritten mark recorded the same kind of adaptation. In the public summary, the team separated observations from inferences: the crossed inks and barrier were observations; the claim about a temporary route was an inference supported by several sources. This distinction made the conclusion narrower, but it also made clear what future evidence could confirm or challenge it.`,
+          `The deadline was met through a staged decision rather than a rushed final answer. Work proceeded where the two models agreed. At the disputed locations, the team chose reversible steps and attached the evidence record to the decision. Visitors would see the restored or reorganized material, but they could also open a digital note explaining why uncertainty remained. The note did not ask visitors to admire indecision. It showed that careful work can produce action without pretending that every question has been closed.`,
+          `Several weeks later, a newly cataloged document supported one part of the team's interpretation and complicated another. Because the photographs, source links, and reasoning had been preserved, the team could update the record without reconstructing the entire project from memory. ${lead} considered that update a success rather than an embarrassment. A useful account, in this view, was not one protected from revision; it was one organized so that revision could be responsible, specific, and visible.`,
+          `The project ultimately changed how the group described expertise. Expertise did not mean reaching the fastest confident answer, nor did it mean postponing every decision until perfect information appeared. It meant matching the strength of a claim to the strength of its evidence, selecting reversible actions when uncertainty was material, and leaving a clear path for later correction. The disruption caused by ${variation} had slowed the opening stage, but it helped the team build a process that was more durable than the original checklist.`
+        ].join('\n\n');
+        const extra={passage,passageSet:`ACT-${code}`,readingForm:form,passageGenre:genre,stimulusGroup:`act-reading-${code}`};
+        const main=`The project shows how evidence from sources with different limits can support action while preserving a path for revision.`;
+        const detail=`A temporary barrier, a maintenance note, and two interviews together explained one changed annotation.`;
+        const inference=`${lead} values conclusions that can be revised responsibly when new evidence appears.`;
+        push(make(`act-form-${code}-main`,'act','act-read-key',2+formIndex%3,'Which choice best states the main idea of the passage?',[main,`The project succeeds only after ${lead} rejects every written record and relies entirely on personal memory, even when several independent sources provide relevant evidence.`,`Expertise requires postponing every action until uncertainty disappears.`,`The disruption permanently invalidated the original checklist.`],0,'The correct choice captures the passage’s combination of evidence, bounded action, and responsible revision. Each distractor contradicts or overstates that development.',extra));
+        push(make(`act-form-${code}-detail`,'act','act-read-key',2+genreIndex%3,'Which detail most directly explains why the team changed its recommendation at one disputed location?',[detail,`A colleague initially worried that the schedule would leave too little time for any useful public explanation or documented decision.`,`The first inspection found labels near areas with different wear.`,`Visitors later received a digital note about remaining uncertainty.`],0,'The photograph, maintenance note, and independent interviews converged on a temporary route, directly explaining the changed annotation and recommendation.',extra));
+        push(make(`act-form-${code}-infer`,'act','act-read-integration',3+genreIndex%2,'The passage most strongly suggests that', [inference,`${lead} treats revision as evidence that the original team lacked expertise and therefore should never have recorded a conclusion.`,`the team believes interviews are always the most accurate source.`,`the deadline became irrelevant after the altered labels were found.`],0,'Treating a later update as a success shows that the lead values transparent, evidence-based revision rather than immunity from correction.',extra));
+        push(make(`act-form-${code}-role`,'act','act-read-craft',3,'What is the main function of the paragraph describing the temporary barrier?',['It demonstrates how several limited sources can converge to explain one disputed observation.',`It proves that every changed annotation in ${artifact} resulted from an identical barrier and six-week detour.`,`It introduces the project for the first time.`,`It dismisses logs and interviews as unusable sources.`],0,'The paragraph gives a concrete case in which distinct sources jointly explain one annotation; it does not universalize the finding.',extra));
+        push(make(`act-form-${code}-word`,'act','act-read-craft',2,'As it is used in the passage, the word “reserve” most nearly means',['caution in expressing a conclusion','a stored supply for later use','a permanent barrier to access','a refusal to decide anything'],0,'The surrounding sentences show the lead limiting the claim to what the evidence supports, so “reserve” means caution or restraint.',extra));
+        push(make(`act-form-${code}-structure`,'act','act-read-craft',3,'Which choice best describes the overall organization of the passage?',['It presents a disrupted project, follows an evidence-based investigation, and draws a broader lesson about revisable expertise.',`It lists unrelated problems at ${site} but never explains how the team addressed them or how the later evidence changed the project.`,`It repeats one completed theory without revision.`,`It compares two separate projects that reach opposite conclusions.`],0,'The passage moves from disruption through investigation and decision to a general account of expertise grounded in evidence and revision.',extra));
+        push(make(`act-form-${code}-evidence`,'act','act-read-integration',3,'Why does the passage discuss the different limitations of logs, photographs, and interviews?',['To explain why agreement across unlike sources can strengthen an interpretation.',`To establish that all three sources are too unreliable to contribute anything useful to the disputed locations in the project.`,`To show that repetition makes any source accurate.`,`To prove that formal plans always match actual behavior.`],0,'The sources have different weaknesses; convergence across them therefore provides stronger support than repetition within one source type.',extra));
+        push(make(`act-form-${code}-qualify`,'act','act-read-integration',4,'Which choice identifies an important qualification in the team’s conclusion?',['Evidence explained one changed annotation but did not show that every rewritten mark had the same cause.',`No changed annotation could be interpreted unless every witness supplied a perfectly matching memory and every record had no missing detail.`,`The barrier affected every recorded route in the site's history.`,`The two working models contradicted each other at every location.`],0,'The passage explicitly limits the barrier-based explanation to one location and refuses to generalize it to every rewritten mark.',extra));
+        push(make(`act-form-${code}-view`,'act','act-read-craft',3,'Which statement best characterizes the passage’s view of uncertainty?',['Uncertainty should shape the scope and reversibility of a decision, not automatically prevent action.',`Experts should conceal uncertainty whenever a public deadline approaches, even if doing so prevents later reviewers from understanding the evidence used.`,`Two agreeing sources eliminate all uncertainty.`,`Any uncertainty makes responsible action impossible.`],0,'The team acts where evidence is sufficient, uses reversible steps where uncertainty matters, and documents how later evidence could change the account.',extra));
+      });
+    }
+  }
+
   generateMath('sat');
   generateMath('act');
+  generateAppliedMath('sat');
+  generateAppliedMath('act');
+  generateBalancedSatVerbal();
+  generateActEnglishPassages();
   generateScience();
+  generateActScienceSets();
+  generateActReadingForms();
 
   const topicObjects = {
     sat: TOPICS.sat.map(row => byId[row[0]]),
@@ -460,7 +732,8 @@
   });
 
   window.ScholarkPrepData = Object.freeze({
-    version: 2,
+    version: 3,
+    calibrationVersion: 'public-prior-v1',
     topics: topicObjects,
     topicById: byId,
     questions: uniqueQuestions,

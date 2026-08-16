@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
+import { auditPrepContent } from './prep-content-audit.js';
 
 globalThis.window = {};
 await import(pathToFileURL(resolve('..', 'prep-v2-data.js')).href);
@@ -33,6 +34,32 @@ test('every official taxonomy topic has practice coverage', () => {
   }
 });
 
+test('every question carries a versioned public-prior calibration record', () => {
+  assert.equal(data.calibrationVersion, 'public-prior-v1');
+  for (const question of data.questions) {
+    const calibration = question.calibration;
+    assert.equal(calibration?.version, data.calibrationVersion, `${question.id} has the wrong calibration version`);
+    assert.equal(calibration?.status, 'provisional', `${question.id} must begin as provisional`);
+    assert.equal(calibration?.sampleSize, 0, `${question.id} must not claim observed responses`);
+    assert.ok(calibration.difficulty >= -3 && calibration.difficulty <= 3, `${question.id} has an invalid difficulty prior`);
+    assert.ok(calibration.discrimination > 0 && calibration.discrimination <= 2.5, `${question.id} has an invalid discrimination prior`);
+    assert.ok(calibration.guessing >= 0 && calibration.guessing <= .35, `${question.id} has an invalid guessing prior`);
+    assert.deepEqual(calibration.sourceIds, question.exam === 'sat'
+      ? ['college-board-digital-sat-technical-manual-2024','college-board-digital-sat-content-domains']
+      : ['act-enhanced-design-framework-2026','act-enhanced-score-interpretation-2025'], `${question.id} has incorrect source provenance`);
+  }
+});
+
+test('content audit rejects no item and recomputes every eligible generated answer', () => {
+  const report = auditPrepContent(data.questions, data.topicById);
+  assert.equal(report.version, 'content-audit-v1');
+  assert.deepEqual(report.errors, []);
+  assert.ok(report.structuralFamilies >= 200);
+  assert.ok(report.largestFamily <= 80);
+  assert.ok(report.deterministicEligible >= 900);
+  assert.equal(report.deterministicCoverage, 1);
+});
+
 test('nonrepeating full-test section minimums are available', () => {
   const minimums = {
     sat: {'Reading and Writing':54, Math:44},
@@ -59,9 +86,9 @@ test('core sections have at least two nonrepeating full-form pools', () => {
   }
 });
 
-test('ACT Reading includes two passage-aligned enhanced-format forms', () => {
+test('ACT Reading includes fifteen passage-aligned enhanced-format forms', () => {
   const grouped = Object.groupBy(data.questions.filter(question => question.passageSet), question => question.readingForm);
-  assert.deepEqual(Object.keys(grouped).sort(), ['A','B']);
+  assert.equal(Object.keys(grouped).length, 15);
   for (const [form, questions] of Object.entries(grouped)) {
     assert.equal(questions.length, 36, `ACT Reading form ${form} must contain 36 questions`);
     const sets = Object.groupBy(questions, question => question.passageSet);

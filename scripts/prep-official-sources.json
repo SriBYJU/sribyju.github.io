@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "lastReviewed": "2026-08-15",
+  "policy": {
+    "originality": "Official materials may define structures, skills, scoring models, aggregate statistics, passage specifications, and rubric dimensions. Scholark does not republish, number-swap, or closely paraphrase copyrighted questions.",
+    "scoring": "Published models and aggregate statistics provide independent priors. Scholark score ranges remain estimates because operational item parameters are not public.",
+    "updates": "Every source has a review date. A release audit fails when a required source becomes stale or its URL is missing."
+  },
+  "sources": [
+    {
+      "id": "college-board-digital-sat-technical-manual-2024",
+      "publisher": "College Board",
+      "exam": "sat",
+      "title": "Digital SAT Suite of Assessments Technical Manual",
+      "url": "https://research.collegeboard.org/media/pdf/Digital%20SAT%20Suite%20of%20Assessments%20Technical%20Manual-FINAL.pdf",
+      "published": "2024",
+      "reviewed": "2026-08-15",
+      "uses": ["multistage routing", "3PL IRT model", "scale interpretation", "reliability", "fairness and form assembly"],
+      "contentPolicy": "Specifications and aggregate methodology only; do not reproduce operational or sample items."
+    },
+    {
+      "id": "college-board-digital-sat-content-domains",
+      "publisher": "College Board",
+      "exam": "sat",
+      "title": "Digital SAT Suite Content Domains and Assessment Framework",
+      "url": "https://satsuite.collegeboard.org/higher-ed-professionals/sat-validity/content-domains",
+      "published": "current",
+      "reviewed": "2026-08-15",
+      "uses": ["domain taxonomy", "skill coverage", "content constraints", "form blueprint"],
+      "contentPolicy": "Use taxonomy and specifications; write independent passages, contexts, stems, and distractors."
+    },
+    {
+      "id": "college-board-digital-sat-scoring",
+      "publisher": "College Board",
+      "exam": "sat",
+      "title": "How Digital SAT Scores Are Calculated",
+      "url": "https://satsuite.collegeboard.org/scores/what-scores-mean/how-scores-calculated",
+      "published": "current",
+      "reviewed": "2026-08-15",
+      "uses": ["score-range language", "adaptive-score interpretation", "guessing and difficulty caveats"],
+      "contentPolicy": "Use public score interpretation; never claim access to College Board operational scoring."
+    },
+    {
+      "id": "act-enhanced-design-framework-2026",
+      "publisher": "ACT",
+      "exam": "act",
+      "title": "Design Framework for the ACT Enhancements",
+      "url": "https://www.act.org/content/dam/act/unsecured/documents/R2519-Design-Framework-for-the-ACT-Enhancements-2026-02.pdf",
+      "published": "2026-02",
+      "reviewed": "2026-08-15",
+      "uses": ["section timing", "reporting-category proportions", "passage counts", "passage lengths", "field-test proportions", "science formats"],
+      "contentPolicy": "Use blueprint and research findings; do not reproduce study forms or copyrighted items."
+    },
+    {
+      "id": "act-enhanced-score-interpretation-2025",
+      "publisher": "ACT",
+      "exam": "act",
+      "title": "Interpreting Scores on the Enhanced ACT",
+      "url": "https://www.act.org/content/act/en/research/pdfs/interpreting-scores-on-the-enhanced-act.html",
+      "published": "2025-03",
+      "reviewed": "2026-08-15",
+      "uses": ["score interpretation", "composite calculation", "linking-study context", "uncertainty language"],
+      "contentPolicy": "Use public aggregate findings and score meaning; do not imply official equating."
+    },
+    {
+      "id": "ap-central-released-frq-index",
+      "publisher": "College Board",
+      "exam": "ap-future-phase",
+      "title": "Past AP Free-Response Questions and Scoring Information",
+      "url": "https://apcentral.collegeboard.org/courses/past-exam-questions",
+      "published": "current",
+      "reviewed": "2026-08-15",
+      "uses": ["future AP rubric dimensions", "scoring guidelines", "sample-response commentary", "scoring statistics"],
+      "contentPolicy": "Reserved for the later AP phase. Link to released prompts; create original practice instead of republishing banks."
+    }
+  ]
+}
