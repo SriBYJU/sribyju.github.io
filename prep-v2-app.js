@@ -54,6 +54,29 @@
         ['Purpose and structure','Describe what a portion does in the author’s reasoning.','sat-rw-structure',['Paraphrase the surrounding argument.','Use a function verb such as illustrates, qualifies, contrasts, or introduces.','Do not merely repeat the portion’s subject.']],
         ['Words in context','Replace the word with each option and preserve the local meaning and tone.','sat-rw-words',['Read the complete sentence.','Predict a simple synonym before viewing choices.','Reject a familiar dictionary meaning that does not fit this use.']]
       ]
+    },
+    patterns: {
+      title:'SAT & ACT Pattern Recognition Playbook',
+      subtitle:'Fast structural decisions that remain valid because they come from grammar, logic, evidence, or mathematics—not answer-choice superstition.',
+      sources:[
+        ['College Board content domains','https://satsuite.collegeboard.org/higher-ed-professionals/sat-validity/content-domains'],
+        ['ACT English reporting categories','https://www.act.org/content/act/en/products-and-services/the-act/scores/understanding-your-scores.html'],
+        ['Purdue OWL: commas and semicolons','https://owl.purdue.edu/owl/general_writing/punctuation/commas/commas_vs_semicolons.html']
+      ],
+      lessons:[
+        ['Period–semicolon equivalence','A period and a semicolon can both separate independent clauses. If two choices differ only by those marks and both sides are complete clauses, they are grammatically equivalent—so a single-answer item must hinge on another difference.','sat-rw-boundaries',['Box the subject–verb core on both sides.','If both sides are independent clauses, mark period and semicolon as structurally equivalent.','Compare every remaining difference; never eliminate them merely because both marks appear.']],
+        ['Comma plus FANBOYS','A comma can join independent clauses only with a coordinating conjunction: for, and, nor, but, or, yet, so.','act-eng-punctuation',['Test both sides for independence.','If both are complete, require a semicolon/period or comma plus FANBOYS.','Reject a comma splice even when the sentence sounds natural.']],
+        ['Colon completion test','A colon must follow a complete clause and introduce an explanation, example, or list.','sat-rw-boundaries',['Cover everything after the colon.','Confirm the words before it form a complete sentence.','Check that the right side explains or specifies the left side.']],
+        ['Pronoun–antecedent number','A pronoun must agree with the noun it replaces. Multiple plural-looking choices can be rejected together when the actual antecedent is singular—but the grammar, not the option count, proves it.','act-eng-usage',['Name the exact antecedent.','Ignore intervening plural nouns.','Match singular/plural and person, then check clarity.']],
+        ['Subject–verb skeleton','Prepositional phrases and interruptions often hide the true subject. Remove them mentally before checking agreement.','act-eng-usage',['Cross out between-phrase material.','Find the head noun and finite verb.','Match number before restoring the full sentence.']],
+        ['Modifier touch rule','An opening modifier should sit next to the noun performing the action.','sat-rw-form',['Underline the opening description.','Ask who logically performs it.','Choose the sentence that places that noun immediately after the comma.']],
+        ['Transition family elimination','Transitions form logic families. Once the relationship is named, eliminate every word from the wrong families at once.','sat-rw-transitions',['Summarize the sentence before and after the blank.','Label contrast, result, example, addition, or sequence.','Choose within that family by nuance and punctuation.']],
+        ['Scope-word alarm','Words such as always, never, proves, only, and completely often exceed the evidence. Treat them as a warning, not an automatic elimination.','sat-rw-inference',['State the smallest supported claim.','Circle absolute language.','Keep an absolute choice only when the text actually establishes the absolute.']],
+        ['Same-job answer symmetry','When several choices perform the same grammatical or mathematical job, identify the feature that truly differs instead of judging surface length.','act-eng-language',['Group structurally equivalent choices.','Name the tested distinction.','Eliminate by the rule, then verify meaning and tone.']],
+        ['Plug-in and backsolve','For variable or answer-choice math, testing choices can expose the correct relationship faster than symbolic work.','sat-math-linear-one',['Start with a middle choice when options are ordered.','Substitute into the original statement.','Use the direction of the error to choose the next value efficiently.']],
+        ['Desmos intersection recognition','An equation or system can often be read as the intersection of two graphs.','sat-math-systems',['Graph each side or equation.','Read the requested coordinate, not automatically both.','Verify restrictions and units in the original prompt.']],
+        ['Pattern audit: rule versus myth','Answer length, repeated letters, and “three choices look alike” are not reliable by themselves. A shortcut is valid only when a grammar, logic, evidence, or math rule explains it.','sat-rw-central',['State the underlying rule out loud.','If no rule explains the elimination, keep the choice alive.','Use the shortcut to save time, then perform a five-second verification.']]
+      ]
     }
   };
 
@@ -62,6 +85,7 @@
       version: data.version, test: 'sat', view: 'dashboard', xp: 0, streak: 0,
       lastActiveDate: null, responses: [], mastery: {}, itemMetrics: {}, bookmarks: [],
       diagnostic: { sat:null, act:null }, scoreHistory:{sat:[],act:[]},
+      completedForms:{sat:[],act:[]},
       plan: { sat:{goal:1350, baseline:'', minutes:30, days:5, targetDate:''}, act:{goal:30, baseline:'', minutes:30, days:5, targetDate:''} },
       settings: { practiceLength:10 }, updatedAt: new Date().toISOString()
     };
@@ -88,6 +112,10 @@
     merged.scoreHistory = {
       sat:Array.isArray(incoming.scoreHistory?.sat)?incoming.scoreHistory.sat.slice(-50):[],
       act:Array.isArray(incoming.scoreHistory?.act)?incoming.scoreHistory.act.slice(-50):[]
+    };
+    merged.completedForms = {
+      sat:Array.isArray(incoming.completedForms?.sat)?[...new Set(incoming.completedForms.sat)]:[],
+      act:Array.isArray(incoming.completedForms?.act)?[...new Set(incoming.completedForms.act)]:[]
     };
     merged.settings = Object.assign(base.settings, incoming.settings || {});
     merged.mastery = incoming.mastery && typeof incoming.mastery === 'object' ? incoming.mastery : {};
@@ -312,16 +340,21 @@
     for(const item of rows){const calibration=calibrationFor(item.question),p=responseProbability(bestTheta,calibration),a=Number(calibration.discrimination)||1;information+=a*a*p*(1-p);}
     const se=Math.max(.18,Math.min(1.2,1/Math.sqrt(information))),lowerTheta=bestTheta-1.28*se,upperTheta=bestTheta+1.28*se;
     const scale=theta=>test==='sat'?Math.round((400+1200/(1+Math.exp(-.9*theta)))/10)*10:Math.round(1+35/(1+Math.exp(-.9*theta)));
-    const low=Math.max(test==='sat'?400:1,scale(lowerTheta)),high=Math.min(test==='sat'?1600:36,scale(upperTheta)),midpoint=scale(bestTheta);
+    const broadLow=Math.max(test==='sat'?400:1,scale(lowerTheta)),broadHigh=Math.min(test==='sat'?1600:36,scale(upperTheta)),midpoint=scale(bestTheta);
     const sections=new Set(rows.map(item=>data.topicById[item.row.skill]?.section).filter(Boolean));
-    return {label:`${low}–${high}`,low,high,midpoint,theta:Math.round(bestTheta*100)/100,attempts:rows.length,sections:[...sections],method:`Independent 3PL-style estimate using ${calibrationVersion}; not official scoring`,version:calibrationVersion,confidence:rows.length>=200?'strong practice evidence':rows.length>=80?'developing practice evidence':'early practice evidence'};
+    const priorFullTests=(state.scoreHistory?.[test]||[]).filter(point=>point.kind==='full-test').slice(-3),allowedSpread=test==='sat'?20:1;
+    const crossFormSpread=priorFullTests.length>=2?Math.max(...priorFullTests.map(point=>point.midpoint))-Math.min(...priorFullTests.map(point=>point.midpoint)):null;
+    const stable=rows.length>=80&&sections.size>=2&&priorFullTests.length>=1&&(crossFormSpread===null||crossFormSpread<=allowedSpread);
+    const halfBand=test==='sat'?10:1,minimum=test==='sat'?400:1,maximum=test==='sat'?1600:36;
+    const low=stable?Math.max(minimum,midpoint-halfBand):midpoint,high=stable?Math.min(maximum,midpoint+halfBand):midpoint;
+    return {label:stable?`${low}–${high}`:`${midpoint}`,low,high,midpoint,theta:Math.round(bestTheta*100)/100,attempts:rows.length,sections:[...sections],method:`Independent 3PL-style estimate using ${calibrationVersion}; not official scoring`,version:calibrationVersion,confidence:stable?(priorFullTests.length>=2?'cross-form confirmed':'full-form stability band'):rows.length>=200?'strong practice evidence; complete a full form for a stability band':rows.length>=80?'developing practice evidence':'early practice evidence',stable,crossFormSpread,uncertaintyLow:broadLow,uncertaintyHigh:broadHigh,uncertaintyLevel:'80% model interval'};
   }
   function practiceRange() { return practiceEstimate().label; }
 
   function recordScoreCheckpoint(kind,label,accuracyValue) {
     const estimate=practiceEstimate();
     if(!Number.isFinite(estimate.midpoint))return null;
-    const checkpoint={id:`${state.test}-${Date.now()}`,exam:state.test,kind,label,at:new Date().toISOString(),midpoint:estimate.midpoint,low:estimate.low,high:estimate.high,attempts:estimate.attempts,accuracy:accuracyValue,method:calibrationVersion};
+    const checkpoint={id:`${state.test}-${Date.now()}`,exam:state.test,kind,label,at:new Date().toISOString(),midpoint:estimate.midpoint,low:estimate.low,high:estimate.high,uncertaintyLow:estimate.uncertaintyLow,uncertaintyHigh:estimate.uncertaintyHigh,stable:estimate.stable,attempts:estimate.attempts,accuracy:accuracyValue,method:calibrationVersion};
     state.scoreHistory[state.test].push(checkpoint);
     state.scoreHistory[state.test]=state.scoreHistory[state.test].slice(-50);
     selectedScorePoint=state.scoreHistory[state.test].length-1;
@@ -338,12 +371,12 @@
     const activeIndex=Math.max(0,Math.min(points.length-1,selectedScorePoint??points.length-1)),active=points[activeIndex],improvement=points.length>1?active.midpoint-points[0].midpoint:0;
     const ticks=state.test==='sat'?[400,800,1200,1600]:[1,12,24,36],reassessAfter=state.test==='sat'?40:45,sinceLast=state.responses.filter(row=>row.exam===state.test&&Date.parse(row.at)>Date.parse(points.at(-1).at)).length;
     return `<section class="prep-v2-card wide"><div class="prep-v2-kicker">${esc(window.currentUser?.displayName?.split(' ')[0]||'Your')} score progress</div><div class="prep-v2-toolbar"><div><h2>Evidence over time</h2><p>${points.length} diagnostic/full-test checkpoint${points.length===1?'':'s'} · ${improvement>0?`+${improvement}`:improvement} from baseline</p></div><div class="prep-v2-chip ${sinceLast>=reassessAfter?'good':''}">${sinceLast>=reassessAfter?'Fresh reassessment ready':`${reassessAfter-sinceLast} more practice responses before reassessment`}</div></div>
-      <div class="prep-v2-chart-scroll"><svg class="prep-v2-score-chart" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="prep-score-title prep-score-desc"><title id="prep-score-title">Estimated ${state.test.toUpperCase()} practice score progress</title><desc id="prep-score-desc">${points.map(point=>`${point.label}: ${point.low} to ${point.high}`).join('; ')}</desc>
+      <div class="prep-v2-chart-scroll"><svg class="prep-v2-score-chart" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="prep-score-title prep-score-desc"><title id="prep-score-title">Estimated ${state.test.toUpperCase()} practice score progress</title><desc id="prep-score-desc">${points.map(point=>`${point.label}: ${point.low===point.high?point.midpoint:`${point.low} to ${point.high}`}`).join('; ')}</desc>
       ${ticks.map(tick=>`<line x1="${padX}" y1="${y(tick)}" x2="${width-padX}" y2="${y(tick)}" class="prep-v2-chart-grid"/><text x="${padX-8}" y="${y(tick)+4}" text-anchor="end">${tick}</text>`).join('')}
       <line x1="${padX}" y1="${y(target)}" x2="${width-padX}" y2="${y(target)}" class="prep-v2-chart-target"/><text x="${width-padX}" y="${Math.max(14,y(target)-7)}" text-anchor="end">Goal ${target}</text>
       ${points.map((point,index)=>`<line x1="${x(index)}" y1="${y(point.low)}" x2="${x(index)}" y2="${y(point.high)}" class="prep-v2-chart-range"/>`).join('')}${points.length>1?`<polyline points="${line}" class="prep-v2-chart-line"/>`:''}
       ${points.map((point,index)=>`<circle cx="${x(index)}" cy="${y(point.midpoint)}" r="${index===activeIndex?7:5}" class="prep-v2-chart-point ${index===activeIndex?'active':''}" tabindex="0" role="button" aria-label="${esc(point.label)}, estimate ${point.low} to ${point.high}" onclick="ScholarkPrep.selectScorePoint(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();ScholarkPrep.selectScorePoint(${index})}"/>`).join('')}</svg></div>
-      <div class="prep-v2-callout"><strong>${esc(active.label)} · ${new Date(active.at).toLocaleDateString()}</strong><br>Estimated ${active.low}–${active.high} (midpoint ${active.midpoint}) · ${active.accuracy}% answered accuracy. The range reflects uncertainty and is not an official score.</div>
+      <div class="prep-v2-callout"><strong>${esc(active.label)} · ${new Date(active.at).toLocaleDateString()}</strong><br>Best estimate ${active.low===active.high?active.midpoint:`${active.low}–${active.high}`} · ${active.accuracy}% answered accuracy. ${active.stable?'The narrow band reflects consistent full-form evidence.':'A narrow band has not unlocked yet; complete two consistent full forms.'} This is not an official score.</div>
       <div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startDiagnostic()">Take a fresh diagnostic</button><button class="prep-v2-secondary" onclick="ScholarkPrep.startFullTest()">Take a full test</button></div></section>`;
   }
 
@@ -384,6 +417,44 @@
     }).slice(0, limit);
   }
 
+  function satUserPercentile(score) {
+    const points=data.publicBenchmarks?.sat?.userPercentiles||[];
+    if(!points.length||!Number.isFinite(Number(score)))return null;
+    const value=Number(score),upper=points.find(([point])=>point>=value)||points.at(-1),lower=[...points].reverse().find(([point])=>point<=value)||points[0];
+    if(upper[0]===lower[0])return upper[1];
+    return Math.round(lower[1]+(upper[1]-lower[1])*(value-lower[0])/(upper[0]-lower[0]));
+  }
+
+  function publicDataMarkup(estimate) {
+    const benchmarks=data.publicBenchmarks;if(!benchmarks)return '';
+    const sourceLinks=benchmarks.sources.map(source=>`<a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.publisher)} · ${esc(source.title)}</a>`).join(' · ');
+    const cards=state.test==='sat'
+      ? [
+          estimate.midpoint?{value:`${satUserPercentile(estimate.midpoint)||'—'}th`,label:'approximate SAT user percentile at the current best estimate'}:null,
+          {value:benchmarks.sat.participation.value,label:benchmarks.sat.participation.label},
+          {value:`${data.formCatalog.sat.length}`,label:'registered Scholark SAT practice forms'}
+        ].filter(Boolean)
+      : [
+          {value:benchmarks.act.participation.value,label:benchmarks.act.participation.label},
+          {value:benchmarks.act.average.value,label:benchmarks.act.average.label},
+          {value:benchmarks.act.retest.value,label:benchmarks.act.retest.label}
+        ];
+    return `<section class="prep-v2-card full prep-v2-public-data"><div class="prep-v2-kicker">Public-data perspective</div><h2>Know what the numbers mean</h2><p>Compare your plan with current national participation, score, and retesting context from official aggregate publications.</p><div class="prep-v2-stat-strip">${cards.map(card=>`<article><strong>${esc(card.value)}</strong><span>${esc(card.label)}</span></article>`).join('')}</div><details><summary>Sources and methodology</summary><p>${sourceLinks}</p><p class="prep-v2-muted">SAT percentile context uses published user-group percentiles from recent graduating cohorts. ACT retesting data describe the published 2025 national cohort. These aggregate comparisons provide context and do not establish that Scholark caused an individual score change.</p></details></section>`;
+  }
+
+  function platformStatsMarkup() {
+    const examQuestions=data.questions.filter(question=>question.exam===state.test),figures=examQuestions.filter(question=>question.figure).length,topics=data.topics[state.test].length,forms=data.formCatalog?.[state.test]?.length||0,tutored=examQuestions.filter(question=>question.tutoring?.version===data.tutoringVersion).length;
+    const stats=[
+      {value:data.questions.length.toLocaleString(),label:'total original SAT + ACT questions'},
+      {value:examQuestions.length.toLocaleString(),label:`original ${state.test.toUpperCase()} questions`},
+      {value:forms,label:'registered full practice forms'},
+      {value:topics,label:'official-taxonomy skills covered'},
+      {value:`${Math.round(tutored/Math.max(1,examQuestions.length)*100)}%`,label:'deterministic tutor coverage'},
+      ...(figures?[{value:figures.toLocaleString(),label:'accessible figure-based items'}]:[])
+    ];
+    return `<section class="prep-v2-card full prep-v2-proof"><div class="prep-v2-toolbar"><div><div class="prep-v2-kicker">Scholark by the numbers</div><h2>Built for depth, not a paywall</h2></div><span class="prep-v2-chip good">All features included</span></div><div class="prep-v2-proof-grid">${stats.map(stat=>`<article><strong>${esc(stat.value)}</strong><span>${esc(stat.label)}</span></article>`).join('')}</div></section>`;
+  }
+
   function planItems() {
     const weak = weakestTopics(7);
     const minutes = Number(state.plan[state.test].minutes) || 30;
@@ -404,6 +475,9 @@
     const rushedMistakes=mistakes.filter(row=>row.errorType==='rushed decision').length;
     const timed=testResponses.filter(row=>Number.isFinite(row.timeMs)&&row.timeMs>0);
     const averageSeconds=timed.length?Math.round(timed.reduce((sum,row)=>sum+row.timeMs,0)/timed.length/1000):0;
+    const sortedTimes=timed.map(row=>row.timeMs).sort((a,b)=>a-b),medianMs=sortedTimes.length?sortedTimes[Math.floor(sortedTimes.length/2)]:0;
+    const decisionProfile={fastAccurate:0,deliberateAccurate:0,rushedMiss:0,deliberateMiss:0};
+    timed.forEach(row=>{const fast=row.timeMs<=medianMs;if(row.correct)decisionProfile[fast?'fastAccurate':'deliberateAccurate']++;else decisionProfile[fast?'rushedMiss':'deliberateMiss']++;});
     const confidenceRows=testResponses.filter(row=>row.confidence);
     const confidenceAligned=confidenceRows.length>=5?Math.max(0,Math.round(100-(confidenceRows.reduce((sum,row)=>{const prediction={low:.3,medium:.6,high:.85}[row.confidence],outcome=row.correct?1:0;return sum+Math.pow(prediction-outcome,2);},0)/confidenceRows.length)/.25*100)):null;
     const reviewsDue=data.topics[state.test].filter(item=>reviewIsDue(item.id)).length;
@@ -413,8 +487,9 @@
       return `<div class="prep-v2-mastery-row"><span>${esc(item.name)}</span><div class="prep-v2-progress"><span style="width:${m.score}%"></span></div><strong>${Math.round(m.score)}%</strong></div>`;
     }).join('');
     app().innerHTML = `<div class="prep-v2-grid">
+      ${platformStatsMarkup()}
       <section class="prep-v2-card"><div class="prep-v2-kicker">Current readiness</div><div class="prep-v2-metric">${avgMastery()}%</div><p>Average topic mastery—not an official score.</p></section>
-      <section class="prep-v2-card"><div class="prep-v2-kicker">Independent practice range</div><div class="prep-v2-metric">${estimate.label}</div><p>${estimate.attempts} scored response${estimate.attempts===1?'':'s'} · ${estimate.confidence||'building evidence'}. This public-prior estimate is not an official SAT or ACT score.</p></section>
+      <section class="prep-v2-card"><div class="prep-v2-kicker">Best practice estimate</div><div class="prep-v2-metric">${estimate.label}</div><p>${estimate.attempts} scored response${estimate.attempts===1?'':'s'} · ${estimate.confidence||'building evidence'}. ${estimate.stable?'The displayed stability band is capped at '+(state.test==='sat'?'20 SAT points':'2 ACT points')+'.':'Complete a registered full form to add the narrow stability band.'} Not an official score.</p>${estimate.uncertaintyLow!==undefined?`<details><summary>Measurement detail</summary><p class="prep-v2-muted">The broader ${esc(estimate.uncertaintyLevel)} is ${estimate.uncertaintyLow}–${estimate.uncertaintyHigh}. It is kept here instead of presented as the headline result.</p></details>`:''}</section>
       <section class="prep-v2-card"><div class="prep-v2-kicker">Momentum</div><div class="prep-v2-metric">${state.streak} day${state.streak === 1 ? '' : 's'}</div><p>${state.xp} XP · ${accuracy()}% lifetime accuracy · ${reviewsDue} memory review${reviewsDue===1?'':'s'} due</p></section>
       ${scoreProgressMarkup()}
       <section class="prep-v2-card wide">
@@ -436,6 +511,8 @@
       <section class="prep-v2-card"><div class="prep-v2-kicker">Confidence calibration</div><div class="prep-v2-metric">${confidenceAligned===null?'—':confidenceAligned+'%'}</div><p>${confidenceRows.length>=5?'A probability-calibration score showing whether confidence matches results.':`Rate confidence on ${5-confidenceRows.length} more practice question${5-confidenceRows.length===1?'':'s'} to unlock this signal.`}</p></section>
       <section class="prep-v2-card"><div class="prep-v2-kicker">Pacing Coach</div><div class="prep-v2-metric">${averageSeconds?averageSeconds+'s':'—'}</div><p>${averageSeconds?'Average response time; section-specific checkpoints appear in timed work.':'Complete a practice set to establish a pacing baseline.'}</p></section>
       <section class="prep-v2-card"><div class="prep-v2-kicker">Mastery Memory Engine</div><div class="prep-v2-metric">${reviewsDue}</div><p>Reviews due now on a 1, 3, 7, 14, then 30-day retention cycle.</p><div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.startMemoryReview()">Start memory review</button></div></section>
+      <section class="prep-v2-card full prep-v2-decision-profile"><div class="prep-v2-toolbar"><div><div class="prep-v2-kicker">Decision Profile Map</div><h2>Separate content gaps from pacing mistakes</h2></div><span class="prep-v2-chip ${timed.length>=12?'good':''}">${timed.length} timed decision${timed.length===1?'':'s'}</span></div>${timed.length?`<div class="prep-v2-quadrants"><article class="strong"><strong>${decisionProfile.fastAccurate}</strong><span>Fast + accurate</span><small>Fluent—keep this skill warm.</small></article><article class="good"><strong>${decisionProfile.deliberateAccurate}</strong><span>Careful + accurate</span><small>Correct; now look for a faster path.</small></article><article class="warn"><strong>${decisionProfile.rushedMiss}</strong><span>Fast + missed</span><small>Slow the recognition step.</small></article><article class="focus"><strong>${decisionProfile.deliberateMiss}</strong><span>Careful + missed</span><small>Relearn the underlying rule.</small></article></div><p class="prep-v2-muted">“Fast” means at or below your own ${Math.round(medianMs/1000)}-second median—not an arbitrary universal cutoff.</p>`:`<p>Complete timed practice to unlock your personal accuracy-versus-speed map. It uses your own median pace, so the coaching adapts as you improve.</p>`}</section>
+      ${publicDataMarkup(estimate)}
     </div>`;
   }
 
@@ -494,17 +571,19 @@
   function renderLearn() {
     const domains = [...new Set(data.topics[state.test].map(item => item.domain))];
     const desmosCard = state.test === 'sat' ? `<button class="prep-v2-domain" onclick="ScholarkPrep.openCourse('desmos')"><span class="prep-v2-chip good">12 visual lessons</span><h3>The Complete Desmos Strategy Course</h3><p>Interactive, unofficial digital SAT Math walkthroughs with a targeted problem after every strategy.</p></button>` : '';
-    app().innerHTML = `<div class="prep-v2-callout"><strong>Topic Academy:</strong> learn the tested idea, study a worked strategy, then launch a drill that updates the same mastery profile used by your plan.</div><section style="margin:22px 0"><h2 style="font-family:var(--font-display);margin-bottom:10px">Strategy courses</h2><div class="prep-v2-domain-grid">${desmosCard}<button class="prep-v2-domain" onclick="ScholarkPrep.openCourse('english')"><span class="prep-v2-chip good">12 rule systems</span><h3>English Rules That Actually Transfer</h3><p>Grammar, rhetoric, evidence, and inference decisions followed by targeted practice.</p></button></div></section>${domains.map(domain => `<section style="margin:22px 0"><h2 style="font-family:var(--font-display);margin-bottom:10px">${esc(domain)}</h2><div class="prep-v2-domain-grid">${data.topics[state.test].filter(item => item.domain === domain).map(item => { const m=mastery(item.id); return `<button class="prep-v2-domain" onclick="ScholarkPrep.openLesson('${item.id}')"><span class="prep-v2-chip ${masteryClass(m.score)}">${masteryLabel(m.score)} · ${Math.round(m.score)}%</span><h3>${esc(item.name)}</h3><p>${esc(item.lesson)}</p><div class="prep-v2-progress"><span style="width:${m.score}%"></span></div></button>`; }).join('')}</div></section>`).join('')}`;
+    app().innerHTML = `<div class="prep-v2-callout"><strong>Topic Academy:</strong> learn the tested idea, study a worked strategy, then launch a drill that updates the same mastery profile used by your plan.</div><section style="margin:22px 0"><h2 style="font-family:var(--font-display);margin-bottom:10px">Strategy courses</h2><div class="prep-v2-domain-grid">${desmosCard}<button class="prep-v2-domain" onclick="ScholarkPrep.openCourse('english')"><span class="prep-v2-chip good">12 rule systems</span><h3>English Rules That Actually Transfer</h3><p>Grammar, rhetoric, evidence, and inference decisions followed by targeted practice.</p></button><button class="prep-v2-domain prep-v2-pattern-card" onclick="ScholarkPrep.openCourse('patterns')"><span class="prep-v2-chip good">12 high-leverage patterns</span><h3>Pattern Recognition Playbook</h3><p>Fast SAT/ACT eliminations backed by grammar, logic, evidence, and math—with a practice drill after every pattern.</p></button></div></section>${domains.map(domain => `<section style="margin:22px 0"><h2 style="font-family:var(--font-display);margin-bottom:10px">${esc(domain)}</h2><div class="prep-v2-domain-grid">${data.topics[state.test].filter(item => item.domain === domain).map(item => { const m=mastery(item.id); return `<button class="prep-v2-domain" onclick="ScholarkPrep.openLesson('${item.id}')"><span class="prep-v2-chip ${masteryClass(m.score)}">${masteryLabel(m.score)} · ${Math.round(m.score)}%</span><h3>${esc(item.name)}</h3><p>${esc(item.lesson)}</p><div class="prep-v2-progress"><span style="width:${m.score}%"></span></div></button>`; }).join('')}</div></section>`).join('')}`;
   }
 
   function openCourse(courseId) {
     const course=strategyCourses[courseId]; if(!course)return;
-    app().innerHTML=`<section class="prep-v2-card full"><button class="prep-v2-secondary" onclick="ScholarkPrep.showView('learn')">← Topic Academy</button><div class="prep-v2-kicker" style="margin-top:18px">Structured strategy course</div><h2>${esc(course.title)}</h2><p>${esc(course.subtitle)}</p>${courseId==='desmos'?'<div class="prep-v2-callout">Desmos is a trademark of Desmos Studio PBC. This independent course is not sponsored or approved by Desmos or College Board.</div>':''}<div class="prep-v2-domain-grid" style="margin-top:18px">${course.lessons.map((lesson,index)=>`<button class="prep-v2-domain" onclick="ScholarkPrep.openCourseLesson('${courseId}',${index})"><span class="prep-v2-chip">Lesson ${index+1}</span><h3>${esc(lesson[0])}</h3><p>${esc(lesson[1])}</p></button>`).join('')}</div></section>`;
+    const sourceFooter=course.sources?.length?`<div class="prep-v2-source-footer"><strong>Rule references</strong><p>${course.sources.map(source=>`<a href="${esc(source[1])}" target="_blank" rel="noopener noreferrer">${esc(source[0])}</a>`).join(' · ')}</p><span>Scholark turns these public rules and specifications into original lessons and practice; it is not affiliated with the publishers.</span></div>`:'';
+    app().innerHTML=`<section class="prep-v2-card full"><button class="prep-v2-secondary" onclick="ScholarkPrep.showView('learn')">← Topic Academy</button><div class="prep-v2-kicker" style="margin-top:18px">Structured strategy course</div><h2>${esc(course.title)}</h2><p>${esc(course.subtitle)}</p>${courseId==='desmos'?'<div class="prep-v2-callout">Desmos is a trademark of Desmos Studio PBC. This independent course is not sponsored or approved by Desmos or College Board.</div>':''}<div class="prep-v2-domain-grid" style="margin-top:18px">${course.lessons.map((lesson,index)=>`<button class="prep-v2-domain" onclick="ScholarkPrep.openCourseLesson('${courseId}',${index})"><span class="prep-v2-chip">Lesson ${index+1}</span><h3>${esc(lesson[0])}</h3><p>${esc(lesson[1])}</p></button>`).join('')}</div>${sourceFooter}</section>`;
   }
 
   function openCourseLesson(courseId,index) {
     const course=strategyCourses[courseId], lesson=course?.lessons[index]; if(!lesson)return;
-    const isDesmos=courseId==='desmos', skillId=isDesmos?lesson[3]:lesson[2], steps=isDesmos?lesson[4]:lesson[3];
+    const isDesmos=courseId==='desmos',patternSkills={sat:['sat-rw-boundaries','sat-rw-boundaries','sat-rw-boundaries','sat-rw-form','sat-rw-form','sat-rw-form','sat-rw-transitions','sat-rw-inference','sat-rw-form','sat-math-linear-one','sat-math-systems','sat-rw-central'],act:['act-eng-punctuation','act-eng-punctuation','act-eng-punctuation','act-eng-usage','act-eng-usage','act-eng-sentence','act-eng-production','act-read-key','act-eng-language','act-math-algebra','act-math-functions','act-read-key']};
+    const skillId=courseId==='patterns'?patternSkills[state.test][index]:(isDesmos?lesson[3]:lesson[2]), steps=isDesmos?lesson[4]:lesson[3];
     app().innerHTML=`<section class="prep-v2-card full prep-v2-setup"><button class="prep-v2-secondary" onclick="ScholarkPrep.openCourse('${courseId}')">← ${esc(course.title)}</button><div class="prep-v2-kicker" style="margin-top:18px">Lesson ${index+1} of ${course.lessons.length}</div><h2>${esc(lesson[0])}</h2><p style="font-size:15px">${esc(lesson[1])}</p>${isDesmos?`<div class="prep-v2-graph-panel" style="margin-top:18px"><div class="prep-v2-kicker">Interactive visual</div><p class="prep-v2-muted">Example expression: <code>${esc(lesson[2])}</code>. Drag and zoom the graph, then open the calculator to change it.</p><canvas id="prep-graph" width="900" height="420" aria-label="Interactive graph for this lesson"></canvas><div class="prep-v2-graph-controls"><button class="prep-v2-secondary" onclick="ScholarkPrep.graphZoom(.75)">Zoom in</button><button class="prep-v2-secondary" onclick="ScholarkPrep.graphZoom(1.35)">Zoom out</button><button class="prep-v2-secondary" onclick="ScholarkPrep.renderCalculator()">Open full calculator</button><button class="prep-v2-secondary" onclick="ScholarkPrep.openDesmos()">Try in Desmos ↗</button><span id="prep-graph-coords" class="prep-v2-muted">Drag to pan</span></div></div>`:''}<h3 style="margin-top:20px">Repeatable method</h3><ol style="padding-left:20px;color:var(--ink2);line-height:1.8">${steps.map(step=>`<li>${esc(step)}</li>`).join('')}</ol><div class="prep-v2-callout"><strong>Your turn:</strong> solve a fresh question using the method before reading its explanation.</div><div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startSkill('${skillId}')">Start lesson practice</button><button class="prep-v2-secondary" onclick="ScholarkPrep.openCourseLesson('${courseId}',${Math.min(index+1,course.lessons.length-1)})">Next lesson →</button></div></section>`;
     if(isDesmos){graph.expression=lesson[2];graphReset();bindGraph();}
   }
@@ -512,15 +591,22 @@
   function openLesson(id) {
     const item = topic(id); if (!item) return;
     const examples = data.questions.filter(question => question.skill === id).slice(0,2);
-    app().innerHTML = `<section class="prep-v2-card full prep-v2-setup"><button class="prep-v2-secondary" onclick="ScholarkPrep.showView('learn')">← Topic Academy</button><div class="prep-v2-kicker" style="margin-top:18px">${esc(item.section)} · ${esc(item.domain)}</div><h2>${esc(item.name)}</h2><p style="font-size:15px">${esc(item.lesson)}</p><div class="prep-v2-callout"><strong>Best strategy</strong>${esc(item.strategy)}</div><h3 style="margin-top:20px">What mastery looks like</h3><p>You can recognize the underlying relationship, choose an efficient method, explain why the correct answer works, and avoid the most common distractor without relying on memorized wording.</p>${examples.length ? `<h3 style="margin-top:20px">Preview examples</h3>${examples.map(example => `<div style="padding:13px 0;border-bottom:1px solid var(--border)"><strong>${esc(example.stem)}</strong><div class="prep-v2-muted">Difficulty ${example.difficulty}/4 · full explanation appears after answering</div></div>`).join('')}` : '<p class="prep-v2-muted" style="margin-top:16px">New drills for this topic are in content review.</p>'}<div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startSkill('${id}')">Practice this topic</button></div></section>`;
+    const course=item.course;
+    app().innerHTML = `<section class="prep-v2-card full prep-v2-setup"><button class="prep-v2-secondary" onclick="ScholarkPrep.showView('learn')">← Topic Academy</button><div class="prep-v2-kicker" style="margin-top:18px">${esc(item.section)} · ${esc(item.domain)}</div><h2>${esc(item.name)}</h2><p style="font-size:16px">${esc(item.lesson)}</p><div class="prep-v2-callout"><strong>Recognition cue</strong>${esc(course?.recognize||item.strategy)}</div><div class="prep-v2-lesson-grid"><article><span>01</span><h3>Recognize</h3><p>${esc(item.lesson)}</p></article><article><span>02</span><h3>Execute</h3><p>${esc(course?.steps?.[0]||item.strategy)}</p></article><article><span>03</span><h3>Verify</h3><p>${esc(course?.steps?.[1]||'Check the result against the prompt.')}</p></article><article><span>04</span><h3>Transfer</h3><p>${esc(course?.steps?.[2]||'Solve a fresh question without reopening the explanation.')}</p></article></div><h3 style="margin-top:24px">Common traps</h3><ul class="prep-v2-trap-list">${(course?.traps||[]).map(trap=>`<li>${esc(trap)}</li>`).join('')}</ul><h3 style="margin-top:24px">Guided checkpoint preview</h3>${examples.length ? examples.map(example => `<div class="prep-v2-preview-question"><strong>${esc(example.stem)}</strong><div class="prep-v2-muted">Difficulty ${example.difficulty}/4 · deterministic hint ladder and choice diagnosis available during practice</div></div>`).join('') : '<p class="prep-v2-muted">New drills for this topic are in content review.</p>'}<div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startSkill('${id}')">Start guided mastery check</button><button class="prep-v2-secondary" onclick="ScholarkPrep.startMemoryReview()">Review due skills</button></div></section>`;
   }
 
   function renderTests() {
     const blueprint = data.blueprints[state.test];
     const available = testQuestions().length;
     const sat = state.test === 'sat';
+    const catalog=data.formCatalog?.[state.test]||[],completed=state.completedForms[state.test]||[],nextForm=catalog.find(form=>!completed.includes(form.id))||catalog[0];
     const sectionCards=(sat?[['Reading and Writing','54 questions · 64 minutes · two routed modules'],['Math','44 questions · 70 minutes · two routed modules']]:[['English','50 questions · 35 minutes'],['Math','45 questions · 50 minutes'],['Reading','36 questions · 40 minutes']]).map(([section,note])=>`<article class="prep-v2-card"><div class="prep-v2-kicker">Timed section</div><h3>${esc(section)}</h3><p>${esc(note)}</p><div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.startSectionTest('${section}')">Start section</button></div></article>`).join('');
-    app().innerHTML = `<div class="prep-v2-grid"><section class="prep-v2-card wide"><div class="prep-v2-kicker">Realistic test-day mode</div><h2>${blueprint.label} full simulation</h2><p>${esc(blueprint.note)}</p><div class="prep-v2-callout">Answers and explanations remain hidden until the end. You can navigate within the current section or module, flag questions, and resume after an accidental refresh. Scholark approximates official structure, timing, and ${sat?'SAT module routing':'ACT’s linear section order'}; it is not official scoring software.</div><div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startFullTest()">Start full ${blueprint.label}</button><button class="prep-v2-secondary" onclick="ScholarkPrep.openOfficialPractice()">Official practice resources ↗</button></div></section><section class="prep-v2-card"><div class="prep-v2-kicker">Original practice library</div><div class="prep-v2-metric">${available}</div><p>Validated ${blueprint.label} question variants currently available in Scholark.</p></section><section class="prep-v2-card full"><div class="prep-v2-kicker">Section simulations</div><h2>Train one official-length section at a time</h2><div class="prep-v2-grid" style="margin-top:14px">${sectionCards}</div></section>${!sat ? `<section class="prep-v2-card full"><div class="prep-v2-kicker">Optional ACT section</div><h3>Science · 40 questions · 40 minutes</h3><p>Science is separate from the enhanced ACT core composite. Start it as an optional section.</p><div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.startScienceTest()">Start ACT Science</button></div></section>` : ''}</div>`;
+    app().innerHTML = `<div class="prep-v2-grid"><section class="prep-v2-card wide prep-v2-test-hero"><div><div class="prep-v2-kicker">Realistic test-day mode</div><h2>${blueprint.label} full simulation</h2><p>${esc(blueprint.note)}</p><div class="prep-v2-callout">Answers and explanations remain hidden until the end. You can navigate within the current section or module, flag questions, and resume after an accidental refresh. Scholark approximates official structure, timing, and ${sat?'SAT module routing':'ACT’s linear section order'}; it is not official scoring software.</div><div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startFullTest('${esc(nextForm?.id||'')}')">Start ${esc(nextForm?.label||`full ${blueprint.label}`)}</button><button class="prep-v2-secondary" onclick="ScholarkPrep.openOfficialPractice()">Official practice resources ↗</button></div></div><div class="prep-v2-form-progress"><strong>${completed.length}/${catalog.length}</strong><span>registered forms completed</span><div class="prep-v2-progress"><span style="width:${catalog.length?completed.length/catalog.length*100:0}%"></span></div></div></section><section class="prep-v2-card"><div class="prep-v2-kicker">Original practice library</div><div class="prep-v2-metric">${available}</div><p>Validated ${blueprint.label} question variants currently available in Scholark.</p></section><section class="prep-v2-card full"><div class="prep-v2-toolbar"><div><div class="prep-v2-kicker">Registered form library</div><h2>${catalog.length} reproducible practice forms</h2><p>Every form has a stable ID and seed, so reassessments can be tracked instead of silently rebuilding a random test.</p></div><button class="prep-v2-secondary" onclick="ScholarkPrep.openFormLibrary()">Browse all forms</button></div><div class="prep-v2-form-row">${catalog.slice(0,6).map(form=>`<button class="prep-v2-form-pill ${completed.includes(form.id)?'complete':''}" onclick="ScholarkPrep.startFullTest('${form.id}')"><span>${completed.includes(form.id)?'✓ Complete':'Ready'}</span><strong>${esc(form.label.replace('Practice ',''))}</strong></button>`).join('')}</div></section><section class="prep-v2-card full"><div class="prep-v2-kicker">Section simulations</div><h2>Train one official-length section at a time</h2><div class="prep-v2-grid" style="margin-top:14px">${sectionCards}</div></section>${!sat ? `<section class="prep-v2-card full"><div class="prep-v2-kicker">Optional ACT section</div><h3>Science · 40 questions · 40 minutes</h3><p>Science is separate from the enhanced ACT core composite. Start it as an optional section.</p><div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.startScienceTest()">Start ACT Science</button></div></section>` : ''}${publicDataMarkup(practiceEstimate())}</div>`;
+  }
+
+  function openFormLibrary() {
+    const catalog=data.formCatalog?.[state.test]||[],completed=state.completedForms[state.test]||[];
+    app().innerHTML=`<section class="prep-v2-card full prep-v2-setup"><button class="prep-v2-secondary" onclick="ScholarkPrep.showView('tests')">← Test center</button><div class="prep-v2-kicker" style="margin-top:18px">Registered assessment library</div><h2>${data.blueprints[state.test].label} forms</h2><p>Choose any form directly. Completed forms remain available for retakes, while Scholark recommends an unseen form by default.</p><div class="prep-v2-form-library">${catalog.map(form=>`<article class="prep-v2-form-card ${completed.includes(form.id)?'complete':''}"><span class="prep-v2-chip ${completed.includes(form.id)?'good':''}">${completed.includes(form.id)?'Completed':'Unseen'}</span><h3>${esc(form.label)}</h3><p>${form.questions} questions · ${form.minutes} minutes · stable form ID</p><button class="prep-v2-primary" onclick="ScholarkPrep.startFullTest('${form.id}')">${completed.includes(form.id)?'Retake form':'Start form'}</button></article>`).join('')}</div></section>`;
   }
 
   function openOfficialPractice() {
@@ -603,13 +689,14 @@
     const minutes=state.test==='sat'?15:11;
     startSession('decision',questions,{feedback:false,label:'Test-Day Decision Simulator',timeLimit:minutes*60});
   }
-  function startFullTest() {
+  function startFullTest(formId) {
+    const catalog=data.formCatalog?.[state.test]||[],form=catalog.find(item=>item.id===formId)||catalog.find(item=>!(state.completedForms[state.test]||[]).includes(item.id))||catalog[0];
     if (state.test === 'sat') {
-      const formSeed=Date.now();
+      const formSeed=form?.seed||Date.now();
       const rw=buildModule(testQuestions().filter(q=>q.section==='Reading and Writing'),54,`sat-rw-${formSeed}`);
       const math=buildModule(testQuestions().filter(q=>q.section==='Math'),44,`sat-math-${formSeed}`);
       const selected=[...rw,...math];
-      startSession('exam',selected,{feedback:false,label:'Full Digital SAT',segments:[
+      startSession('exam',selected,{feedback:false,label:form?.label||'Full Digital SAT',formId:form?.id||null,segments:[
         {label:'Reading and Writing · Module 1',start:0,end:26,timeLimit:32*60,route:'mixed'},
         {label:'Reading and Writing · Module 2',start:27,end:53,timeLimit:32*60,route:'pending'},
         {label:'Math · Module 1',start:54,end:75,timeLimit:35*60,route:'mixed'},
@@ -624,9 +711,9 @@
       return;
     }
     const selected=[];
-    const formSeed=Date.now();
+    const formSeed=form?.seed||Date.now();
     Object.entries(requirements).forEach(([section,count])=>selected.push(...(section==='Reading'?buildActReadingSection(`act-${section}-${formSeed}`):section==='English'?buildActEnglishSection(`act-${section}-${formSeed}`):buildModule(testQuestions().filter(q=>q.section===section),count,`act-${section}-${formSeed}`))));
-    startSession('exam',selected,{feedback:false,label:'Full ACT',segments:[
+    startSession('exam',selected,{feedback:false,label:form?.label||'Full ACT',formId:form?.id||null,segments:[
       {label:'English',start:0,end:49,timeLimit:35*60,route:'linear'},
       {label:'Math',start:50,end:94,timeLimit:50*60,route:'linear'},
       {label:'Reading',start:95,end:130,timeLimit:40*60,route:'linear'}
@@ -697,13 +784,19 @@
     }).flat().map(question=>Object.assign({},question,{readingForm:form}));
   }
   function shuffle(values,seed=Date.now()) {
-    const result=values.slice(); let n=typeof seed==='number'?seed:String(seed).split('').reduce((s,c)=>s+c.charCodeAt(0),0);
+    const result=values.slice();
+    let n;
+    if(typeof seed==='number')n=seed>>>0;
+    else {
+      n=2166136261;
+      for(const character of String(seed)){n^=character.charCodeAt(0);n=Math.imul(n,16777619)>>>0;}
+    }
     for(let i=result.length-1;i>0;i--){n=(n*1664525+1013904223)>>>0;const j=n%(i+1);[result[i],result[j]]=[result[j],result[i]];} return result;
   }
 
   function startSession(kind, questions, options) {
     if (!questions.length) { if (typeof showToast === 'function') showToast('No validated questions are available for that selection yet.', 'error'); return; }
-    session={kind,questions,current:0,answers:new Array(questions.length).fill(null),confidence:new Array(questions.length).fill(null),hintsUsed:new Array(questions.length).fill(0),flags:[],startedAt:Date.now(),questionStartedAt:Date.now(),feedback:!!options.feedback,label:options.label||kind,timeLimit:options.timeLimit||null,segments:options.segments||null,segmentIndex:0,segmentStartedAt:Date.now(),finished:false,replaySources:options.replaySources||null,approaches:new Array(questions.length).fill(null),skipped:[],revisited:[],eliminated:new Array(questions.length).fill(null).map(()=>[]),notes:new Array(questions.length).fill('')};
+    session={kind,questions,current:0,answers:new Array(questions.length).fill(null),confidence:new Array(questions.length).fill(null),hintsUsed:new Array(questions.length).fill(0),flags:[],startedAt:Date.now(),questionStartedAt:Date.now(),feedback:!!options.feedback,label:options.label||kind,formId:options.formId||null,timeLimit:options.timeLimit||null,segments:options.segments||null,segmentIndex:0,segmentStartedAt:Date.now(),finished:false,replaySources:options.replaySources||null,approaches:new Array(questions.length).fill(null),skipped:[],revisited:[],eliminated:new Array(questions.length).fill(null).map(()=>[]),notes:new Array(questions.length).fill('')};
     state.view='practice'; updateChrome();
     saveSessionSnapshot();
     if(session.timeLimit) startTimer();
@@ -737,6 +830,8 @@
   }
 
   function guidedHint(question, level) {
+    const tailored=question.tutoring?.hints?.[level-1];
+    if(tailored)return tailored;
     const currentTopic=topic(question.skill);
     if(level===1)return currentTopic?.strategy||'Translate the question into one precise task before evaluating the choices.';
     if(question.section==='Math')return 'Write the relationship with units, estimate the result, then test the most plausible choices or graph the two sides. Keep restrictions from the original problem.';
@@ -775,9 +870,10 @@
     const replaySource=session.kind==='replay'?session.replaySources?.[session.current]:null;
     const decisionControls=session.kind==='decision'&&answer===null?`<div class="prep-v2-callout"><strong>Choose your approach before solving:</strong><div class="prep-v2-actions">${['manual','calculator','elimination'].map(method=>`<button class="prep-v2-secondary ${session.approaches[session.current]===method?'active':''}" onclick="ScholarkPrep.setApproach('${method}')">${method==='manual'?'Work manually':method==='calculator'?'Use calculator':'Eliminate choices'}</button>`).join('')}<button class="prep-v2-secondary" onclick="ScholarkPrep.skipQuestion()">Skip strategically →</button></div><span class="prep-v2-muted">Skipping is recorded as a decision, not an incorrect answer. Return before time expires to recover it.</span></div>`:'';
     const hintCount=session.hintsUsed?.[session.current]||0;
-    const hintPanel=session.feedback&&answer===null?`<div class="prep-v2-callout"><strong>Guided Hint Ladder</strong>${Array.from({length:hintCount},(_,index)=>`<p style="margin-top:7px"><strong>Hint ${index+1}:</strong> ${esc(guidedHint(q,index+1))}</p>`).join('')}<div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.showHint()" ${hintCount>=2?'disabled':''}>${hintCount===0?'Show first hint':hintCount===1?'Show deeper hint':'Hints used'}</button></div></div>`:'';
+    const hintPanel=session.feedback&&answer===null?`<div class="prep-v2-callout prep-v2-tutor"><strong>Deterministic Tutor · Hint Ladder</strong>${Array.from({length:hintCount},(_,index)=>`<div class="prep-v2-tutor-step"><span>${index+1}</span><p>${esc(guidedHint(q,index+1))}</p></div>`).join('')}<div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.showHint()" ${hintCount>=3?'disabled':''}>${hintCount===0?'Show strategy cue':hintCount===1?'Show setup guidance':hintCount===2?'Show evidence check':'Hints used'}</button></div></div>`:'';
+    const choiceReview=revealed&&q.tutoring?.choiceFeedback?`<details class="prep-v2-choice-review"><summary>Why every choice works or fails</summary>${q.tutoring.choiceFeedback.map((feedback,index)=>`<article class="${index===q.answer?'correct':''}"><strong>${letters[index]} · ${esc(feedback.label)}</strong><p>${esc(feedback.feedback)}</p></article>`).join('')}</details>`:'';
     app().innerHTML=`<div class="prep-v2-toolbar"><div><strong>${esc(segment?.label||session.label)}</strong><div class="prep-v2-muted">${esc(q.section)} · Question ${session.current-bounds.start+1} of ${bounds.end-bounds.start+1}${segment?' in this module/section':''}</div></div><div style="display:flex;align-items:center;gap:10px">${elapsed!==null?`<span class="prep-v2-timer" id="prep-session-timer">${formatTime(elapsed)}</span>`:''}<button class="prep-v2-secondary" onclick="ScholarkPrep.finishSession(true)">End session</button></div></div>
-      <div class="prep-v2-question-shell"><main class="prep-v2-question"><div class="prep-v2-qmeta"><span class="prep-v2-chip">${esc(q.exam.toUpperCase())}</span><span class="prep-v2-chip">${esc(currentTopic?.name||q.skill)}</span><span class="prep-v2-chip">Difficulty ${q.difficulty}/4</span>${q.calculator?'<span class="prep-v2-chip good">Calculator permitted</span>':''}${session.skipped.includes(session.current)?'<span class="prep-v2-chip focus">Returned skip</span>':''}</div>${replaySource?`<div class="prep-v2-callout"><strong>Fresh transfer check:</strong> this is a different question targeting the same skill as a saved <em>${esc(replaySource.errorType)}</em>.</div>`:''}${q.passage?`<div class="prep-v2-passage">${esc(q.passage)}</div>`:''}<div class="prep-v2-stem">${esc(q.stem)}</div>${decisionControls}${session.kind!=='exam'&&session.kind!=='decision'?`<div class="prep-v2-muted" style="margin-bottom:9px">Before answering, how confident are you? ${['low','medium','high'].map(level=>`<button class="prep-v2-chip ${session.confidence[session.current]===level?'good':''}" onclick="ScholarkPrep.setConfidence('${level}')" ${answer!==null?'disabled':''}>${level[0].toUpperCase()+level.slice(1)}</button>`).join('')}</div>`:''}${hintPanel}<div class="prep-v2-options">${q.options.map((option,index)=>{let cls=answer===index?' selected':'';if(session.eliminated[session.current]?.includes(index))cls+=' eliminated';if(revealed&&index===q.answer)cls+=' correct';if(revealed&&answer===index&&index!==q.answer)cls+=' wrong';return `<div class="prep-v2-option-row"><button class="prep-v2-option${cls}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.answer(${index})"><span class="prep-v2-letter">${letters[index]}</span><span>${esc(option)}</span></button><button class="prep-v2-eliminate ${session.eliminated[session.current]?.includes(index)?'active':''}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.toggleEliminate(${index})" aria-label="${session.eliminated[session.current]?.includes(index)?'Restore':'Eliminate'} choice ${letters[index]}">×</button></div>`;}).join('')}</div>${revealed?`<div class="prep-v2-explanation"><strong>${answer===q.answer?'Correct':'Not quite'} · ${esc(currentTopic?.name||'Explanation')}</strong>${esc(q.explanation)}<div style="margin-top:7px"><strong>Strategy:</strong> ${esc(currentTopic?.strategy||'Verify the relationship asked for before selecting a choice.')}</div></div>`:''}<details class="prep-v2-scratch"><summary>Scratchpad / annotation</summary><label class="sr-only" for="prep-note">Notes for this question</label><textarea id="prep-note" rows="4" placeholder="Write evidence, equations, or a reminder…" oninput="ScholarkPrep.updateNote(this.value)">${esc(session.notes[session.current]||'')}</textarea></details><div class="prep-v2-muted prep-v2-shortcuts">Keyboard: 1–4 answer · ←/→ navigate · F flag</div><div class="prep-v2-toolbar"><button class="prep-v2-secondary" onclick="ScholarkPrep.previous()" ${session.current===bounds.start?'disabled':''}>← Previous</button><div><button class="prep-v2-secondary" onclick="ScholarkPrep.toggleFlag()">${session.flags.includes(session.current)?'★ Flagged':'☆ Flag'}</button> <button class="prep-v2-primary" onclick="ScholarkPrep.next()">${session.current===bounds.end?(segment&&session.segmentIndex<session.segments.length-1?'End module / section':'Finish'):'Next →'}</button></div></div></main>
+      <div class="prep-v2-question-shell"><main class="prep-v2-question"><div class="prep-v2-qmeta"><span class="prep-v2-chip">${esc(q.exam.toUpperCase())}</span><span class="prep-v2-chip">${esc(currentTopic?.name||q.skill)}</span><span class="prep-v2-chip">Difficulty ${q.difficulty}/4</span>${q.calculator?'<span class="prep-v2-chip good">Calculator permitted</span>':''}${session.skipped.includes(session.current)?'<span class="prep-v2-chip focus">Returned skip</span>':''}</div>${replaySource?`<div class="prep-v2-callout"><strong>Fresh transfer check:</strong> this is a different question targeting the same skill as a saved <em>${esc(replaySource.errorType)}</em>.</div>`:''}${q.passage?`<div class="prep-v2-passage">${esc(q.passage)}</div>`:''}<div class="prep-v2-stem">${esc(q.stem)}</div>${decisionControls}${session.kind!=='exam'&&session.kind!=='decision'?`<div class="prep-v2-muted" style="margin-bottom:9px">Before answering, how confident are you? ${['low','medium','high'].map(level=>`<button class="prep-v2-chip ${session.confidence[session.current]===level?'good':''}" onclick="ScholarkPrep.setConfidence('${level}')" ${answer!==null?'disabled':''}>${level[0].toUpperCase()+level.slice(1)}</button>`).join('')}</div>`:''}${hintPanel}<div class="prep-v2-options">${q.options.map((option,index)=>{let cls=answer===index?' selected':'';if(session.eliminated[session.current]?.includes(index))cls+=' eliminated';if(revealed&&index===q.answer)cls+=' correct';if(revealed&&answer===index&&index!==q.answer)cls+=' wrong';return `<div class="prep-v2-option-row"><button class="prep-v2-option${cls}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.answer(${index})"><span class="prep-v2-letter">${letters[index]}</span><span>${esc(option)}</span></button><button class="prep-v2-eliminate ${session.eliminated[session.current]?.includes(index)?'active':''}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.toggleEliminate(${index})" aria-label="${session.eliminated[session.current]?.includes(index)?'Restore':'Eliminate'} choice ${letters[index]}">×</button></div>`;}).join('')}</div>${revealed?`<div class="prep-v2-explanation"><strong>${answer===q.answer?'Correct':'Not quite'} · ${esc(currentTopic?.name||'Explanation')}</strong>${esc(q.explanation)}<div style="margin-top:7px"><strong>Strategy:</strong> ${esc(currentTopic?.strategy||'Verify the relationship asked for before selecting a choice.')}</div></div>${choiceReview}`:''}<details class="prep-v2-scratch"><summary>Scratchpad / annotation</summary><label class="sr-only" for="prep-note">Notes for this question</label><textarea id="prep-note" rows="4" placeholder="Write evidence, equations, or a reminder…" oninput="ScholarkPrep.updateNote(this.value)">${esc(session.notes[session.current]||'')}</textarea></details><div class="prep-v2-muted prep-v2-shortcuts">Keyboard: 1–4 answer · ←/→ navigate · F flag</div><div class="prep-v2-toolbar"><button class="prep-v2-secondary" onclick="ScholarkPrep.previous()" ${session.current===bounds.start?'disabled':''}>← Previous</button><div><button class="prep-v2-secondary" onclick="ScholarkPrep.toggleFlag()">${session.flags.includes(session.current)?'★ Flagged':'☆ Flag'}</button> <button class="prep-v2-primary" onclick="ScholarkPrep.next()">${session.current===bounds.end?(segment&&session.segmentIndex<session.segments.length-1?'End module / section':'Finish'):'Next →'}</button></div></div></main>
       <aside class="prep-v2-side"><div class="prep-v2-sidebox"><h4>Question map</h4><div class="prep-v2-map">${session.questions.slice(bounds.start,bounds.end+1).map((item,offset)=>{const index=bounds.start+offset;return `<button class="${index===session.current?'current ':''}${session.answers[index]!==null?'done ':''}${session.flags.includes(index)?'flagged':''}" onclick="ScholarkPrep.goTo(${index})">${offset+1}</button>`;}).join('')}</div></div>${pacingCoachMarkup(bounds,elapsed)}<div class="prep-v2-sidebox"><h4>${esc(currentTopic?.name||'Current skill')}</h4><p>${esc(currentTopic?.lesson||'Use the information given to choose the best-supported answer.')}</p>${q.calculator?'<div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.openCalculatorDuringSession()">Open calculator</button></div>':''}</div><div class="prep-v2-sidebox"><h4>Saved automatically</h4><p>Answers and mastery updates are stored after each response. Signed-in progress also syncs to your account.</p></div></aside></div>`;
     if(q.figure){const stem=app().querySelector?.('.prep-v2-stem');if(stem)stem.insertAdjacentHTML('beforebegin',figureMarkup(q.figure));}
   }
@@ -794,7 +890,7 @@
     renderSession();
   }
   function setConfidence(level){if(!session||session.answers[session.current]!==null||!['low','medium','high'].includes(level))return;session.confidence[session.current]=level;saveSessionSnapshot();renderSession();}
-  function showHint(){if(!session||!session.feedback||session.answers[session.current]!==null)return;session.hintsUsed[session.current]=Math.min(2,(session.hintsUsed[session.current]||0)+1);saveSessionSnapshot();renderSession();}
+  function showHint(){if(!session||!session.feedback||session.answers[session.current]!==null)return;session.hintsUsed[session.current]=Math.min(3,(session.hintsUsed[session.current]||0)+1);saveSessionSnapshot();renderSession();}
   function adaptDiagnosticNext(){
     const nextIndex=session.current+1;
     if(nextIndex>=session.questions.length||session.answers[nextIndex]!==null)return;
@@ -868,7 +964,7 @@
     const preference=rate>=.6?'hard':'easier';
     const section=session.questions[completed.start].section;
     const excluded=new Set(session.questions.filter((q,index)=>index<nextSegment.start||index>nextSegment.end).map(q=>q.id));
-    const replacement=buildModule(testQuestions().filter(q=>q.section===section),nextSegment.end-nextSegment.start+1,`${section}-${preference}-${Date.now()}`,preference,excluded);
+    const replacement=buildModule(testQuestions().filter(q=>q.section===section),nextSegment.end-nextSegment.start+1,`${session.formId||session.startedAt}-${section}-${preference}`,preference,excluded);
     replacement.forEach((question,offset)=>{session.questions[nextSegment.start+offset]=question;session.answers[nextSegment.start+offset]=null;});
     nextSegment.route=preference;
   }
@@ -885,10 +981,14 @@
     if(finished.kind==='diagnostic') {
       state.diagnostic[state.test]={completedAt:new Date().toISOString(),correct,total:finished.questions.length,answered,accuracy:accuracyValue,weakest:weakestTopics(5).map(item=>item.id)};
       recordScoreCheckpoint('diagnostic',`${state.test.toUpperCase()} diagnostic`,accuracyValue);
-    } else if(finished.kind==='exam'&&(/^Full Digital SAT$|^Full ACT$/).test(finished.label)) {
+    }
+    const completedRegisteredForm=finished.kind==='exam'&&finished.formId&&answered===finished.questions.length;
+    if(completedRegisteredForm) {
+      if(!state.completedForms[state.test].includes(finished.formId))state.completedForms[state.test].push(finished.formId);
       recordScoreCheckpoint('full-test',finished.label,accuracyValue);
     }
     saveState();
+    const sessionEstimate=completedRegisteredForm?practiceEstimate():null;
     const breakdown={}; finished.questions.forEach((q,index)=>{const key=q.domain;breakdown[key]??={total:0,correct:0};breakdown[key].total++;if(finished.answers[index]===q.answer)breakdown[key].correct++;});
     if(finished.kind==='decision'){
       const skipped=finished.skipped.length,recovered=finished.skipped.filter(index=>finished.answers[index]!==null).length;
@@ -910,7 +1010,7 @@
     const slowest=Object.entries(skillTimes).sort((a,b)=>b[1].total/b[1].count-a[1].total/a[1].count)[0];
     const hintTotal=completedRows.reduce((sum,row)=>sum+(Number(row.hintsUsed)||0),0);
     const pacingReport=completedRows.length?`<div class="prep-v2-callout"><strong>Session behavior:</strong> ${averageTime}s average per answered question${slowest?` · slowest recurring skill: ${esc(topic(slowest[0])?.name||slowest[0])} (${Math.round(slowest[1].total/slowest[1].count/1000)}s average)`:''} · ${hintTotal} guided hint${hintTotal===1?'':'s'} used.</div>`:'';
-    app().innerHTML=`<section class="prep-v2-card full prep-v2-setup"><div class="prep-v2-kicker">Session complete</div><h2>${esc(finished.label)}</h2><div class="prep-v2-grid" style="margin-top:18px"><div class="prep-v2-card"><div class="prep-v2-metric">${correct}/${finished.questions.length}</div><p>Correct</p></div><div class="prep-v2-card"><div class="prep-v2-metric">${accuracyValue}%</div><p>Answered accuracy</p></div><div class="prep-v2-card"><div class="prep-v2-metric">${finished.flags.length}</div><p>Flagged</p></div></div>${pacingReport}<h3 style="margin-top:22px">Domain breakdown</h3>${Object.entries(breakdown).map(([domain,row])=>`<div class="prep-v2-mastery-row"><span>${esc(domain)}</span><div class="prep-v2-progress"><span style="width:${Math.round(row.correct/row.total*100)}%"></span></div><strong>${row.correct}/${row.total}</strong></div>`).join('')}<div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.showView('dashboard')">View updated plan</button><button class="prep-v2-secondary" onclick="ScholarkPrep.startAdaptive()">Practice priorities</button></div></section>`;
+    app().innerHTML=`<section class="prep-v2-card full prep-v2-setup"><div class="prep-v2-kicker">Session complete</div><h2>${esc(finished.label)}</h2><div class="prep-v2-grid prep-v2-result-grid" style="margin-top:18px"><div class="prep-v2-card"><div class="prep-v2-metric">${correct}/${finished.questions.length}</div><p>Correct</p></div><div class="prep-v2-card"><div class="prep-v2-metric">${accuracyValue}%</div><p>Answered accuracy</p></div>${sessionEstimate?`<div class="prep-v2-card prep-v2-score-result"><div class="prep-v2-kicker">Scholark stability band</div><div class="prep-v2-metric">${sessionEstimate.label}</div><p>${state.test==='sat'?'20-point':'2-point'} headline band using the public-prior model and this complete form. Not an official score.</p></div>`:`<div class="prep-v2-card"><div class="prep-v2-metric">${finished.flags.length}</div><p>Flagged</p></div>`}</div>${sessionEstimate?`<details class="prep-v2-methodology"><summary>How this estimate was produced</summary><p>Scholark uses official-public test structure, module routing, content-domain coverage, and provisional item-response priors. College Board states that digital SAT scores depend on item characteristics and response patterns—not raw correct count alone. ACT states that raw scores are converted so results have the same meaning across forms. Their operational equating parameters are not public, so this remains an independent estimate.</p><p class="prep-v2-muted">Broader 80% model interval: ${sessionEstimate.uncertaintyLow}–${sessionEstimate.uncertaintyHigh}. The headline stability band is intentionally capped for decision-friendly display and should be checked against official Bluebook or ACT practice.</p></details>`:''}${pacingReport}<h3 style="margin-top:22px">Domain breakdown</h3>${Object.entries(breakdown).map(([domain,row])=>`<div class="prep-v2-mastery-row"><span>${esc(domain)}</span><div class="prep-v2-progress"><span style="width:${Math.round(row.correct/row.total*100)}%"></span></div><strong>${row.correct}/${row.total}</strong></div>`).join('')}<div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.showView('dashboard')">View updated plan</button><button class="prep-v2-secondary" onclick="ScholarkPrep.startAdaptive()">Practice priorities</button></div></section>`;
   }
   function startTimer(){stopTimer();timerId=setInterval(()=>{if(!session||(session.timeLimit==null&&!session.segments?.length))return stopTimer();const left=remainingSegmentSeconds();const el=document.getElementById('prep-session-timer');if(el&&left!==null)el.textContent=formatTime(left);if(left!==null&&left<=0)advanceSegment(true);},1000);}
   function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
@@ -954,7 +1054,7 @@
   function openCalculatorDuringSession(){if(!session)return;renderCalculator();}
   function returnToSession(){if(session)renderSession();}
 
-  const API={init,setTest,showView,savePlan,openPlanStudio,applyPlanScenario,startDiagnostic,startAdaptive,startMemoryReview,startSkill,startPractice,startMistakes,startMisconceptionReplay,startDecisionSimulator,openLesson,openCourse,openCourseLesson,startFullTest,startSectionTest,startScienceTest,openOfficialPractice,answer,setConfidence,showHint,setApproach,skipQuestion,previous,next,goTo,toggleFlag,toggleEliminate,updateNote,finishSession,renderCalculator,calcPreview,calcKey,plotExpression,findRoots,graphZoom,graphReset,openDesmos,openCalculatorDuringSession,returnToSession,getPracticeEstimate:practiceEstimate,selectScorePoint};
+  const API={init,setTest,showView,savePlan,openPlanStudio,applyPlanScenario,startDiagnostic,startAdaptive,startMemoryReview,startSkill,startPractice,startMistakes,startMisconceptionReplay,startDecisionSimulator,openLesson,openCourse,openCourseLesson,startFullTest,startSectionTest,startScienceTest,openFormLibrary,openOfficialPractice,answer,setConfidence,showHint,setApproach,skipQuestion,previous,next,goTo,toggleFlag,toggleEliminate,updateNote,finishSession,renderCalculator,calcPreview,calcKey,plotExpression,findRoots,graphZoom,graphReset,openDesmos,openCalculatorDuringSession,returnToSession,getPracticeEstimate:practiceEstimate,selectScorePoint};
   window.ScholarkPrep=API;
   window.initPrep=init;
   window.setPrepSubject=function(){};

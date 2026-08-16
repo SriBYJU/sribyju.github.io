@@ -64,7 +64,7 @@ const criteria = [
 
   award('calibration','Public-data priors and Bayesian calibration',7,questions.every(question=>question.calibration?.version===data.calibrationVersion)&&/function practiceEstimate/.test(appSource)?7:0,`${data.calibrationVersion}; versioned per-item priors and 3PL-style posterior grid`),
   award('quarantine','Automatic item quarantine and minimum-sample rules',4,/quarantineThreshold/.test(appSource)&&/function questionIsEligible/.test(appSource)?4:0,'minimum-sample, accuracy, discrimination, and explicit-status gates'),
-  award('score-ranges','Uncertainty-aware estimated score ranges',3,/lowerTheta/.test(appSource)&&/not official scoring/.test(appSource)&&/Independent practice range/.test(appSource)?3:0,'80% uncertainty interval with evidence label and non-official disclosure'),
+  award('score-ranges','Decision-friendly band with transparent model uncertainty',3,/lowerTheta/.test(appSource)&&/not official scoring/.test(appSource)&&/Scholark stability band/.test(appSource)&&/80% model interval/.test(appSource)?3:0,'narrow completed-form headline plus separate 80% model interval and non-official disclosure'),
 
   award('adaptive','Mastery, memory, confidence, pacing, and replay',5,['reviewIsDue','Confidence calibration','Pacing Coach','Misconception Replay'].every(token=>appSource.includes(token))?5:0,'five coaching signals present'),
   award('testing-ux','Professional testing controls and analytics',4,['Question map','toggleFlag','Session behavior','toggleEliminate','updateNote','scoreProgressMarkup'].every(token=>appSource.includes(token))?4:0,'question map, flags, eliminator, scratchpad, pacing analytics, and progress timeline'),

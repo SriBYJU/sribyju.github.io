@@ -86,9 +86,9 @@ test('core sections have at least two nonrepeating full-form pools', () => {
   }
 });
 
-test('ACT Reading includes fifteen passage-aligned enhanced-format forms', () => {
+test('ACT Reading includes twenty passage-aligned enhanced-format forms', () => {
   const grouped = Object.groupBy(data.questions.filter(question => question.passageSet), question => question.readingForm);
-  assert.equal(Object.keys(grouped).length, 15);
+  assert.equal(Object.keys(grouped).length, 20);
   for (const [form, questions] of Object.entries(grouped)) {
     assert.equal(questions.length, 36, `ACT Reading form ${form} must contain 36 questions`);
     const sets = Object.groupBy(questions, question => question.passageSet);
@@ -98,6 +98,67 @@ test('ACT Reading includes fifteen passage-aligned enhanced-format forms', () =>
       assert.ok(rows[0].passage.trim().split(/\s+/).length >= 500, `${set} needs a sustained college-readiness passage`);
       assert.equal(new Set(rows.map(row => row.passage)).size, 1, `${set} questions must share one passage`);
     }
+  }
+});
+
+test('every item has complete deterministic tutoring and assessment-pool metadata', () => {
+  assert.equal(data.tutoringVersion, 'deterministic-tutor-v2');
+  for (const question of data.questions) {
+    assert.equal(question.tutoring?.version, data.tutoringVersion, `${question.id} has the wrong tutor version`);
+    assert.ok(question.tutoring.hints.length >= 3, `${question.id} needs a three-step hint ladder`);
+    assert.ok(question.tutoring.solutionPath.length >= 3, `${question.id} needs a worked solution path`);
+    assert.equal(question.tutoring.choiceFeedback.length, 4, `${question.id} needs feedback for every choice`);
+    assert.equal(question.tutoring.choiceFeedback.filter(row => row.status === 'correct').length, 1, `${question.id} must identify exactly one correct choice`);
+    question.tutoring.choiceFeedback.forEach((row,index) => {
+      if (row.status === 'distractor') assert.ok(row.feedback.includes(`“${question.options[index].slice(0,Math.min(97,question.options[index].length))}`), `${question.id} choice ${index+1} feedback must name the actual option`);
+    });
+    assert.ok(question.tutoring.evidenceGuide.length >= 20, `${question.id} needs an evidence guide`);
+    assert.equal(question.tutoring.transferSkill, question.skill, `${question.id} must transfer to its tested skill`);
+    assert.ok(['assessment-reserved','dual-use'].includes(question.usagePool), `${question.id} has an invalid usage pool`);
+  }
+});
+
+test('standard-English convention items use the correct skill taxonomy', () => {
+  assert.equal(data.questions.find(question => question.id === 'sat-conv-10').skill, 'sat-rw-form');
+  assert.equal(data.questions.find(question => question.id === 'act-conv-10').skill, 'act-eng-sentence');
+  assert.match(data.questions.find(question => question.id === 'sat-conv-10').tutoring.choiceFeedback.find(row => row.status === 'distractor').label, /modifier/);
+});
+
+test('every blueprint topic has a structured lesson and checkpoint practice', () => {
+  for (const topic of Object.values(data.topics).flat()) {
+    assert.equal(topic.course?.version, 'topic-course-v1', `${topic.id} has the wrong course version`);
+    assert.ok(topic.course.recognize.length >= 20, `${topic.id} needs a recognition rule`);
+    assert.ok(topic.course.steps.length >= 3, `${topic.id} needs at least three execution steps`);
+    assert.ok(topic.course.traps.length >= 3, `${topic.id} needs at least three common traps`);
+    assert.ok(topic.course.checkpointQuestionIds.length >= 3, `${topic.id} needs checkpoint items`);
+    for (const id of topic.course.checkpointQuestionIds) assert.ok(data.questions.some(question => question.id === id), `${topic.id} references missing checkpoint ${id}`);
+  }
+});
+
+test('registered form catalogs are stable, unique, and deep', () => {
+  assert.equal(data.formCatalog.sat.length, 30);
+  assert.equal(data.formCatalog.act.length, 20);
+  for (const exam of ['sat','act']) {
+    const forms = data.formCatalog[exam];
+    assert.equal(new Set(forms.map(form => form.id)).size, forms.length, `${exam} form IDs must be unique`);
+    assert.equal(new Set(forms.map(form => form.seed)).size, forms.length, `${exam} form seeds must be unique`);
+    for (const form of forms) {
+      assert.equal(form.exam, exam);
+      assert.ok(typeof form.seed === 'string' && form.seed.length >= 12);
+      assert.ok(form.questions > 90);
+      assert.ok(form.minutes >= 120);
+    }
+  }
+});
+
+test('public benchmark cards have dated, attributable source links', () => {
+  const benchmarks = Object.values(data.publicBenchmarks).flatMap(value => Array.isArray(value) ? value : [value]).filter(value => value && typeof value === 'object');
+  assert.ok(benchmarks.length >= 3);
+  for (const benchmark of benchmarks) {
+    if (!benchmark.sourceUrl) continue;
+    assert.match(benchmark.sourceUrl, /^https:\/\//);
+    assert.ok(benchmark.source);
+    assert.ok(benchmark.year);
   }
 });
 

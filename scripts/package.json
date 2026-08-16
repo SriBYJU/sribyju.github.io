@@ -6,7 +6,9 @@
     "check": "node --check send-weekly-email.js",
     "test": "node --test",
     "prep:audit": "node prep-quality-audit.js",
-    "prep:release": "node prep-quality-audit.js --release"
+    "prep:release": "node prep-quality-audit.js --release",
+    "prep:market-audit": "node prep-market-quality-audit.js",
+    "prep:market-release": "node prep-market-quality-audit.js --release"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",
