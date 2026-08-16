@@ -1,57 +1,61 @@
 ---
 name: testing-scholark
-description: Test Scholark app end-to-end. Covers local server setup, auth flows, Pro feature gating, SAT/ACT Prep, essay save/load, and UI verification.
+description: Test Scholark app end-to-end. Covers local server setup, free authenticated access, SAT/ACT Prep, cloud/local persistence, and responsive UI verification.
 ---
 
 # Testing Scholark
 
 ## Local Server Setup
 
-1. Start a local server from the repo root:
+1. Start a local server from the repository root:
    ```bash
-   cd /home/ubuntu/repos/GradeScope && python3 -m http.server 8080 &
+   python -m http.server 8080
    ```
-2. Verify: `curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/index.html` should return `200`
-3. The entire app is a single `index.html` file — all HTML, CSS, and JS in one file
+2. Verify that `http://localhost:8080/index.html` returns `200`.
+3. Use `http://localhost:8080/scripts/prep-browser-harness.html` for SAT/ACT browser QA without a network account. The harness runs the production prep engine with a local test identity.
+4. Run the repository checks from `scripts/` with `npm ci`, `npm test`, and `npm run prep:market-release`.
 
 ## Auth Testing
 
-- **Admin account**: `admin@scholark.app` / `Scholark2026!` (has Pro access)
-- `isPro()` checks `window.currentUser?.email === 'admin@scholark.app'`
-- After login, nav should show "Admin ▾" (or display name + ▾) instead of "Sign In"
-- Auth state comes from Firebase — the `onAuthStateChanged` handler updates `window.currentUser`
-- **Gotcha**: If you sign in/out without navigating away from the current page section, some UI elements (like exam card onclick handlers) may have stale state. Navigate away and back to force re-render via the section's `init` function
+- Do not place test passwords or private credentials in this file, test output, browser JavaScript, or commits.
+- Auth state comes from Firebase Authentication; the `onAuthStateChanged` handler updates `window.currentUser`.
+- Signed-in users should have access to every existing feature. There are no Pro, trial, subscription, payment, or locked-feature gates.
+- Sign-in remains required where a feature needs a user identity for saving or syncing.
+- Verify email/password and at least one federated provider in a staging-safe session when credentials are available.
+- After sign-in, the navigation should show the account display name instead of "Sign In" and saving should target that user's UID.
 
-## Pro Feature Gating
+## Free-Access Verification
 
-- Pro features: AI Essay Coach, College Quiz, AI Counselor, Full Practice Exams (SAT/ACT)
-- Non-Pro users should see a toast: "This feature requires a Pro subscription. Upgrade to access full practice exams!"
-- Pro gate exists in two layers: (1) card onclick handler in render functions, (2) defensive check inside the feature function itself (e.g. `startExam()`)
-- To test Pro gate: sign out → navigate to feature → click the locked card → verify toast appears and feature does NOT activate
+- Search visible UI and source for obsolete Pro, upgrade, trial, subscription, payment, locked-feature, and Stripe checkout messaging.
+- Confirm a signed-in non-admin account can open the essay coach, admissions counselor, college quiz, SAT/ACT full forms, study planner, and college application tools.
+- Confirm signed-out users receive an understandable sign-in request only for identity-dependent saving/syncing.
 
 ## SAT/ACT Prep Testing
 
-- **Practice questions**: 66 total (26 easy, 20 medium, 20 hard) across Math, Reading, Writing
-- **Difficulty filters**: Easy (🟢 1x XP), Medium (🟡 1.5x XP), Hard (🔴 2x XP)
-- **XP tracking**: Correct answer = 10 × multiplier. Stats stored in `localStorage` key `gs_prep_state`
-- **Full SAT Exam** (Pro): 20 questions, 50 min timer
-- **Full ACT Exam** (Pro): 40 questions, 55 min timer
-- **Gotcha**: Native `confirm()` dialogs (e.g. "End Exam" button) block browser tool interactions. Dismiss with `xdotool key Return` from shell
-- To clear prep state for fresh testing: `localStorage.removeItem('gs_prep_state')` in browser console
+- **Question bank**: 7,444 original items — 3,200 SAT and 4,244 ACT.
+- **Registered forms**: 30 reproducible SAT forms and 20 reproducible ACT forms.
+- Verify diagnostic, targeted practice, Learn courses, Test Center, calculator, result review, mistake replay, and progress graph.
+- Confirm every question has three tutoring hints, a solution path, and feedback for all four choices.
+- Confirm registered form IDs and seeds are stable, SAT module routing is reproducible, and abandoning a form does not count as completion.
+- Confirm a completed full SAT form shows at most a 20-point headline stability band; ACT shows at most 2 points. Broader model uncertainty and the non-official-score disclosure must remain visible.
+- Test answer choice, elimination, flagging, scratchpad, previous/next, question map, and keyboard shortcuts (`1`–`4`, arrows, `F`).
+- Prep state is versioned in `localStorage` under the `gs_prep_v2_` prefix; use a new localhost origin or a fresh browser profile for a clean browser run rather than deleting user data.
 
 ## Essay Save/Load Testing
 
-- Essays save to `localStorage` keyed by user UID
-- Test flow: write essay → save → sign out → sign in → verify essay in saved list → load → verify text restored → delete → verify removed
-- Firestore sync may hang due to security rules — localStorage is the primary storage
+- Test flow: write essay → save → verify saved list → load → edit → save → permanently delete → verify it is gone locally and from Firestore.
+- Verify legacy local essay IDs migrate safely to the Firestore document ID without duplicating or losing content.
+- Force a Firestore failure and verify the UI reports the cloud-sync error, retains the safe local copy where supported, and never shows a false successful-cloud-save message.
+- Repeat cloud/local fallback checks for study-planner tasks, college applications, and calculator result saving/deletion.
 
 ## Common Gotchas
 
-- **Stale UI after auth change**: Section-specific UI (exam cards, Pro badges) doesn't auto-update on sign-in/out. Navigate away and back to trigger the section's init function
-- **Firestore offline errors**: Firestore may show offline/timeout errors in console — this is expected if security rules aren't configured. Features fall back to localStorage
-- **Dark mode**: Toggle at bottom-right corner. State persists in localStorage key `gs_dark_mode`
-- **Mobile testing**: Use browser DevTools to set viewport to 375px width for phone simulation
+- Native `confirm()` appears when ending an active timed form. In automated browser tests, handle the dialog explicitly; do not click the button blindly.
+- Firestore offline or permission errors must be surfaced clearly. A local fallback is acceptable only when the feature explicitly supports it.
+- Test corrupted and legacy `localStorage` payloads; parsing must fall back safely without erasing valid data.
+- Test at desktop width and at a phone viewport such as 390×844. Verify no horizontal overflow and that the timer, answers, navigation, question map, lessons, charts, and source disclosures remain usable.
+- Check browser console warnings/errors, duplicate IDs, accessible button names, focus/keyboard behavior, and `aria-live` status messaging.
 
-## Devin Secrets Needed
+## Secrets
 
-No secrets required for local testing. Firebase auth works client-side with the embedded config.
+No private secrets are required for the local prep harness or automated test suite. Never expose GitHub tokens, Firebase service-account keys, Gmail credentials, or AI API keys in client code or test output.

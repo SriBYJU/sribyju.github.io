@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "reviewed": "2026-08-15",
+  "passed": true,
+  "desktop": {
+    "passed": true,
+    "checks": [
+      "SAT dashboard renders the 7,444 combined-question showcase and 3,200 SAT count",
+      "SAT Test Center exposes 30 registered forms and starts a 27-question, 32-minute module",
+      "ACT Test Center exposes 20 registered forms and starts the 50-question, 35-minute English section",
+      "question map, answer selection, flagging, keyboard shortcuts, and pacing controls respond",
+      "pattern lesson, guided practice, three-step hints, and choice-specific diagnosis render",
+      "no warning or error console messages were observed in the SAT or ACT flows"
+    ]
+  },
+  "mobile": {
+    "passed": true,
+    "viewport": "390x844",
+    "horizontalOverflow": false,
+    "checks": [
+      "dashboard proof cards collapse into a readable two-column phone layout",
+      "Test Center remains within the viewport and retains registered-form controls",
+      "active SAT question, four choices, scratchpad, timer, navigation, and question map remain usable",
+      "document width remained below viewport width on dashboard, Test Center, and active-question screens"
+    ]
+  },
+  "accessibility": {
+    "passed": true,
+    "checks": [
+      "no duplicate element IDs were present in the tested active-question view",
+      "all rendered buttons had accessible text or labels",
+      "prep output includes an aria-live region",
+      "question answering, navigation, and flagging support keyboard operation",
+      "score charts expose accessible image labels"
+    ]
+  },
+  "notes": "This report records browser-observed product behavior. It does not establish learning efficacy or official score equivalence."
+}

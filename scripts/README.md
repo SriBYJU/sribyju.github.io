@@ -2,9 +2,9 @@
 
 ## SAT/ACT 9.6 release gate
 
-The SAT/ACT quality phase stays local until `npm run prep:release` reaches at least **96/100**. Run `npm run prep:audit` for the scored breakdown. The audit uses `prep-official-sources.json` to record the official College Board and ACT publications used for structure, aggregate methodology, and scoring priors; copyrighted questions are not republished or number-swapped.
+The SAT/ACT quality phase stays local until `npm run prep:market-release` reaches at least **96/100** and the browser evidence gate passes. Run `npm run prep:market-audit` for the engineering/product-readiness breakdown and `npm run prep:audit` for the content-focused breakdown. The audits use `prep-official-sources.json` to record the official College Board and ACT publications used for structure, aggregate methodology, and scoring priors; copyrighted questions are not republished or number-swapped.
 
-The current version generates and validates **5,963 original questions** across SAT Reading and Writing, SAT Math, ACT English, ACT Math, ACT Reading, and optional ACT Science. It includes official-size timed simulations, SAT module routing, aligned ACT passage/experiment forms, adaptive topic practice, mistake replay, pacing and confidence analytics, a score-progress timeline, an in-app SAT-style graphing workspace, keyboard-accessible test controls, and safe local/cloud persistence. Score ranges are independent practice estimates with uncertainty; they are not official College Board or ACT scores and do not promise a particular result.
+The current version generates and validates **7,444 original questions**—**3,200 SAT** and **4,244 ACT**—across SAT Reading and Writing, SAT Math, ACT English, ACT Math, ACT Reading, and optional ACT Science. It includes 30 registered SAT and 20 registered ACT forms, official-size timed simulations, SAT module routing, aligned ACT passage/experiment forms, deterministic three-step tutoring for every item, structured topic and strategy courses, mistake replay, pacing/confidence/decision-profile analytics, a score-progress graph, an in-app SAT-style graphing workspace, keyboard-accessible test controls, and safe local/cloud persistence. Score estimates are independent practice estimates with a narrow completed-form headline band and separately disclosed broader model uncertainty; they are not official College Board or ACT scores and do not promise a particular result.
 
 Release verification:
 
@@ -15,6 +15,7 @@ npm test
 npm run check
 npm audit --omit=dev
 npm run prep:release
+npm run prep:market-release
 ```
 
 Sends curated college prep tips every Monday via GitHub Actions. The workflow is scheduled for **13:15 UTC** and does not promise a particular inbox-delivery time.

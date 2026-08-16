@@ -27,9 +27,99 @@ test('prep engine exposes the complete adaptive-session API', () => {
     'startMisconceptionReplay','startDecisionSimulator','startFullTest','startSectionTest',
     'startScienceTest','setConfidence','showHint','setApproach','skipQuestion',
     'toggleEliminate','updateNote','selectScorePoint','getPracticeEstimate',
-    'renderCalculator','returnToSession'
+    'renderCalculator','returnToSession','openFormLibrary','openCourse','openCourseLesson'
   ];
   for (const method of required) assert.equal(typeof window.ScholarkPrep[method], 'function', `${method} is missing`);
+});
+
+test('registered forms are reproducible and preserve their stable identity', () => {
+  const api = window.ScholarkPrep;
+  values.clear();
+  api.init();
+  for (const [exam,formId] of [['sat','sat-form-01'],['act','act-form-01']]) {
+    api.setTest(exam);
+    api.startFullTest(formId);
+    let snapshot = JSON.parse(localStorage.getItem('gs_prep_v2_guest_active_session'));
+    const firstRun = [...snapshot.questions];
+    assert.equal(snapshot.formId, formId);
+    api.finishSession(false);
+    api.startFullTest(formId);
+    snapshot = JSON.parse(localStorage.getItem('gs_prep_v2_guest_active_session'));
+    assert.deepEqual(snapshot.questions, firstRun, `${formId} must assemble reproducibly`);
+    api.finishSession(false);
+  }
+  const saved = JSON.parse(localStorage.getItem('gs_prep_v2_guest'));
+  assert.deepEqual(saved.completedForms, {sat:[],act:[]}, 'an unanswered form must not be marked complete');
+});
+
+test('registered form seeds produce distinct assembled forms', () => {
+  const api = window.ScholarkPrep;
+  values.clear();
+  api.init();
+  api.setTest('sat');
+  const signatures = new Set();
+  for (let number = 1; number <= 10; number += 1) {
+    api.startFullTest(`sat-form-${String(number).padStart(2,'0')}`);
+    const snapshot = JSON.parse(localStorage.getItem('gs_prep_v2_guest_active_session'));
+    signatures.add(snapshot.questions.join('|'));
+    api.finishSession(false);
+  }
+  assert.equal(signatures.size, 10, 'the first ten registered SAT forms must not collide');
+});
+
+test('test center, public benchmarks, and pattern course render with source context', () => {
+  const api = window.ScholarkPrep;
+  values.clear();
+  api.init();
+  api.setTest('sat');
+  api.showView('tests');
+  assert.match(prepApp.innerHTML, /Realistic test-day mode/);
+  assert.match(prepApp.innerHTML, /30 reproducible practice forms/);
+  api.openFormLibrary();
+  assert.match(prepApp.innerHTML, /SAT Practice Form 01/);
+  assert.match(prepApp.innerHTML, /SAT Practice Form 30/);
+  api.showView('dashboard');
+  assert.ok(prepApp.innerHTML.includes(window.ScholarkPrepData.questions.length.toLocaleString()));
+  assert.match(prepApp.innerHTML, /total original SAT \+ ACT questions/);
+  assert.match(prepApp.innerHTML, /Public-data perspective/);
+  assert.match(prepApp.innerHTML, /official aggregate publications/);
+  assert.match(prepApp.innerHTML, /do not establish that Scholark caused/);
+  assert.match(prepApp.innerHTML, /College Board/);
+  api.openCourse('patterns');
+  assert.match(prepApp.innerHTML, /Pattern Recognition Playbook/);
+  assert.match(prepApp.innerHTML, /Period–semicolon equivalence/);
+  assert.match(prepApp.innerHTML, /Purdue OWL/);
+  api.openCourseLesson('patterns',0);
+  assert.match(prepApp.innerHTML, /Your turn/);
+  assert.match(prepApp.innerHTML, /independent clauses/i);
+});
+
+test('only a completed registered form unlocks a narrow score stability band', () => {
+  const api = window.ScholarkPrep;
+  const bank = new Map(window.ScholarkPrepData.questions.map(question => [question.id,question]));
+  values.clear();
+  api.init();
+  api.setTest('sat');
+  api.startFullTest('sat-form-01');
+  for (let segmentNumber = 0; segmentNumber < 4; segmentNumber += 1) {
+    let snapshot = JSON.parse(localStorage.getItem('gs_prep_v2_guest_active_session'));
+    const segment = snapshot.segments[snapshot.segmentIndex];
+    for (let index = segment.start; index <= segment.end; index += 1) {
+      api.goTo(index);
+      snapshot = JSON.parse(localStorage.getItem('gs_prep_v2_guest_active_session'));
+      api.answer(bank.get(snapshot.questions[index]).answer);
+    }
+    api.goTo(segment.end);
+    api.next();
+  }
+  const saved = JSON.parse(localStorage.getItem('gs_prep_v2_guest'));
+  assert.deepEqual(saved.completedForms.sat, ['sat-form-01']);
+  assert.equal(saved.scoreHistory.sat.at(-1).kind, 'full-test');
+  const estimate = api.getPracticeEstimate('sat');
+  assert.equal(estimate.stable, true);
+  assert.ok(estimate.high - estimate.low <= 20);
+  assert.match(prepApp.innerHTML, /Scholark stability band/);
+  assert.match(prepApp.innerHTML, /Broader 80% model interval/);
 });
 
 test('decision simulation records strategy and powers a fresh misconception replay', () => {
@@ -167,6 +257,10 @@ test('practice estimates use accumulated evidence and item metrics stay privacy-
     assert.ok(!('uid' in metric));
     assert.ok(!('name' in metric));
   }
+  api.showView('dashboard');
+  assert.match(prepApp.innerHTML, /Decision Profile Map/);
+  assert.match(prepApp.innerHTML, /Fast \+ accurate/);
+  assert.match(prepApp.innerHTML, /your own .*second median/);
 });
 
 test('diagnostics create score-history checkpoints and render an interactive progress chart', () => {

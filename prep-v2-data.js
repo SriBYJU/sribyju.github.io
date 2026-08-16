@@ -212,6 +212,7 @@
   const targetedVerbal = [
     ['sat-evidence-text-1','sat','sat-rw-evidence-text',3,'A researcher claims that urban foxes adjust quickly to changes in food availability. Which finding, if true, would most directly support the claim?',['Foxes shifted their foraging routes within days after trash bins were secured.','Foxes have reddish coats in both urban and rural habitats.','Several cities use different styles of trash bins.','The researchers observed foxes during the evening.'],0,'A rapid route change in response to secured food sources directly supports behavioral adjustment.'],
     ['sat-evidence-text-2','sat','sat-rw-evidence-text',2,'A student claims that the poet presents memory as incomplete. Which quotation would best support the claim?',[`“I hold the outline, though the colors have gone.”`,`“The clock announces noon above the square.”`,`“A bright flag rises over the station.”`,`“We counted every window on the train.”`],0,'The surviving outline and missing colors directly portray an incomplete memory.'],
+    ['sat-evidence-text-3','sat','sat-rw-evidence-text',4,'A historian argues that a coastal town’s new breakwater changed local trade sooner than civic leaders expected. Which finding, if true, would most directly support the argument?',['Shipping records show that cargo volume rose sharply within the breakwater’s first six months.','The breakwater used stone quarried in a neighboring region.','Several civic leaders attended the opening ceremony.','The town had maintained a public market for more than a century.'],0,'A sharp cargo increase within six months directly links the new breakwater to an earlier-than-expected change in trade.'],
     ['sat-evidence-data-1','sat','sat-rw-evidence-data',2,'A seedling’s mean height was 12 cm in week 2, 18 cm in week 4, and 21 cm in week 6. Which statement accurately uses the data?',['Growth was greater from week 2 to week 4 than from week 4 to week 6.','The seedling doubled in height from week 2 to week 4.','Height decreased after week 4.','The seedling grew by 9 cm during each interval.'],0,'The increases were 6 cm and 3 cm, respectively.'],
     ['sat-evidence-data-2','sat','sat-rw-evidence-data',3,'A survey reports 46% support in Group A, 61% in Group B, and 59% in Group C. Which claim is best supported?',['Support was higher in Groups B and C than in Group A.','Group B had twice the support of Group A.','Every group had majority support.','Groups B and C had identical support.'],0,'Both 61% and 59% exceed 46%; the other statements misstate the values.'],
     ['sat-words-1','sat','sat-rw-words',2,'The committee’s initial proposal was “modest,” requesting only a small pilot program. As used here, “modest” most nearly means',['limited','shy','humble','ordinary'],0,'The context defines the request as small in scale, so limited is most precise.'],
@@ -284,9 +285,11 @@
     ['The telescope’s mirrors, which require precise alignment, _____ inspected before every observing run.','are','is','was','has','The plural subject mirrors takes the plural verb are.'],
     ['The chef adjusted the recipe _____ the available peaches were sweeter than expected.','because','although,','therefore','because,','Because correctly introduces the reason; no comma separates the verb from this essential clause.']
   ];
+  const satConventionSkills=['sat-rw-form','sat-rw-boundaries','sat-rw-boundaries','sat-rw-form','sat-rw-boundaries','sat-rw-form','sat-rw-boundaries','sat-rw-form','sat-rw-boundaries','sat-rw-form','sat-rw-form','sat-rw-boundaries'];
+  const actConventionSkills=['act-eng-usage','act-eng-punctuation','act-eng-punctuation','act-eng-sentence','act-eng-punctuation','act-eng-usage','act-eng-punctuation','act-eng-usage','act-eng-punctuation','act-eng-sentence','act-eng-usage','act-eng-punctuation'];
   conventionItems.forEach((item,index) => {
-    push(make(`sat-conv-${index+1}`, 'sat', index % 2 ? 'sat-rw-boundaries' : 'sat-rw-form', 1 + index % 4, 'Which choice completes the text so that it conforms to the conventions of Standard English?', item.slice(1,5), 0, item[5], {passage:item[0]}));
-    push(make(`act-conv-${index+1}`, 'act', index % 3 === 0 ? 'act-eng-usage' : index % 3 === 1 ? 'act-eng-sentence' : 'act-eng-punctuation', 1 + index % 4, 'Which choice results in a grammatically acceptable sentence?', item.slice(1,5), 0, item[5], {passage:item[0]}));
+    push(make(`sat-conv-${index+1}`, 'sat', satConventionSkills[index], 1 + index % 4, 'Which choice completes the text so that it conforms to the conventions of Standard English?', item.slice(1,5), 0, item[5], {passage:item[0]}));
+    push(make(`act-conv-${index+1}`, 'act', actConventionSkills[index], 1 + index % 4, 'Which choice results in a grammatically acceptable sentence?', item.slice(1,5), 0, item[5], {passage:item[0]}));
   });
 
   const synthesisItems = [
@@ -506,8 +509,9 @@
   function generateBalancedSatVerbal() {
     const subjects=['urban tree canopies','coral nurseries','community archives','migrating songbirds','soil fungi','bilingual story hours','nighttime transit','river restoration','museum lighting','school gardens','coastal dunes','public art maps','heat-resilient pavement','local oral histories','pollinator corridors','library makerspaces','wetland grasses','music rehearsal methods','historic market records','neighborhood cooling centers'];
     const methods=['a matched-site comparison','a preregistered field experiment','a multi-year observational study','a controlled laboratory trial','a repeated-measures survey'];
-    for(let i=1;i<=100;i++){
-      const subject=subjects[(i-1)%subjects.length],method=methods[i%methods.length],before=22+i%17,change=5+i%11,after=before+change,limit=['the study covered only one season','the sites were located in one region','participation was voluntary','the sample excluded extreme weather days'][i%4];
+    const limitations=['the study covered only one season','the sites were located in one region','participation was voluntary','the sample excluded extreme weather days'];
+    for(let i=1;i<=250;i++){
+      const subject=subjects[(i-1)%subjects.length],method=methods[Math.floor((i-1)/subjects.length)%methods.length],before=22+i%17,change=5+i%11,after=before+change,limit=limitations[Math.floor((i-1)/(subjects.length*methods.length))%limitations.length];
       const base=`Using ${method}, a research team studied ${subject} across ${80+i} recorded observations. The primary measure averaged ${before} units under the comparison condition and ${after} units under the focal condition. The researchers concluded that the focal condition was associated with a higher measure in this sample. They also emphasized that ${limit}, so the result should be tested in additional settings before being treated as universal.`;
       push(make(`sat-blueprint-central-${i}`,'sat','sat-rw-central',2+i%3,'Which choice best states the main idea of the text?',[
         `The focal condition was associated with a higher measured outcome, although the study's stated limitation narrows the conclusion.`,
@@ -515,6 +519,9 @@
         `No measurable pattern appeared in the sample.`,
         `The team focused primarily on explaining why additional research would be unnecessary after this single sample.`
       ],0,'The correct choice reports the observed direction and preserves the limitation. The other choices turn an association into a universal claim or contradict the described results.',{passage:base}));
+
+      const evidencePassage=`A research team studying ${subject} reported a ${change}-unit difference between its comparison and focal conditions. The team describes the result as an association and notes that ${limit}. A reviewer asks for the sentence that most directly supports both the observed difference and the report's caution.`;
+      push(make(`sat-blueprint-text-evidence-${i}`,'sat','sat-rw-evidence-text',2+i%3,'Which quotation from the report would most directly support the team’s claim?',[`“The focal-condition mean was ${after} units, compared with ${before} units in the comparison condition; because ${limit}, replication should precede a broad conclusion.”`,`“The focal condition will produce exactly the same result in every setting, so no additional measurement is necessary.”`,`“The two conditions produced identical means, and the stated limitation had no bearing on interpretation.”`,`“The research team selected ${subject} as its topic before deciding which outcome to measure.”`],0,`The keyed quotation states the observed ${change}-unit difference and preserves the explicit limitation, directly supporting both parts of the claim.`,{passage:evidencePassage}));
 
       const dataPassage=`A study of ${subject} reported ${80+i} observations and the following mean values for its primary measure: comparison condition, ${before} units; focal condition, ${after} units. The author argues that the focal condition produced a higher mean in the observed sample.`;
       push(make(`sat-blueprint-data-${i}`,'sat','sat-rw-evidence-data',2+i%3,'Which choice most effectively uses the data to support the author’s argument?',[
@@ -676,8 +683,8 @@ The students limited their conclusion to the tested range and recorded the same 
       ['Social Science','Professor Daniel Ibarra','community researcher','a regional library network','records from mobile library stops','studying how schedule changes affected repeat visits'],
       ['Natural Science','Dr. Leena Park','field ecologist','a restored marsh','sensor records and sediment cores','explaining why two nearby channels recovered differently']
     ];
-    const variations=['seasonal storms','a staffing change','a delayed shipment','an unexpected temperature shift','a revised safety rule','a new volunteer cohort','a damaged instrument','an unusually dry month','a change in public hours','a second survey team','a construction closure','a software migration','a funding deadline'];
-    for(let formIndex=2;formIndex<15;formIndex++){
+    const variations=['seasonal storms','a staffing change','a delayed shipment','an unexpected temperature shift','a revised safety rule','a new volunteer cohort','a damaged instrument','an unusually dry month','a change in public hours','a second survey team','a construction closure','a software migration','a funding deadline','a preservation grant review','a regional transit interruption','a building ventilation repair','a new cataloging standard','a community advisory meeting'];
+    for(let formIndex=2;formIndex<20;formIndex++){
       const form=String.fromCharCode(65+formIndex),variation=variations[formIndex-2];
       profiles.forEach((profile,genreIndex)=>{
         const [genre,lead,role,site,artifact,goal]=profile,code=`${form}-${genreIndex+1}`,sequence=11+formIndex*3+genreIndex;
@@ -719,10 +726,6 @@ The students limited their conclusion to the tested range and recorded the same 
   generateActScienceSets();
   generateActReadingForms();
 
-  const topicObjects = {
-    sat: TOPICS.sat.map(row => byId[row[0]]),
-    act: TOPICS.act.map(row => byId[row[0]])
-  };
   const contentKeys = new Set();
   const uniqueQuestions = questions.filter(question => {
     const key = `${question.exam}|${question.passage || ''}|${question.stem}`.toLowerCase().replace(/\s+/g,' ').trim();
@@ -731,12 +734,111 @@ The students limited their conclusion to the tested range and recorded the same 
     return true;
   });
 
+  function tutorFor(question) {
+    const currentTopic=byId[question.skill];
+    const isLanguageRule=question.section==='English'||/^(sat-rw-(boundaries|form|transitions|synthesis)|act-eng-)/.test(question.skill);
+    const correctOption=question.options[question.answer];
+    const quoted=value=>`“${String(value).length>100?String(value).slice(0,97)+'…':String(value)}”`;
+    const sectionAdvice=question.section==='Math'
+      ? 'Translate the requested quantity into an equation, keep the units visible, and verify the result in the original relationship.'
+      : question.section==='Science'
+        ? 'Read the axes, units, conditions, and controlled variables before deciding what the reported evidence can support.'
+        : isLanguageRule
+          ? 'Identify the sentence core and the exact rhetorical relationship before comparing grammar, punctuation, and concision.'
+          : 'Locate the smallest sentence, detail, or pattern that proves the choice without extending the claim beyond the passage.';
+    const choiceFeedback=question.options.map((option,index)=>{
+      if(index===question.answer)return {status:'correct',label:'Supported answer',feedback:question.explanation};
+      if(question.section==='Math')return {status:'distractor',label:'fails the original relationship',feedback:`Substituting ${quoted(option)} does not produce the requested quantity under every condition in the prompt. The keyed value is ${quoted(correctOption)}. ${question.explanation}`};
+      if(question.section==='Science')return {status:'distractor',label:/every|always|must|proves|only/i.test(option)?'extends beyond the tested range':'misreads a reported condition',feedback:`${quoted(option)} is not supported by the reported variables, controls, measurements, or tested range. The keyed choice is ${quoted(correctOption)} because ${question.explanation.charAt(0).toLowerCase()+question.explanation.slice(1)}`};
+      if(isLanguageRule){
+        if(/introductory modifier|ones? walking|person who examined/i.test(question.explanation))return {status:'distractor',label:'dangling or illogical modifier',feedback:`The opening modifier must describe the grammatical subject immediately after the comma. ${quoted(option)} puts the wrong noun or construction in that position; ${quoted(correctOption)} names the person performing the action. ${question.explanation}`};
+        if(/transition|connects the two ideas|logical relationship/i.test(`${question.stem} ${currentTopic.name}`))return {status:'distractor',label:'wrong logic relationship',feedback:`${quoted(option)} signals a relationship that does not match the surrounding ideas. ${quoted(correctOption)} matches the required logic. ${question.explanation}`};
+        if(/punctuation|boundar|colon|semicolon|comma|dash/i.test(`${question.stem} ${currentTopic.name} ${question.explanation}`))return {status:'distractor',label:'clause-boundary mismatch',feedback:`Inserted into the sentence, ${quoted(option)} does not punctuate the actual clause structure correctly. ${quoted(correctOption)} does. ${question.explanation}`};
+        if(/agreement|subject|verb|pronoun|tense|parallel/i.test(`${currentTopic.name} ${question.explanation}`))return {status:'distractor',label:'agreement or usage mismatch',feedback:`${quoted(option)} does not match the sentence’s subject, antecedent, tense sequence, or parallel structure. ${quoted(correctOption)} satisfies the tested convention. ${question.explanation}`};
+        return {status:'distractor',label:'precision or rhetorical mismatch',feedback:`${quoted(option)} does not preserve the required meaning, concision, placement, or rhetorical purpose. ${quoted(correctOption)} does. ${question.explanation}`};
+      }
+      const overstates=/\b(always|never|every|entirely|only|must|proves?|universal|identical|complete(?:ly)?)\b/i.test(option);
+      return {status:'distractor',label:overstates?'scope overreach':'not supported by the evidence',feedback:`${quoted(option)} ${overstates?'goes beyond the passage’s stated scope or certainty':'does not answer the exact claim, function, or inference requested'}. ${quoted(correctOption)} is keyed because ${question.explanation.charAt(0).toLowerCase()+question.explanation.slice(1)}`};
+    });
+    return {
+      version:'deterministic-tutor-v2',
+      hints:[
+        currentTopic.strategy,
+        sectionAdvice,
+        question.passage ? 'Return to the exact sentence, value, or relationship named in the prompt; state what it proves before reopening the choices.' : 'Estimate the answer and test the remaining choices against every condition in the prompt.'
+      ],
+      solutionPath:[currentTopic.strategy,sectionAdvice,question.explanation],
+      choiceFeedback,
+      evidenceGuide:question.passage
+        ? 'Use the passage or figure itself as the evidence boundary; the explanation identifies the relationship the keyed choice must preserve.'
+        : 'Verify the keyed result in the original quantities and conditions rather than relying on answer-choice appearance.',
+      transferSkill:question.skill
+    };
+  }
+
+  const enhancedQuestions=uniqueQuestions.map(question=>Object.assign({},question,{
+    usagePool:hash(`${question.id}-assessment`)%5<2?'assessment-reserved':'dual-use',
+    tutoring:tutorFor(question),
+    validation:Object.assign({},question.validation,{checks:[...new Set([...(question.validation?.checks||[]),'deterministic-tutor','choice-feedback','assessment-pool'])]})
+  }));
+
+  const topicObjects = {
+    sat: TOPICS.sat.map(row => byId[row[0]]),
+    act: TOPICS.act.map(row => byId[row[0]])
+  };
+  Object.values(topicObjects).flat().forEach(item=>{
+    const checkpointIds=enhancedQuestions.filter(question=>question.skill===item.id).slice(0,3).map(question=>question.id);
+    const verification=item.section==='Math'
+      ? 'Check the result in the original relationship and confirm that units and restrictions still hold.'
+      : item.section==='Science'
+        ? 'State the tested range and separate observation, inference, and causation.'
+        : 'Point to the exact language or sentence structure that makes the decision necessary.';
+    item.course={
+      version:'topic-course-v1',
+      recognize:`Use this skill when a question asks you to ${item.lesson.charAt(0).toLowerCase()+item.lesson.slice(1)}`,
+      steps:[item.strategy,verification,'Explain why the strongest distractor fails, then solve a fresh transfer question without the explanation open.'],
+      traps:item.section==='Math'
+        ? ['solving for a related quantity instead of the requested one','dropping a unit, restriction, or negative sign','trusting a graph or calculator output without checking context']
+        : item.section==='Science'
+          ? ['confusing an independent variable with a control','claiming causation from an association','generalizing beyond the tested conditions']
+          : ['choosing a true statement that does not answer the question','selecting wording that is broader than the evidence','using punctuation or transitions by sound instead of structure'],
+      checkpointQuestionIds:checkpointIds
+    };
+  });
+
+  const formCatalog={
+    sat:Array.from({length:30},(_,index)=>({id:`sat-form-${String(index+1).padStart(2,'0')}`,exam:'sat',label:`SAT Practice Form ${String(index+1).padStart(2,'0')}`,seed:`scholark-sat-form-${index+1}-v1`,questions:98,minutes:134,version:'form-catalog-v1'})),
+    act:Array.from({length:20},(_,index)=>({id:`act-form-${String(index+1).padStart(2,'0')}`,exam:'act',label:`ACT Practice Form ${String(index+1).padStart(2,'0')}`,seed:`scholark-act-form-${index+1}-v1`,questions:131,minutes:125,version:'form-catalog-v1'}))
+  };
+  const publicBenchmarks={
+    version:'public-benchmarks-2025-v1',
+    reviewed:'2026-08-15',
+    sat:{
+      participation:{value:'2M+',label:'Class of 2025 students took the SAT in high school',sourceId:'college-board-sat-suite-results-2025'},
+      userPercentiles:[[400,1],[500,1],[600,2],[650,3],[700,6],[750,11],[800,17],[850,24],[900,32],[950,39],[1000,47],[1050,55],[1100,62],[1150,69],[1200,75],[1250,80],[1300,85],[1350,89],[1400,93],[1450,95],[1500,97],[1520,98],[1550,99],[1600,99]],
+      percentileSourceId:'college-board-sat-user-percentiles'
+    },
+    act:{
+      participation:{value:'1.38M',label:'ACT-tested U.S. graduates in the Class of 2025',sourceId:'act-graduating-class-database-2025'},
+      average:{value:'19.4',label:'2025 national average Composite',sourceId:'act-graduating-class-database-2025'},
+      retest:{value:'+2.4',label:'average Superscore change among the 34% who tested more than once',sourceId:'act-graduating-class-database-2025'}
+    },
+    sources:[
+      {id:'college-board-sat-user-percentiles',publisher:'College Board',title:'SAT User Percentiles',url:'https://research.collegeboard.org/reports/sat-suite/understanding-scores/sat'},
+      {id:'college-board-sat-suite-results-2025',publisher:'College Board',title:'SAT Suite Program Results 2025',url:'https://reports.collegeboard.org/sat-suite-program-results'},
+      {id:'act-graduating-class-database-2025',publisher:'ACT',title:'ACT-tested Class of 2025 Data',url:'https://www.act.org/content/act/en/research/services-and-resources/data-and-visualization/grad-class-database-2025.html'}
+    ]
+  };
+
   window.ScholarkPrepData = Object.freeze({
-    version: 3,
+    version: 4,
     calibrationVersion: 'public-prior-v1',
+    tutoringVersion:'deterministic-tutor-v2',
     topics: topicObjects,
     topicById: byId,
-    questions: uniqueQuestions,
+    questions: enhancedQuestions,
+    formCatalog,
+    publicBenchmarks,
     blueprints: {
       sat: { label: 'Digital SAT', coreQuestions: 98, minutes: 134, sections: ['Reading and Writing','Math'], note: '54 Reading and Writing questions in 64 minutes; 44 Math questions in 70 minutes, each section split into two modules.' },
       act: { label: 'ACT', coreQuestions: 131, minutes: 125, sections: ['English','Math','Reading'], note: 'Enhanced ACT core: 50 English questions in 35 minutes, 45 Math in 50 minutes, and 36 Reading in 40 minutes. Science is an optional 40-question, 40-minute section.' }
