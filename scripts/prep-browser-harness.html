@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Scholark Prep Local QA</title>
+</head>
+<body>
+  <main id="qa-root" style="max-width:1200px;margin:0 auto;padding:24px">
+    <div class="prep-v2-toolbar">
+      <div><strong>Scholark Prep Local QA</strong><div class="prep-v2-muted">Production engine · local test identity · no network account</div></div>
+      <div class="prep-v2-actions"><button id="prep-test-sat" class="prep-v2-test" onclick="ScholarkPrep.setTest('sat')">SAT</button><button id="prep-test-act" class="prep-v2-test" onclick="ScholarkPrep.setTest('act')">ACT</button></div>
+    </div>
+    <nav class="prep-v2-actions" aria-label="Prep views">
+      <button data-prep-view="dashboard" onclick="ScholarkPrep.showView('dashboard')">Dashboard</button>
+      <button data-prep-view="diagnostic" onclick="ScholarkPrep.showView('diagnostic')">Diagnostic</button>
+      <button data-prep-view="practice" onclick="ScholarkPrep.showView('practice')">Practice</button>
+      <button data-prep-view="learn" onclick="ScholarkPrep.showView('learn')">Learn</button>
+      <button data-prep-view="tests" onclick="ScholarkPrep.showView('tests')">Tests</button>
+      <button data-prep-view="calculator" onclick="ScholarkPrep.showView('calculator')">Calculator</button>
+    </nav>
+    <div id="prep-app" aria-live="polite"></div>
+  </main>
+  <script>
+  (async function(){
+    const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    if(!local){document.body.textContent='This browser harness is available only on localhost.';return;}
+    const source=await fetch('../index.html').then(response=>response.text());
+    const styles=[...source.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(match=>match[1]).join('\n');
+    const style=document.createElement('style');style.textContent=styles;document.head.appendChild(style);
+    window.currentUser={uid:'local-browser-qa',displayName:'Local QA Student'};
+    window.showToast=function(message,type){const note=document.createElement('div');note.id='qa-toast';note.dataset.type=type||'info';note.textContent=message;document.body.appendChild(note);setTimeout(()=>note.remove(),1200);};
+    for(const src of ['../prep-v2-data.js','../prep-v2-app.js'])await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.body.appendChild(script);});
+    window.initPrep();
+  })().catch(error=>{document.getElementById('prep-app').textContent=`Local QA failed to start: ${error.message}`;});
+  </script>
+</body>
+</html>

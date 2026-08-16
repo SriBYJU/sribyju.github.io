@@ -1,5 +1,22 @@
 # Scholark — Automated Weekly Email System
 
+## SAT/ACT 9.6 release gate
+
+The SAT/ACT quality phase stays local until `npm run prep:release` reaches at least **96/100**. Run `npm run prep:audit` for the scored breakdown. The audit uses `prep-official-sources.json` to record the official College Board and ACT publications used for structure, aggregate methodology, and scoring priors; copyrighted questions are not republished or number-swapped.
+
+The current version generates and validates **5,963 original questions** across SAT Reading and Writing, SAT Math, ACT English, ACT Math, ACT Reading, and optional ACT Science. It includes official-size timed simulations, SAT module routing, aligned ACT passage/experiment forms, adaptive topic practice, mistake replay, pacing and confidence analytics, a score-progress timeline, an in-app SAT-style graphing workspace, keyboard-accessible test controls, and safe local/cloud persistence. Score ranges are independent practice estimates with uncertainty; they are not official College Board or ACT scores and do not promise a particular result.
+
+Release verification:
+
+```powershell
+cd scripts
+npm ci
+npm test
+npm run check
+npm audit --omit=dev
+npm run prep:release
+```
+
 Sends curated college prep tips every Monday via GitHub Actions. The workflow is scheduled for **13:15 UTC** and does not promise a particular inbox-delivery time.
 
 ## How It Works

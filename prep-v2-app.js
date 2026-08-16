@@ -9,9 +9,13 @@
 
   const STORAGE_PREFIX = 'gs_prep_v2_';
   const LEGACY_KEY = 'gs_prep_state';
+  const calibrationVersion = 'public-prior-v1';
+  const quarantineThreshold = Object.freeze({minResponses:80,minAccuracy:.08,maxAccuracy:.95,minDiscrimination:.08});
   const letters = ['A','B','C','D'];
   let state;
   let session = null;
+  let selectedScorePoint = null;
+  let keyboardBound = false;
   let timerId = null;
   let graph = { minX:-10, maxX:10, minY:-10, maxY:10, expression:'x^2', dragging:false, lastX:0, lastY:0 };
   const strategyCourses = {
@@ -56,8 +60,8 @@
   function defaultState() {
     return {
       version: data.version, test: 'sat', view: 'dashboard', xp: 0, streak: 0,
-      lastActiveDate: null, responses: [], mastery: {}, bookmarks: [],
-      diagnostic: { sat:null, act:null },
+      lastActiveDate: null, responses: [], mastery: {}, itemMetrics: {}, bookmarks: [],
+      diagnostic: { sat:null, act:null }, scoreHistory:{sat:[],act:[]},
       plan: { sat:{goal:1350, baseline:'', minutes:30, days:5, targetDate:''}, act:{goal:30, baseline:'', minutes:30, days:5, targetDate:''} },
       settings: { practiceLength:10 }, updatedAt: new Date().toISOString()
     };
@@ -81,8 +85,13 @@
       act:Object.assign({},base.plan.act,incoming.plan?.act||{})
     };
     merged.diagnostic = Object.assign(base.diagnostic, incoming.diagnostic || {});
+    merged.scoreHistory = {
+      sat:Array.isArray(incoming.scoreHistory?.sat)?incoming.scoreHistory.sat.slice(-50):[],
+      act:Array.isArray(incoming.scoreHistory?.act)?incoming.scoreHistory.act.slice(-50):[]
+    };
     merged.settings = Object.assign(base.settings, incoming.settings || {});
     merged.mastery = incoming.mastery && typeof incoming.mastery === 'object' ? incoming.mastery : {};
+    merged.itemMetrics = incoming.itemMetrics && typeof incoming.itemMetrics === 'object' ? incoming.itemMetrics : {};
     merged.responses = Array.isArray(incoming.responses) ? incoming.responses.slice(-2000) : [];
     merged.bookmarks = Array.isArray(incoming.bookmarks) ? [...new Set(incoming.bookmarks)] : [];
     return merged;
@@ -170,18 +179,22 @@
     render();
     if(session&&(session.timeLimit||session.segments?.length))startTimer();
     loadCloudState();
+    if(!keyboardBound&&document?.addEventListener){document.addEventListener('keydown',handlePrepKeydown);keyboardBound=true;}
   }
 
   function saveSessionSnapshot() {
     if(!session)return;
-    const snapshot=Object.assign({},session,{questions:session.questions.map(q=>q.id),savedAt:new Date().toISOString()});
+    const snapshot=Object.assign({},session,{questions:session.questions.map(q=>q.id),contentVersion:data.version,savedAt:new Date().toISOString()});
     try{localStorage.setItem(sessionStorageKey(),JSON.stringify(snapshot));}
     catch(error){console.warn('Could not save the active test session:',error);}
   }
   function restoreSession() {
     let snapshot=null;
     try{snapshot=safeParse(localStorage.getItem(sessionStorageKey()));}catch(error){console.warn('Could not read the active test session:',error);}
-    if(!snapshot||!Array.isArray(snapshot.questions)||Date.now()-(Date.parse(snapshot.savedAt)||0)>86400000)return null;
+    if(!snapshot||snapshot.contentVersion!==data.version||!Array.isArray(snapshot.questions)||Date.now()-(Date.parse(snapshot.savedAt)||0)>86400000){
+      if(snapshot?.contentVersion!==undefined&&snapshot.contentVersion!==data.version){try{localStorage.removeItem(sessionStorageKey());}catch(error){console.warn('Could not clear an outdated test session:',error);}}
+      return null;
+    }
     const lookup=new Map(data.questions.map(q=>[q.id,q]));
     const questions=snapshot.questions.map(id=>lookup.get(id));
     if(questions.some(q=>!q)){
@@ -197,6 +210,8 @@
     snapshot.approaches=Array.isArray(snapshot.approaches)?snapshot.approaches:new Array(questions.length).fill(null);
     snapshot.skipped=Array.isArray(snapshot.skipped)?snapshot.skipped:[];
     snapshot.revisited=Array.isArray(snapshot.revisited)?snapshot.revisited:[];
+    snapshot.eliminated=Array.isArray(snapshot.eliminated)?snapshot.eliminated.map(row=>Array.isArray(row)?row:[]):new Array(questions.length).fill(null).map(()=>[]);
+    snapshot.notes=Array.isArray(snapshot.notes)?snapshot.notes:new Array(questions.length).fill('');
     snapshot.questionStartedAt=Date.now();
     return snapshot;
   }
@@ -232,8 +247,33 @@
 
   function app() { return document.getElementById('prep-app'); }
   function esc(value) { return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
+  function figureMarkup(figure) {
+    if(!figure||!['bar','line'].includes(figure.type))return '';
+    const width=520,height=260,left=58,right=24,top=24,bottom=48,plotWidth=width-left-right,plotHeight=height-top-bottom;
+    if(figure.type==='bar'){
+      const values=figure.values.map(Number),max=Math.max(1,...values)*1.15,barWidth=Math.min(100,plotWidth/values.length*.58);
+      return `<figure class="prep-v2-figure"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Bar chart: ${esc(figure.labels.map((label,index)=>`${label}, ${values[index]} ${figure.unit||''}`).join('; '))}"><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}"/><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"/>${values.map((value,index)=>{const x=left+(index+.5)*plotWidth/values.length-barWidth/2,y=top+(max-value)/max*plotHeight,h=height-bottom-y;return `<rect x="${x}" y="${y}" width="${barWidth}" height="${h}"/><text x="${x+barWidth/2}" y="${y-7}" text-anchor="middle">${value}</text><text x="${x+barWidth/2}" y="${height-bottom+19}" text-anchor="middle">${esc(figure.labels[index])}</text>`;}).join('')}<text x="${left}" y="14">${esc(figure.unit||'Value')}</text></svg><figcaption>Values are also stated in the question text.</figcaption></figure>`;
+    }
+    const points=figure.points.map(([x,y])=>[Number(x),Number(y)]),minX=Math.min(...points.map(row=>row[0])),maxX=Math.max(...points.map(row=>row[0])),minY=Math.min(0,...points.map(row=>row[1])),maxY=Math.max(...points.map(row=>row[1]))*1.12||1;
+    const px=value=>left+(value-minX)/(maxX-minX||1)*plotWidth,py=value=>top+(maxY-value)/(maxY-minY||1)*plotHeight;
+    return `<figure class="prep-v2-figure"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Line graph: ${esc(points.map(([x,y])=>`${figure.xLabel} ${x}, ${figure.yLabel} ${y}`).join('; '))}"><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}"/><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"/><polyline points="${points.map(([x,y])=>`${px(x)},${py(y)}`).join(' ')}"/>${points.map(([x,y])=>`<circle cx="${px(x)}" cy="${py(y)}" r="5"/><text x="${px(x)}" y="${py(y)-9}" text-anchor="middle">${y}</text><text x="${px(x)}" y="${height-bottom+18}" text-anchor="middle">${x}</text>`).join('')}<text x="${left}" y="14">${esc(figure.yLabel)}</text><text x="${width-right}" y="${height-8}" text-anchor="end">${esc(figure.xLabel)}</text></svg><figcaption>Values are also available in the accompanying table.</figcaption></figure>`;
+  }
   function topic(id) { return data.topicById[id]; }
-  function testQuestions() { return data.questions.filter(question => question.exam === state.test); }
+  function calibrationFor(question) {
+    const published=question.calibration||{difficulty:0,discrimination:1,guessing:.25,status:'provisional',sampleSize:0};
+    const aggregate=window.ScholarkPrepCalibration?.items?.[question.id];
+    if(!aggregate||aggregate.version!==calibrationVersion||Number(aggregate.sampleSize)<quarantineThreshold.minResponses)return published;
+    return Object.assign({},published,aggregate);
+  }
+  function questionIsEligible(question) {
+    const calibration=calibrationFor(question);
+    if(Number(calibration.sampleSize)<quarantineThreshold.minResponses)return calibration.status!=='blocked';
+    return calibration.status!=='quarantined'&&calibration.status!=='blocked'
+      && Number(calibration.accuracy)>=quarantineThreshold.minAccuracy
+      && Number(calibration.accuracy)<=quarantineThreshold.maxAccuracy
+      && Number(calibration.discrimination)>=quarantineThreshold.minDiscrimination;
+  }
+  function testQuestions() { return data.questions.filter(question => question.exam === state.test && questionIsEligible(question)); }
   function mastery(id) { return state.mastery[id] || {score:50,attempts:0,correct:0,confidence:0,trend:0}; }
   function effectiveMastery(id) {
     const row=mastery(id);
@@ -253,16 +293,78 @@
     if (!state.responses.length) return 0;
     return Math.round(state.responses.filter(row => row.correct).length / state.responses.length * 100);
   }
-  function practiceRange() {
-    const attempts = state.responses.filter(row => row.exam === state.test).length;
-    if (attempts < 20) return 'More data needed';
-    const score = avgMastery();
-    if (state.test === 'sat') {
-      const midpoint = Math.round((400 + score * 12) / 10) * 10;
-      return `${Math.max(400,midpoint-70)}–${Math.min(1600,midpoint+70)}`;
+  function responseProbability(theta,calibration) {
+    const a=Math.max(.25,Math.min(2.5,Number(calibration.discrimination)||1));
+    const b=Math.max(-3,Math.min(3,Number(calibration.difficulty)||0));
+    const c=Math.max(0,Math.min(.35,Number(calibration.guessing)||.25));
+    return c+(1-c)/(1+Math.exp(-1.7*a*(theta-b)));
+  }
+  function practiceEstimate(test=state.test) {
+    const rows=state.responses.filter(row=>row.exam===test).slice(-300).map(row=>({row,question:data.questions.find(question=>question.id===row.questionId)})).filter(item=>item.question);
+    if(rows.length<20)return {label:'More data needed',attempts:rows.length,method:'Public-data prior; at least 20 responses required',version:calibrationVersion};
+    let bestTheta=0,bestLikelihood=-Infinity;
+    for(let theta=-3;theta<=3.0001;theta+=.05){
+      let likelihood=-theta*theta/2;
+      for(const item of rows){const p=Math.max(.0001,Math.min(.9999,responseProbability(theta,calibrationFor(item.question))));likelihood+=item.row.correct?Math.log(p):Math.log(1-p);}
+      if(likelihood>bestLikelihood){bestLikelihood=likelihood;bestTheta=theta;}
     }
-    const midpoint = Math.round(1 + score * .35);
-    return `${Math.max(1,midpoint-2)}–${Math.min(36,midpoint+2)}`;
+    let information=1;
+    for(const item of rows){const calibration=calibrationFor(item.question),p=responseProbability(bestTheta,calibration),a=Number(calibration.discrimination)||1;information+=a*a*p*(1-p);}
+    const se=Math.max(.18,Math.min(1.2,1/Math.sqrt(information))),lowerTheta=bestTheta-1.28*se,upperTheta=bestTheta+1.28*se;
+    const scale=theta=>test==='sat'?Math.round((400+1200/(1+Math.exp(-.9*theta)))/10)*10:Math.round(1+35/(1+Math.exp(-.9*theta)));
+    const low=Math.max(test==='sat'?400:1,scale(lowerTheta)),high=Math.min(test==='sat'?1600:36,scale(upperTheta)),midpoint=scale(bestTheta);
+    const sections=new Set(rows.map(item=>data.topicById[item.row.skill]?.section).filter(Boolean));
+    return {label:`${low}–${high}`,low,high,midpoint,theta:Math.round(bestTheta*100)/100,attempts:rows.length,sections:[...sections],method:`Independent 3PL-style estimate using ${calibrationVersion}; not official scoring`,version:calibrationVersion,confidence:rows.length>=200?'strong practice evidence':rows.length>=80?'developing practice evidence':'early practice evidence'};
+  }
+  function practiceRange() { return practiceEstimate().label; }
+
+  function recordScoreCheckpoint(kind,label,accuracyValue) {
+    const estimate=practiceEstimate();
+    if(!Number.isFinite(estimate.midpoint))return null;
+    const checkpoint={id:`${state.test}-${Date.now()}`,exam:state.test,kind,label,at:new Date().toISOString(),midpoint:estimate.midpoint,low:estimate.low,high:estimate.high,attempts:estimate.attempts,accuracy:accuracyValue,method:calibrationVersion};
+    state.scoreHistory[state.test].push(checkpoint);
+    state.scoreHistory[state.test]=state.scoreHistory[state.test].slice(-50);
+    selectedScorePoint=state.scoreHistory[state.test].length-1;
+    return checkpoint;
+  }
+
+  function scoreProgressMarkup() {
+    const points=state.scoreHistory[state.test]||[],plan=state.plan[state.test];
+    if(!points.length)return `<section class="prep-v2-card wide"><div class="prep-v2-kicker">Score progress</div><h2>Your evidence timeline starts with a diagnostic</h2><p>Complete a diagnostic now, then Scholark will recommend fresh reassessments as your plan advances. Ranges are independent practice estimates, not official scores.</p><button class="prep-v2-primary" onclick="ScholarkPrep.startDiagnostic()">Start baseline diagnostic</button></section>`;
+    const minimum=state.test==='sat'?400:1,maximum=state.test==='sat'?1600:36,width=760,height=250,padX=46,padY=28,plotWidth=width-padX*2,plotHeight=height-padY*2;
+    const x=index=>padX+(points.length===1?plotWidth/2:index/(points.length-1)*plotWidth);
+    const y=value=>padY+(maximum-Math.max(minimum,Math.min(maximum,value)))/(maximum-minimum)*plotHeight;
+    const line=points.map((point,index)=>`${x(index)},${y(point.midpoint)}`).join(' '),target=Math.max(minimum,Math.min(maximum,Number(plan.goal)||minimum));
+    const activeIndex=Math.max(0,Math.min(points.length-1,selectedScorePoint??points.length-1)),active=points[activeIndex],improvement=points.length>1?active.midpoint-points[0].midpoint:0;
+    const ticks=state.test==='sat'?[400,800,1200,1600]:[1,12,24,36],reassessAfter=state.test==='sat'?40:45,sinceLast=state.responses.filter(row=>row.exam===state.test&&Date.parse(row.at)>Date.parse(points.at(-1).at)).length;
+    return `<section class="prep-v2-card wide"><div class="prep-v2-kicker">${esc(window.currentUser?.displayName?.split(' ')[0]||'Your')} score progress</div><div class="prep-v2-toolbar"><div><h2>Evidence over time</h2><p>${points.length} diagnostic/full-test checkpoint${points.length===1?'':'s'} · ${improvement>0?`+${improvement}`:improvement} from baseline</p></div><div class="prep-v2-chip ${sinceLast>=reassessAfter?'good':''}">${sinceLast>=reassessAfter?'Fresh reassessment ready':`${reassessAfter-sinceLast} more practice responses before reassessment`}</div></div>
+      <div class="prep-v2-chart-scroll"><svg class="prep-v2-score-chart" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="prep-score-title prep-score-desc"><title id="prep-score-title">Estimated ${state.test.toUpperCase()} practice score progress</title><desc id="prep-score-desc">${points.map(point=>`${point.label}: ${point.low} to ${point.high}`).join('; ')}</desc>
+      ${ticks.map(tick=>`<line x1="${padX}" y1="${y(tick)}" x2="${width-padX}" y2="${y(tick)}" class="prep-v2-chart-grid"/><text x="${padX-8}" y="${y(tick)+4}" text-anchor="end">${tick}</text>`).join('')}
+      <line x1="${padX}" y1="${y(target)}" x2="${width-padX}" y2="${y(target)}" class="prep-v2-chart-target"/><text x="${width-padX}" y="${Math.max(14,y(target)-7)}" text-anchor="end">Goal ${target}</text>
+      ${points.map((point,index)=>`<line x1="${x(index)}" y1="${y(point.low)}" x2="${x(index)}" y2="${y(point.high)}" class="prep-v2-chart-range"/>`).join('')}${points.length>1?`<polyline points="${line}" class="prep-v2-chart-line"/>`:''}
+      ${points.map((point,index)=>`<circle cx="${x(index)}" cy="${y(point.midpoint)}" r="${index===activeIndex?7:5}" class="prep-v2-chart-point ${index===activeIndex?'active':''}" tabindex="0" role="button" aria-label="${esc(point.label)}, estimate ${point.low} to ${point.high}" onclick="ScholarkPrep.selectScorePoint(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();ScholarkPrep.selectScorePoint(${index})}"/>`).join('')}</svg></div>
+      <div class="prep-v2-callout"><strong>${esc(active.label)} · ${new Date(active.at).toLocaleDateString()}</strong><br>Estimated ${active.low}–${active.high} (midpoint ${active.midpoint}) · ${active.accuracy}% answered accuracy. The range reflects uncertainty and is not an official score.</div>
+      <div class="prep-v2-actions"><button class="prep-v2-primary" onclick="ScholarkPrep.startDiagnostic()">Take a fresh diagnostic</button><button class="prep-v2-secondary" onclick="ScholarkPrep.startFullTest()">Take a full test</button></div></section>`;
+  }
+
+  function selectScorePoint(index){selectedScorePoint=Number(index);renderDashboard();}
+
+  function recordItemMetric(question,correct,selected,timeMs,confidence) {
+    const existing=state.itemMetrics[question.id]&&typeof state.itemMetrics[question.id]==='object'?state.itemMetrics[question.id]:{};
+    const optionCounts=Array.isArray(existing.optionCounts)&&existing.optionCounts.length===4?existing.optionCounts.slice():[0,0,0,0];
+    if(Number.isInteger(selected)&&selected>=0&&selected<4)optionCounts[selected]+=1;
+    const attempts=(Number(existing.attempts)||0)+1;
+    const correctCount=(Number(existing.correct)||0)+(correct?1:0);
+    state.itemMetrics[question.id]={
+      version:calibrationVersion,
+      attempts,
+      correct:correctCount,
+      accuracy:Math.round(correctCount/attempts*10000)/10000,
+      optionCounts,
+      totalMs:(Number(existing.totalMs)||0)+Math.max(0,Number(timeMs)||0),
+      confidentWrong:(Number(existing.confidentWrong)||0)+(!correct&&confidence==='high'?1:0),
+      lastUpdated:new Date().toISOString()
+    };
   }
 
   function render() {
@@ -305,14 +407,16 @@
     const confidenceRows=testResponses.filter(row=>row.confidence);
     const confidenceAligned=confidenceRows.length>=5?Math.max(0,Math.round(100-(confidenceRows.reduce((sum,row)=>{const prediction={low:.3,medium:.6,high:.85}[row.confidence],outcome=row.correct?1:0;return sum+Math.pow(prediction-outcome,2);},0)/confidenceRows.length)/.25*100)):null;
     const reviewsDue=data.topics[state.test].filter(item=>reviewIsDue(item.id)).length;
+    const estimate=practiceEstimate();
     const rows = weakestTopics(6).map(item => {
       const m = mastery(item.id);
       return `<div class="prep-v2-mastery-row"><span>${esc(item.name)}</span><div class="prep-v2-progress"><span style="width:${m.score}%"></span></div><strong>${Math.round(m.score)}%</strong></div>`;
     }).join('');
     app().innerHTML = `<div class="prep-v2-grid">
       <section class="prep-v2-card"><div class="prep-v2-kicker">Current readiness</div><div class="prep-v2-metric">${avgMastery()}%</div><p>Average topic mastery—not an official score.</p></section>
-      <section class="prep-v2-card"><div class="prep-v2-kicker">Practice range</div><div class="prep-v2-metric">${practiceRange()}</div><p>${state.test === 'sat' ? 'SAT-style range' : 'ACT-style range'} after enough practice evidence.</p></section>
+      <section class="prep-v2-card"><div class="prep-v2-kicker">Independent practice range</div><div class="prep-v2-metric">${estimate.label}</div><p>${estimate.attempts} scored response${estimate.attempts===1?'':'s'} · ${estimate.confidence||'building evidence'}. This public-prior estimate is not an official SAT or ACT score.</p></section>
       <section class="prep-v2-card"><div class="prep-v2-kicker">Momentum</div><div class="prep-v2-metric">${state.streak} day${state.streak === 1 ? '' : 's'}</div><p>${state.xp} XP · ${accuracy()}% lifetime accuracy · ${reviewsDue} memory review${reviewsDue===1?'':'s'} due</p></section>
+      ${scoreProgressMarkup()}
       <section class="prep-v2-card wide">
         <div class="prep-v2-kicker">Your next seven study days</div><h2>${diag ? 'Plan built from your diagnostic and recent work' : 'Start with a diagnostic for a calibrated plan'}</h2>
         <p>Scholark prioritizes weak skills, then schedules spaced review so improvement sticks.</p>
@@ -521,7 +625,7 @@
     }
     const selected=[];
     const formSeed=Date.now();
-    Object.entries(requirements).forEach(([section,count])=>selected.push(...(section==='Reading'?buildActReadingSection(`act-${section}-${formSeed}`):buildModule(testQuestions().filter(q=>q.section===section),count,`act-${section}-${formSeed}`))));
+    Object.entries(requirements).forEach(([section,count])=>selected.push(...(section==='Reading'?buildActReadingSection(`act-${section}-${formSeed}`):section==='English'?buildActEnglishSection(`act-${section}-${formSeed}`):buildModule(testQuestions().filter(q=>q.section===section),count,`act-${section}-${formSeed}`))));
     startSession('exam',selected,{feedback:false,label:'Full ACT',segments:[
       {label:'English',start:0,end:49,timeLimit:35*60,route:'linear'},
       {label:'Math',start:50,end:94,timeLimit:50*60,route:'linear'},
@@ -541,13 +645,13 @@
     }
     const configs={English:[50,35],Math:[45,50],Reading:[36,40]},config=configs[section];
     if(!config||pool.length<config[0]){if(typeof showToast==='function')showToast('That ACT section is not available.','error');return;}
-    const questions=section==='Reading'?buildActReadingSection(seed):buildModule(pool,config[0],seed);
+    const questions=section==='Reading'?buildActReadingSection(seed):section==='English'?buildActEnglishSection(seed):buildModule(pool,config[0],seed);
     startSession('exam',questions,{feedback:false,label:`ACT ${section} Section`,segments:[{label:section,start:0,end:config[0]-1,timeLimit:config[1]*60,route:'linear'}]});
   }
   function startScienceTest() {
     const pool = testQuestions().filter(q=>q.section==='Science');
     if(pool.length<40){if(typeof showToast==='function')showToast('ACT Science needs more nonrepeating reviewed items before a full section can start.','error');return;}
-    startSession('exam', buildModule(pool,40,`act-science-${Date.now()}`), {feedback:false,label:'ACT Science',segments:[{label:'Optional Science',start:0,end:39,timeLimit:40*60,route:'linear'}]});
+    startSession('exam', buildActScienceSection(`act-science-${Date.now()}`), {feedback:false,label:'ACT Science',segments:[{label:'Optional Science',start:0,end:39,timeLimit:40*60,route:'linear'}]});
   }
   function buildModule(pool,count,seed,preference='mixed',excluded=new Set()) {
     const available=shuffle(pool.filter(q=>!excluded.has(q.id)),seed);
@@ -561,6 +665,20 @@
     available.sort((a,b)=>Math.abs(a.difficulty-target[selected.length%target.length])-Math.abs(b.difficulty-target[selected.length%target.length]));
     selected.push(...available.slice(0,Math.max(0,count-selected.length)));
     return selected.slice(0,count);
+  }
+  function buildActEnglishSection(seed) {
+    const grouped=testQuestions().filter(question=>question.section==='English'&&question.englishForm&&question.englishPassageSet).reduce((map,question)=>{
+      map[question.englishForm]??={};map[question.englishForm][question.englishPassageSet]??=[];map[question.englishForm][question.englishPassageSet].push(question);return map;
+    },{});
+    const complete=Object.entries(grouped).filter(([,sets])=>Object.keys(sets).length===5&&Object.values(sets).every(rows=>rows.length>=10));
+    if(!complete.length)return buildModule(testQuestions().filter(question=>question.section==='English'),50,seed);
+    const [,sets]=shuffle(complete,seed)[0];
+    return Object.entries(sets).sort(([a],[b])=>a.localeCompare(b)).flatMap(([,rows])=>shuffle(rows,`${seed}-${rows[0].englishPassageSet}`).slice(0,10));
+  }
+  function buildActScienceSection(seed) {
+    const groups=Object.values(Object.groupBy(testQuestions().filter(question=>question.section==='Science'&&question.stimulusGroup),question=>question.stimulusGroup)).filter(rows=>rows.length>=8);
+    if(groups.length<5)return buildModule(testQuestions().filter(question=>question.section==='Science'),40,seed);
+    return shuffle(groups,seed).slice(0,5).flatMap(rows=>shuffle(rows,`${seed}-${rows[0].stimulusGroup}`).slice(0,8));
   }
   function buildActReadingSection(seed) {
     const grouped=testQuestions().filter(question=>question.section==='Reading'&&question.passageSet&&question.readingForm).reduce((map,question)=>{
@@ -585,7 +703,7 @@
 
   function startSession(kind, questions, options) {
     if (!questions.length) { if (typeof showToast === 'function') showToast('No validated questions are available for that selection yet.', 'error'); return; }
-    session={kind,questions,current:0,answers:new Array(questions.length).fill(null),confidence:new Array(questions.length).fill(null),hintsUsed:new Array(questions.length).fill(0),flags:[],startedAt:Date.now(),questionStartedAt:Date.now(),feedback:!!options.feedback,label:options.label||kind,timeLimit:options.timeLimit||null,segments:options.segments||null,segmentIndex:0,segmentStartedAt:Date.now(),finished:false,replaySources:options.replaySources||null,approaches:new Array(questions.length).fill(null),skipped:[],revisited:[]};
+    session={kind,questions,current:0,answers:new Array(questions.length).fill(null),confidence:new Array(questions.length).fill(null),hintsUsed:new Array(questions.length).fill(0),flags:[],startedAt:Date.now(),questionStartedAt:Date.now(),feedback:!!options.feedback,label:options.label||kind,timeLimit:options.timeLimit||null,segments:options.segments||null,segmentIndex:0,segmentStartedAt:Date.now(),finished:false,replaySources:options.replaySources||null,approaches:new Array(questions.length).fill(null),skipped:[],revisited:[],eliminated:new Array(questions.length).fill(null).map(()=>[]),notes:new Array(questions.length).fill('')};
     state.view='practice'; updateChrome();
     saveSessionSnapshot();
     if(session.timeLimit) startTimer();
@@ -627,6 +745,29 @@
     return 'Return to the smallest phrase or detail that proves the claim. Eliminate choices that are broader, more absolute, or merely possible.';
   }
 
+  function toggleEliminate(index) {
+    if(!session||session.answers[session.current]!==null||!Number.isInteger(index)||index<0||index>3)return;
+    const rows=session.eliminated[session.current]||(session.eliminated[session.current]=[]),position=rows.indexOf(index);
+    if(position>=0)rows.splice(position,1);else rows.push(index);
+    saveSessionSnapshot();renderSession();
+  }
+
+  function updateNote(value) {
+    if(!session)return;
+    session.notes[session.current]=String(value||'').slice(0,1200);
+    saveSessionSnapshot();
+  }
+
+  function handlePrepKeydown(event) {
+    if(!session||event.defaultPrevented||event.ctrlKey||event.metaKey||event.altKey)return;
+    const tag=event.target?.tagName?.toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select'||event.target?.isContentEditable)return;
+    if(/^[1-4]$/.test(event.key)&&session.answers[session.current]===null){event.preventDefault();answer(Number(event.key)-1);return;}
+    if(event.key==='ArrowRight'){event.preventDefault();next();return;}
+    if(event.key==='ArrowLeft'){event.preventDefault();previous();return;}
+    if(event.key.toLowerCase()==='f'){event.preventDefault();toggleFlag();}
+  }
+
   function renderSession() {
     const q=session.questions[session.current], answer=session.answers[session.current], revealed=session.feedback&&answer!==null;
     const currentTopic=topic(q.skill);
@@ -636,8 +777,9 @@
     const hintCount=session.hintsUsed?.[session.current]||0;
     const hintPanel=session.feedback&&answer===null?`<div class="prep-v2-callout"><strong>Guided Hint Ladder</strong>${Array.from({length:hintCount},(_,index)=>`<p style="margin-top:7px"><strong>Hint ${index+1}:</strong> ${esc(guidedHint(q,index+1))}</p>`).join('')}<div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.showHint()" ${hintCount>=2?'disabled':''}>${hintCount===0?'Show first hint':hintCount===1?'Show deeper hint':'Hints used'}</button></div></div>`:'';
     app().innerHTML=`<div class="prep-v2-toolbar"><div><strong>${esc(segment?.label||session.label)}</strong><div class="prep-v2-muted">${esc(q.section)} · Question ${session.current-bounds.start+1} of ${bounds.end-bounds.start+1}${segment?' in this module/section':''}</div></div><div style="display:flex;align-items:center;gap:10px">${elapsed!==null?`<span class="prep-v2-timer" id="prep-session-timer">${formatTime(elapsed)}</span>`:''}<button class="prep-v2-secondary" onclick="ScholarkPrep.finishSession(true)">End session</button></div></div>
-      <div class="prep-v2-question-shell"><main class="prep-v2-question"><div class="prep-v2-qmeta"><span class="prep-v2-chip">${esc(q.exam.toUpperCase())}</span><span class="prep-v2-chip">${esc(currentTopic?.name||q.skill)}</span><span class="prep-v2-chip">Difficulty ${q.difficulty}/4</span>${q.calculator?'<span class="prep-v2-chip good">Calculator permitted</span>':''}${session.skipped.includes(session.current)?'<span class="prep-v2-chip focus">Returned skip</span>':''}</div>${replaySource?`<div class="prep-v2-callout"><strong>Fresh transfer check:</strong> this is a different question targeting the same skill as a saved <em>${esc(replaySource.errorType)}</em>.</div>`:''}${q.passage?`<div class="prep-v2-passage">${esc(q.passage)}</div>`:''}<div class="prep-v2-stem">${esc(q.stem)}</div>${decisionControls}${session.kind!=='exam'&&session.kind!=='decision'?`<div class="prep-v2-muted" style="margin-bottom:9px">Before answering, how confident are you? ${['low','medium','high'].map(level=>`<button class="prep-v2-chip ${session.confidence[session.current]===level?'good':''}" onclick="ScholarkPrep.setConfidence('${level}')" ${answer!==null?'disabled':''}>${level[0].toUpperCase()+level.slice(1)}</button>`).join('')}</div>`:''}${hintPanel}<div class="prep-v2-options">${q.options.map((option,index)=>{let cls=answer===index?' selected':'';if(revealed&&index===q.answer)cls+=' correct';if(revealed&&answer===index&&index!==q.answer)cls+=' wrong';return `<button class="prep-v2-option${cls}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.answer(${index})"><span class="prep-v2-letter">${letters[index]}</span><span>${esc(option)}</span></button>`;}).join('')}</div>${revealed?`<div class="prep-v2-explanation"><strong>${answer===q.answer?'Correct':'Not quite'} · ${esc(currentTopic?.name||'Explanation')}</strong>${esc(q.explanation)}<div style="margin-top:7px"><strong>Strategy:</strong> ${esc(currentTopic?.strategy||'Verify the relationship asked for before selecting a choice.')}</div></div>`:''}<div class="prep-v2-toolbar"><button class="prep-v2-secondary" onclick="ScholarkPrep.previous()" ${session.current===bounds.start?'disabled':''}>← Previous</button><div><button class="prep-v2-secondary" onclick="ScholarkPrep.toggleFlag()">${session.flags.includes(session.current)?'★ Flagged':'☆ Flag'}</button> <button class="prep-v2-primary" onclick="ScholarkPrep.next()">${session.current===bounds.end?(segment&&session.segmentIndex<session.segments.length-1?'End module / section':'Finish'):'Next →'}</button></div></div></main>
+      <div class="prep-v2-question-shell"><main class="prep-v2-question"><div class="prep-v2-qmeta"><span class="prep-v2-chip">${esc(q.exam.toUpperCase())}</span><span class="prep-v2-chip">${esc(currentTopic?.name||q.skill)}</span><span class="prep-v2-chip">Difficulty ${q.difficulty}/4</span>${q.calculator?'<span class="prep-v2-chip good">Calculator permitted</span>':''}${session.skipped.includes(session.current)?'<span class="prep-v2-chip focus">Returned skip</span>':''}</div>${replaySource?`<div class="prep-v2-callout"><strong>Fresh transfer check:</strong> this is a different question targeting the same skill as a saved <em>${esc(replaySource.errorType)}</em>.</div>`:''}${q.passage?`<div class="prep-v2-passage">${esc(q.passage)}</div>`:''}<div class="prep-v2-stem">${esc(q.stem)}</div>${decisionControls}${session.kind!=='exam'&&session.kind!=='decision'?`<div class="prep-v2-muted" style="margin-bottom:9px">Before answering, how confident are you? ${['low','medium','high'].map(level=>`<button class="prep-v2-chip ${session.confidence[session.current]===level?'good':''}" onclick="ScholarkPrep.setConfidence('${level}')" ${answer!==null?'disabled':''}>${level[0].toUpperCase()+level.slice(1)}</button>`).join('')}</div>`:''}${hintPanel}<div class="prep-v2-options">${q.options.map((option,index)=>{let cls=answer===index?' selected':'';if(session.eliminated[session.current]?.includes(index))cls+=' eliminated';if(revealed&&index===q.answer)cls+=' correct';if(revealed&&answer===index&&index!==q.answer)cls+=' wrong';return `<div class="prep-v2-option-row"><button class="prep-v2-option${cls}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.answer(${index})"><span class="prep-v2-letter">${letters[index]}</span><span>${esc(option)}</span></button><button class="prep-v2-eliminate ${session.eliminated[session.current]?.includes(index)?'active':''}" ${answer!==null?'disabled':''} onclick="ScholarkPrep.toggleEliminate(${index})" aria-label="${session.eliminated[session.current]?.includes(index)?'Restore':'Eliminate'} choice ${letters[index]}">×</button></div>`;}).join('')}</div>${revealed?`<div class="prep-v2-explanation"><strong>${answer===q.answer?'Correct':'Not quite'} · ${esc(currentTopic?.name||'Explanation')}</strong>${esc(q.explanation)}<div style="margin-top:7px"><strong>Strategy:</strong> ${esc(currentTopic?.strategy||'Verify the relationship asked for before selecting a choice.')}</div></div>`:''}<details class="prep-v2-scratch"><summary>Scratchpad / annotation</summary><label class="sr-only" for="prep-note">Notes for this question</label><textarea id="prep-note" rows="4" placeholder="Write evidence, equations, or a reminder…" oninput="ScholarkPrep.updateNote(this.value)">${esc(session.notes[session.current]||'')}</textarea></details><div class="prep-v2-muted prep-v2-shortcuts">Keyboard: 1–4 answer · ←/→ navigate · F flag</div><div class="prep-v2-toolbar"><button class="prep-v2-secondary" onclick="ScholarkPrep.previous()" ${session.current===bounds.start?'disabled':''}>← Previous</button><div><button class="prep-v2-secondary" onclick="ScholarkPrep.toggleFlag()">${session.flags.includes(session.current)?'★ Flagged':'☆ Flag'}</button> <button class="prep-v2-primary" onclick="ScholarkPrep.next()">${session.current===bounds.end?(segment&&session.segmentIndex<session.segments.length-1?'End module / section':'Finish'):'Next →'}</button></div></div></main>
       <aside class="prep-v2-side"><div class="prep-v2-sidebox"><h4>Question map</h4><div class="prep-v2-map">${session.questions.slice(bounds.start,bounds.end+1).map((item,offset)=>{const index=bounds.start+offset;return `<button class="${index===session.current?'current ':''}${session.answers[index]!==null?'done ':''}${session.flags.includes(index)?'flagged':''}" onclick="ScholarkPrep.goTo(${index})">${offset+1}</button>`;}).join('')}</div></div>${pacingCoachMarkup(bounds,elapsed)}<div class="prep-v2-sidebox"><h4>${esc(currentTopic?.name||'Current skill')}</h4><p>${esc(currentTopic?.lesson||'Use the information given to choose the best-supported answer.')}</p>${q.calculator?'<div class="prep-v2-actions"><button class="prep-v2-secondary" onclick="ScholarkPrep.openCalculatorDuringSession()">Open calculator</button></div>':''}</div><div class="prep-v2-sidebox"><h4>Saved automatically</h4><p>Answers and mastery updates are stored after each response. Signed-in progress also syncs to your account.</p></div></aside></div>`;
+    if(q.figure){const stem=app().querySelector?.('.prep-v2-stem');if(stem)stem.insertAdjacentHTML('beforebegin',figureMarkup(q.figure));}
   }
 
   function answer(index) {
@@ -688,6 +830,7 @@
     const timeMs=Date.now()-session.questionStartedAt, confidence=session.confidence?.[session.current]||null;
     const errorType=correct?null:confidence==='high'?'confident misconception':timeMs<9000?'rushed decision':q.section==='Math'?'setup or calculation':'evidence or distractor';
     const hintsUsed=session.hintsUsed?.[session.current]||0;
+    recordItemMetric(q,correct,selected,timeMs,confidence);
     state.responses.push({questionId:q.id,exam:q.exam,skill:q.skill,difficulty:q.difficulty,correct,selected,answer:q.answer,confidence,errorType,at:now,timeMs,hintsUsed,sessionKind:session.kind,approach:session.approaches?.[session.current]||null,skipped:session.skipped?.includes(session.current)||false,revisited:session.revisited?.includes(session.current)||false});
     state.responses=state.responses.slice(-2000); state.xp+=correct?Math.max(4,10+q.difficulty*3-hintsUsed*4):2; updateStreak(); saveState();
   }
@@ -739,7 +882,12 @@
     const answered=finished.answers.filter(answer=>answer!==null).length;
     const correct=finished.questions.reduce((sum,q,index)=>sum+(finished.answers[index]===q.answer?1:0),0);
     const accuracyValue=answered?Math.round(correct/answered*100):0;
-    if(finished.kind==='diagnostic') state.diagnostic[state.test]={completedAt:new Date().toISOString(),correct,total:finished.questions.length,answered,accuracy:accuracyValue,weakest:weakestTopics(5).map(item=>item.id)};
+    if(finished.kind==='diagnostic') {
+      state.diagnostic[state.test]={completedAt:new Date().toISOString(),correct,total:finished.questions.length,answered,accuracy:accuracyValue,weakest:weakestTopics(5).map(item=>item.id)};
+      recordScoreCheckpoint('diagnostic',`${state.test.toUpperCase()} diagnostic`,accuracyValue);
+    } else if(finished.kind==='exam'&&(/^Full Digital SAT$|^Full ACT$/).test(finished.label)) {
+      recordScoreCheckpoint('full-test',finished.label,accuracyValue);
+    }
     saveState();
     const breakdown={}; finished.questions.forEach((q,index)=>{const key=q.domain;breakdown[key]??={total:0,correct:0};breakdown[key].total++;if(finished.answers[index]===q.answer)breakdown[key].correct++;});
     if(finished.kind==='decision'){
@@ -806,7 +954,7 @@
   function openCalculatorDuringSession(){if(!session)return;renderCalculator();}
   function returnToSession(){if(session)renderSession();}
 
-  const API={init,setTest,showView,savePlan,openPlanStudio,applyPlanScenario,startDiagnostic,startAdaptive,startMemoryReview,startSkill,startPractice,startMistakes,startMisconceptionReplay,startDecisionSimulator,openLesson,openCourse,openCourseLesson,startFullTest,startSectionTest,startScienceTest,openOfficialPractice,answer,setConfidence,showHint,setApproach,skipQuestion,previous,next,goTo,toggleFlag,finishSession,renderCalculator,calcPreview,calcKey,plotExpression,findRoots,graphZoom,graphReset,openDesmos,openCalculatorDuringSession,returnToSession};
+  const API={init,setTest,showView,savePlan,openPlanStudio,applyPlanScenario,startDiagnostic,startAdaptive,startMemoryReview,startSkill,startPractice,startMistakes,startMisconceptionReplay,startDecisionSimulator,openLesson,openCourse,openCourseLesson,startFullTest,startSectionTest,startScienceTest,openOfficialPractice,answer,setConfidence,showHint,setApproach,skipQuestion,previous,next,goTo,toggleFlag,toggleEliminate,updateNote,finishSession,renderCalculator,calcPreview,calcKey,plotExpression,findRoots,graphZoom,graphReset,openDesmos,openCalculatorDuringSession,returnToSession,getPracticeEstimate:practiceEstimate,selectScorePoint};
   window.ScholarkPrep=API;
   window.initPrep=init;
   window.setPrepSubject=function(){};
