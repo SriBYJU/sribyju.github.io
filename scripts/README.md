@@ -1,5 +1,18 @@
 # Scholark — Automated Weekly Email System
 
+## AP Studio release gate
+
+The AP market-quality phase stays local until `npm run ap:release` reaches at least **96/100** and browser QA passes. AP Studio v2 currently supports **23 courses**, **3,480 original concept-and-reasoning checks**, and **70 exam-specific written/performance task modes**. It uses current public section counts, timing, and weights; it does not copy or number-swap released questions. See `AP_BENCHMARK.md` for the dated public comparison, release contract, and honest limitations.
+
+AP verification:
+
+```powershell
+cd scripts
+npm ci
+npm test
+npm run ap:release
+```
+
 ## SAT/ACT 9.6 release gate
 
 The SAT/ACT quality phase stays local until `npm run prep:market-release` reaches at least **96/100** and the browser evidence gate passes. Run `npm run prep:market-audit` for the engineering/product-readiness breakdown and `npm run prep:audit` for the content-focused breakdown. The audits use `prep-official-sources.json` to record the official College Board and ACT publications used for structure, aggregate methodology, and scoring priors; copyrighted questions are not republished or number-swapped.

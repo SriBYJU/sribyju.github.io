@@ -1,0 +1,38 @@
+{
+  "runDate": "2026-08-16",
+  "target": "http://localhost:8080/scripts/ap-browser-harness.html",
+  "browser": "Codex in-app browser",
+  "result": "pass",
+  "coverage": {
+    "courseHub": {
+      "coursesOpened": 23,
+      "failures": 0,
+      "checks": ["search and category controls rendered", "all course cards opened", "eight workspace tabs per course", "four current-format metrics per course"]
+    },
+    "adaptivePractice": {
+      "result": "pass",
+      "checks": ["diagnostic starts", "four unique choices", "confidence selection", "answer feedback", "question map", "elimination", "scratchpad", "flagging", "session resumed after reload"]
+    },
+    "constructedResponse": {
+      "result": "pass",
+      "checks": ["APUSH SAQ/DBQ/LEQ modes", "Psychology AAQ/EBQ modes", "Spanish project presentation/project Q&A/argument essay modes", "local rubric feedback"]
+    },
+    "responsive": {
+      "viewport": "390x844",
+      "result": "pass",
+      "documentHorizontalOverflow": false,
+      "questionCardWidthPx": 355,
+      "sidePanelWidthPx": 355,
+      "questionMapButtons": 12
+    },
+    "console": {
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "notes": [
+    "Cloud functions were replaced with local no-op stubs in the browser harness; automated unit tests cover the sync contract.",
+    "No production account credentials or private data were used.",
+    "A separate production-page tab navigation was blocked by browser security policy; syntax, bundle order, integrity, and the production AP scripts are covered by repository tests."
+  ]
+}

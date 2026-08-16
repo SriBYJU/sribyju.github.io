@@ -8,7 +8,9 @@
     "prep:audit": "node prep-quality-audit.js",
     "prep:release": "node prep-quality-audit.js --release",
     "prep:market-audit": "node prep-market-quality-audit.js",
-    "prep:market-release": "node prep-market-quality-audit.js --release"
+    "prep:market-release": "node prep-market-quality-audit.js --release",
+    "ap:audit": "node ap-market-quality-audit.js",
+    "ap:release": "node ap-market-quality-audit.js --release"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",

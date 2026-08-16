@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Scholark AP Studio Browser Harness</title>
+  <style>
+    :root{--bg:#fffdfa;--bg2:#f6f3ed;--bg3:#ece8df;--ink:#1d1d24;--ink2:#4a4852;--ink3:#77727e;--border:#ddd8cf;--accent:#c6622a;--blue-light:#eef5ff;--green:#267a4a;--green-light:#eaf7ef;--red:#b23a3a;--red-light:#fff0f0;--gold:#9c6a15;--font-body:Inter,system-ui,sans-serif;--font-display:Georgia,serif;--font-mono:ui-monospace,monospace;--shadow:0 8px 28px rgba(30,28,22,.07)}
+    @media(prefers-color-scheme:dark){:root{--bg:#17171b;--bg2:#202027;--bg3:#2a2a32;--ink:#f6f2e9;--ink2:#d1ccd2;--ink3:#a7a1aa;--border:#3a3942;--blue-light:#19273a;--green-light:#173427;--red-light:#391d20}}
+    body{margin:0;background:var(--bg2);font-family:var(--font-body);color:var(--ink)}.page{display:block}.ad-reserve{display:none}
+  </style>
+  <link rel="stylesheet" href="../ap-v2.css">
+</head>
+<body>
+  <div class="page" id="page-ap"></div>
+  <script>
+    window.currentUser={uid:'ap-browser-harness-v2',displayName:'AP QA'};
+    window._dbSaveSyncState=async()=>true;
+    window._dbGetSyncState=async()=>[];
+    window.showToast=(message,type)=>{const node=document.getElementById('ap2-live');if(node){node.textContent=message;node.dataset.type=type||'info';}};
+  </script>
+  <script src="../ap-v2-data.js"></script>
+  <script src="../ap-v2-app.js"></script>
+  <script>ScholarkAP.init();</script>
+</body>
+</html>
