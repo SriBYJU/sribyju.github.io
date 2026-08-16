@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scholark — The Free College Toolkit: GPA, AP Study, SAT Prep & More - By Shriyan Avadhanula</title>
-<meta name="description" content="Free college planning tools for GPA, essays, applications, financial planning, SAT/ACT practice, and AP study.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8622a'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-size='58' font-family='serif' fill='white'%3ES%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Free college planning tools used by 10,000+ students monthly for GPA, essays, applications, financial planning, SAT/ACT practice, and AP study.">
+<link rel="icon" type="image/svg+xml" href="scholark-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -50,9 +50,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-hei
 /* NAV */
 nav{position:sticky;top:0;z-index:1000;background:rgba(250,249,246,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;animation:fadeDown .4s ease}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--ink);text-decoration:none}
-.nav-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:breathe 3s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.nav-logo{display:flex;align-items:center;gap:9px;cursor:pointer;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
+.nav-logo-mark{width:34px;height:34px;display:block;filter:drop-shadow(0 3px 6px rgba(106,43,17,.16));transition:transform .25s ease,filter .25s ease}
+.nav-logo:hover .nav-logo-mark{transform:translateY(-1px) rotate(-2deg);filter:drop-shadow(0 5px 9px rgba(106,43,17,.22))}
+.brand-k{position:relative;color:var(--accent);font-style:italic;margin-left:.01em}
+.brand-k::after{content:'';position:absolute;width:4px;height:4px;right:-5px;top:0;border-radius:1px;background:#eeb468;transform:rotate(45deg);box-shadow:0 0 0 2px rgba(238,180,104,.16)}
 .nav-links{display:flex;align-items:center;gap:6px}
 .nav-link{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink2);background:none;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
 .nav-link:hover{background:var(--bg2);color:var(--ink)}
@@ -229,7 +231,9 @@ hr{border:none;border-top:1px solid var(--border2);margin:20px 0}
 /* FOOTER */
 footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:36px}
-.footer-brand .logo{font-family:var(--font-display);font-size:22px;color:white;margin-bottom:10px}
+.footer-brand .logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:22px;color:white;margin-bottom:10px;font-weight:700;letter-spacing:-.02em}
+.footer-brand .logo img{width:38px;height:38px;display:block}
+.footer-brand .brand-k{color:#f1a16f}
 .footer-brand p{font-size:13px;line-height:1.7;max-width:260px}
 .footer-col h4{color:white;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
 .footer-col a{display:block;color:rgba(255,255,255,.55);font-size:13px;text-decoration:none;margin-bottom:8px;transition:var(--transition);cursor:pointer}
@@ -868,8 +872,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <!-- NAVIGATION -->
 <nav>
   <div class="nav-logo" onclick="showPage('home')">
-    <div class="nav-logo-dot"></div>
-    Scholark
+    <img class="nav-logo-mark" src="scholark-mark.svg" alt="">
+    <span>Scholar<span class="brand-k">k</span></span>
   </div>
   <div class="nav-links">
     <button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button>
@@ -915,7 +919,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <h1>The College <em>Toolkit</em><br>Students Actually Use</h1>
       <p class="hero-desc">Seven precision calculators plus an on-device essay coach for every stage of your college journey.</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Core calculators</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">10,000+</div><div class="hero-stat-label">Students monthly</div></div>
         <div class="hero-stat"><div class="hero-stat-num">200+</div><div class="hero-stat-label">Universities tracked</div></div>
         <div class="hero-stat"><div class="hero-stat-num">19</div><div class="hero-stat-label">AP subjects</div></div>
       </div>
@@ -949,7 +953,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
   <footer>
     <div class="footer-grid">
-      <div class="footer-brand"><div class="logo">Scholark</div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
+      <div class="footer-brand"><div class="logo"><img src="scholark-mark.svg" alt=""><span>Scholar<span class="brand-k">k</span></span></div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
       <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('prep');initPrep()">SAT Prep</a><a onclick="showPage('compare')">Compare</a><a onclick="showPage('counselor');initCounselor()">Admissions Guide</a></div>
       <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay Coach</a></div>
@@ -1281,7 +1285,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
   <footer>
     <div class="footer-grid">
-      <div class="footer-brand"><div class="logo">Scholark</div><p>Free college planning tools for high school and college students. Up-to-date with 2026 rates.</p></div>
+      <div class="footer-brand"><div class="logo"><img src="scholark-mark.svg" alt=""><span>Scholar<span class="brand-k">k</span></span></div><p>Free college planning tools for high school and college students. Up-to-date with 2026 rates.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="switchTab('gpa',null)">GPA Calculator</a><a onclick="switchTab('weighted',null)">Weighted GPA</a><a onclick="switchTab('needed',null)">Grade Needed</a><a onclick="switchTab('chances',null)">College Chances</a></div>
       <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a></div>
       <div class="footer-col"><h4>Important</h4><p>Results are estimates for educational use, not professional advice.</p></div>
@@ -2104,25 +2108,29 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="about-hero-content">
       <div class="about-avatar"><img src="IMG_7529.png" alt="Profile Picture"></div>
       <h1>Built by a Student,<br>for Students</h1>
-      <p class="subtitle">Scholark was created by Shriyan Avadhanula, a 10th-grade student who got tired of juggling spreadsheets and clunky calculators.</p>
+      <p class="subtitle">Scholark was created by Shriyan Avadhanula, an 11th-grade student building the college-planning platform he wanted for himself and other students.</p>
     </div>
   </div>
   <div class="about-content">
     <div class="about-section">
       <h2>The Story</h2>
       <p>Every college prep tool online was either buried behind a signup form, littered with irrelevant ads, or just plain ugly. The ones that were good cost money. So I built Scholark — a clean, fast, actually useful set of calculators that every student deserves for free.</p>
-      <p>What started as a personal GPA tracker for my own IB MYP coursework turned into a full platform when friends kept asking to use it.</p>
+      <p>What started as a personal GPA tracker for my own IB coursework grew into a platform used by more than 10,000 students each month.</p>
     </div>
     <div class="about-section">
       <h2>About the Creator</h2>
-      <p>Shriyan Avadhanula, a high schooler in Virginia, enrolled in an IB program, targeting UVA McIntire and Virginia Tech's Computing and Management program. Outside school, I founded and run a data privacy organization called DataShadow to help people manage and monetize their data, and I've also filed a patent on specific AI claims, and run finance/business initiatives through Fund Flow RVA.</p>
+      <p>I'm Shriyan Avadhanula, an 11th-grade student in Henrico High School's full IB Diploma Programme, with a 3.95 unweighted GPA and a 4.5+ weighted GPA. I build at the intersection of technology, finance, cybersecurity, and entrepreneurship—usually by turning a complicated system into something people can actually use.</p>
+      <p>Beyond Scholark, I founded the patent-pending DataShadow platform, co-founded the ATHENA athlete-intelligence research platform, created the privacy-first DinkSense coaching app, and publish an annual Cyber Risk Intelligence Report. ATHENA's models have been validated across 27,548 athletes and 155,109 real-world race records.</p>
+      <p>I've completed 22 certifications and career credentials, including finance job simulations from JPMorgan Chase and Goldman Sachs and technology credentials from IBM, Microsoft, OpenAI, and Salesforce. I also study live-style M&amp;A analysis through Partner-level mentorship and compete as a sponsored 4.5-rated junior pickleball athlete.</p>
       <div class="badge-grid">
-        <div class="badge">📊 IB Student</div>
-        <div class="badge">🎾 Founded DataShadow</div>
-        <div class="badge">💼 Finance Co-President</div>
-        <div class="badge">🔐 Cybersecurity Researcher</div>
-        <div class="badge">🎓 2x Presidential Educational Award</div>
-        <div class="badge">📈 M&A Mentorship</div>
+        <div class="badge">📊 11th-Grade IB Student</div>
+        <div class="badge">🚀 10,000+ Monthly Scholark Users</div>
+        <div class="badge">🏅 22 Certifications &amp; Credentials</div>
+        <div class="badge">🔐 Patent-Pending Founder</div>
+        <div class="badge">🧪 155,109 Athletic Records Analyzed</div>
+        <div class="badge">🛡️ Published Cyber-Risk Author</div>
+        <div class="badge">📈 Partner-Level M&amp;A Mentorship</div>
+        <div class="badge">🏓 Sponsored Competitive Athlete</div>
       </div>
     </div>
     <div class="about-section">
