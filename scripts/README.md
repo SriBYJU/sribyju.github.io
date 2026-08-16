@@ -1,13 +1,17 @@
 # Scholark — Automated Weekly Email System
 
-Sends AI-curated college prep tips to subscribers every **Monday at 8 AM ET** via GitHub Actions. **Completely free** — no Firebase Blaze plan needed.
+Sends curated college prep tips every Monday via GitHub Actions. The workflow is scheduled for **13:15 UTC** and does not promise a particular inbox-delivery time.
 
 ## How It Works
 
-- GitHub Actions runs `scripts/send-weekly-email.js` every Monday at 12:00 UTC (8 AM ET)
-- The script reads active subscribers from Firestore (`email_subscribers` collection)
+- GitHub Actions runs `scripts/send-weekly-email.js` every Monday at 13:15 UTC
+- The script pages through every Firebase Authentication user (1,000 per page) and combines those addresses with the Firestore `email_subscribers` collection
+- Email addresses are normalized, deduplicated, and suppressed when any matching subscriber record is explicitly inactive or unsubscribed
 - Sends a branded HTML email with 5 college prep tips via Gmail SMTP
 - 52 unique weekly tip sets rotate throughout the year
+- A workflow concurrency group and a Firestore lease prevent overlapping sends
+- Aggregate eligible, attempted, sent, and failed counts are logged without printing full recipient addresses
+- Each message includes a mail-based unsubscribe link and `List-Unsubscribe` header
 - You can also trigger the workflow manually from the GitHub Actions tab
 
 ## Setup (One-Time)
@@ -41,7 +45,7 @@ Add these 3 secrets:
 
 ### 4. Done!
 
-The workflow will automatically run every Monday. You can also trigger it manually:
+The workflow will attempt to send every Monday. Delivery remains subject to Gmail and recipient-provider filtering. You can also trigger it manually:
 1. Go to the **Actions** tab in your GitHub repo
 2. Select **"Weekly Email"** from the left sidebar
 3. Click **"Run workflow"**

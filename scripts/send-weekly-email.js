@@ -1,8 +1,9 @@
 /**
  * Scholark — Automated Weekly College Tips Email
  *
- * Runs via GitHub Actions every Monday at 8 AM ET (12:00 UTC).
- * Reads subscribers from Firestore, sends branded email via Gmail SMTP.
+ * Runs via GitHub Actions every Monday at 13:15 UTC.
+ * Combines Firebase Authentication users with Firestore preferences, then
+ * sends branded email via Gmail SMTP.
  *
  * Required environment variables:
  *   FIREBASE_SERVICE_ACCOUNT — JSON string of Firebase service account key
@@ -11,13 +12,26 @@
  */
 
 import { initializeApp, cert } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
 import { createTransport } from "nodemailer";
+import { createHash, randomUUID } from "node:crypto";
+import { pathToFileURL } from "node:url";
 
 // ── Firebase setup ──────────────────────────────────────────
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-initializeApp({ credential: cert(serviceAccount) });
-const db = getFirestore();
+let db;
+let auth;
+function initializeFirebaseAdmin() {
+  const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!rawServiceAccount) throw new Error("Missing FIREBASE_SERVICE_ACCOUNT environment variable.");
+  let serviceAccount;
+  try { serviceAccount = JSON.parse(rawServiceAccount); }
+  catch { throw new Error("FIREBASE_SERVICE_ACCOUNT must contain valid JSON."); }
+  initializeApp({ credential: cert(serviceAccount) });
+  db = getFirestore();
+  auth = getAuth();
+}
+const RUN_LOCK_TTL_MS = 2 * 60 * 60 * 1000;
 
 // ── 52 unique weekly tips — one for each week of the year ───
 const WEEKLY_TIPS = [
@@ -1048,7 +1062,7 @@ const WEEKLY_TIPS = [
       "Start with the GPA Calculator to know exactly where you stand — awareness is the first step to improvement.",
       "Use the SAT/ACT Prep daily — even 10 minutes of practice builds momentum and earns XP.",
       "Compare your dream schools with the College Comparison tool — data-driven decisions beat emotional ones.",
-      "Run your essay through the AI Coach before submitting — an outside perspective catches what you miss.",
+      "Run your essay through the on-device Essay Rubric Coach before submitting, then ask a trusted person for a second read.",
       "Set a GPA goal and check the Goal Tracker weekly — consistent monitoring keeps you accountable all semester."
     ]
   },
@@ -1065,7 +1079,8 @@ const WEEKLY_TIPS = [
 ];
 
 // ── Email HTML template ─────────────────────────────────────
-function getEmailHTML(tip, weekNum, totalWeeks) {
+function getEmailHTML(tip, weekNum, totalWeeks, unsubscribeEmail) {
+  const unsubscribeHref = `mailto:${encodeURIComponent(unsubscribeEmail)}?subject=${encodeURIComponent('Unsubscribe from Scholark weekly tips')}&body=${encodeURIComponent('Please unsubscribe this email address from Scholark weekly tips.')}`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -1084,12 +1099,11 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
     .tip-num{display:inline-block;width:24px;height:24px;background:#c8622a;color:white;border-radius:50%;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0}
     .tip-row{display:flex;align-items:flex-start;gap:0}
     .cta{display:inline-block;padding:12px 24px;background:#c8622a;color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;margin:24px 0}
-    .pro-box{background:#fdf0e8;border:1px solid #f5d5c0;border-radius:10px;padding:20px;margin:28px 0 8px;text-align:center}
-    .pro-box h3{margin:0 0 8px;font-size:16px;color:#c8622a;font-weight:700}
-    .pro-box p{margin:0 0 14px;font-size:13px;color:#1a1714}
-    .pro-box ul{list-style:none;padding:0;margin:0 0 16px;font-size:13px;color:#1a1714;text-align:left;display:inline-block}
-    .pro-box ul li{padding:3px 0}
-    .pro-cta{display:inline-block;padding:10px 20px;background:#c8622a;color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px}
+    .feature-box{background:#fdf0e8;border:1px solid #f5d5c0;border-radius:10px;padding:20px;margin:28px 0 8px;text-align:center}
+    .feature-box h3{margin:0 0 8px;font-size:16px;color:#c8622a;font-weight:700}
+    .feature-box p{margin:0 0 14px;font-size:13px;color:#1a1714}
+    .feature-box ul{list-style:none;padding:0;margin:0 0 16px;font-size:13px;color:#1a1714;text-align:left;display:inline-block}
+    .feature-box ul li{padding:3px 0}
     .signoff{padding:24px 0 0;font-size:14px;color:#1a1714;line-height:1.7}
     .signoff .name{font-weight:700}
     .footer{text-align:center;padding:24px 0;border-top:1px solid #f3f1ec;font-size:12px;color:#8a847b}
@@ -1115,16 +1129,15 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
       <div style="text-align:center">
         <a href="https://sribyju.github.io" class="cta">Open Scholark &rarr;</a>
       </div>
-      <div class="pro-box">
-        <h3>&#10024; Want to take it further?</h3>
-        <p>With <strong>Scholark Pro</strong>, you get tools most students don't have access to:</p>
+      <div class="feature-box">
+        <h3>&#10024; Keep building momentum</h3>
+        <p>Every Scholark tool is free for signed-in students:</p>
         <ul>
-          <li>&#10003; <strong>AI Essay Coach</strong> &mdash; real-time feedback on your essays</li>
+          <li>&#10003; <strong>Essay Rubric Coach</strong> &mdash; private, admissions-reader-style feedback</li>
           <li>&#10003; <strong>Scholarship Finder</strong> &mdash; matched to your profile</li>
           <li>&#10003; <strong>Study Planner</strong> &mdash; never miss a deadline again</li>
           <li>&#10003; <strong>College Compatibility Quiz</strong> &mdash; find your perfect fit</li>
         </ul>
-        <a href="https://sribyju.github.io" class="pro-cta">Try Pro Free for 7 Days &rarr;</a>
       </div>
       <div class="signoff">
         <p>Regards,</p>
@@ -1133,7 +1146,8 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
       </div>
     </div>
     <div class="footer">
-      <p>You're receiving this because you signed up for Scholark weekly tips.</p>
+      <p>You're receiving this because you have a Scholark account or subscribed to weekly tips.</p>
+      <p><a href="${unsubscribeHref}">Unsubscribe from weekly emails</a></p>
       <p><a href="https://sribyju.github.io">Scholark</a> &middot; Free college planning tools</p>
     </div>
   </div>
@@ -1141,90 +1155,185 @@ function getEmailHTML(tip, weekNum, totalWeeks) {
 </html>`;
 }
 
+export function normalizeEmail(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+function isEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export function recipientFingerprint(email) {
+  return createHash("sha256").update(email).digest("hex").slice(0, 10);
+}
+
+export function redactEmailAddresses(value) {
+  return String(value || "").replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted-email]");
+}
+
+export async function getAllAuthEmails(authClient = auth) {
+  const emails = new Set();
+  let pageToken;
+  do {
+    const page = await authClient.listUsers(1000, pageToken);
+    for (const user of page.users) {
+      const email = normalizeEmail(user.email);
+      if (isEmail(email)) emails.add(email);
+    }
+    pageToken = page.pageToken;
+  } while (pageToken);
+  return emails;
+}
+
+async function getSubscriberPreferences(dbClient = db) {
+  const snapshot = await dbClient.collection("email_subscribers").get();
+  const preferences = new Map();
+  for (const document of snapshot.docs) {
+    const data = document.data();
+    const email = normalizeEmail(data.email || document.id);
+    if (!isEmail(email)) continue;
+    const existing = preferences.get(email) || { active: false, suppressed: false };
+    const explicitlyInactive = data.active === false || Boolean(data.unsubscribedAt);
+    preferences.set(email, {
+      active: existing.active || data.active !== false,
+      // Any explicit inactive duplicate wins so case-variant records cannot
+      // accidentally reactivate a person who opted out.
+      suppressed: existing.suppressed || explicitlyInactive,
+    });
+  }
+  return preferences;
+}
+
+export async function getEligibleRecipients(authClient = auth, dbClient = db) {
+  const [authEmails, subscriberPreferences] = await Promise.all([
+    getAllAuthEmails(authClient),
+    getSubscriberPreferences(dbClient),
+  ]);
+  const candidates = new Set(authEmails);
+  for (const [email, preference] of subscriberPreferences) {
+    if (preference.active) candidates.add(email);
+  }
+  return [...candidates]
+    .filter((email) => !subscriberPreferences.get(email)?.suppressed)
+    .sort();
+}
+
+async function acquireRunLock() {
+  const owner = randomUUID();
+  const lockRef = db.collection("email_meta").doc("weekly_run_lock");
+  await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(lockRef);
+    const expiresAt = snapshot.data()?.expiresAt?.toMillis?.() || 0;
+    if (expiresAt > Date.now()) {
+      const error = new Error("A weekly email run is already active.");
+      error.code = "RUN_ALREADY_ACTIVE";
+      throw error;
+    }
+    transaction.set(lockRef, {
+      owner,
+      startedAt: FieldValue.serverTimestamp(),
+      expiresAt: Timestamp.fromMillis(Date.now() + RUN_LOCK_TTL_MS),
+    });
+  });
+  return async () => {
+    await db.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(lockRef);
+      if (snapshot.data()?.owner === owner) transaction.delete(lockRef);
+    });
+  };
+}
+
+async function getNextWeekNumber() {
+  const counterRef = db.collection("email_meta").doc("week_counter");
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(counterRef);
+    let weekNum = (snapshot.data()?.current || 0) + 1;
+    if (weekNum > WEEKLY_TIPS.length) weekNum = 1;
+    transaction.set(counterRef, { current: weekNum, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    return weekNum;
+  });
+}
+
 // ── Main ────────────────────────────────────────────────────
 async function main() {
-  const emailUser = process.env.EMAIL_USER;
+  initializeFirebaseAdmin();
+  const emailUser = normalizeEmail(process.env.EMAIL_USER);
   const emailPass = process.env.EMAIL_PASS;
+  if (!emailUser || !emailPass) throw new Error("Missing EMAIL_USER or EMAIL_PASS environment variables.");
 
-  if (!emailUser || !emailPass) {
-    console.error("Missing EMAIL_USER or EMAIL_PASS environment variables.");
-    process.exit(1);
-  }
-
-  // Determine which tip to send (sequential counter stored in Firestore)
-  let weekNum = 1;
-  const counterRef = db.collection("email_meta").doc("week_counter");
-  const counterSnap = await counterRef.get();
-  if (counterSnap.exists) {
-    weekNum = (counterSnap.data().current || 0) + 1;
-    if (weekNum > WEEKLY_TIPS.length) weekNum = 1;
-  }
-  await counterRef.set({ current: weekNum });
-
-  const tipIndex = weekNum - 1;
-  const tip = WEEKLY_TIPS[tipIndex];
-
-  console.log(`Week ${weekNum} of ${WEEKLY_TIPS.length} — sending: "${tip.subject}"`);
-
-  // Get all active subscribers from Firestore
-  const subscribersSnap = await db
-    .collection("email_subscribers")
-    .where("active", "==", true)
-    .get();
-
-  if (subscribersSnap.empty) {
-    console.log("No active subscribers — skipping.");
-    return;
-  }
-
-  console.log(`Found ${subscribersSnap.size} active subscriber(s).`);
-
-  // Set up Gmail SMTP transport
-  const transporter = createTransport({
-    service: "gmail",
-    auth: { user: emailUser, pass: emailPass },
-  });
-
-  const emailHTML = getEmailHTML(tip, weekNum, WEEKLY_TIPS.length);
-
-  // Send to each subscriber
-  const results = { sent: 0, failed: 0 };
-  for (const docSnap of subscribersSnap.docs) {
-    const sub = docSnap.data();
-    try {
-      await transporter.sendMail({
-        from: `"Scholark" <${emailUser}>`,
-        to: sub.email,
-        subject: `\u{1F4DA} ${tip.subject} — Scholark Weekly Tips`,
-        html: emailHTML,
-      });
-      results.sent++;
-      console.log(`  Sent to ${sub.email}`);
-    } catch (err) {
-      console.error(`  Failed to send to ${sub.email}: ${err.message}`);
-      results.failed++;
-    }
-  }
-
-  console.log(`Done. ${results.sent} sent, ${results.failed} failed.`);
-
-  // Log the send to Firestore
+  let releaseLock;
   try {
-    const { FieldValue } = await import("firebase-admin/firestore");
-    await db.collection("email_logs").add({
-      sentAt: FieldValue.serverTimestamp(),
-      weekNum,
-      tipSubject: tip.subject,
-      subscriberCount: subscribersSnap.size,
-      sent: results.sent,
-      failed: results.failed,
-    });
-  } catch (e) {
-    console.warn("Could not log to Firestore:", e.message);
+    try {
+      releaseLock = await acquireRunLock();
+    } catch (error) {
+      if (error.code === "RUN_ALREADY_ACTIVE") {
+        console.log("Another weekly email run is active; skipping this run.");
+        return;
+      }
+      throw error;
+    }
+
+    const weekNum = await getNextWeekNumber();
+    const tip = WEEKLY_TIPS[weekNum - 1];
+    const recipients = await getEligibleRecipients();
+    const results = { eligible: recipients.length, attempted: 0, sent: 0, failed: 0 };
+
+    console.log(`Week ${weekNum} of ${WEEKLY_TIPS.length} — sending: "${tip.subject}"`);
+    console.log(`Total eligible: ${results.eligible}`);
+    if (!recipients.length) {
+      console.log("No eligible recipients; skipping sends.");
+    } else {
+      const transporter = createTransport({
+        service: "gmail",
+        auth: { user: emailUser, pass: emailPass },
+      });
+      const emailHTML = getEmailHTML(tip, weekNum, WEEKLY_TIPS.length, emailUser);
+      const unsubscribeHeader = `<mailto:${emailUser}?subject=${encodeURIComponent("Unsubscribe from Scholark weekly tips")}>`;
+
+      for (const email of recipients) {
+        const fingerprint = recipientFingerprint(email);
+        results.attempted++;
+        try {
+          await transporter.sendMail({
+            from: `"Scholark" <${emailUser}>`,
+            to: email,
+            subject: `\u{1F4DA} ${tip.subject} — Scholark Weekly Tips`,
+            html: emailHTML,
+            headers: { "List-Unsubscribe": unsubscribeHeader },
+          });
+          results.sent++;
+          console.log(`Sent to recipient ${fingerprint}.`);
+        } catch (error) {
+          results.failed++;
+          console.error(`Failed recipient ${fingerprint}: ${redactEmailAddresses(error.message)}`);
+        }
+      }
+    }
+
+    console.log(`Totals — eligible: ${results.eligible}, attempted: ${results.attempted}, sent: ${results.sent}, failed: ${results.failed}.`);
+    try {
+      await db.collection("email_logs").add({
+        sentAt: FieldValue.serverTimestamp(),
+        weekNum,
+        tipSubject: tip.subject,
+        ...results,
+      });
+    } catch (error) {
+      console.warn("Could not write aggregate email log:", redactEmailAddresses(error.message));
+    }
+    if (results.failed > 0) process.exitCode = 1;
+  } finally {
+    if (releaseLock) {
+      try { await releaseLock(); }
+      catch (error) { console.warn("Could not release weekly run lock:", redactEmailAddresses(error.message)); }
+    }
   }
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMainModule) {
+  main().catch((error) => {
+    console.error("Fatal error:", redactEmailAddresses(error.message));
+    process.exit(1);
+  });
+}

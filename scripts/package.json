@@ -2,8 +2,12 @@
   "name": "scholark-email",
   "private": true,
   "type": "module",
+  "scripts": {
+    "check": "node --check send-weekly-email.js",
+    "test": "node --test"
+  },
   "dependencies": {
-    "firebase-admin": "^12.0.0",
-    "nodemailer": "^6.9.0"
+    "firebase-admin": "^14.2.0",
+    "nodemailer": "^9.0.5"
   }
 }

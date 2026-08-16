@@ -8,10 +8,25 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
-    // Email subscribers — anyone can subscribe, only admin functions can read all
+    // Email preferences — users may manage only the record matching the email
+    // verified by Firebase Authentication. Admin SDK operations bypass rules.
     match /email_subscribers/{email} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      function ownsEmailRecord() {
+        return request.auth != null
+          && request.auth.token.email is string
+          && email == request.auth.token.email.lower();
+      }
+      allow read: if ownsEmailRecord();
+      allow create: if ownsEmailRecord()
+        && request.resource.data.email == request.auth.token.email.lower()
+        && request.resource.data.active == true
+        && request.resource.data.keys().hasOnly(['email', 'name', 'subscribedAt', 'active', 'source']);
+      allow update: if ownsEmailRecord()
+        && request.resource.data.email == request.auth.token.email.lower()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['name', 'subscribedAt', 'unsubscribedAt', 'active', 'source']);
+      // Preserve explicit unsubscribe records instead of deleting them.
+      allow delete: if false;
     }
     // Email metadata (week counter) — server-side only
     match /email_meta/{docId} {

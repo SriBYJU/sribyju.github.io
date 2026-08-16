@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scholark — The Free College Toolkit: GPA, AP Study, SAT Prep & More - By Shriyan Avadhanula</title>
-<meta name="description" content="The most complete free college planning toolkit. GPA calculator, weighted GPA, grade needed, college chances estimator, student loan calculator, SAT score converter, and scholarship finder. Trusted by 100,000+ students.">
+<meta name="description" content="Free college planning tools for GPA, essays, applications, financial planning, SAT/ACT practice, and AP study.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8622a'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-size='58' font-family='serif' fill='white'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -32,7 +33,7 @@
   --shadow:0 2px 12px rgba(0,0,0,0.3);--shadow-lg:0 8px 32px rgba(0,0,0,0.4);
 }
 [data-theme="dark"] nav{background:rgba(26,23,20,0.92)}
-[data-theme="dark"] .pricing-card{background:var(--bg2)}
+[data-theme="dark"] .feature-overview-card{background:var(--bg2)}
 [data-theme="dark"] .auth-modal{background:var(--bg)}
 [data-theme="dark"] .profile-menu{background:var(--bg2)}
 [data-theme="dark"] input,[data-theme="dark"] textarea,[data-theme="dark"] select{background:var(--bg2);color:var(--ink);border-color:var(--border)}
@@ -56,11 +57,10 @@ nav{position:sticky;top:0;z-index:1000;background:rgba(250,249,246,0.92);backdro
 .nav-link{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink2);background:none;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body)}
 .nav-link:hover{background:var(--bg2);color:var(--ink)}
 .nav-link.active{background:var(--ink);color:var(--bg)}
-.nav-premium{padding:7px 18px;border-radius:8px;background:var(--accent);color:white;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body);margin-left:8px}
-.nav-premium:hover{background:#b5571f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(200,98,42,0.3)}
+.nav-features-cta{padding:7px 18px;border-radius:8px;background:var(--accent);color:white;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:var(--transition);font-family:var(--font-body);margin-left:8px}
+.nav-features-cta:hover{background:#b5571f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(200,98,42,0.3)}
 .nav-user-btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid rgba(200,98,42,0.2);cursor:pointer;font-family:var(--font-body);margin-left:6px;transition:var(--transition)}
 .nav-user-btn:hover{background:rgba(200,98,42,0.15)}
-.trial-badge{background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,0.2);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;margin-left:8px}
 
 /* AD BANNER */
 .ad-banner{background:var(--bg2);border-bottom:1px solid var(--border2);height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink3);letter-spacing:.05em;text-transform:uppercase}
@@ -191,31 +191,26 @@ hr{border:none;border-top:1px solid var(--border2);margin:20px 0}
 .contact-card p{font-size:13px;color:var(--ink3)}
 .contact-card a{color:var(--accent);text-decoration:none;font-weight:500}
 
-/* PRICING */
-.premium-hero{background:var(--bg2);padding:60px 40px;text-align:center;border-bottom:1px solid var(--border)}
-.premium-hero h1{font-family:var(--font-display);font-size:42px;color:var(--ink);margin-bottom:12px}
-.premium-hero p{font-size:16px;color:var(--ink2);max-width:520px;margin:0 auto}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:50px auto;padding:0 40px}
-.pricing-card{background:white;border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow);transition:var(--transition);position:relative}
-.pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
-.pricing-card.featured{border:2px solid var(--accent);transform:scale(1.03)}
-.pricing-card.featured:hover{transform:scale(1.03) translateY(-4px)}
-.pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.05em;white-space:nowrap}
-.pricing-tier{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
-.pricing-price{font-family:var(--font-display);font-size:48px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px}
-.pricing-price span{font-size:18px;vertical-align:top;margin-top:10px;display:inline-block}
-.pricing-period{font-size:13px;color:var(--ink3);margin-bottom:20px}
-.pricing-features{list-style:none;margin-bottom:24px}
-.pricing-features li{padding:8px 0;font-size:14px;color:var(--ink2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px}
-.pricing-features li:last-child{border-bottom:none}
+/* FEATURES OVERVIEW */
+.features-hero{background:var(--bg2);padding:60px 40px;text-align:center;border-bottom:1px solid var(--border)}
+.features-hero h1{font-family:var(--font-display);font-size:42px;color:var(--ink);margin-bottom:12px}
+.features-hero p{font-size:16px;color:var(--ink2);max-width:520px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:960px;margin:50px auto;padding:0 40px}
+.feature-overview-card{background:white;border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow);transition:var(--transition);position:relative}
+.feature-overview-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.feature-overview-card.featured{border:2px solid var(--accent);transform:scale(1.03)}
+.feature-overview-card.featured:hover{transform:scale(1.03) translateY(-4px)}
+.overview-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.05em;white-space:nowrap}
+.overview-title{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+.overview-list{list-style:none;margin-bottom:24px}
+.overview-list li{padding:8px 0;font-size:14px;color:var(--ink2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px}
+.overview-list li:last-child{border-bottom:none}
 .feat-check{color:var(--green);font-size:16px}.feat-x{color:var(--ink3);font-size:14px}
-.btn-pricing{width:100%;padding:13px;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);border:none}
-.btn-pricing.outline{background:none;border:1px solid var(--border);color:var(--ink)}
-.btn-pricing.outline:hover{background:var(--bg2)}
-.btn-pricing.filled{background:var(--accent);color:white}
-.btn-pricing.filled:hover{background:#b5571f;box-shadow:0 4px 16px rgba(200,98,42,.3)}
-.btn-pricing.dark{background:var(--ink);color:white}
-.btn-pricing.dark:hover{opacity:.9}
+.overview-button{width:100%;padding:13px;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);border:none}
+.overview-button.filled{background:var(--accent);color:white}
+.overview-button.filled:hover{background:#b5571f;box-shadow:0 4px 16px rgba(200,98,42,.3)}
+.overview-button.dark{background:var(--ink);color:white}
+.overview-button.dark:hover{opacity:.9}
 
 /* FAQ */
 .faq-section{max-width:700px;margin:0 auto;padding:0 40px 60px}
@@ -266,16 +261,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .auth-social-btn:hover{background:var(--bg2)}
 .auth-switch{text-align:center;font-size:13px;color:var(--ink3);margin-top:16px}
 .auth-switch a{color:var(--accent);cursor:pointer;font-weight:600}
-.trial-info-box{background:var(--green-light);border:1px solid rgba(42,110,69,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--green);line-height:1.6;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.auth-info-box{background:var(--green-light);border:1px solid rgba(42,110,69,0.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--green);line-height:1.6;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
 .auth-error{background:var(--red-light);border:1px solid rgba(192,49,43,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);display:none}
 .auth-error.show{display:block}
 
-/* PAYMENT MODAL */
-.payment-modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(26,23,20,.6);backdrop-filter:blur(8px);align-items:center;justify-content:center}
-.payment-modal.open{display:flex}
-.payment-box{background:white;border-radius:var(--radius-xl);padding:36px;max-width:480px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .3s cubic-bezier(.4,0,.2,1)}
-.payment-box h2{font-family:var(--font-display);font-size:26px;color:var(--ink);margin-bottom:6px}
-.payment-box .sub{font-size:14px;color:var(--ink3);margin-bottom:24px}
 .plan-toggle{display:flex;gap:10px;margin-bottom:20px}
 .plan-option{flex:1;padding:16px;border-radius:12px;border:2px solid var(--border);background:white;cursor:pointer;transition:var(--transition);text-align:center;position:relative}
 .plan-option.selected{border-color:var(--accent);background:var(--accent-light)}
@@ -305,7 +294,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .dash-header{max-width:1100px;margin:0 auto;padding:40px 40px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
 .dash-welcome{font-family:var(--font-display);font-size:32px;color:var(--ink)}
 .dash-plan-badge{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;background:var(--accent-light);color:var(--accent);border:1px solid rgba(200,98,42,.2)}
-.dash-plan-badge.pro{background:var(--gold-light);color:var(--gold);border-color:rgba(184,134,11,.2)}
 .dash-actions{display:flex;gap:10px;flex-wrap:wrap}
 .save-btn{padding:8px 18px;border-radius:8px;background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,.2);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition)}
 .save-btn:hover{background:rgba(42,110,69,.15)}
@@ -364,14 +352,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 .gate-card{background:white;border:1px solid var(--border);border-radius:16px;padding:24px 28px;text-align:center;max-width:400px;box-shadow:var(--shadow-lg)}
 .gate-card h3{font-family:var(--font-display);font-size:20px;margin-bottom:6px}
 .gate-card p{font-size:13px;color:var(--ink3);margin-bottom:16px}
-.locked-panel{position:relative;overflow:hidden;min-height:200px}
-.pro-tag{display:inline-flex;align-items:center;gap:5px;background:var(--gold-light);color:var(--gold);border:1px solid rgba(184,134,11,.2);border-radius:100px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;margin-left:8px}
-
-/* TRIAL COUNTDOWN */
-.trial-banner{background:linear-gradient(90deg,#1a4d2e,#2a6e45);padding:10px 40px;display:flex;align-items:center;justify-content:center;gap:12px;color:white;font-size:13px;font-weight:500}
-.trial-days{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:100px;font-weight:700;font-family:var(--font-mono)}
-.trial-upgrade{background:white;color:var(--green);padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:var(--transition);margin-left:8px}
-.trial-upgrade:hover{background:var(--green-light)}
 
 /* PROFILE DROPDOWN */
 .profile-dropdown{position:relative}
@@ -412,8 +392,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .tool-tabs{padding:0 24px 20px}
   .tool-section-banner{padding:20px 24px}
   nav{padding:0 20px}
-  .pricing-grid{grid-template-columns:1fr;max-width:400px}
-  .pricing-card.featured{transform:none}
+  .features-grid{grid-template-columns:1fr;max-width:400px}
+  .feature-overview-card.featured{transform:none}
   .footer-grid{grid-template-columns:1fr 1fr}
   .course-row{grid-template-columns:1fr 90px 75px 36px}
   .about-content{padding:40px 24px}
@@ -429,10 +409,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .hero-stats{gap:16px}
   .trust-bar{gap:16px;padding:12px 20px}
   .footer-grid{grid-template-columns:1fr}
-  .premium-hero{padding:40px 24px}
-  .pricing-grid{padding:0 24px}
-  nav .nav-links .nav-link:not(.active){display:none}
-  .trial-banner{padding:10px 20px;flex-wrap:wrap;gap:6px}
+  .features-hero{padding:40px 24px}
+  .features-grid{padding:0 24px}
+  nav .nav-links .nav-link:not(.active):not(#nav-signin-btn){display:none}
+  .nav-features-cta{display:none}
 }
 
 /* ── NEW FEATURE STYLES ───────────────────────────────── */
@@ -445,7 +425,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 [data-theme="dark"] .feat-card{background:var(--bg2)}
 .feat-card h3{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px}
 .feat-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em}
-.feat-badge.pro{background:var(--gold-light);color:var(--gold);border:1px solid rgba(184,134,11,.2)}
 .feat-badge.free{background:var(--green-light);color:var(--green);border:1px solid rgba(42,110,69,.2)}
 .feat-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font-body);transition:var(--transition)}
 .feat-btn-primary{background:var(--accent);color:white}.feat-btn-primary:hover{background:#b5571f}
@@ -460,9 +439,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 @media(max-width:768px){.feat-grid-2,.feat-grid-3{grid-template-columns:1fr}}
 .feat-empty{text-align:center;padding:40px 20px;color:var(--ink3);font-size:14px}
 .feat-empty span{font-size:40px;display:block;margin-bottom:12px}
-.premium-gate{text-align:center;padding:60px 24px;background:var(--bg2);border-radius:var(--radius-lg);border:1px solid var(--border)}
-.premium-gate h3{font-family:var(--font-display);font-size:24px;margin-bottom:8px}
-.premium-gate p{color:var(--ink2);font-size:14px;margin-bottom:16px}
 
 /* GPA GOAL TRACKER */
 .goal-meter{position:relative;width:200px;height:200px;margin:0 auto 20px}
@@ -594,8 +570,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .streak-badge{font-size:12px;padding:4px 12px}
   .progress-stat .stat-val{font-size:22px}
   .activity-dot{width:10px;height:10px}
-  .premium-gate{padding:40px 16px}
-  .premium-gate h3{font-size:20px}
 }
 @media(max-width:480px){
   .feat-section{padding:16px 12px}
@@ -609,7 +583,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   .modal-box{padding:20px}
 }
 
-/* ── AI COUNSELOR CHATBOT ───────────────────────────── */
+/* ── ADMISSIONS GUIDE CHAT ──────────────────────────── */
 .counselor-chat{display:flex;flex-direction:column;height:500px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg)}
 .counselor-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
 .counselor-msg{max-width:80%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6;animation:msgIn .3s ease}
@@ -830,7 +804,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8035550913474000" crossorigin="anonymous"></script>
-<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
@@ -839,10 +812,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   <div class="modal-box">
     <button class="modal-close" onclick="closeAuth()">✕</button>
     <div class="modal-title">Welcome to Scholark</div>
-    <div class="modal-subtitle" id="auth-subtitle">Create a free account to save your results and unlock tools.</div>
-    <div class="trial-info-box" id="trial-info-box">
-      <span>🎁</span>
-      <span><strong>7-day free Pro trial</strong> — Sign up today and unlock all Pro features free for 7 days. No credit card required.</span>
+    <div class="modal-subtitle" id="auth-subtitle">Create a free account to save results and use the complete toolkit.</div>
+    <div class="auth-info-box" id="auth-info-box">
+      <span>✓</span>
+      <span><strong>Every Scholark feature is free.</strong> Sign in to save your work and sync it across devices.</span>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
@@ -892,35 +865,6 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
-<div class="payment-modal" id="paymentModal">
-  <div class="payment-box">
-    <button class="close-modal" onclick="closePayment()">✕</button>
-    <h2>Upgrade to Pro</h2>
-    <p class="sub">Choose your plan — 7-day free trial included on monthly.</p>
-    <div class="plan-toggle">
-      <div class="plan-option selected" id="plan-monthly" onclick="selectPlan('monthly')">
-        <div class="plan-option-name">Monthly</div>
-        <div class="plan-option-price">$4.99</div>
-        <div class="plan-option-period">per month</div>
-      </div>
-      <div class="plan-option" id="plan-annual" onclick="selectPlan('annual')">
-        <div class="plan-option-save">Save 25%</div>
-        <div class="plan-option-name">Annual</div>
-        <div class="plan-option-price">$45</div>
-        <div class="plan-option-period">per year</div>
-      </div>
-    </div>
-    <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green);margin-bottom:20px" id="trial-note">
-      🎁 <strong>7-day free trial included</strong> — cancel anytime before the trial ends and pay nothing.
-    </div>
-    <button class="pay-btn" id="stripe-checkout-btn" onclick="handleStripeCheckout()">
-      <span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>
-    </button>
-    <p class="secure-note">🔒 Secured by Stripe · Cancel anytime · SSL encrypted</p>
-  </div>
-</div>
-
 <!-- NAVIGATION -->
 <nav>
   <div class="nav-logo" onclick="showPage('home')">
@@ -930,66 +874,54 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   <div class="nav-links">
     <button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button>
     <button class="nav-link" id="nav-tools" onclick="goToTools()">Calculators</button>
-    <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay AI ✦</button>
+    <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay Coach ✦</button>
     <button class="nav-link" id="nav-goals" onclick="showPage('goals')">Goals</button>
     <button class="nav-link" id="nav-prep" onclick="showPage('prep');initPrep()">SAT Prep</button>
     <button class="nav-link" id="nav-ap" onclick="showPage('ap');initAPHub()">AP Study</button>
     <button class="nav-link" id="nav-compare" onclick="showPage('compare')">Compare</button>
-    <button class="nav-link" id="nav-premium" onclick="showPage('premium')">Pricing</button>
+    <button class="nav-link" id="nav-features" onclick="showPage('features')">Features</button>
     <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
     <button class="nav-link" id="nav-dashboard" onclick="goDashboard()" style="display:none">Dashboard</button>
-    <span class="trial-badge" id="trial-badge" style="display:none"></span>
     <div class="profile-dropdown" id="profile-dropdown" style="display:none">
       <button class="nav-user-btn" onclick="toggleProfileMenu()" id="nav-user-name">Account ▾</button>
       <div class="profile-menu" id="profile-menu">
         <button class="profile-menu-item" onclick="showPage('profile');toggleProfileMenu()">👤 Profile</button>
         <button class="profile-menu-item" onclick="goDashboard();toggleProfileMenu()">📊 Dashboard</button>
         <button class="profile-menu-item" onclick="showPage('progress');toggleProfileMenu()">📈 Progress</button>
-        <button class="profile-menu-item" onclick="showPage('planner');initPlanner();toggleProfileMenu()">📅 Study Planner</button>
-        <button class="profile-menu-item" onclick="showPage('apps');renderApps();toggleProfileMenu()">🎓 Applications</button>
-        <button class="profile-menu-item" onclick="showPage('scholarships');initScholarships();toggleProfileMenu()">💰 Scholarships</button>
-        <button class="profile-menu-item" onclick="showPage('quiz');initQuiz();toggleProfileMenu()">🧩 College Quiz</button>
-        <button class="profile-menu-item" onclick="showPage('community');renderQA();toggleProfileMenu()">💬 Community</button>
-        <button class="profile-menu-item" onclick="showPage('counselor');initCounselor();toggleProfileMenu()">🤖 AI Counselor</button>
+        <button class="profile-menu-item" onclick="showPage('planner');toggleProfileMenu()">📅 Study Planner</button>
+        <button class="profile-menu-item" onclick="showPage('apps');toggleProfileMenu()">🎓 Applications</button>
+        <button class="profile-menu-item" onclick="showPage('scholarships');toggleProfileMenu()">💰 Scholarships</button>
+        <button class="profile-menu-item" onclick="showPage('quiz');toggleProfileMenu()">🧩 College Quiz</button>
+        <button class="profile-menu-item" onclick="showPage('community');toggleProfileMenu()">💬 Community</button>
+        <button class="profile-menu-item" onclick="showPage('counselor');initCounselor();toggleProfileMenu()">🧭 Admissions Guide</button>
         <button class="profile-menu-item" onclick="showPage('prep');initPrep();toggleProfileMenu()">📝 SAT/ACT Prep</button>
         <button class="profile-menu-item" onclick="showPage('ap');initAPHub();toggleProfileMenu()">📚 AP Study</button>
         <button class="profile-menu-item" onclick="showPage('compare');toggleProfileMenu()">⚖️ Compare Colleges</button>
-        <div class="profile-menu-divider"></div>
-        <button class="profile-menu-item" onclick="showPage('premium');toggleProfileMenu()">⭐ Upgrade to Pro</button>
         <div class="profile-menu-divider"></div>
         <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
       </div>
     </div>
     <button class="nav-link" id="nav-signin-btn" onclick="openAuth('login')" style="display:none">Sign In</button>
-    <button class="nav-premium" id="nav-get-pro" onclick="openPayment('pro')">Get Pro ↗</button>
+    <button class="nav-features-cta" id="nav-features-cta" onclick="showPage('features')">All Features ↗</button>
   </div>
 </nav>
-
-<!-- TRIAL BANNER (shown when on trial) -->
-<div class="trial-banner" id="trial-banner" style="display:none">
-  <span>🎁 Free trial active —</span>
-  <span class="trial-days" id="trial-days-left">7 days left</span>
-  <span>remaining. Upgrade to keep Pro access.</span>
-  <button class="trial-upgrade" onclick="openPayment('pro')">Upgrade Now</button>
-</div>
-
 
 <!-- HOME PAGE -->
 <div class="page active" id="page-home">
   <div class="ad-banner" id="ad-banner-home"><ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-8035550913474000" data-ad-slot="HOME_BANNER_SLOT"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>
   <div class="hero">
     <div>
-      <div class="hero-eyebrow">⚡ Free · Instant results · AI-powered</div>
+      <div class="hero-eyebrow">⚡ Free · Instant results · Privacy-friendly</div>
       <h1>The College <em>Toolkit</em><br>Students Actually Use</h1>
-      <p class="hero-desc">Seven precision calculators + AI essay coach for every stage of your college journey. Used by 10,000+ students nationwide.</p>
+      <p class="hero-desc">Seven precision calculators plus an on-device essay coach for every stage of your college journey.</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">100K+</div><div class="hero-stat-label">Students monthly</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Core calculators</div></div>
         <div class="hero-stat"><div class="hero-stat-num">200+</div><div class="hero-stat-label">Universities tracked</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">4.9★</div><div class="hero-stat-label">User rating</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">19</div><div class="hero-stat-label">AP subjects</div></div>
       </div>
       <div class="hero-ctas">
         <button class="btn-primary" onclick="goToTools()">Open Calculators →</button>
-        <button class="btn-secondary" onclick="showPage('premium')">See Pro Plan</button>
+        <button class="btn-secondary" onclick="showPage('features')">Explore Features</button>
       </div>
     </div>
     <div class="hero-card">
@@ -997,33 +929,33 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <div class="hero-tool-list">
         <div class="hero-tool-item" onclick="showTool('gpa')"><div class="hero-tool-icon" style="background:#fdf0e8">📊</div><div><div class="hero-tool-name">GPA Calculator</div><div class="hero-tool-desc">Semester & cumulative GPA</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showTool('weighted')"><div class="hero-tool-icon" style="background:#e8f5ee">⭐</div><div><div class="hero-tool-name">Weighted GPA</div><div class="hero-tool-desc">AP, IB, Honors on 5.0 scale</div></div><div class="hero-tool-arrow">→</div></div>
-        <div class="hero-tool-item" onclick="showTool('chances')"><div class="hero-tool-icon" style="background:#fef8e1">🏫</div><div><div class="hero-tool-name">College Chances</div><div class="hero-tool-desc">Compare vs 200+ real universities</div></div><div class="hero-tool-arrow">→</div></div>
-        <div class="hero-tool-item" onclick="goToEssay()"><div class="hero-tool-icon" style="background:#e8eef8">✍️</div><div><div class="hero-tool-name">AI Essay Coach <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Live feedback as you write</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('chances')"><div class="hero-tool-icon" style="background:#fef8e1">🏫</div><div><div class="hero-tool-name">College Chances</div><div class="hero-tool-desc">Compare with a 200+ university dataset</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="goToEssay()"><div class="hero-tool-icon" style="background:#e8eef8">✍️</div><div><div class="hero-tool-name">Essay Rubric Coach</div><div class="hero-tool-desc">Private, on-device feedback</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showTool('loan')"><div class="hero-tool-icon" style="background:#fce8e8">💰</div><div><div class="hero-tool-name">Student Loan Calc</div><div class="hero-tool-desc">Monthly payment & total cost</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('goals')"><div class="hero-tool-icon" style="background:#e8f5ee">🎯</div><div><div class="hero-tool-name">GPA Goal Tracker</div><div class="hero-tool-desc">Set targets & track progress</div></div><div class="hero-tool-arrow">→</div></div>
-        <div class="hero-tool-item" onclick="showPage('quiz');initQuiz()"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('quiz')"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz</div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('prep');initPrep()"><div class="hero-tool-icon" style="background:#e8eef8">📝</div><div><div class="hero-tool-name">SAT/ACT Prep</div><div class="hero-tool-desc">Practice questions with XP & streaks</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('ap');initAPHub()"><div class="hero-tool-icon" style="background:#f0e8ff">📚</div><div><div class="hero-tool-name">AP Study Tools</div><div class="hero-tool-desc">MCQs, FRQs, cram sheets for 19 APs</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('compare')"><div class="hero-tool-icon" style="background:#fef8e1">⚖️</div><div><div class="hero-tool-name">College Compare</div><div class="hero-tool-desc">Side-by-side with radar charts</div></div><div class="hero-tool-arrow">→</div></div>
-        <div class="hero-tool-item" onclick="showPage('counselor');initCounselor()"><div class="hero-tool-icon" style="background:#fdf0e8">🤖</div><div><div class="hero-tool-name">AI Counselor <span class="pro-tag">✦ Pro</span></div><div class="hero-tool-desc">24/7 admissions advice chatbot</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('counselor');initCounselor()"><div class="hero-tool-icon" style="background:#fdf0e8">🧭</div><div><div class="hero-tool-name">Admissions Guide</div><div class="hero-tool-desc">Curated admissions guidance</div></div><div class="hero-tool-arrow">→</div></div>
       </div>
     </div>
   </div>
   <div class="trust-bar">
-    <div class="trust-item">✓ <strong>100% Free</strong> core tools</div>
+    <div class="trust-item">✓ <strong>100% Free</strong> for signed-in students</div>
     <div class="trust-item">✓ <strong>200+</strong> real university acceptance rates</div>
-    <div class="trust-item">✓ <strong>AI Essay</strong> coach — live feedback</div>
-    <div class="trust-item">✓ <strong>7-day</strong> free Pro trial</div>
+    <div class="trust-item">✓ <strong>Essay rubric</strong> feedback stays on-device</div>
+    <div class="trust-item">✓ <strong>Complete toolkit</strong> for every account</div>
   </div>
   <footer>
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo">Scholark</div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
-      <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('prep');initPrep()">SAT Prep</a><a onclick="showPage('compare')">Compare</a><a onclick="showPage('counselor');initCounselor()">AI Counselor</a></div>
-      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay AI</a></div>
-      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a><a href="#">Cookie Policy</a></div>
+      <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="showPage('prep');initPrep()">SAT Prep</a><a onclick="showPage('compare')">Compare</a><a onclick="showPage('counselor');initCounselor()">Admissions Guide</a></div>
+      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay Coach</a></div>
+      <div class="footer-col"><h4>Important</h4><p>Calculators and admissions guidance provide estimates for educational use.</p></div>
     </div>
-    <div class="footer-bottom"><span>© 2026 Scholark. All rights reserved. Results are estimates only.</span><div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div></div>
+    <div class="footer-bottom"><span>© 2026 Scholark. All rights reserved. Results are estimates only.</span></div>
   </footer>
 </div>
 
@@ -1124,7 +1056,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <!-- COLLEGE CHANCES with University Search -->
       <div id="tab-chances" class="tool-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title">College Admission Chance Estimator</div><div class="card-subtitle">Search 200+ real U.S. universities and compare your estimated admission probability against their actual acceptance rates.</div></div>
+          <div class="card-header"><div class="card-title">College Admission Chance Estimator</div><div class="card-subtitle">Search a 200+ university dataset and compare a planning estimate with the stored acceptance-rate benchmark.</div></div>
           <div id="chances-result" class="result-box result-hidden" style="flex-direction:column;align-items:stretch;gap:14px">
             <div style="display:flex;justify-content:space-between;align-items:flex-end">
               <div><div class="result-label">Your Estimated Chance</div><div class="result-value" id="chances-val">—</div></div>
@@ -1132,7 +1064,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
             </div>
             <div><div class="chance-meter"><div class="chance-fill" id="chances-bar" style="width:0%"></div></div></div>
             <div id="comparison-section" style="display:none">
-              <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Your Chances vs Official Rate</div>
+              <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Planning Estimate vs Dataset Rate</div>
               <div class="comparison-bar-wrap">
                 <div class="comparison-label"><span id="comp-uni-name">University</span><span id="comp-official-rate">—</span></div>
                 <div class="comparison-bar"><div class="comparison-fill official" id="comp-official-bar" style="width:0%"></div></div>
@@ -1217,7 +1149,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <!-- STUDENT LOAN -->
       <div id="tab-loan" class="tool-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title">Student Loan Calculator</div><div class="card-subtitle">Calculate your monthly payment, total cost, and see a full repayment breakdown. Uses 2026 federal loan rates.</div></div>
+          <div class="card-header"><div class="card-title">Student Loan Calculator</div><div class="card-subtitle">Calculate monthly payment and total cost using 2026–27 federal rates or a custom rate.</div></div>
           <div id="loan-result" class="result-box result-hidden blue-result">
             <div><div class="result-label">Monthly Payment</div><div class="result-value blue" id="loan-monthly">$0</div></div>
             <div style="text-align:right"><div class="result-label">Total Interest Paid</div><div style="font-family:var(--font-mono);font-size:22px;color:var(--red)" id="loan-interest">$0</div></div>
@@ -1226,16 +1158,16 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
             <div class="field-group"><label class="field-label">Total Loan Amount ($)</label><input type="number" id="l-amount" placeholder="e.g. 30000" min="0"></div>
             <div class="field-group"><label class="field-label">Loan Type</label>
               <select id="l-type" onchange="setLoanRate()">
-                <option value="6.53">Federal Subsidized (6.53% — 2026)</option>
-                <option value="6.53">Federal Unsubsidized Undergrad (6.53%)</option>
-                <option value="8.08">Federal Unsubsidized Grad (8.08%)</option>
-                <option value="9.08">Federal PLUS Loan (9.08%)</option>
+                <option value="6.52">Federal Subsidized Undergrad (6.52% — 2026–27)</option>
+                <option value="6.52">Federal Unsubsidized Undergrad (6.52%)</option>
+                <option value="8.07">Federal Unsubsidized Grad (8.07%)</option>
+                <option value="9.07">Federal PLUS Loan (9.07%)</option>
                 <option value="custom">Custom / Private Rate</option>
               </select>
             </div>
           </div>
           <div class="two-col">
-            <div class="field-group"><label class="field-label">Annual Interest Rate (%)</label><input type="number" id="l-rate" placeholder="e.g. 6.53" step="0.01" value="6.53"></div>
+            <div class="field-group"><label class="field-label">Annual Interest Rate (%)</label><input type="number" id="l-rate" placeholder="e.g. 6.52" step="0.01" value="6.52"></div>
             <div class="field-group"><label class="field-label">Repayment Term (years)</label><input type="number" id="l-term" placeholder="e.g. 10" value="10" min="1" max="30"></div>
           </div>
           <button class="btn-calc" onclick="calcLoan()">Calculate Payments</button>
@@ -1243,13 +1175,13 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           <div id="loan-warn" style="display:none"></div>
         </div>
         <div class="card">
-          <div class="card-title" style="font-size:18px;margin-bottom:14px">2026 Federal Loan Rates</div>
+          <div class="card-title" style="font-size:18px;margin-bottom:14px">2026–27 Federal Loan Rates</div>
           <div class="scale-grid" style="grid-template-columns:1fr">
-            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Subsidized (Undergrad)</span><span class="scale-grade">6.53%</span></div>
-            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Unsubsidized (Grad)</span><span class="scale-grade">8.08%</span></div>
-            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct PLUS Loans</span><span class="scale-grade">9.08%</span></div>
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Subsidized / Unsubsidized (Undergrad)</span><span class="scale-grade">6.52%</span></div>
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct Unsubsidized (Grad)</span><span class="scale-grade">8.07%</span></div>
+            <div class="scale-item" style="padding:10px 14px"><span style="font-size:13px">Direct PLUS Loans</span><span class="scale-grade">9.07%</span></div>
           </div>
-          <div class="warn-box">⚠️ Federal loan limits: Dependent undergrads can borrow up to $31,000 total. Always exhaust federal options before taking private loans.</div>
+          <div class="warn-box">⚠️ Rates apply to loans first disbursed July 1, 2026–June 30, 2027. Verify current rates, eligibility, and borrowing limits at <a href="https://studentaid.gov/interest" target="_blank" rel="noopener noreferrer">StudentAid.gov</a>.</div>
         </div>
       </div>
 
@@ -1276,7 +1208,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <!-- SCHOLARSHIP -->
       <div id="tab-scholarship" class="tool-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title">Scholarship & Financial Need Estimator</div><div class="card-subtitle">Estimate your Expected Family Contribution (EFC / SAI), potential scholarship eligibility, and unmet financial need.</div></div>
+          <div class="card-header"><div class="card-title">Scholarship & Financial Need Estimator</div><div class="card-subtitle">Build a rough planning scenario for college costs and possible merit aid. This is not a FAFSA calculation or financial aid offer.</div></div>
           <div id="sch-result" class="result-box result-hidden green-result" style="flex-direction:column;gap:14px;align-items:stretch">
             <div style="display:flex;justify-content:space-between;align-items:flex-end">
               <div><div class="result-label">Est. Unmet Financial Need / Year</div><div class="result-value green" id="sch-need">$0</div></div>
@@ -1307,9 +1239,9 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         </div>
         <div class="card">
           <div class="card-title" style="font-size:18px;margin-bottom:14px">Aid Tips</div>
-          <div class="tip-item"><span class="tip-icon">📋</span><span>File your FAFSA as early as possible — October 1. Many aid programs are first-come, first-served.</span></div>
+          <div class="tip-item"><span class="tip-icon">📋</span><span>Check the current FAFSA opening date and your state and college priority deadlines at StudentAid.gov.</span></div>
           <div class="tip-item"><span class="tip-icon">💡</span><span>A GPA of 3.5+ qualifies you for most merit scholarships. A 3.7+ opens National Merit worth $5,000–$30,000+.</span></div>
-          <div class="tip-item"><span class="tip-icon">📞</span><span>Always appeal your financial aid award. 67% of students who appeal receive a better offer.</span></div>
+          <div class="tip-item"><span class="tip-icon">📞</span><span>If your financial circumstances changed, contact the college financial aid office and ask about its review or appeal process.</span></div>
         </div>
       </div>
 
@@ -1339,10 +1271,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="tip-item" style="font-size:12px"><span class="tip-icon">📅</span><span>Junior year GPA is weighted most heavily by admissions officers.</span></div>
       </div>
       <div class="sidebar-card" style="background:var(--ink);border-color:var(--ink)">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">Scholark Pro</div>
-        <div style="font-family:var(--font-display);font-size:20px;color:white;margin-bottom:8px">Unlock the full suite</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:16px;line-height:1.6">AI Essay Coach, college comparison, save calculations, PDF reports, and more.</div>
-        <button class="btn-primary" style="width:100%;font-size:13px" onclick="openPayment('pro')">Start Free Trial →</button>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">Included for Everyone</div>
+        <div style="font-family:var(--font-display);font-size:20px;color:white;margin-bottom:8px">Use the full Scholark suite</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:16px;line-height:1.6">Essay tools, college comparison, saved calculations, planning, and more are free for signed-in students.</div>
+        <button class="btn-primary" style="width:100%;font-size:13px" onclick="showPage('features')">Explore All Features →</button>
       </div>
     </div>
   </div>
@@ -1351,23 +1283,23 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo">Scholark</div><p>Free college planning tools for high school and college students. Up-to-date with 2026 rates.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="switchTab('gpa',null)">GPA Calculator</a><a onclick="switchTab('weighted',null)">Weighted GPA</a><a onclick="switchTab('needed',null)">Grade Needed</a><a onclick="switchTab('chances',null)">College Chances</a></div>
-      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('premium')">Pricing</a><a onclick="showPage('about')">About</a></div>
-      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Disclaimer</a></div>
+      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a></div>
+      <div class="footer-col"><h4>Important</h4><p>Results are estimates for educational use, not professional advice.</p></div>
     </div>
     <div class="footer-bottom"><span>© 2026 Scholark. Estimates only — not professional advice.</span></div>
   </footer>
 </div>
 
 
-<!-- ESSAY AI PAGE -->
+<!-- ESSAY COACH PAGE -->
 <div class="page" id="page-essay">
   <div class="tool-section-banner" style="background:linear-gradient(135deg,#1a1714,#2d2420)">
     <div style="max-width:1020px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
       <div>
-        <h2 style="color:white;margin-bottom:4px">✦ AI Essay Coach <span class="pro-tag">Pro</span></h2>
-        <p style="font-size:14px;color:rgba(255,255,255,.6);margin:0">Write your college essay with real-time AI feedback — as you type.</p>
+        <h2 style="color:white;margin-bottom:4px">✦ Essay Rubric Coach</h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.6);margin:0">Get a private, admissions-reader-style review of structure, voice, clarity, and impact.</p>
       </div>
-      <div id="essay-trial-note" style="font-size:13px;color:rgba(255,255,255,.6)"></div>
+      <div id="essay-access-note" style="font-size:13px;color:rgba(255,255,255,.6)"></div>
     </div>
   </div>
 
@@ -1376,20 +1308,20 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <!-- LOGIN GATE (shown when not logged in) -->
     <div id="essay-gate" style="display:none;text-align:center;padding:80px 40px">
       <div style="font-size:56px;margin-bottom:20px">✍️</div>
-      <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:12px">AI Essay Coach</div>
-      <p style="font-size:16px;color:var(--ink2);max-width:460px;margin:0 auto 28px;line-height:1.7">Get real-time AI feedback on your college essays — structure, voice, word choice, and more. Create a free account to start your 7-day Pro trial.</p>
+      <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:12px">Essay Rubric Coach</div>
+      <p style="font-size:16px;color:var(--ink2);max-width:460px;margin:0 auto 28px;line-height:1.7">Review your draft through an admissions-reader lens: structure, authentic voice, specificity, reflection, and impact. Create a free account to save and sync drafts.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
         <button class="btn-primary" onclick="openAuth('signup')" style="font-size:15px">Create Free Account →</button>
         <button class="btn-secondary" onclick="openAuth('login')">Sign In</button>
       </div>
     </div>
 
-    <!-- ESSAY EDITOR (shown when logged in + Pro/trial) -->
+    <!-- ESSAY EDITOR (shown when logged in) -->
     <div id="essay-editor" style="display:none">
       <div class="card">
         <div class="card-header">
           <div class="card-title">Your College Essay</div>
-          <div class="card-subtitle">Write or paste your essay below. Use the prompts dropdown to align with Common App or Coalition prompts. AI feedback updates automatically.</div>
+          <div class="card-subtitle">Write or paste your essay below. The rubric review runs locally in your browser and does not upload the draft.</div>
         </div>
         <div class="essay-toolbar">
           <select class="essay-prompt-select" id="essay-prompt" onchange="updatePromptHint()">
@@ -1407,19 +1339,19 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           </select>
           <div style="display:flex;align-items:center;gap:12px">
             <span class="essay-word-count" id="essay-word-count">0 words / 650 max</span>
-            <button class="essay-get-feedback" onclick="getEssayFeedback()" id="feedback-btn">✦ Get AI Feedback</button>
+            <button class="essay-get-feedback" onclick="getEssayFeedback()" id="feedback-btn">✦ Get Rubric Feedback</button>
           </div>
         </div>
         <div id="prompt-hint" style="display:none;background:var(--blue-light);border:1px solid rgba(30,79,163,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:#1a3c7a;margin-bottom:12px;line-height:1.6"></div>
-        <textarea class="essay-textarea" id="essay-textarea" placeholder="Start writing your college essay here... The AI coach will analyze your writing and provide feedback on structure, voice, clarity, and how well you answer the prompt." oninput="onEssayInput()"></textarea>
+        <textarea class="essay-textarea" id="essay-textarea" placeholder="Start writing your college essay here... The rubric coach will review structure, voice, clarity, and prompt alignment." oninput="onEssayInput()"></textarea>
         <div id="essay-char-note" style="margin-top:8px"></div>
       </div>
 
-      <!-- AI Feedback Panel -->
+      <!-- Rubric Feedback Panel -->
       <div class="essay-ai-panel" id="essay-ai-panel">
         <div class="essay-ai-header">
           <div class="essay-ai-pulse"></div>
-          <div class="essay-ai-title">AI Coach Feedback</div>
+          <div class="essay-ai-title">Rubric Coach Feedback</div>
         </div>
         <div id="essay-ai-content" class="essay-ai-content">
           <div class="essay-ai-loading">Analyzing your essay<span class="essay-ai-dots"><span>.</span><span>.</span><span>.</span></span></div>
@@ -1456,16 +1388,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="dash-header">
       <div><div class="dash-welcome" id="dash-welcome">Welcome back!</div><div style="font-size:14px;color:var(--ink3);margin-top:4px" id="dash-email-display"></div></div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div class="dash-plan-badge" id="dash-plan-badge">Free</div>
-        <button class="btn-primary" style="font-size:13px" onclick="openPayment('pro')" id="dash-upgrade-btn">Upgrade to Pro →</button>
-      </div>
-    </div>
-
-    <!-- Trial box -->
-    <div id="dash-trial-box" style="max-width:1100px;margin:20px auto 0;padding:0 40px;display:none">
-      <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div style="font-size:14px;color:var(--green)">🎁 <strong>Free trial active</strong> — <span id="dash-trial-days"></span> days remaining</div>
-        <button class="btn-calc" style="margin:0;padding:10px 20px;font-size:13px" onclick="openPayment('pro')">Upgrade Now</button>
+        <div class="dash-plan-badge" id="dash-plan-badge">All Features Included</div>
       </div>
     </div>
 
@@ -1509,19 +1432,15 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     </div>
 
     <div class="profile-card">
-      <div class="profile-card-title">Subscription</div>
+      <div class="profile-card-title">Access</div>
       <div class="profile-plan-card">
         <div class="profile-plan-info">
           <div class="profile-plan-icon" id="profile-plan-icon" style="background:var(--bg2)">📦</div>
           <div>
-            <div class="profile-plan-name" id="profile-plan-name">Free Plan</div>
-            <div class="profile-plan-desc" id="profile-plan-desc">Core calculators included</div>
+            <div class="profile-plan-name" id="profile-plan-name">All Features Included</div>
+            <div class="profile-plan-desc" id="profile-plan-desc">Free for every signed-in student</div>
           </div>
         </div>
-        <button class="btn-primary" style="font-size:13px;padding:10px 20px" onclick="openPayment('pro')" id="profile-upgrade-btn">Upgrade to Pro →</button>
-      </div>
-      <div id="profile-trial-info" style="display:none;margin-top:14px">
-        <div style="background:var(--green-light);border:1px solid rgba(42,110,69,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--green)">🎁 <strong>Free trial active</strong> — <span id="profile-trial-days">7</span> days remaining</div>
       </div>
     </div>
 
@@ -1538,19 +1457,18 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- PREMIUM PAGE -->
-<div class="page" id="page-premium">
-  <div class="premium-hero">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(200,98,42,.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px">✦ Simple, Honest Pricing</div>
-    <h1>Start Free.<br>Upgrade When Ready.</h1>
-    <p>All core calculators are free forever. Pro unlocks the AI Essay Coach, reports, history, and advanced tools. <strong>7-day free trial — no card required.</strong></p>
+<!-- FEATURES PAGE -->
+<div class="page" id="page-features">
+  <div class="features-hero">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(200,98,42,.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px">✦ Complete Student Toolkit</div>
+    <h1>Every Feature.<br>Free for Students.</h1>
+    <p>Sign in once to use the complete Scholark toolkit and keep your saved work synced across devices.</p>
   </div>
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <div class="pricing-tier">Free</div>
-      <div class="pricing-price"><span>$</span>0</div>
-      <div class="pricing-period">forever, no credit card</div>
-      <ul class="pricing-features">
+  <div class="features-grid">
+    <div class="feature-overview-card featured">
+      <div class="overview-badge">Included</div>
+      <div class="overview-title">Plan & Calculate</div>
+      <ul class="overview-list">
         <li><span class="feat-check">✓</span> GPA Calculator</li>
         <li><span class="feat-check">✓</span> Weighted GPA (5.0)</li>
         <li><span class="feat-check">✓</span> Grade Needed Calculator</li>
@@ -1558,66 +1476,40 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <li><span class="feat-check">✓</span> Student Loan Calculator</li>
         <li><span class="feat-check">✓</span> SAT/ACT Converter</li>
         <li><span class="feat-check">✓</span> GPA Goal Tracker</li>
-        <li><span class="feat-check">✓</span> Application Tracker (3 schools)</li>
+        <li><span class="feat-check">✓</span> Unlimited Application Tracker</li>
         <li><span class="feat-check">✓</span> Dark Mode</li>
-        <li><span class="feat-check">✓</span> Community Q&A (read-only)</li>
-        <li><span class="feat-x">—</span> AI Essay Coach</li>
-        <li><span class="feat-x">—</span> Study Planner</li>
-        <li><span class="feat-x">—</span> Scholarship Finder</li>
-        <li><span class="feat-x">—</span> College Quiz</li>
+        <li><span class="feat-check">✓</span> Progress Dashboard & Streaks</li>
       </ul>
-      <button class="btn-pricing outline" onclick="goToTools()">Use Free Tools →</button>
+      <button class="overview-button filled" onclick="goToTools()">Open Calculators →</button>
     </div>
-    <div class="pricing-card featured">
-      <div class="pricing-badge">Most Popular</div>
-      <div class="pricing-tier">Pro</div>
-      <div class="pricing-price"><span>$</span>4.99</div>
-      <div class="pricing-period">per month · 7-day free trial</div>
-      <ul class="pricing-features">
-        <li><span class="feat-check">✓</span> Everything in Free</li>
-        <li><span class="feat-check">✓</span> <strong>AI Essay Coach</strong> (live feedback)</li>
+    <div class="feature-overview-card">
+      <div class="overview-title">Prepare & Explore</div>
+      <ul class="overview-list">
+        <li><span class="feat-check">✓</span> <strong>Essay Coach</strong> and saved drafts</li>
         <li><span class="feat-check">✓</span> <strong>Study Planner</strong> (assignments & calendar)</li>
         <li><span class="feat-check">✓</span> <strong>Scholarship Finder</strong> (matched to you)</li>
         <li><span class="feat-check">✓</span> <strong>College Compatibility Quiz</strong></li>
-        <li><span class="feat-check">✓</span> Unlimited applications tracker</li>
+        <li><span class="feat-check">✓</span> SAT & ACT Practice Exams</li>
+        <li><span class="feat-check">✓</span> AP Study Tools</li>
+        <li><span class="feat-check">✓</span> College Comparison</li>
         <li><span class="feat-check">✓</span> Share results & social cards</li>
-        <li><span class="feat-check">✓</span> Progress dashboard & streaks</li>
-        <li><span class="feat-check">✓</span> Community Q&A (post & reply)</li>
-        <li><span class="feat-check">✓</span> Priority email support</li>
+        <li><span class="feat-check">✓</span> Community Q&A</li>
       </ul>
-      <button class="btn-pricing filled" onclick="openPayment('pro')">Start Free Trial — $4.99/mo</button>
-    </div>
-    <div class="pricing-card">
-      <div class="pricing-tier">Annual</div>
-      <div class="pricing-price"><span>$</span>45</div>
-      <div class="pricing-period">per year · all updates included</div>
-      <ul class="pricing-features">
-        <li><span class="feat-check">✓</span> Everything in Pro</li>
-        <li><span class="feat-check">✓</span> Full year of access</li>
-        <li><span class="feat-check">✓</span> All future features</li>
-        <li><span class="feat-check">✓</span> Advanced essay rubric scoring</li>
-        <li><span class="feat-check">✓</span> Essay draft comparison</li>
-        <li><span class="feat-check">✓</span> Priority scholarship alerts</li>
-        <li><span class="feat-check">✓</span> Unlimited college quiz retakes</li>
-        <li><span class="feat-check">✓</span> 1 free consult call</li>
-        <li><span class="feat-check">✓</span> VIP support</li>
-      </ul>
-      <button class="btn-pricing dark" onclick="openPayment('annual')">Get Annual — $45/yr</button>
+      <button class="overview-button dark" onclick="goToEssay()">Open Essay Tools →</button>
     </div>
   </div>
   <div style="max-width:700px;margin:0 auto;padding:0 40px;text-align:center;margin-bottom:32px">
     <div style="font-family:var(--font-display);font-size:32px;color:var(--ink);margin-bottom:8px">Frequently Asked Questions</div>
   </div>
   <div class="faq-section">
-    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Are the free tools really free forever? <span class="faq-toggle">+</span></div><div class="faq-a">Yes. All 7 calculators are 100% free with no signup, no email required, and no time limit. Pro is for students who want the AI Essay Coach and extra power features.</div></div>
-    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">How does the 7-day free trial work? <span class="faq-toggle">+</span></div><div class="faq-a">Sign up with your email and you get 7 days of full Pro access — no credit card required. After 7 days, you'll be prompted to subscribe if you want to keep Pro features. You'll never be charged without explicitly entering your payment information.</div></div>
-    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">How accurate are the results? <span class="faq-toggle">+</span></div><div class="faq-a">GPA, grade needed, and loan calculations are mathematically exact. College chances and financial aid estimates are based on publicly available admissions data — they're directional guides, not guarantees.</div></div>
-    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Can I cancel my Pro subscription anytime? <span class="faq-toggle">+</span></div><div class="faq-a">Yes, absolutely. Cancel any time from your account dashboard with one click. No cancellation fees, no questions asked.</div></div>
-    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Is my data safe? <span class="faq-toggle">+</span></div><div class="faq-a">All calculations happen locally in your browser. Account data is stored securely. Payments are processed by Stripe — we never see your card number.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Are all Scholark tools free? <span class="faq-toggle">+</span></div><div class="faq-a">Yes. Every existing Scholark feature is free for signed-in students. Signing in is still required where Scholark needs to save or sync personal work.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Why do I need an account? <span class="faq-toggle">+</span></div><div class="faq-a">Your account keeps saved calculations, essays, planner tasks, and applications associated with you so they can sync safely across devices.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">How should I use the results? <span class="faq-toggle">+</span></div><div class="faq-a">GPA, grade-needed, and loan outputs follow the displayed formulas and your inputs. College-chance and financial-aid outputs are rough planning scenarios, not predictions or offers.</div></div>
+    <div class="faq-item" onclick="toggleFAQ(this)"><div class="faq-q">Is my data safe? <span class="faq-toggle">+</span></div><div class="faq-a">Calculations happen in your browser. Signed-in account data is stored under your Firebase user ID and protected by Firestore rules so other users cannot read it.</div></div>
   </div>
   <footer>
     <div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;font-size:12px">
-      <span>© 2026 Scholark · <a href="#" style="color:rgba(255,255,255,.4)">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4)">Terms</a></span>
+      <span>© 2026 Scholark · Educational estimates only</span>
     </div>
   </footer>
 </div>
@@ -1667,11 +1559,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- STUDY PLANNER PAGE (Premium) -->
+<!-- STUDY PLANNER PAGE -->
 <div class="page" id="page-planner">
   <div class="feat-section">
     <div class="feat-header">
-      <h1>📅 Study Planner <span class="feat-badge pro">✦ Pro</span></h1>
+      <h1>📅 Study Planner</h1>
       <p>Track assignments, set deadlines, and never miss a due date. Your personal academic command center.</p>
     </div>
     <div id="planner-gate"></div>
@@ -1752,11 +1644,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- SCHOLARSHIP FINDER PAGE (Premium) -->
+<!-- SCHOLARSHIP FINDER PAGE -->
 <div class="page" id="page-scholarships">
   <div class="feat-section">
     <div class="feat-header">
-      <h1>💰 Scholarship Finder <span class="feat-badge pro">✦ Pro</span></h1>
+      <h1>💰 Scholarship Finder</h1>
       <p>Find scholarships matched to your profile. Answer a few questions and discover opportunities you qualify for.</p>
     </div>
     <div id="scholarship-gate"></div>
@@ -1891,11 +1783,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- COLLEGE COMPATIBILITY QUIZ PAGE (Premium) -->
+<!-- COLLEGE COMPATIBILITY QUIZ PAGE -->
 <div class="page" id="page-quiz">
   <div class="feat-section">
     <div class="feat-header">
-      <h1>🧩 College Compatibility Quiz <span class="feat-badge pro">✦ Pro</span></h1>
+      <h1>🧩 College Compatibility Quiz</h1>
       <p>Discover your ideal college match based on your personality, preferences, and academic goals.</p>
     </div>
     <div id="quiz-gate"></div>
@@ -1927,18 +1819,18 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   </div>
 </div>
 
-<!-- AI ADMISSIONS COUNSELOR -->
+<!-- ADMISSIONS GUIDE -->
 <div class="page" id="page-counselor">
   <div class="feat-section">
     <div class="feat-header">
-      <h1>🤖 AI Admissions Counselor <span class="feat-badge pro">✦ Pro</span></h1>
-      <p>Get 24/7 personalized college admissions advice — essays, strategy, financial aid, and more.</p>
+      <h1>🧭 Admissions Guide</h1>
+      <p>Get private, curated guidance on essays, strategy, financial aid, interviews, and more.</p>
     </div>
     <div id="counselor-gate"></div>
     <div id="counselor-content" style="display:none">
       <div class="counselor-chat" id="counselor-chat">
         <div class="counselor-msgs" id="counselor-msgs">
-          <div class="counselor-msg bot">Hey there! 👋 I'm your AI admissions counselor. I can help with college strategy, essay topics, financial aid, interview prep, and more. What's on your mind?</div>
+          <div class="counselor-msg bot">Hey there! 👋 I’m Scholark’s on-device admissions guide. Ask about college strategy, essay topics, financial aid, interviews, or extracurriculars.</div>
         </div>
         <div class="counselor-suggestions" id="counselor-suggestions">
           <button class="counselor-suggest-btn" onclick="askCounselor('Is my GPA good enough for top schools?')">Is my GPA good enough?</button>
@@ -1952,7 +1844,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           <button onclick="sendCounselorMsg()" id="counselor-send-btn">Send</button>
         </div>
       </div>
-      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--ink3)">AI responses are for guidance only — always verify with your school counselor.</div>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--ink3)">Guidance is educational and general. Verify deadlines and personal advice with schools and your counselor.</div>
     </div>
   </div>
 </div>
@@ -1983,10 +1875,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       </div>
     </div>
     <div class="prep-mode-tabs" id="prep-tabs">
-      <button class="prep-mode-tab active" onclick="setPrepSubject('all')">All Subjects</button>
-      <button class="prep-mode-tab" onclick="setPrepSubject('math')">Math</button>
-      <button class="prep-mode-tab" onclick="setPrepSubject('reading')">Reading</button>
-      <button class="prep-mode-tab" onclick="setPrepSubject('writing')">Writing</button>
+      <button class="prep-mode-tab active" onclick="setPrepSubject('all',this)">All Subjects</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('math',this)">Math</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('reading',this)">Reading</button>
+      <button class="prep-mode-tab" onclick="setPrepSubject('writing',this)">Writing</button>
     </div>
     <div class="prep-diff-tabs" id="prep-diff-tabs">
       <button class="prep-diff-tab active" data-diff="all" onclick="setPrepDifficulty('all')">All Levels</button>
@@ -2001,7 +1893,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <div style="font-size:12px;color:var(--ink3);margin-top:4px">Based on your accuracy across all subjects</div>
     </div>
     <div class="prep-exam-section" id="prep-exam-section">
-      <h2 style="margin:0 0 4px">📋 Full Practice Exams <span class="feat-badge pro">Pro</span></h2>
+      <h2 style="margin:0 0 4px">📋 Full Practice Exams</h2>
       <p style="margin:0;font-size:13px;color:var(--ink3)">Timed, full-length practice tests with score reports</p>
       <div class="prep-exam-cards" id="prep-exam-cards"></div>
     </div>
@@ -2057,8 +1949,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <h3>📬 Weekly College Tips</h3>
     <p>Get actionable college prep advice, deadline reminders, and scholarship alerts delivered to your inbox.</p>
     <div class="email-capture-form">
-      <input type="email" class="feat-input" id="email-capture-input" placeholder="you@email.com" style="flex:1">
-      <button class="feat-btn feat-btn-primary" onclick="subscribeEmail()">Subscribe</button>
+      <input type="email" class="feat-input" id="email-capture-input" placeholder="Sign in to use your account email" style="flex:1" readonly>
+      <button class="feat-btn feat-btn-primary" onclick="subscribeEmail()">Use Account Email</button>
     </div>
     <div id="email-capture-msg" style="font-size:12px;color:var(--green);margin-top:8px;display:none"></div>
   </div>
@@ -2070,11 +1962,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <div class="page" id="page-ap">
   <div id="ap-hub-view" class="ap-hub">
     <h1>📚 AP Study Hub</h1>
-    <p class="ap-subtitle">Practice MCQs, AI-graded FRQs, cram sheets & full practice exams for 19 AP subjects</p>
+    <p class="ap-subtitle">Practice MCQs, structured FRQ practice, cram sheets & full practice exams for 19 AP subjects</p>
     <div id="ap-subjects-grid"></div>
     <div class="ap-cb-credit">
       AP® and Advanced Placement® are registered trademarks of the College Board, which was not involved in the production of, and does not endorse, this product.<br>
-      Questions are derived from publicly released AP exam materials and are for educational practice only.
+      Practice materials are independently created for educational use. Check the current official course and exam description when preparing for an AP exam.
     </div>
   </div>
   <div id="ap-subject-view" class="ap-subject-view" style="display:none">
@@ -2133,15 +2025,15 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="ap-frq-actions">
           <button class="ap-btn ap-btn-primary" onclick="apGradeFRQ()" id="ap-frq-grade-btn">Grade My Response</button>
           <button class="ap-btn ap-btn-secondary" onclick="apNextFRQ()">New Question</button>
-          <span id="ap-frq-loading" style="display:none;color:var(--ink3);font-size:13px">Grading with AI...</span>
+          <span id="ap-frq-loading" style="display:none;color:var(--ink3);font-size:13px">Checking rubric signals...</span>
         </div>
         <div class="ap-frq-feedback" id="ap-frq-feedback">
-          <h4>AI Feedback</h4>
+          <h4>Rubric Feedback</h4>
           <div id="ap-frq-feedback-text"></div>
         </div>
       </div>
       <p style="font-size:11px;color:var(--ink3);margin-top:8px;text-align:center">
-        FRQs are graded by AI using official College Board rubric criteria. Results are approximate and for practice only.
+        FRQs receive an on-device rubric estimate. This is not an official College Board score and cannot verify factual correctness.
       </p>
     </div>
 
@@ -2236,16 +2128,14 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="about-section">
       <h2>Get In Touch</h2>
       <div class="contact-grid">
-        <div class="contact-card"><div class="icon">✉️</div><h3>Email</h3><p><a href="mailto:avadhanula.shriyan@gmail.com">avadhanula.shriyan@gmail.com</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Response within 24 hours</p></div>
-        <div class="contact-card"><div class="icon">🐦</div><h3>Twitter / X</h3><p><a href="#">@scholark</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Updates & announcements</p></div>
-        <div class="contact-card"><div class="icon">📸</div><h3>Instagram</h3><p><a href="#">@scholark.app</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Student tips & features</p></div>
+        <div class="contact-card"><div class="icon">✉️</div><h3>Email</h3><p><a href="mailto:avadhanula.shriyan@gmail.com">avadhanula.shriyan@gmail.com</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Questions & feedback</p></div>
         <div class="contact-card"><div class="icon">💼</div><h3>Partnerships</h3><p><a href="mailto:partnerships@scholark.app">partnerships@scholark.app</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Sponsorships & collabs</p></div>
       </div>
     </div>
   </div>
   <footer>
     <div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px 0;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;font-size:12px;text-align:center">
-      <span style="color:rgba(255,255,255,.4)">© 2026 Scholark · Made by a student, for students · <a href="#" style="color:rgba(255,255,255,.4)">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4)">Terms</a></span>
+      <span style="color:rgba(255,255,255,.4)">© 2026 Scholark · Made by a student, for students · Educational estimates only</span>
     </div>
   </footer>
 </div>
@@ -2262,10 +2152,10 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 function showPage(name) {
   // Login gate: require auth for all feature pages
-  const publicPages = ['home', 'premium', 'about'];
+  const publicPages = ['home', 'features', 'about'];
   if (!publicPages.includes(name) && !window.currentUser) {
     openAuth('signup', 'Sign up to access all features');
-    return;
+    return false;
   }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('page-' + name);
@@ -2274,10 +2164,13 @@ function showPage(name) {
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   const navBtn = document.getElementById('nav-' + name);
   if (navBtn) navBtn.classList.add('active');
+  const emailBanner = document.getElementById('email-capture-banner');
+  if (emailBanner && name !== 'home') emailBanner.style.display = 'none';
   window.scrollTo(0, 0);
   if (name === 'essay' && typeof updateEssayPage === 'function') updateEssayPage();
   if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
   if (name === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
+  return true;
 }
 
 function switchTab(tab, btn) {
@@ -2339,105 +2232,21 @@ function switchAuthTab(tab) {
   const tabSignup = document.getElementById('tab-signup');
   const tabLogin = document.getElementById('tab-login');
   const switchText = document.getElementById('auth-switch-text');
-  const trialBox = document.getElementById('trial-info-box');
+  const infoBox = document.getElementById('auth-info-box');
   if (tab === 'login') {
     if (signup) signup.style.display = 'none';
     if (login) login.style.display = '';
     if (tabSignup) tabSignup.classList.remove('active');
     if (tabLogin) tabLogin.classList.add('active');
     if (switchText) switchText.innerHTML = 'New here? <a onclick="switchAuthTab(\'signup\')">Create an account</a>';
-    if (trialBox) trialBox.style.display = 'none';
+    if (infoBox) infoBox.style.display = 'none';
   } else {
     if (signup) signup.style.display = '';
     if (login) login.style.display = 'none';
     if (tabSignup) tabSignup.classList.add('active');
     if (tabLogin) tabLogin.classList.remove('active');
     if (switchText) switchText.innerHTML = 'Already have an account? <a onclick="switchAuthTab(\'login\')">Sign in</a>';
-    if (trialBox) trialBox.style.display = '';
-  }
-}
-
-/* ============================================================
-   STRIPE CONFIGURATION
-   Replace these with your actual Stripe keys and Price IDs.
-   Get them from https://dashboard.stripe.com/apikeys and
-   https://dashboard.stripe.com/products
-============================================================ */
-const STRIPE_CONFIG = {
-  publishableKey: 'pk_test_51TWkyaAMuEElk3jV2mJjlUTTJPS0OYBPiRDdlUNDEKYHnaPIygntC4UETn640LIY8Go5Fnh1vvBXpZGRNbAumT9q009Vmc7dRl',
-  prices: {
-    monthly: 'price_1TWl3zAMuEElk3jViAVfYxdi',
-    annual:  'price_1TWl42AMuEElk3jVknubOB7L'
-  },
-  successUrl: window.location.origin + window.location.pathname + '?payment=success&session_id={CHECKOUT_SESSION_ID}',
-  cancelUrl:  window.location.origin + window.location.pathname + '?payment=cancelled'
-};
-
-let selectedPlan = 'monthly';
-let stripeInstance = null;
-
-function getStripe() {
-  if (!stripeInstance && STRIPE_CONFIG.publishableKey) {
-    stripeInstance = Stripe(STRIPE_CONFIG.publishableKey);
-  }
-  return stripeInstance;
-}
-
-function selectPlan(plan) {
-  selectedPlan = plan;
-  document.getElementById('plan-monthly').classList.toggle('selected', plan === 'monthly');
-  document.getElementById('plan-annual').classList.toggle('selected', plan === 'annual');
-  const btnText = document.getElementById('pay-btn-text');
-  const trialNote = document.getElementById('trial-note');
-  if (plan === 'annual') {
-    if (btnText) btnText.textContent = '🔒 Subscribe — $45/year';
-    if (trialNote) trialNote.style.display = 'none';
-  } else {
-    if (btnText) btnText.textContent = '🔒 Start Free Trial — then $4.99/mo';
-    if (trialNote) trialNote.style.display = '';
-  }
-}
-
-function openPayment(plan) {
-  if (!window.currentUser) { openAuth('signup', 'Create a free account first, then upgrade.'); return; }
-  const modal = document.getElementById('paymentModal');
-  if (!modal) return;
-  modal.classList.add('open');
-  selectPlan(plan === 'annual' ? 'annual' : 'monthly');
-}
-
-function closePayment() {
-  const modal = document.getElementById('paymentModal');
-  if (!modal) return;
-  modal.classList.remove('open');
-}
-
-async function handleStripeCheckout() {
-  const stripe = getStripe();
-  if (!stripe) {
-    showToast('Stripe is not configured yet. Contact support.', 'error');
-    return;
-  }
-  const btn = document.getElementById('stripe-checkout-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span>Redirecting to Stripe...</span>'; }
-
-  try {
-    const priceId = STRIPE_CONFIG.prices[selectedPlan];
-    const { error } = await stripe.redirectToCheckout({
-      lineItems: [{ price: priceId, quantity: 1 }],
-      mode: 'subscription',
-      successUrl: STRIPE_CONFIG.successUrl,
-      cancelUrl: STRIPE_CONFIG.cancelUrl,
-      clientReferenceId: window.currentUser?.uid || '',
-      customerEmail: window.currentUser?.email || ''
-    });
-    if (error) {
-      showToast(error.message || 'Something went wrong.', 'error');
-      if (btn) { btn.disabled = false; btn.innerHTML = '<span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>'; }
-    }
-  } catch (e) {
-    showToast('Could not connect to Stripe. Please try again.', 'error');
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span id="pay-btn-text">🔒 Start Free Trial — then $4.99/mo</span>'; }
+    if (infoBox) infoBox.style.display = '';
   }
 }
 
@@ -2488,8 +2297,7 @@ function updateNavForUser() {
   const signinBtn = document.getElementById('nav-signin-btn');
   const userNameBtn = document.getElementById('nav-user-name');
   const profileDrop = document.querySelector('.profile-dropdown');
-  const trialBanner = document.getElementById('trial-banner');
-  const getProBtn = document.getElementById('nav-get-pro');
+  const featuresBtn = document.getElementById('nav-features-cta');
 
   if (user) {
     if (signinBtn) signinBtn.style.display = 'none';
@@ -2498,22 +2306,11 @@ function updateNavForUser() {
       const name = user.displayName || user.email?.split('@')[0] || 'Account';
       userNameBtn.textContent = name.split(' ')[0] + ' ▾';
     }
-    // Show trial banner if on trial
-    if (trialBanner && window._gsProfile?.plan === 'trial') {
-      trialBanner.style.display = 'flex';
-      const daysEl = trialBanner.querySelector('.trial-days');
-      if (daysEl && typeof getTrialDaysLeft === 'function') daysEl.textContent = getTrialDaysLeft() + ' days left';
-    } else if (trialBanner) {
-      trialBanner.style.display = 'none';
-    }
-    // Hide "Get Pro" if already pro
-    if (getProBtn && typeof isPro === 'function' && isPro()) getProBtn.style.display = 'none';
-    else if (getProBtn) getProBtn.style.display = '';
+    if (featuresBtn) featuresBtn.style.display = '';
   } else {
     if (signinBtn) signinBtn.style.display = '';
     if (profileDrop) profileDrop.style.display = 'none';
-    if (trialBanner) trialBanner.style.display = 'none';
-    if (getProBtn) getProBtn.style.display = '';
+    if (featuresBtn) featuresBtn.style.display = '';
   }
 }
 
@@ -2536,25 +2333,10 @@ function renderDashboard() {
   if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.displayName?.split(' ')[0] || user.email?.split('@')[0] || 'there') + '!';
   if (emailEl) emailEl.textContent = user.email || '';
 
-  // Plan badge
+  // Access badge
   const planBadge = document.getElementById('dash-plan-badge');
-  const upgradeBtn = document.getElementById('dash-upgrade-btn');
-  const plan = typeof getUserPlan === 'function' ? getUserPlan() : 'free';
   if (planBadge) {
-    if (plan === 'pro' || plan === 'annual') { planBadge.textContent = '✦ Pro'; planBadge.classList.add('pro'); }
-    else if (plan === 'trial') { planBadge.textContent = '🎁 Trial'; planBadge.classList.add('pro'); }
-    else { planBadge.textContent = 'Free'; planBadge.classList.remove('pro'); }
-  }
-  if (upgradeBtn && typeof isPro === 'function') upgradeBtn.style.display = isPro() ? 'none' : '';
-
-  // Trial box
-  const trialBox = document.getElementById('dash-trial-box');
-  const trialDaysEl = document.getElementById('dash-trial-days');
-  if (trialBox) {
-    if (plan === 'trial' && typeof getTrialDaysLeft === 'function') {
-      trialBox.style.display = '';
-      if (trialDaysEl) trialDaysEl.textContent = getTrialDaysLeft();
-    } else { trialBox.style.display = 'none'; }
+    planBadge.textContent = 'All Features Included';
   }
 
   // Load saved results list
@@ -2572,14 +2354,15 @@ function renderDashboard() {
       }
       list.innerHTML = items.map(item => `
         <div class="dash-card">
-          <div class="dash-card-title">${item.title || item.tool}</div>
-          <div class="dash-card-meta">${item.date || ''}</div>
-          ${Object.entries(item.data || {}).map(([k,v]) => `<div class="dash-stat"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
+          <div class="dash-card-title">${escapeHTML(item.title || item.tool || 'Saved result')}</div>
+          <div class="dash-card-meta">${escapeHTML(item.date || '')}</div>
+          ${Object.entries(item.data || {}).map(([k,v]) => `<div class="dash-stat"><span class="k">${escapeHTML(k)}</span><span class="v">${escapeHTML(v)}</span></div>`).join('')}
           <button class="delete-btn" onclick="deleteSavedItem('${item.id}')">Delete</button>
         </div>
       `).join('');
-    }).catch(() => {
-      if (list) list.innerHTML = '<p style="font-size:13px;color:var(--ink3);padding:20px">Could not load saved results.</p>';
+    }).catch((error) => {
+      console.error('Dashboard load error:', error);
+      if (list) list.innerHTML = '<p style="font-size:13px;color:var(--red);padding:20px">Cloud sync failed. Check your connection and reload to try again.</p>';
     });
   }
 }
@@ -2590,6 +2373,9 @@ window.deleteSavedItem = function(id) {
   window._dbDeleteSaved(user.uid, id).then(() => {
     renderDashboard();
     showToast('Deleted.');
+  }).catch((error) => {
+    console.error('Dashboard delete error:', error);
+    showToast('Could not delete that result from the cloud. Please try again.', 'error');
   });
 };
 
@@ -2633,37 +2419,21 @@ function renderProfilePage() {
     }
   }
 
-  const plan = typeof getUserPlan === 'function' ? getUserPlan() : 'free';
   const planIcon = document.getElementById('profile-plan-icon');
   const planName = document.getElementById('profile-plan-name');
   const planDesc = document.getElementById('profile-plan-desc');
-  const upgradeBtn = document.getElementById('profile-upgrade-btn');
-  const trialInfo = document.getElementById('profile-trial-info');
+  if (planIcon) { planIcon.textContent = '✓'; planIcon.style.background = 'var(--green-light)'; }
+  if (planName) planName.textContent = 'All Features Included';
+  if (planDesc) planDesc.textContent = 'Free for every signed-in student';
+}
 
-  if (plan === 'pro' || plan === 'annual') {
-    if (planIcon) { planIcon.textContent = '\u2726'; planIcon.style.background = 'var(--gold-light)'; }
-    if (planName) planName.textContent = plan === 'annual' ? 'Annual Plan' : 'Pro Plan';
-    if (planDesc) planDesc.textContent = 'All features unlocked';
-    if (upgradeBtn) upgradeBtn.style.display = 'none';
-    if (trialInfo) trialInfo.style.display = 'none';
-  } else if (plan === 'trial') {
-    if (planIcon) { planIcon.textContent = '\ud83c\udf81'; planIcon.style.background = 'var(--green-light)'; }
-    if (planName) planName.textContent = 'Pro Trial';
-    const daysLeft = typeof getTrialDaysLeft === 'function' ? getTrialDaysLeft() : 7;
-    if (planDesc) planDesc.textContent = daysLeft + ' days remaining in your free trial';
-    if (upgradeBtn) upgradeBtn.style.display = '';
-    if (trialInfo) {
-      trialInfo.style.display = 'block';
-      const trialDaysEl = document.getElementById('profile-trial-days');
-      if (trialDaysEl) trialDaysEl.textContent = daysLeft;
-    }
-  } else {
-    if (planIcon) { planIcon.textContent = '\ud83d\udce6'; planIcon.style.background = 'var(--bg2)'; }
-    if (planName) planName.textContent = 'Free Plan';
-    if (planDesc) planDesc.textContent = 'Core calculators included';
-    if (upgradeBtn) upgradeBtn.style.display = '';
-    if (trialInfo) trialInfo.style.display = 'none';
-  }
+function escapeHTML(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 // Init: show home page on load
@@ -2742,79 +2512,88 @@ const DB = {
     const ref = doc(db, 'users', user.uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) {
-      // New user — write full profile
       await setDoc(ref, {
         name: user.displayName || extraData.name || '',
-        email: user.email,
+        email: (user.email || '').trim().toLowerCase(),
         createdAt: serverTimestamp(),
-        plan: 'free',
-        trialStart: serverTimestamp(),
         ...extraData
       });
+    } else {
+      await setDoc(ref, {
+        name: user.displayName || snap.data().name || extraData.name || '',
+        email: (user.email || snap.data().email || '').trim().toLowerCase(),
+        lastSignInAt: serverTimestamp()
+      }, { merge: true });
     }
   },
 
   // Fetch the stored profile from Firestore
   getUserProfile: async (uid) => {
-    try {
-      const snap = await getDoc(doc(db, 'users', uid));
-      return snap.exists() ? snap.data() : null;
-    } catch { return null; }
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? snap.data() : null;
   },
 
   // Update a field on the user profile
   updateUserProfile: async (uid, data) => {
-    try { await updateDoc(doc(db, 'users', uid), data); } catch {}
+    await updateDoc(doc(db, 'users', uid), data);
   },
 
   // ── Saved results ─────────────────────────────────────────
   getSaved: async (uid) => {
-    try {
-      const q = query(collection(db, 'users', uid, 'saved'), orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch { return []; }
+    const q = query(collection(db, 'users', uid, 'saved'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   },
 
   addSaved: async (uid, item) => {
-    try {
-      await addDoc(collection(db, 'users', uid, 'saved'), {
-        ...item,
-        createdAt: serverTimestamp(),
-        date: new Date().toLocaleDateString()
-      });
-    } catch (e) { console.error('addSaved error', e); }
+    const ref = await addDoc(collection(db, 'users', uid, 'saved'), {
+      ...item,
+      createdAt: serverTimestamp(),
+      date: new Date().toLocaleDateString()
+    });
+    return ref.id;
   },
 
   deleteSaved: async (uid, id) => {
-    try { await deleteDoc(doc(db, 'users', uid, 'saved', id)); } catch {}
+    await deleteDoc(doc(db, 'users', uid, 'saved', id));
   },
 
   // ── Essays ────────────────────────────────────────────────
   getEssays: async (uid) => {
-    try {
-      const q = query(collection(db, 'users', uid, 'essays'), orderBy('savedAt', 'desc'));
-      const snap = await getDocs(q);
-      return snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
-    } catch { return []; }
+    const q = query(collection(db, 'users', uid, 'essays'), orderBy('savedAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => {
+      const data = d.data();
+      const savedAt = data.savedAt?.toDate ? data.savedAt.toDate().toLocaleString() : data.savedAt;
+      return { ...data, id: data.id || d.id, firestoreId: d.id, savedAt };
+    });
   },
 
   saveEssay: async (uid, essay) => {
-    try {
-      if (essay.firestoreId) {
-        const ref = doc(db, 'users', uid, 'essays', essay.firestoreId);
-        await setDoc(ref, { ...essay, savedAt: serverTimestamp() }, { merge: true });
-      } else {
-        await addDoc(collection(db, 'users', uid, 'essays'), {
-          ...essay,
-          savedAt: serverTimestamp()
-        });
-      }
-    } catch (e) { console.error('DB.saveEssay error', e); }
+    const firestoreId = essay.firestoreId || essay.id;
+    const { firestoreId: ignored, ...payload } = essay;
+    const ref = doc(db, 'users', uid, 'essays', firestoreId);
+    await setDoc(ref, { ...payload, id: essay.id || firestoreId, savedAt: serverTimestamp() }, { merge: true });
+    return firestoreId;
   },
 
   deleteEssay: async (uid, firestoreId) => {
-    try { await deleteDoc(doc(db, 'users', uid, 'essays', firestoreId)); } catch {}
+    await deleteDoc(doc(db, 'users', uid, 'essays', firestoreId));
+  },
+
+  // Small, versioned sync documents preserve the existing local arrays while
+  // allowing planner tasks and applications to follow the signed-in account.
+  getSyncState: async (uid, key) => {
+    const snap = await getDoc(doc(db, 'users', uid, 'sync', key));
+    return snap.exists() ? (snap.data().items || []) : [];
+  },
+
+  saveSyncState: async (uid, key, items) => {
+    await setDoc(doc(db, 'users', uid, 'sync', key), {
+      version: 1,
+      items,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
   }
 };
 
@@ -2831,6 +2610,11 @@ onAuthStateChanged(auth, async (user) => {
   // Expose DB helpers for dashboard (sync — no await needed)
   window._dbGetSaved = (uid) => DB.getSaved(uid);
   window._dbDeleteSaved = (uid, id) => DB.deleteSaved(uid, id);
+  window._dbGetEssays = (uid) => DB.getEssays(uid);
+  window._dbSaveEssay = (uid, essay) => DB.saveEssay(uid, essay);
+  window._dbDeleteEssay = (uid, id) => DB.deleteEssay(uid, id);
+  window._dbGetSyncState = (uid, key) => DB.getSyncState(uid, key);
+  window._dbSaveSyncState = (uid, key, items) => DB.saveSyncState(uid, key, items);
 
   // Update UI immediately so nav/dashboard/profile respond without
   // waiting on Firestore (which may be slow or offline).
@@ -2855,31 +2639,12 @@ onAuthStateChanged(auth, async (user) => {
       if (dashActive && typeof renderDashboard   === 'function') renderDashboard();
     } catch (e) {
       console.error('Auth-state DB sync error:', e);
+      showToast('Signed in, but cloud syncing is unavailable. Your local data is still available.', 'error');
     }
   } else {
     window._gsProfile = null;
   }
 
-  // Handle Stripe payment success redirect
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('payment') === 'success' && user) {
-    try {
-      const plan = urlParams.get('plan') || 'pro';
-      await updateDoc(doc(db, 'users', user.uid), { plan: plan === 'annual' ? 'annual' : 'pro' });
-      window._gsProfile = { ...window._gsProfile, plan: plan === 'annual' ? 'annual' : 'pro' };
-      if (typeof updateNavForUser === 'function') updateNavForUser();
-      if (typeof renderDashboard === 'function') renderDashboard();
-      if (typeof renderProfilePage === 'function') renderProfilePage();
-      showToast('✓ Payment successful! Pro features are now active.', 'success');
-    } catch (e) {
-      console.error('Failed to activate Pro:', e);
-    }
-    // Clean URL params
-    window.history.replaceState({}, '', window.location.pathname);
-  } else if (urlParams.get('payment') === 'cancelled') {
-    showToast('Payment cancelled. No charges were made.', 'info');
-    window.history.replaceState({}, '', window.location.pathname);
-  }
 });
 
 /* ============================================================
@@ -2899,7 +2664,6 @@ window.handleSignup = async function() {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await DB.setCurrentUser(cred.user, { name });
-    subscribeEmailToFirestore(email, cred.user.displayName || name);
     closeAuth();
     showToast('✓ Account created! Welcome to Scholark.');
   } catch (e) {
@@ -2942,13 +2706,16 @@ window.handleGoogleAuth = async function() {
 };
 
 // Handle Google redirect result on page load
-getRedirectResult(auth).then(result => {
+getRedirectResult(auth).then(async result => {
   if (result?.user) {
-    DB.setCurrentUser(result.user);
+    await DB.setCurrentUser(result.user);
     closeAuth();
     showToast('✓ Signed in with Google!');
   }
-}).catch(() => {});
+}).catch((error) => {
+  console.error('Google redirect sign-in error:', error);
+  showToast(firebaseErrMsg(error.code), 'error');
+});
 
 // Sign out
 window.handleSignOut = async function() {
@@ -2975,36 +2742,8 @@ function firebaseErrMsg(code) {
   return map[code] || 'Something went wrong. Please try again.';
 }
 
-/* ============================================================
-   PLAN HELPERS
-   Reads from window._gsProfile (set by onAuthStateChanged)
-   so they stay synchronous like the original code expects.
-============================================================ */
-const ADMIN_EMAILS = ['admin@gradescope.app'];
-
-window.getUserPlan = function() {
-  const user = window.currentUser || window._gsUser || window._gsAuth?.currentUser;
-  const email = user?.email;
-  if (email && ADMIN_EMAILS.includes(email.toLowerCase())) return 'pro';
-  return window._gsProfile?.plan || 'free';
-};
-
-window.isPro = function() {
-  const plan = getUserPlan();
-  if (plan === 'pro' || plan === 'annual') return true;
-  // Check trial
-  if (plan === 'trial' && window._gsProfile?.trialStart) {
-    const start = window._gsProfile.trialStart.toDate?.() || new Date(window._gsProfile.trialStart);
-    const daysElapsed = (Date.now() - start.getTime()) / 86400000;
-    return daysElapsed < 7;
-  }
-  return false;
-};
-
-window.getTrialDaysLeft = function() {
-  if (!window._gsProfile?.trialStart) return 0;
-  const start = window._gsProfile.trialStart.toDate?.() || new Date(window._gsProfile.trialStart);
-  return Math.max(0, 7 - Math.floor((Date.now() - start.getTime()) / 86400000));
+window.hasFeatureAccess = function() {
+  return Boolean(window.currentUser || window._gsUser || window._gsAuth?.currentUser);
 };
 
 /* ============================================================
@@ -3013,9 +2752,14 @@ window.getTrialDaysLeft = function() {
 window.saveResult = async function(tool, title, data) {
   const user = window._gsUser || (window._gsAuth && window._gsAuth.currentUser);
   if (!user) return;
-  await DB.addSaved(user.uid, { tool, title, data });
-  showToast('✓ Saved to your dashboard!');
-  if (typeof renderDashboard === 'function') renderDashboard();
+  try {
+    await DB.addSaved(user.uid, { tool, title, data });
+    showToast('✓ Saved to your dashboard!');
+    if (typeof renderDashboard === 'function') renderDashboard();
+  } catch (error) {
+    console.error('Calculator save error:', error);
+    showToast('Could not save to the cloud. Check your connection and try again.', 'error');
+  }
 };
 
 /* ============================================================
@@ -3240,7 +2984,7 @@ function selectUniversity(name) {
   document.getElementById('uni-search').value = u.name;
   document.getElementById('uni-results').classList.remove('show');
   document.getElementById('sel-uni-name').textContent = u.name + ' (' + u.state + ')';
-  document.getElementById('sel-uni-data').textContent = 'Official acceptance rate: ' + u.rate + '% · Tier: ' + u.tier.charAt(0).toUpperCase() + u.tier.slice(1);
+  document.getElementById('sel-uni-data').textContent = 'Dataset acceptance rate: ' + u.rate + '% · Tier: ' + u.tier.charAt(0).toUpperCase() + u.tier.slice(1);
   document.getElementById('selected-uni').classList.add('show');
   // Auto-set selectivity dropdown to match tier
   const tierMap = {ivy:'ivy',high:'high',select:'select',mod:'mod',open:'open'};
@@ -3286,7 +3030,7 @@ function addGPARow(name='',grade='A',credits=3) {
   const id=gpaCount;
   const div=document.createElement('div');
   div.className='course-row'; div.id='gr-'+id;
-  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${name}" style="font-size:13px">
+  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${escapeHTML(name)}" style="font-size:13px">
     <select style="font-size:13px">${gradeOpts.replace(`"${grade}"`,`"${grade}" selected`)}</select>
     <input type="number" value="${credits}" min=".5" max="6" step=".5" style="font-size:13px">
     <button class="btn-remove" onclick="this.closest('.course-row').remove()">×</button>`;
@@ -3295,11 +3039,14 @@ function addGPARow(name='',grade='A',credits=3) {
 function calcGPA() {
   const rows=document.querySelectorAll('#gpa-courses .course-row');
   let pts=0,creds=0;
+  let invalidCredits=false;
   rows.forEach(r=>{
     const g=r.querySelectorAll('select')[0].value;
-    const c=parseFloat(r.querySelectorAll('input[type=number]')[0].value)||0;
+    const c=parseFloat(r.querySelectorAll('input[type=number]')[0].value);
+    if(!Number.isFinite(c)||c<=0) { invalidCredits=true; return; }
     pts+=(GP[g]||0)*c; creds+=c;
   });
+  if(invalidCredits) { showToast('Each course needs a positive credit value.', 'error'); return null; }
   if(!creds) return null;
   const gpa=pts/creds;
   const info=gpaInfo(gpa);
@@ -3346,7 +3093,7 @@ function addWGPARow(name='',grade='A',type='Regular') {
   const id=wgpaCount;
   const div=document.createElement('div');
   div.className='course-row'; div.style.gridTemplateColumns='1fr 110px 120px 36px'; div.id='wgr-'+id;
-  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${name}" style="font-size:13px">
+  div.innerHTML=`<input type="text" placeholder="Course ${id}" value="${escapeHTML(name)}" style="font-size:13px">
     <select style="font-size:13px">${gradeOpts.replace(`"${grade}"`,`"${grade}" selected`)}</select>
     <select style="font-size:13px">${typeOpts.replace(`"${type}"`,`"${type}" selected`)}</select>
     <button class="btn-remove" onclick="this.closest('.course-row').remove()">×</button>`;
@@ -3387,7 +3134,10 @@ function calcNeeded() {
   const cur=parseFloat(document.getElementById('n-current').value);
   const w=parseFloat(document.getElementById('n-weight').value)/100;
   const tgt=parseFloat(document.getElementById('n-target').value);
-  if(isNaN(cur)||isNaN(w)||isNaN(tgt)) return;
+  if(!Number.isFinite(cur)||!Number.isFinite(w)||!Number.isFinite(tgt)||cur<0||cur>100||tgt<0||tgt>100||w<=0||w>1) {
+    showToast('Enter grades from 0–100 and an assessment weight greater than 0% and no more than 100%.', 'error');
+    return;
+  }
   const needed=(tgt - cur*(1-w)) / w;
   const box=document.getElementById('needed-result');
   box.classList.remove('result-hidden');
@@ -3412,10 +3162,15 @@ function calcNeeded() {
    COLLEGE CHANCES + UNIVERSITY COMPARISON
 ============================================================ */
 function calcChances() {
-  const gpa=parseFloat(document.getElementById('c-gpa').value)||0;
-  const wgpa=parseFloat(document.getElementById('c-wgpa').value)||0;
+  const gpa=parseFloat(document.getElementById('c-gpa').value);
+  const wgpa=parseFloat(document.getElementById('c-wgpa').value);
   const sat=parseFloat(document.getElementById('c-sat').value)||0;
   const act=parseFloat(document.getElementById('c-act').value)||0;
+  if(!Number.isFinite(gpa)||gpa<0||gpa>4||!Number.isFinite(wgpa)||wgpa<0||wgpa>5||
+     (sat!==0&&(sat<400||sat>1600))||(act!==0&&(act<1||act>36))) {
+    showToast('Enter GPA values in range and, if provided, SAT 400–1600 or ACT 1–36.', 'error');
+    return null;
+  }
   const school=document.getElementById('c-school').value;
   const rank=document.getElementById('c-rank').value;
   const ecs=document.getElementById('c-ecs').value;
@@ -3486,7 +3241,7 @@ function calcChances() {
   const compSection = document.getElementById('comparison-section');
   if(selectedUni) {
     compSection.style.display = 'block';
-    document.getElementById('comp-uni-name').textContent = selectedUni.name + ' (Official)';
+    document.getElementById('comp-uni-name').textContent = selectedUni.name + ' (dataset)';
     document.getElementById('comp-official-rate').textContent = selectedUni.rate + '%';
     document.getElementById('comp-official-bar').style.width = Math.min(selectedUni.rate, 100) + '%';
     document.getElementById('comp-user-rate').textContent = Math.round(chance) + '%';
@@ -3494,13 +3249,13 @@ function calcChances() {
     const verdict = document.getElementById('comp-verdict');
     if(chance >= selectedUni.rate * 1.2) {
       verdict.style.background = '#e8f5ee'; verdict.style.color = '#1a4d2e';
-      verdict.innerHTML = '✅ <strong>Good match!</strong> Your estimated admission chance (' + Math.round(chance) + '%) is above the official acceptance rate (' + selectedUni.rate + '%). This looks like a strong target or safety school for you.';
+      verdict.innerHTML = '✅ <strong>Potential match.</strong> Your planning estimate (' + Math.round(chance) + '%) is above the stored acceptance-rate benchmark (' + selectedUni.rate + '%). Treat this as one input when building a balanced list.';
     } else if(chance >= selectedUni.rate * 0.7) {
       verdict.style.background = '#fef8e1'; verdict.style.color = '#7a5800';
-      verdict.innerHTML = '📊 <strong>Competitive match.</strong> Your estimated chance (' + Math.round(chance) + '%) is close to the official rate (' + selectedUni.rate + '%). This is a solid target school — apply with a strong application.';
+      verdict.innerHTML = '📊 <strong>Competitive range.</strong> Your planning estimate (' + Math.round(chance) + '%) is close to the stored rate (' + selectedUni.rate + '%). Verify current admissions data and keep a balanced list.';
     } else {
       verdict.style.background = '#fce8e8'; verdict.style.color = '#7a1a1a';
-      verdict.innerHTML = '⚠️ <strong>Reach school.</strong> Your estimated chance (' + Math.round(chance) + '%) is below the official acceptance rate (' + selectedUni.rate + '%). This is a reach — still worth applying but have backups.';
+      verdict.innerHTML = '⚠️ <strong>Reach range.</strong> Your planning estimate (' + Math.round(chance) + '%) is below the stored rate (' + selectedUni.rate + '%). Consider additional target and likely schools.';
     }
   } else {
     compSection.style.display = 'none';
@@ -3517,7 +3272,7 @@ function calcChancesAndSave() {
     saveResult('College Chances', 'College Chances — ' + (selectedUni?.name || result.school), {
       'Estimated Chance': result.chance + '%',
       'University': selectedUni?.name || 'Custom tier',
-      'Official Rate': selectedUni ? selectedUni.rate + '%' : 'N/A'
+      'Dataset Rate': selectedUni ? selectedUni.rate + '%' : 'N/A'
     });
   }
 }
@@ -3531,11 +3286,14 @@ function setLoanRate() {
   if(val!=='custom') document.getElementById('l-rate').value=val;
 }
 function calcLoan() {
-  const P=parseFloat(document.getElementById('l-amount').value)||0;
+  const P=parseFloat(document.getElementById('l-amount').value);
   const r=parseFloat(document.getElementById('l-rate').value)/100/12;
   const n=parseFloat(document.getElementById('l-term').value)*12;
-  if(!P||!r||!n) return;
-  const M=P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  if(!Number.isFinite(P)||!Number.isFinite(r)||!Number.isFinite(n)||P<=0||r<0||r>1||n<=0||n>360) {
+    showToast('Enter a positive loan amount, a 1–30 year term, and an interest rate from 0% to 100%.', 'error');
+    return;
+  }
+  const M=r===0 ? P/n : P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
   const total=M*n, interest=total-P;
   document.getElementById('loan-result').classList.remove('result-hidden');
   document.getElementById('loan-monthly').textContent='$'+M.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
@@ -3547,9 +3305,9 @@ function calcLoan() {
     <div class="loan-row"><span class="key">Total interest paid</span><span class="value" style="color:var(--red)">$${interest.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</span></div>
     <div class="loan-row"><span class="key">Interest-to-Principal Ratio</span><span class="value">${((interest/P)*100).toFixed(1)}%</span></div>`;
   const warn=document.getElementById('loan-warn');
-  if(P>31000&&document.getElementById('l-type').value==='6.53'){
+  if(P>31000&&document.getElementById('l-type').value!=='custom'){
     warn.style.display='block';
-    warn.innerHTML='<div class="warn-box" style="margin-top:12px">⚠️ This exceeds the federal dependent undergrad loan limit of $31,000. Amounts above this require private loans.</div>';
+    warn.innerHTML='<div class="warn-box" style="margin-top:12px">⚠️ This amount may exceed an applicable federal annual or aggregate limit. Verify your loan type and eligibility at StudentAid.gov.</div>';
   } else { warn.style.display='none'; }
 }
 
@@ -3558,7 +3316,7 @@ function calcLoan() {
 ============================================================ */
 function convertSAT() {
   const sat=parseInt(document.getElementById('sat-input').value)||0;
-  if(sat<400||sat>1600) return;
+  if(sat<400||sat>1600) { showToast('Enter an SAT score from 400 to 1600.', 'error'); return; }
   let best=CONCORDANCE[0];
   CONCORDANCE.forEach(row=>{ if(Math.abs(row[0]-sat)<Math.abs(best[0]-sat)) best=row; });
   showSATResult(`ACT Equivalent: ${best[1]}`,`${best[2]}th`,best,`Your SAT of ${sat} is roughly equivalent to ACT ${best[1]}. You're in the <strong>${best[2]}th percentile</strong> nationally.`);
@@ -3566,7 +3324,7 @@ function convertSAT() {
 }
 function convertACT() {
   const act=parseInt(document.getElementById('act-input').value)||0;
-  if(act<1||act>36) return;
+  if(act<1||act>36) { showToast('Enter an ACT score from 1 to 36.', 'error'); return; }
   let best=CONCORDANCE[0];
   CONCORDANCE.forEach(row=>{ if(Math.abs(row[1]-act)<Math.abs(best[1]-act)) best=row; });
   showSATResult(`SAT Equivalent: ${best[0]}`,`${best[2]}th`,best,`Your ACT of ${act} is roughly equivalent to SAT ${best[0]}. You're in the <strong>${best[2]}th percentile</strong> nationally.`);
@@ -3589,34 +3347,38 @@ function buildSATTable() {
    SCHOLARSHIP CALCULATOR
 ============================================================ */
 function calcScholarship() {
-  const income=parseFloat(document.getElementById('s-income').value)||0;
-  const assets=parseFloat(document.getElementById('s-assets').value)||0;
-  const family=parseInt(document.getElementById('s-family').value)||4;
-  const inCollege=parseInt(document.getElementById('s-incollege').value)||1;
+  const income=parseFloat(document.getElementById('s-income').value);
+  const assets=parseFloat(document.getElementById('s-assets').value);
+  const family=parseInt(document.getElementById('s-family').value);
+  const inCollege=parseInt(document.getElementById('s-incollege').value);
   const coa=parseInt(document.getElementById('s-school').value)||28000;
-  const gpa=parseFloat(document.getElementById('s-gpa').value)||0;
+  const gpa=parseFloat(document.getElementById('s-gpa').value);
+  if(!Number.isFinite(income)||income<0||!Number.isFinite(assets)||assets<0||
+     !Number.isInteger(family)||family<1||!Number.isInteger(inCollege)||inCollege<1||inCollege>family||
+     !Number.isFinite(gpa)||gpa<0||gpa>4) {
+    showToast('Enter nonnegative finances, a valid household size, and a GPA from 0 to 4.', 'error');
+    return;
+  }
   let sai=0;
   const incomeAfterAllowance=Math.max(income-([0,20000,25000,29000,32000,36000][Math.min(family,5)]||36000),0);
   sai+=incomeAfterAllowance*0.22;
   sai+=Math.max(assets-12000,0)*0.05;
   sai/=inCollege; sai=Math.max(0,Math.round(sai));
   const need=Math.max(coa-sai,0);
-  const pellMax=income<30000?7395:income<50000?5000:income<75000?2000:0;
-  const needBased=Math.min(need,pellMax+12000);
+  const pellMaximum=7395;
   let merit=0;
   if(gpa>=3.9)merit=15000; else if(gpa>=3.7)merit=10000; else if(gpa>=3.5)merit=6000; else if(gpa>=3.3)merit=3000; else if(gpa>=3.0)merit=1000;
   const box=document.getElementById('sch-result'); box.classList.remove('result-hidden');
   document.getElementById('sch-need').textContent='$'+need.toLocaleString();
   document.getElementById('sch-merit').textContent='$'+merit.toLocaleString();
-  document.getElementById('sch-breakdown').innerHTML=`<strong>Estimated SAI / EFC:</strong> $${sai.toLocaleString()} &nbsp;·&nbsp;
+  document.getElementById('sch-breakdown').innerHTML=`<strong>Illustrative family contribution:</strong> $${sai.toLocaleString()} &nbsp;·&nbsp;
      <strong>Cost of Attendance:</strong> $${coa.toLocaleString()}/yr<br>
-     <strong>Pell Grant Estimate:</strong> $${pellMax.toLocaleString()}/yr &nbsp;·&nbsp;
-     <strong>Need-Based Aid Est.:</strong> $${needBased.toLocaleString()}/yr<br>
-     <em style="font-size:12px;color:var(--ink3)">Estimates only. Actual awards depend on your school and FAFSA verification.</em>`;
+     <strong>2026–27 maximum Pell Grant:</strong> $${pellMaximum.toLocaleString()}/yr; individual eligibility is determined through the FAFSA process.<br>
+     <em style="font-size:12px;color:var(--ink3)">Planning estimate only. Actual SAI, Pell eligibility, and awards depend on federal rules, FAFSA data, enrollment, and your school.</em>`;
 }
 
 /* ============================================================
-   ESSAY AI COACH
+   ESSAY RUBRIC COACH
 ============================================================ */
 const PROMPT_HINTS = {
   ca1: 'Prompt: Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. Tell us your story.',
@@ -3642,7 +3404,6 @@ function updatePromptHint() {
   }
 }
 
-let essayFeedbackTimeout = null;
 function onEssayInput() {
   const text = document.getElementById('essay-textarea').value;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -3661,7 +3422,7 @@ function onEssayInput() {
 async function getEssayFeedback() {
   const text = document.getElementById('essay-textarea').value.trim();
   if(text.length < 100) { showToast('Write at least 100 characters before getting feedback.', 'error'); return; }
-  if(!isPro()) { openPayment('pro'); return; }
+  if(!hasFeatureAccess()) { openAuth('login', 'Sign in to use the Essay Coach.'); return; }
 
   const panel = document.getElementById('essay-ai-panel');
   const content = document.getElementById('essay-ai-content');
@@ -3674,44 +3435,8 @@ async function getEssayFeedback() {
 
   const prompt = document.getElementById('essay-prompt').value;
   const promptHint = PROMPT_HINTS[prompt] || '';
-  const words = text.split(/\s+/).length;
-
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `You are an expert college admissions essay coach. Analyze this student's college essay and provide actionable, specific feedback.
-
-${promptHint ? 'PROMPT: ' + promptHint + '\n\n' : ''}ESSAY (${words} words):
-${text}
-
-Respond in this EXACT JSON format (no markdown, just raw JSON):
-{
-  "scores": {"structure": 8, "voice": 7, "clarity": 9, "impact": 6},
-  "summary": "2-3 sentence overall assessment",
-  "strengths": ["specific strength 1", "specific strength 2"],
-  "improvements": ["specific actionable improvement 1", "specific actionable improvement 2", "specific actionable improvement 3"],
-  "opening_note": "one sentence about how the opening hooks the reader",
-  "closing_note": "one sentence about how the conclusion lands",
-  "word_count_note": "${words > 650 ? 'OVER LIMIT - must cut ' + (words-650) + ' words' : words < 250 ? 'Too short - expand your story' : 'Good length'}"
-}`
-        }]
-      })
-    });
-
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '{}';
-    let feedback;
-    try { feedback = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
-    catch(e) { throw new Error('Could not parse AI response'); }
+    const feedback = analyzeEssayLocally(text, promptHint);
 
     const s = feedback.scores || {};
     document.getElementById('score-structure').textContent = s.structure || '—';
@@ -3726,37 +3451,103 @@ Respond in this EXACT JSON format (no markdown, just raw JSON):
     scoreGrid.style.display = 'grid';
 
     content.innerHTML = `
-      <p style="margin-bottom:14px;font-weight:600;color:var(--ink)">${feedback.summary || ''}</p>
-      ${feedback.word_count_note ? `<div style="background:${feedback.word_count_note.includes('OVER') ? 'var(--red-light)' : 'var(--blue-light)'};border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:14px;color:${feedback.word_count_note.includes('OVER') ? 'var(--red)' : 'var(--blue)'}">${feedback.word_count_note}</div>` : ''}
+      <p style="margin-bottom:14px;font-weight:600;color:var(--ink)">${escapeHTML(feedback.summary || '')}</p>
+      ${feedback.word_count_note ? `<div style="background:${feedback.word_count_note.includes('OVER') ? 'var(--red-light)' : 'var(--blue-light)'};border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:14px;color:${feedback.word_count_note.includes('OVER') ? 'var(--red)' : 'var(--blue)'}">${escapeHTML(feedback.word_count_note)}</div>` : ''}
       <div style="margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:6px">✅ Strengths</div>
-        ${(feedback.strengths||[]).map(s=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)">${s}</div>`).join('')}
+        ${(feedback.strengths||[]).map(s=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)">${escapeHTML(s)}</div>`).join('')}
       </div>
       <div style="margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:6px">🎯 Improve Next</div>
-        ${(feedback.improvements||[]).map((s,i)=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)"><strong>${i+1}.</strong> ${s}</div>`).join('')}
+        ${(feedback.improvements||[]).map((s,i)=>`<div style="padding:6px 0;font-size:13px;border-bottom:1px solid rgba(200,98,42,.1)"><strong>${i+1}.</strong> ${escapeHTML(s)}</div>`).join('')}
       </div>
-      ${feedback.opening_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:8px">Opening: ${feedback.opening_note}</div>` : ''}
-      ${feedback.closing_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:4px">Closing: ${feedback.closing_note}</div>` : ''}
+      ${feedback.opening_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:8px">Opening: ${escapeHTML(feedback.opening_note)}</div>` : ''}
+      ${feedback.closing_note ? `<div style="font-size:12px;color:var(--ink3);font-style:italic;margin-top:4px">Closing: ${escapeHTML(feedback.closing_note)}</div>` : ''}
     `;
   } catch(err) {
-    content.innerHTML = '<div style="color:var(--red);font-size:13px">⚠️ Could not get feedback right now. Please try again in a moment.</div>';
+    console.error('Essay feedback error:', err);
+    const msg = 'Could not analyze the essay right now. Your draft is unchanged; please try again.';
+    content.innerHTML = '<div style="color:var(--red);font-size:13px">⚠️ ' + escapeHTML(msg) + '</div>';
   }
   document.getElementById('feedback-btn').disabled = false;
-  document.getElementById('feedback-btn').textContent = '✦ Get AI Feedback';
+  document.getElementById('feedback-btn').textContent = '✦ Get Rubric Feedback';
+}
+
+function analyzeEssayLocally(text, promptHint) {
+  const words = text.match(/[A-Za-zÀ-ÿ0-9'’-]+/g) || [];
+  const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+  const paragraphs = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  const lowerWords = words.map(word => word.toLowerCase());
+  const uniqueRatio = new Set(lowerWords).size / Math.max(words.length, 1);
+  const sentenceLengths = sentences.map(sentence => (sentence.match(/[A-Za-zÀ-ÿ0-9'’-]+/g) || []).length);
+  const avgSentence = sentenceLengths.reduce((sum, length) => sum + length, 0) / Math.max(sentenceLengths.length, 1);
+  const variance = sentenceLengths.length > 1 ? Math.max(...sentenceLengths) - Math.min(...sentenceLengths) : 0;
+  const transitions = lowerWords.filter(word => ['however','because','although','therefore','instead','meanwhile','finally','ultimately','yet'].includes(word)).length;
+  const vagueWords = lowerWords.filter(word => ['very','really','things','stuff','good','bad','nice'].includes(word)).length;
+  const sensoryWords = lowerWords.filter(word => ['saw','heard','felt','smelled','tasted','bright','dark','quiet','loud','warm','cold'].includes(word)).length;
+  const hasSpecifics = /\b\d+\b|[“”"]|\b[A-Z][a-z]+\b/.test(text);
+  const lengthScore = words.length >= 250 && words.length <= 650 ? 3 : words.length >= 150 && words.length <= 750 ? 2 : 1;
+
+  const scores = {
+    structure: Math.min(10, 3 + lengthScore + Math.min(paragraphs.length, 3) + (transitions > 1 ? 1 : 0)),
+    voice: Math.min(10, 4 + (uniqueRatio > 0.45 ? 2 : 1) + (variance >= 12 ? 2 : 1) + (sensoryWords > 1 ? 1 : 0)),
+    clarity: Math.min(10, 8 - (avgSentence > 28 ? 2 : avgSentence > 22 ? 1 : 0) - (vagueWords > 4 ? 2 : vagueWords > 1 ? 1 : 0) + (paragraphs.length >= 3 ? 1 : 0)),
+    impact: Math.min(10, 4 + (hasSpecifics ? 2 : 0) + (sensoryWords > 0 ? 1 : 0) + (words.length >= 300 ? 1 : 0) + (paragraphs.length >= 3 ? 1 : 0))
+  };
+  Object.keys(scores).forEach(key => { scores[key] = Math.max(1, scores[key]); });
+
+  const strengths = [];
+  const improvements = [];
+  if (paragraphs.length >= 3) strengths.push('The draft has distinct sections that give the reader a visible progression.');
+  else improvements.push('Break the draft into a clear opening, development, and reflective ending.');
+  if (variance >= 12) strengths.push('Sentence lengths vary enough to create a natural rhythm.');
+  else improvements.push('Mix short emphasis sentences with longer reflective ones to improve rhythm.');
+  if (hasSpecifics) strengths.push('Specific details help the draft feel grounded rather than generic.');
+  else improvements.push('Add a concrete moment, place, action, number, or line of dialogue the reader can picture.');
+  if (avgSentence > 26) improvements.push('Several sentences are likely carrying too many ideas; split the longest ones for clarity.');
+  if (vagueWords > 1) improvements.push(`Replace vague intensifiers or general words (${vagueWords} found) with precise nouns and verbs.`);
+  if (promptHint && text.length < 300) improvements.push('Connect the personal story more explicitly to the selected prompt.');
+  while (strengths.length < 2) strengths.push('The draft provides enough material for a focused revision pass.');
+  while (improvements.length < 3) improvements.push('After revising, read the essay aloud and cut any sentence that repeats an earlier idea.');
+
+  return {
+    scores,
+    summary: `This admissions-reader-style review found ${words.length} words, ${sentences.length} sentences, and ${paragraphs.length} paragraph${paragraphs.length === 1 ? '' : 's'}. Use the scores as focused revision guidance rather than an admissions outcome.`,
+    strengths: strengths.slice(0, 3),
+    improvements: improvements.slice(0, 4),
+    opening_note: sentences[0] && sentenceLengths[0] <= 25
+      ? 'The opening is concise; make sure it begins with a concrete moment or tension.'
+      : 'Consider tightening the opening so the central moment arrives sooner.',
+    closing_note: paragraphs.length >= 2
+      ? 'Use the ending to show what changed in your thinking rather than restating the introduction.'
+      : 'Add a distinct closing reflection that shows growth or forward movement.',
+    word_count_note: words.length > 650 ? `OVER LIMIT - trim at least ${words.length - 650} words` : words.length < 250 ? 'Short draft - develop the central scene and reflection' : 'Within the typical Common App length range'
+  };
 }
 
 /* ── Local essay storage (localStorage, keyed per user) ────── */
 function _essayKey(uid) { return 'gs_essays_' + uid; }
 function _getLocalEssays(uid) {
-  try { return JSON.parse(localStorage.getItem(_essayKey(uid)) || '[]'); }
-  catch { return []; }
+  try {
+    const value = JSON.parse(localStorage.getItem(_essayKey(uid)) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch (error) {
+    console.warn('Ignoring invalid local essay data:', error);
+    return [];
+  }
 }
 function _setLocalEssays(uid, essays) {
-  localStorage.setItem(_essayKey(uid), JSON.stringify(essays));
+  try {
+    localStorage.setItem(_essayKey(uid), JSON.stringify(essays));
+    return true;
+  } catch (error) {
+    console.error('Could not save local essay data:', error);
+    showToast('This browser could not update its local essay copy.', 'error');
+    return false;
+  }
 }
 
-function saveEssay() {
+async function saveEssay() {
   if(!window.currentUser) { openAuth('signup', 'Sign up to save your essays.'); return; }
   const text = document.getElementById('essay-textarea').value.trim();
   if(!text) { showToast('Write something first!', 'error'); return; }
@@ -3773,10 +3564,20 @@ function saveEssay() {
   };
   const essays = _getLocalEssays(uid);
   essays.unshift(essay);
-  _setLocalEssays(uid, essays);
+  const savedLocally = _setLocalEssays(uid, essays);
   renderSavedEssays();
-  showToast('✓ Essay saved!');
-  DB.saveEssay(uid, essay).catch(() => {});
+  try {
+    const firestoreId = await DB.saveEssay(uid, essay);
+    const saved = _getLocalEssays(uid);
+    const localEssay = saved.find(item => item.id === essay.id);
+    if (localEssay) localEssay.firestoreId = firestoreId;
+    const localMetadataSaved = _setLocalEssays(uid, saved);
+    showToast(localMetadataSaved ? '✓ Essay saved and synced!' : 'Essay saved to your account; the local browser copy could not be updated.', localMetadataSaved ? undefined : 'info');
+    trackActivity('essay_save');
+  } catch (error) {
+    console.error('Essay cloud save error:', error);
+    showToast(savedLocally ? 'Essay saved on this device, but cloud sync failed. Please try again later.' : 'Essay could not be saved locally or to the cloud. Please try again.', 'error');
+  }
 }
 
 function renderSavedEssays() {
@@ -3790,8 +3591,8 @@ function renderSavedEssays() {
   list.innerHTML = essays.map(e => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border2);gap:12px;flex-wrap:wrap">
       <div>
-        <div style="font-size:14px;font-weight:600;color:var(--ink)">${e.title}</div>
-        <div style="font-size:12px;color:var(--ink3)">${e.words} words${e.savedAt ? ' · Saved ' + e.savedAt : ''}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink)">${escapeHTML(e.title)}</div>
+        <div style="font-size:12px;color:var(--ink3)">${Number(e.words) || 0} words${e.savedAt ? ' · Saved ' + escapeHTML(e.savedAt) : ''}</div>
       </div>
       <div style="display:flex;gap:8px">
         <button onclick="loadEssay('${e.id}')" style="padding:6px 14px;border-radius:6px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(30,79,163,.2);font-size:12px;cursor:pointer;font-family:var(--font-body)">Load</button>
@@ -3813,34 +3614,67 @@ function loadEssay(id) {
   showToast('Essay loaded!');
 }
 
-function deleteEssay(id) {
+async function deleteEssay(id) {
   const uid = (window.currentUser || window._gsUser)?.uid;
   if(!uid) return;
-  const essays = _getLocalEssays(uid).filter(e => e.id !== id);
-  _setLocalEssays(uid, essays);
-  renderSavedEssays();
-  showToast('Deleted.');
-  DB.deleteEssay(uid, id).catch(() => {});
+  const current = _getLocalEssays(uid);
+  const essay = current.find(e => e.id === id);
+  if (!essay) { showToast('Essay not found.', 'error'); return; }
+  try {
+    await DB.deleteEssay(uid, essay.firestoreId || essay.id);
+    _setLocalEssays(uid, current.filter(e => e.id !== id));
+    renderSavedEssays();
+    showToast('Deleted.');
+  } catch (error) {
+    console.error('Essay delete error:', error);
+    showToast('Could not delete this essay from the cloud. It has not been removed.', 'error');
+  }
+}
+
+let essaySyncPromise = null;
+async function syncEssays() {
+  const uid = (window.currentUser || window._gsUser)?.uid;
+  if (!uid || essaySyncPromise) return essaySyncPromise;
+  essaySyncPromise = (async () => {
+    const local = _getLocalEssays(uid);
+    const remote = await DB.getEssays(uid);
+    const merged = new Map();
+    local.forEach(essay => merged.set(essay.id, essay));
+    remote.forEach(essay => merged.set(essay.id, { ...merged.get(essay.id), ...essay }));
+
+    // Safely migrate existing local-only essays using their stable local ID.
+    const remoteIds = new Set(remote.map(essay => essay.id));
+    for (const essay of local.filter(item => !remoteIds.has(item.id))) {
+      const firestoreId = await DB.saveEssay(uid, essay);
+      merged.set(essay.id, { ...essay, firestoreId });
+    }
+
+    const items = [...merged.values()].sort((a, b) => String(b.savedAt || '').localeCompare(String(a.savedAt || '')));
+    _setLocalEssays(uid, items);
+    renderSavedEssays();
+  })().catch(error => {
+    console.error('Essay sync error:', error);
+    showToast('Cloud essay sync failed. Your essays on this device are still available.', 'error');
+  }).finally(() => { essaySyncPromise = null; });
+  return essaySyncPromise;
 }
 
 function updateEssayPage() {
   const gate = document.getElementById('essay-gate');
   const editor = document.getElementById('essay-editor');
-  if(!currentUser) {
+  if(!window.currentUser) {
     if(gate) gate.style.display = 'block';
     if(editor) editor.style.display = 'none';
     return;
   }
   if(gate) gate.style.display = 'none';
   if(editor) editor.style.display = 'block';
-  const note = document.getElementById('essay-trial-note');
-  const plan = getUserPlan();
+  const note = document.getElementById('essay-access-note');
   if(note) {
-    if(plan === 'trial') note.textContent = '🎁 Trial active — ' + getTrialDaysLeft() + ' days left';
-    else if(isPro()) note.textContent = '✦ Pro member';
-    else note.textContent = 'Upgrade to Pro to use the AI coach';
+    note.textContent = 'Free for signed-in students';
   }
   renderSavedEssays();
+  syncEssays();
 }
 
 /* ============================================================
@@ -3856,10 +3690,13 @@ function toggleDarkMode() {
   const isDark = html.getAttribute('data-theme') === 'dark';
   html.setAttribute('data-theme', isDark ? '' : 'dark');
   document.getElementById('dark-toggle').textContent = isDark ? '🌙' : '☀️';
-  localStorage.setItem('gs_theme', isDark ? 'light' : 'dark');
+  try { localStorage.setItem('gs_theme', isDark ? 'light' : 'dark'); }
+  catch (error) { console.warn('Could not save theme preference:', error); }
 }
 function initDarkMode() {
-  const saved = localStorage.getItem('gs_theme');
+  let saved = null;
+  try { saved = localStorage.getItem('gs_theme'); }
+  catch (error) { console.warn('Could not read theme preference:', error); }
   if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('dark-toggle').textContent = '☀️'; }
 }
 
@@ -3871,7 +3708,10 @@ function calcGoal() {
   const done = parseFloat(document.getElementById('goal-credits-done').value);
   const target = parseFloat(document.getElementById('goal-target-gpa').value);
   const left = parseFloat(document.getElementById('goal-credits-left').value);
-  if ([cur, done, target, left].some(isNaN) || done + left === 0) return;
+  if (![cur, done, target, left].every(Number.isFinite) || cur<0 || cur>4 || target<0 || target>4 || done<0 || left<=0) {
+    showToast('Enter current and target GPAs from 0 to 4, completed credits of 0 or more, and positive remaining credits.', 'error');
+    return;
+  }
   const needed = ((target * (done + left)) - (cur * done)) / left;
   const arc = document.getElementById('goal-arc');
   const valEl = document.getElementById('goal-needed-gpa');
@@ -3896,7 +3736,7 @@ function renderGoalScenarios() {
   const el = document.getElementById('goal-scenarios');
   el.innerHTML = goalScenarios.map((s, i) => `
     <div class="goal-scenario">
-      <input type="text" placeholder="Class name" value="${s.name}" onchange="goalScenarios[${i}].name=this.value;calcGoalProjection()">
+      <input type="text" placeholder="Class name" value="${escapeHTML(s.name)}" onchange="goalScenarios[${i}].name=this.value;calcGoalProjection()">
       <input type="number" placeholder="Credits" value="${s.credits}" min="1" max="6" style="max-width:80px" onchange="goalScenarios[${i}].credits=+this.value;calcGoalProjection()">
       <select onchange="goalScenarios[${i}].grade=this.value;calcGoalProjection()">
         <option value="4.0" ${s.grade==='4.0'?'selected':''}>A (4.0)</option>
@@ -3919,7 +3759,7 @@ function calcGoalProjection() {
   const done = parseFloat(document.getElementById('goal-credits-done').value);
   const projEl = document.getElementById('goal-projection');
   const projVal = document.getElementById('goal-projected');
-  if (isNaN(cur) || isNaN(done) || !goalScenarios.length) { projEl.style.display = 'none'; return; }
+  if (!Number.isFinite(cur) || cur<0 || cur>4 || !Number.isFinite(done) || done<0 || !goalScenarios.length || goalScenarios.some(s => !Number.isFinite(Number(s.credits)) || Number(s.credits)<=0)) { projEl.style.display = 'none'; return; }
   let totalPoints = cur * done, totalCredits = done;
   goalScenarios.forEach(s => { totalPoints += parseFloat(s.grade) * s.credits; totalCredits += s.credits; });
   const projected = totalPoints / totalCredits;
@@ -3928,23 +3768,78 @@ function calcGoalProjection() {
 }
 
 /* ============================================================
-   STUDY PLANNER (Premium)
+   STUDY PLANNER
 ============================================================ */
 let plannerDate = new Date();
 let tasks = [];
 let taskFilter = 'all';
 
-function initPlanner() {
-  if (!isPro()) {
-    document.getElementById('planner-gate').innerHTML = '<div class="premium-gate"><h3>📅 Study Planner</h3><p>Upgrade to Pro to track assignments, set deadlines, and stay organized.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock Study Planner — Start Free Trial</button></div>';
-    document.getElementById('planner-content').style.display = 'none';
-    return;
+function readLocalArray(key) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch (error) {
+    console.warn(`Ignoring invalid local data for ${key}:`, error);
+    return [];
   }
+}
+
+function writeLocalArray(key, items) {
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+    return true;
+  } catch (error) {
+    console.error(`Could not save local data for ${key}:`, error);
+    showToast('This browser could not save your changes locally.', 'error');
+    return false;
+  }
+}
+
+function mergeFeatureItems(localItems, remoteItems) {
+  const merged = new Map();
+  [...remoteItems, ...localItems].forEach(item => {
+    if (!item || !item.id) return;
+    const existing = merged.get(String(item.id));
+    const incomingTime = Date.parse(item.updatedAt || item.createdAt || 0) || 0;
+    const existingTime = Date.parse(existing?.updatedAt || existing?.createdAt || 0) || 0;
+    if (!existing || incomingTime >= existingTime) merged.set(String(item.id), { ...existing, ...item, id: String(item.id) });
+  });
+  return [...merged.values()];
+}
+
+const featureSyncs = new Map();
+function syncFeatureState(key, localItems, onMerged) {
+  const uid = window.currentUser?.uid;
+  if (!uid || !window._dbGetSyncState || !window._dbSaveSyncState) return Promise.resolve(localItems);
+  const syncKey = `${uid}:${key}`;
+  if (featureSyncs.has(syncKey)) return featureSyncs.get(syncKey);
+  const promise = (async () => {
+    const remoteItems = await window._dbGetSyncState(uid, key);
+    const merged = mergeFeatureItems(localItems, Array.isArray(remoteItems) ? remoteItems : []);
+    onMerged(merged);
+    await window._dbSaveSyncState(uid, key, merged);
+    return merged;
+  })().catch(error => {
+    console.error(`${key} cloud sync error:`, error);
+    showToast(`Cloud sync for ${key === 'planner' ? 'planner tasks' : 'applications'} failed. Changes on this device are still saved.`, 'error');
+    throw error;
+  }).finally(() => featureSyncs.delete(syncKey));
+  featureSyncs.set(syncKey, promise);
+  return promise;
+}
+
+function initPlanner() {
   document.getElementById('planner-gate').innerHTML = '';
   document.getElementById('planner-content').style.display = 'block';
-  tasks = JSON.parse(localStorage.getItem('gs_tasks_' + (window.currentUser?.uid || 'anon')) || '[]');
+  tasks = readLocalArray('gs_tasks_' + (window.currentUser?.uid || 'anon'));
   renderCalendar();
   renderTasks();
+  syncFeatureState('planner', tasks, merged => {
+    tasks = merged;
+    writeLocalArray('gs_tasks_' + window.currentUser.uid, tasks);
+    renderCalendar();
+    renderTasks();
+  }).catch(error => console.debug('Planner sync failure already reported:', error));
 }
 
 function renderCalendar() {
@@ -3959,7 +3854,7 @@ function renderCalendar() {
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
-    const hasTask = tasks.some(t => t.due === dateStr);
+    const hasTask = tasks.some(t => !t.deleted && t.due === dateStr);
     html += `<div class="planner-day${isToday?' today':''}${hasTask?' has-task':''}" onclick="showDayTasks('${dateStr}')">${d}</div>`;
   }
   cal.innerHTML = html;
@@ -3973,33 +3868,51 @@ function plannerNav(dir) {
 function openAddTask() { document.getElementById('task-form').style.display = 'block'; }
 function closeAddTask() { document.getElementById('task-form').style.display = 'none'; }
 
-function addTask() {
+async function addTask() {
   const title = document.getElementById('task-title').value.trim();
   const cls = document.getElementById('task-class').value.trim();
   const due = document.getElementById('task-due').value;
   const priority = document.getElementById('task-priority').value;
   const type = document.getElementById('task-type').value;
   if (!title) { showToast('Enter a task title!', 'error'); return; }
-  tasks.push({ id: Date.now().toString(), title, class: cls, due, priority, type, done: false, createdAt: new Date().toISOString() });
-  saveTasks();
+  const now = new Date().toISOString();
+  tasks.push({ id: Date.now().toString(), title, class: cls, due, priority, type, done: false, createdAt: now, updatedAt: now });
+  const sync = saveTasks();
   closeAddTask();
   document.getElementById('task-title').value = '';
   document.getElementById('task-class').value = '';
   renderCalendar(); renderTasks();
-  showToast('Task added!');
   trackActivity('task_add');
+  try { await sync; showToast('Task added and synced!'); }
+  catch { showToast('Task added on this device; cloud sync failed.', 'error'); }
 }
-function toggleTask(id) {
+async function toggleTask(id) {
   const t = tasks.find(t => t.id === id);
-  if (t) { t.done = !t.done; saveTasks(); renderTasks(); if(t.done) trackActivity('task_done'); }
+  if (t) {
+    t.done = !t.done;
+    t.updatedAt = new Date().toISOString();
+    const sync = saveTasks();
+    renderTasks();
+    if(t.done) trackActivity('task_done');
+    try { await sync; } catch { showToast('Task updated locally; cloud sync failed.', 'error'); }
+  }
 }
-function deleteTask(id) {
-  tasks = tasks.filter(t => t.id !== id);
-  saveTasks(); renderCalendar(); renderTasks();
-  showToast('Task deleted.');
+async function deleteTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.deleted = true;
+  task.updatedAt = new Date().toISOString();
+  const sync = saveTasks();
+  renderCalendar(); renderTasks();
+  try { await sync; showToast('Task deleted and synced.'); }
+  catch { showToast('Task deleted on this device; cloud sync failed.', 'error'); }
 }
 function saveTasks() {
-  localStorage.setItem('gs_tasks_' + (window.currentUser?.uid || 'anon'), JSON.stringify(tasks));
+  const key = 'gs_tasks_' + (window.currentUser?.uid || 'anon');
+  writeLocalArray(key, tasks);
+  return window.currentUser && window._dbSaveSyncState
+    ? window._dbSaveSyncState(window.currentUser.uid, 'planner', tasks)
+    : Promise.resolve();
 }
 function filterTasks(f) { taskFilter = f; renderTasks(); }
 function showDayTasks(dateStr) { taskFilter = dateStr; renderTasks(); }
@@ -4007,7 +3920,7 @@ function showDayTasks(dateStr) { taskFilter = dateStr; renderTasks(); }
 function renderTasks() {
   const list = document.getElementById('task-list');
   const today = new Date().toISOString().split('T')[0];
-  let filtered = [...tasks];
+  let filtered = tasks.filter(t => !t.deleted);
   if (taskFilter === 'today') filtered = filtered.filter(t => t.due === today);
   else if (taskFilter === 'week') { const week = new Date(); week.setDate(week.getDate() + 7); filtered = filtered.filter(t => t.due >= today && t.due <= week.toISOString().split('T')[0]); }
   else if (taskFilter === 'overdue') filtered = filtered.filter(t => t.due < today && !t.done);
@@ -4019,7 +3932,7 @@ function renderTasks() {
     return `<div class="task-item${t.done?' done':''}">
       <div class="task-check${t.done?' checked':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
       <div class="task-priority ${t.priority}"></div>
-      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">${t.title}</div><div style="font-size:12px;color:var(--ink3)">${t.class?t.class+' · ':''}${t.type}${t.due?' · Due '+t.due:''}</div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">${escapeHTML(t.title)}</div><div style="font-size:12px;color:var(--ink3)">${t.class?escapeHTML(t.class)+' · ':''}${escapeHTML(t.type)}${t.due?' · Due '+escapeHTML(t.due):''}</div></div>
       ${isOverdue?'<span style="font-size:11px;color:var(--red);font-weight:600">OVERDUE</span>':''}
       <button class="feat-btn feat-btn-danger" onclick="deleteTask('${t.id}')" style="padding:4px 10px;font-size:11px">✕</button>
     </div>`;
@@ -4030,50 +3943,69 @@ function renderTasks() {
    COLLEGE APPLICATION TRACKER
 ============================================================ */
 let apps = [];
-function loadApps() { apps = JSON.parse(localStorage.getItem('gs_apps_' + (window.currentUser?.uid || 'anon')) || '[]'); }
-function saveApps() { localStorage.setItem('gs_apps_' + (window.currentUser?.uid || 'anon'), JSON.stringify(apps)); }
+function loadApps() { apps = readLocalArray('gs_apps_' + (window.currentUser?.uid || 'anon')); }
+function saveApps() {
+  const key = 'gs_apps_' + (window.currentUser?.uid || 'anon');
+  writeLocalArray(key, apps);
+  return window.currentUser && window._dbSaveSyncState
+    ? window._dbSaveSyncState(window.currentUser.uid, 'applications', apps)
+    : Promise.resolve();
+}
 function openAddApp() { document.getElementById('app-form').style.display = 'block'; }
 function closeAddApp() { document.getElementById('app-form').style.display = 'none'; }
 
-function addApp() {
+async function addApp() {
   const school = document.getElementById('app-school').value.trim();
   const type = document.getElementById('app-type').value;
   const deadline = document.getElementById('app-deadline').value;
   const status = document.getElementById('app-status-sel').value;
   const notes = document.getElementById('app-notes').value.trim();
   if (!school) { showToast('Enter a school name!', 'error'); return; }
-  apps.push({ id: Date.now().toString(), school, type, deadline, status, notes, createdAt: new Date().toISOString() });
-  saveApps(); closeAddApp();
+  const now = new Date().toISOString();
+  apps.push({ id: Date.now().toString(), school, type, deadline, status, notes, createdAt: now, updatedAt: now });
+  const sync = saveApps(); closeAddApp();
   document.getElementById('app-school').value = '';
   document.getElementById('app-notes').value = '';
   renderApps();
-  showToast('Application added!');
   trackActivity('app_add');
+  try { await sync; showToast('Application added and synced!'); }
+  catch { showToast('Application added on this device; cloud sync failed.', 'error'); }
 }
-function updateAppStatus(id, status) {
+async function updateAppStatus(id, status) {
   const app = apps.find(a => a.id === id);
-  if (app) { app.status = status; saveApps(); renderApps(); }
+  if (app) {
+    app.status = status;
+    app.updatedAt = new Date().toISOString();
+    const sync = saveApps();
+    renderApps(true);
+    try { await sync; } catch { showToast('Status updated locally; cloud sync failed.', 'error'); }
+  }
 }
-function deleteApp(id) {
-  apps = apps.filter(a => a.id !== id);
-  saveApps(); renderApps();
-  showToast('Application removed.');
+async function deleteApp(id) {
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  app.deleted = true;
+  app.updatedAt = new Date().toISOString();
+  const sync = saveApps(); renderApps(true);
+  try { await sync; showToast('Application removed and synced.'); }
+  catch { showToast('Application removed on this device; cloud sync failed.', 'error'); }
 }
-function renderApps() {
+function renderApps(skipSync = false) {
   loadApps();
   const list = document.getElementById('app-list');
   const stats = document.getElementById('app-stats');
   const counts = { 'not-started': 0, 'in-progress': 0, 'submitted': 0, 'accepted': 0, 'rejected': 0, 'waitlisted': 0 };
-  apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+  const visibleApps = apps.filter(a => !a.deleted);
+  visibleApps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
   stats.innerHTML = Object.entries(counts).filter(([,v]) => v > 0).map(([k,v]) => `<div class="app-status ${k}" style="font-size:13px">${v} ${k.replace('-',' ')}</div>`).join('');
-  if (!apps.length) { list.innerHTML = '<div class="feat-empty"><span>🎓</span>No applications yet. Add a school to get started!</div>'; return; }
+  if (!visibleApps.length) { list.innerHTML = '<div class="feat-empty"><span>🎓</span>No applications yet. Add a school to get started!</div>'; }
   const today = new Date().toISOString().split('T')[0];
-  list.innerHTML = apps.map(a => {
+  if (visibleApps.length) list.innerHTML = visibleApps.map(a => {
     const daysLeft = a.deadline ? Math.ceil((new Date(a.deadline) - new Date()) / 86400000) : null;
     const urgent = daysLeft !== null && daysLeft <= 7 && daysLeft >= 0;
     return `<div class="app-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div><strong style="font-size:15px">${a.school}</strong> <span style="font-size:12px;color:var(--ink3)">${{rd:'Regular Decision',ea:'Early Action',ed:'Early Decision',rolling:'Rolling'}[a.type]||a.type}</span></div>
+        <div><strong style="font-size:15px">${escapeHTML(a.school)}</strong> <span style="font-size:12px;color:var(--ink3)">${escapeHTML({rd:'Regular Decision',ea:'Early Action',ed:'Early Decision',rolling:'Rolling'}[a.type]||a.type)}</span></div>
         <button class="feat-btn feat-btn-danger" onclick="deleteApp('${a.id}')" style="padding:4px 10px;font-size:11px">✕</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -4081,14 +4013,21 @@ function renderApps() {
           ${['not-started','in-progress','submitted','accepted','rejected','waitlisted'].map(s => `<option value="${s}" ${a.status===s?'selected':''}>${s.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('')}
         </select>
         ${a.deadline ? `<span class="app-deadline${urgent?' urgent':''}">📅 ${a.deadline}${daysLeft!==null?(daysLeft<0?' (passed)':' ('+daysLeft+' days)'):''}</span>` : ''}
-        ${a.notes ? `<span style="font-size:12px;color:var(--ink3)">📝 ${a.notes}</span>` : ''}
+        ${a.notes ? `<span style="font-size:12px;color:var(--ink3)">📝 ${escapeHTML(a.notes)}</span>` : ''}
       </div>
     </div>`;
   }).join('');
+  if (!skipSync && window.currentUser) {
+    syncFeatureState('applications', apps, merged => {
+      apps = merged;
+      writeLocalArray('gs_apps_' + window.currentUser.uid, apps);
+      renderApps(true);
+    }).catch(error => console.debug('Application sync failure already reported:', error));
+  }
 }
 
 /* ============================================================
-   SCHOLARSHIP FINDER (Premium)
+   SCHOLARSHIP FINDER
 ============================================================ */
 const SCHOLARSHIPS_DB = [
   {name:'National Merit Scholarship',amount:'$2,500',gpa:3.5,majors:['stem','engineering','business','arts','social','health','education','other'],states:[],years:['hs-senior'],desc:'Awarded to high school seniors based on PSAT/NMSQT scores.'},
@@ -4109,11 +4048,6 @@ const SCHOLARSHIPS_DB = [
 ];
 
 function initScholarships() {
-  if (!isPro()) {
-    document.getElementById('scholarship-gate').innerHTML = '<div class="premium-gate"><h3>💰 Scholarship Finder</h3><p>Upgrade to Pro to search thousands of scholarships matched to your profile.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock Scholarships — Start Free Trial</button></div>';
-    document.getElementById('scholarship-content').style.display = 'none';
-    return;
-  }
   document.getElementById('scholarship-gate').innerHTML = '';
   document.getElementById('scholarship-content').style.display = 'block';
 }
@@ -4186,7 +4120,15 @@ function downloadShareCard() {
    PROGRESS & STREAKS
 ============================================================ */
 function _actKey(uid) { return 'gs_activity_' + (uid || 'anon'); }
-function _getActivity(uid) { try { return JSON.parse(localStorage.getItem(_actKey(uid)) || '{}'); } catch { return {}; } }
+function _getActivity(uid) {
+  try {
+    const value = JSON.parse(localStorage.getItem(_actKey(uid)) || '{}');
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  } catch (error) {
+    console.warn('Ignoring invalid local activity data:', error);
+    return {};
+  }
+}
 
 function trackActivity(type) {
   const uid = window.currentUser?.uid;
@@ -4195,7 +4137,8 @@ function trackActivity(type) {
   if (!act[today]) act[today] = { count: 0, types: {} };
   act[today].count++;
   act[today].types[type] = (act[today].types[type] || 0) + 1;
-  localStorage.setItem(_actKey(uid), JSON.stringify(act));
+  try { localStorage.setItem(_actKey(uid), JSON.stringify(act)); }
+  catch (error) { console.warn('Could not persist activity data:', error); }
 }
 
 function getStreak() {
@@ -4239,7 +4182,7 @@ function renderProgress() {
   }
   heatmap.innerHTML = hmHtml;
   const trend = document.getElementById('gpa-trend-chart');
-  const gpaHistory = JSON.parse(localStorage.getItem('gs_gpa_history_' + (uid||'anon')) || '[]');
+  const gpaHistory = readLocalArray('gs_gpa_history_' + (uid||'anon'));
   if (gpaHistory.length) {
     trend.innerHTML = gpaHistory.slice(-20).map(g => {
       const h = (g.gpa / 4) * 180;
@@ -4253,8 +4196,8 @@ function renderProgress() {
 ============================================================ */
 let qaFilter = 'all';
 function _qaKey() { return 'gs_qa'; }
-function _getQA() { try { return JSON.parse(localStorage.getItem(_qaKey()) || '[]'); } catch { return []; } }
-function _saveQA(posts) { localStorage.setItem(_qaKey(), JSON.stringify(posts)); }
+function _getQA() { return readLocalArray(_qaKey()); }
+function _saveQA(posts) { writeLocalArray(_qaKey(), posts); }
 
 const SAMPLE_QA = [
   {id:'s1',title:'What GPA do I need for Ivy League schools?',body:'I have a 3.7 unweighted GPA and I\'m wondering if it\'s competitive for Harvard, Yale, or Princeton.',tag:'admissions',author:'StudentA',votes:24,replies:[{author:'CollegeAdvisor',body:'A 3.7 UW is competitive but Ivies are holistic — your essays, extracurriculars, and recommendations matter just as much. Focus on showing passion and depth.',votes:15}],createdAt:'2026-05-10'},
@@ -4274,22 +4217,22 @@ function renderQA() {
       <div style="display:flex;gap:12px">
         <div class="qa-votes">
           <button class="qa-vote-btn" onclick="voteQA('${p.id}',1)">▲</button>
-          <span class="qa-vote-count">${p.votes}</span>
+          <span class="qa-vote-count">${Number(p.votes) || 0}</span>
           <button class="qa-vote-btn" onclick="voteQA('${p.id}',-1)">▼</button>
         </div>
         <div style="flex:1">
-          <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px">${p.title}</div>
-          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">${p.body}</div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px">${escapeHTML(p.title)}</div>
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:8px">${escapeHTML(p.body)}</div>
           <div style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink3)">
-            <span class="qa-tag">${p.tag}</span>
-            <span>by ${p.author}</span>
-            <span>· ${p.createdAt}</span>
+            <span class="qa-tag">${escapeHTML(p.tag)}</span>
+            <span>by ${escapeHTML(p.author)}</span>
+            <span>· ${escapeHTML(p.createdAt)}</span>
             <span>· ${p.replies?.length || 0} replies</span>
           </div>
           ${(p.replies||[]).map(r => `
             <div class="qa-reply">
-              <div style="font-size:13px;color:var(--ink)">${r.body}</div>
-              <div style="font-size:11px;color:var(--ink3);margin-top:4px">— ${r.author} · ${r.votes} upvotes</div>
+              <div style="font-size:13px;color:var(--ink)">${escapeHTML(r.body)}</div>
+              <div style="font-size:11px;color:var(--ink3);margin-top:4px">— ${escapeHTML(r.author)} · ${Number(r.votes) || 0} upvotes</div>
             </div>
           `).join('')}
         </div>
@@ -4327,42 +4270,49 @@ function postQuestion() {
 /* ============================================================
    EMAIL CAPTURE
 ============================================================ */
-function subscribeEmailToFirestore(email, name) {
-  try {
-    const subRef = doc(db, 'email_subscribers', email);
-    setDoc(subRef, {
-      email: email,
-      name: name || '',
-      subscribedAt: serverTimestamp(),
-      active: true,
-      source: 'app'
-    }, { merge: true });
-  } catch(e) { console.error('Firestore subscribe error', e); }
+async function subscribeEmailToFirestore(email, name) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const subRef = doc(db, 'email_subscribers', normalizedEmail);
+  await setDoc(subRef, {
+    email: normalizedEmail,
+    name: name || '',
+    subscribedAt: serverTimestamp(),
+    active: true,
+    source: 'app'
+  }, { merge: true });
 }
-function subscribeEmail() {
-  const email = document.getElementById('email-capture-input').value.trim();
-  if (!email || !email.includes('@')) { showToast('Enter a valid email!', 'error'); return; }
-  const subs = JSON.parse(localStorage.getItem('gs_email_subs') || '[]');
-  if (subs.includes(email)) { showToast('You\'re already subscribed!'); return; }
-  subs.push(email);
-  localStorage.setItem('gs_email_subs', JSON.stringify(subs));
-  subscribeEmailToFirestore(email, window.currentUser?.displayName || '');
+async function subscribeEmail() {
+  const user = window.currentUser;
+  if (!user?.email) { openAuth('login', 'Sign in to manage weekly emails.'); return; }
+  const email = user.email.trim().toLowerCase();
+  const input = document.getElementById('email-capture-input');
+  if (input) input.value = email;
+  try {
+    await subscribeEmailToFirestore(email, user.displayName || '');
+  } catch (error) {
+    console.error('Weekly email preference error:', error);
+    showToast('Could not update your weekly email preference. Please try again.', 'error');
+    return;
+  }
   const msg = document.getElementById('email-capture-msg');
-  msg.textContent = '✓ Subscribed! Check your inbox for a welcome email.';
+  msg.textContent = '✓ Email preference saved. Your email provider may filter or delay messages.';
   msg.style.display = 'block';
-  document.getElementById('email-capture-input').value = '';
   showToast('Subscribed to weekly tips!');
 }
 function initEmailCapture() {
-  const dismissed = localStorage.getItem('gs_email_dismissed');
+  let dismissed = null;
+  try { dismissed = localStorage.getItem('gs_email_dismissed'); }
+  catch (error) { console.warn('Could not read email banner preference:', error); }
   if (!dismissed) {
     const banner = document.getElementById('email-capture-banner');
     if (banner) banner.style.display = 'block';
   }
+  const input = document.getElementById('email-capture-input');
+  if (input) input.value = window.currentUser?.email?.trim().toLowerCase() || '';
 }
 
 /* ============================================================
-   COLLEGE COMPATIBILITY QUIZ (Premium)
+   COLLEGE COMPATIBILITY QUIZ
 ============================================================ */
 const QUIZ_QUESTIONS = [
   { q: 'What kind of campus setting appeals to you most?', opts: ['Big city with endless things to do', 'College town with a strong community', 'Suburban — best of both worlds', 'Rural — peaceful and focused'] },
@@ -4396,11 +4346,6 @@ let quizAnswers = [];
 let quizStep = 0;
 
 function initQuiz() {
-  if (!isPro()) {
-    document.getElementById('quiz-gate').innerHTML = '<div class="premium-gate"><h3>🧩 College Compatibility Quiz</h3><p>Upgrade to Pro to discover your ideal college match based on your personality and preferences.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock College Quiz — Start Free Trial</button></div>';
-    document.getElementById('quiz-content').style.display = 'none';
-    return;
-  }
   document.getElementById('quiz-gate').innerHTML = '';
   document.getElementById('quiz-content').style.display = 'block';
   startQuiz();
@@ -4470,7 +4415,7 @@ function shareQuizResults() { showPage('share'); document.getElementById('share-
 ============================================================ */
 const _origShowPage = showPage;
 showPage = function(name) {
-  _origShowPage(name);
+  if (!_origShowPage(name)) return false;
   if (name === 'progress') renderProgress();
   if (name === 'planner') initPlanner();
   if (name === 'apps') renderApps();
@@ -4478,6 +4423,7 @@ showPage = function(name) {
   if (name === 'quiz') initQuiz();
   if (name === 'community') renderQA();
   if (name === 'home') initEmailCapture();
+  return true;
 };
 
 /* ============================================================
@@ -4548,14 +4494,9 @@ window.shareQuizResults = shareQuizResults;
 window.goalScenarios = goalScenarios;
 
 /* ============================================================
-   AI ADMISSIONS COUNSELOR (Pro)
+   ADMISSIONS GUIDE
 ============================================================ */
 function initCounselor() {
-  if (!isPro()) {
-    document.getElementById('counselor-gate').innerHTML = '<div class="premium-gate"><h3>🤖 AI Admissions Counselor</h3><p>Upgrade to Pro for 24/7 personalized college admissions advice powered by AI.</p><button class="feat-btn feat-btn-primary" onclick="openPayment(\'pro\')">Unlock AI Counselor — Start Free Trial</button></div>';
-    document.getElementById('counselor-content').style.display = 'none';
-    return;
-  }
   document.getElementById('counselor-gate').innerHTML = '';
   document.getElementById('counselor-content').style.display = 'block';
 }
@@ -4572,7 +4513,7 @@ async function sendCounselorMsg() {
   input.value = '';
 
   const msgs = document.getElementById('counselor-msgs');
-  msgs.innerHTML += '<div class="counselor-msg user">' + text.replace(/</g,'&lt;') + '</div>';
+  msgs.innerHTML += '<div class="counselor-msg user">' + escapeHTML(text) + '</div>';
   msgs.innerHTML += '<div class="counselor-msg bot typing" id="counselor-typing">Thinking...</div>';
   msgs.scrollTop = msgs.scrollHeight;
 
@@ -4580,24 +4521,10 @@ async function sendCounselorMsg() {
   document.getElementById('counselor-suggestions').style.display = 'none';
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        system: 'You are a friendly, knowledgeable college admissions counselor for high school students. Give specific, actionable advice. Keep responses concise (2-4 paragraphs max). Use a warm, encouraging tone. Cover topics like: college selection strategy, essay writing, financial aid/FAFSA, extracurriculars, standardized testing, interviews, recommendation letters, and application timelines. If asked about specific GPA/test scores, give realistic but encouraging assessments. Never discourage a student from applying anywhere.',
-        messages: [{ role: 'user', content: text }]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Sorry, I had trouble processing that. Could you try rephrasing your question?';
+    const reply = getAdmissionsGuideReply(text);
     const typing = document.getElementById('counselor-typing');
     if (typing) typing.remove();
-    const formatted = reply.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    const formatted = escapeHTML(reply).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
     msgs.innerHTML += '<div class="counselor-msg bot"><p>' + formatted + '</p></div>';
   } catch (e) {
     const typing = document.getElementById('counselor-typing');
@@ -4606,6 +4533,35 @@ async function sendCounselorMsg() {
   }
   msgs.scrollTop = msgs.scrollHeight;
   document.getElementById('counselor-send-btn').disabled = false;
+}
+
+function getAdmissionsGuideReply(question) {
+  const q = question.toLowerCase();
+  if (/gpa|grade|academic/.test(q)) {
+    return 'Start by comparing your course rigor and grades with each college’s published first-year profile. There is no universal “good enough” GPA, and selective admissions are holistic.\n\nBuild a balanced list with likely, target, and reach schools; use the GPA Goal Tracker for improvement planning; and focus on the strongest schedule you can handle without sacrificing health or core grades.';
+  }
+  if (/essay|common app|personal statement|topic/.test(q)) {
+    return 'Choose a specific moment that reveals how you think, respond, or change—not a résumé summary. A small scene with concrete detail often works better than a huge life topic.\n\nDraft the scene first, then add reflection: what did you notice, why did it matter, and what changed afterward? Use the Essay Rubric Coach for an on-device revision pass, then ask a trusted human reader whether the draft sounds like you.';
+  }
+  if (/financial|fafsa|aid|scholarship|cost|money/.test(q)) {
+    return 'Compare net price, not sticker price. Complete the FAFSA and any required CSS Profile as early as the current application cycle allows, then use each college’s official net price calculator.\n\nApply for local and institutional scholarships, check renewal requirements, and compare grants, work-study, and loans separately. Verify every deadline on the college or scholarship provider’s official site.';
+  }
+  if (/extracurricular|activity|club|volunteer|leadership/.test(q)) {
+    return 'Depth, initiative, and measurable contribution usually communicate more than a long list of memberships. Pick a few activities you genuinely value and document what you changed, built, learned, or contributed.\n\nLeadership can mean organizing people, improving a process, mentoring someone, or taking responsibility—it does not require a title.';
+  }
+  if (/interview/.test(q)) {
+    return 'Prepare a two-minute introduction, specific reasons for the school, and three stories that show curiosity, collaboration, and resilience. Practice aloud, but do not memorize a script.\n\nAsk thoughtful questions that cannot be answered by the homepage, send a short thank-you afterward, and remember that many interviews are informative rather than decisive.';
+  }
+  if (/sat|act|test/.test(q)) {
+    return 'Check each school’s current testing policy on its official admissions site. If scores are optional, compare yours with the school’s published middle 50% range and submit when they strengthen the application.\n\nUse timed practice to diagnose weak areas, review every mistake, and prioritize the exam that better fits your strengths rather than preparing equally for both.';
+  }
+  if (/recommend|teacher|letter/.test(q)) {
+    return 'Ask teachers who know your work habits and growth, not only the class where you earned the highest grade. Request letters well before the deadline and provide a short résumé or “brag sheet” with goals, projects, and moments they may remember.\n\nThank recommenders and keep them updated, but never ask to read a confidential letter.';
+  }
+  if (/deadline|timeline|early decision|early action|regular decision/.test(q)) {
+    return 'Build one master calendar from each college’s official admissions page. Track application, recommendation, testing, financial-aid, portfolio, and scholarship deadlines separately.\n\nEarly Decision is binding, so use it only after comparing affordability with your family and reviewing the agreement. Early Action is usually nonbinding, but policies vary by school.';
+  }
+  return 'I can give curated guidance on GPA and course planning, essays, college lists, testing, financial aid, extracurriculars, recommendations, interviews, and application timelines. Try asking one focused question in one of those areas.\n\nThis guide works entirely on your device and does not send your question to an AI service.';
 }
 
 window.initCounselor = initCounselor;
@@ -4693,7 +4649,7 @@ const PREP_QUESTIONS = [
   {subject:'writing',difficulty:'hard',q:'In which sentence does the subjunctive mood correctly express a hypothetical? ',opts:['If I was rich, I would travel.','If I were rich, I would travel.','If I am rich, I would travel.','If I be rich, I would travel.'],answer:1,explain:'The subjunctive "were" (not "was") is used for hypothetical/contrary-to-fact conditions: "If I were..."'},
 ];
 
-// ── FULL PRACTICE EXAM QUESTION BANKS (Pro) ──
+// ── FULL PRACTICE EXAM QUESTION BANKS ──
 const SAT_EXAM_QUESTIONS = [
   // Reading & Writing (27 questions, 64 min in real SAT — we use 20 questions, ~30 min)
   {section:'Reading & Writing',q:'Based on the passage excerpt: "The author argues that urbanization, while economically beneficial, creates ecological debt." Which choice best describes the author\'s position?',opts:['Urbanization should be stopped','Economic growth and ecology are inherently opposed','Cities create environmental costs that offset economic gains','Ecological debt is a myth'],answer:2,explain:'The author acknowledges economic benefits but emphasizes ecological costs — a balanced critique.'},
@@ -4764,10 +4720,18 @@ const XP_MULTIPLIER = { easy: 1, medium: 1.5, hard: 2 };
 const DIFF_LABELS = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
 
 function loadPrepState() {
-  const saved = localStorage.getItem('gs_prep_state');
+  let saved = null;
+  try { saved = localStorage.getItem('gs_prep_state'); }
+  catch (error) { console.warn('Could not read SAT/ACT practice state:', error); }
   if (saved) {
-    const s = JSON.parse(saved);
-    Object.assign(prepState, s);
+    try {
+      const s = JSON.parse(saved);
+      if (s && typeof s === 'object' && !Array.isArray(s)) Object.assign(prepState, s);
+    } catch (error) {
+      console.warn('Ignoring invalid SAT/ACT practice state:', error);
+      try { localStorage.removeItem('gs_prep_state'); }
+      catch (removeError) { console.warn('Could not clear invalid SAT/ACT practice state:', removeError); }
+    }
     if (!prepState.difficulty) prepState.difficulty = 'all';
     const today = new Date().toDateString();
     if (prepState.lastDate && prepState.lastDate !== today) {
@@ -4779,7 +4743,11 @@ function loadPrepState() {
 }
 
 function savePrepState() {
-  localStorage.setItem('gs_prep_state', JSON.stringify(prepState));
+  try { localStorage.setItem('gs_prep_state', JSON.stringify(prepState)); }
+  catch (error) {
+    console.error('Could not save SAT/ACT practice state:', error);
+    showToast('Practice progress could not be saved in this browser.', 'error');
+  }
 }
 
 function initPrep() {
@@ -4792,10 +4760,10 @@ function initPrep() {
   renderExamCards();
 }
 
-function setPrepSubject(sub) {
+function setPrepSubject(sub, button) {
   prepState.subject = sub;
   document.querySelectorAll('.prep-mode-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  if (button) button.classList.add('active');
   prepState.current = 0;
   prepState.answered = [];
   loadPrepQuestion();
@@ -4915,32 +4883,26 @@ function showXPToast(text) {
   setTimeout(() => toast.remove(), 1600);
 }
 
-// ── Full Practice Exam Logic (Pro) ──
+// ── Full Practice Exam Logic ──
 function renderExamCards() {
   const cards = document.getElementById('prep-exam-cards');
   if (!cards) return;
-  const pro = isPro();
   cards.innerHTML = `
-    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'sat\')' : 'showProGate()'}">
+    <div class="prep-exam-card" onclick="startExam('sat')">
       <h3>📝 Full SAT</h3>
       <p><strong>20 questions</strong> · 50 min timer</p>
       <p style="margin-top:8px;font-size:12px">Reading & Writing + Math sections</p>
-      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+      <p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>
     </div>
-    <div class="prep-exam-card" onclick="${pro ? 'startExam(\'act\')' : 'showProGate()'}">
+    <div class="prep-exam-card" onclick="startExam('act')">
       <h3>📋 Full ACT</h3>
       <p><strong>40 questions</strong> · 55 min timer</p>
       <p style="margin-top:8px;font-size:12px">English, Math, Reading & Science</p>
-      ${!pro ? '<p style="margin-top:8px;font-size:11px;color:var(--accent)">🔒 Pro Feature</p>' : '<p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>'}
+      <p style="margin-top:8px;font-size:11px;color:var(--green)">Start Exam →</p>
     </div>`;
 }
 
-function showProGate() {
-  showToast('This feature requires a Pro subscription. Upgrade to access full practice exams!', 'info');
-}
-
 function startExam(type) {
-  if (!isPro()) { showProGate(); return; }
   const questions = type === 'sat' ? [...SAT_EXAM_QUESTIONS] : [...ACT_EXAM_QUESTIONS];
   const timeMinutes = type === 'sat' ? 50 : 55;
   examState = {
@@ -5115,7 +5077,6 @@ window.nextPrepQuestion = nextPrepQuestion;
 window.startExam = startExam;
 window.quitExam = quitExam;
 window.exitExam = exitExam;
-window.showProGate = showProGate;
 
 /* ============================================================
    COLLEGE HEAD-TO-HEAD COMPARISON
@@ -5493,42 +5454,41 @@ async function apGradeFRQ() {
   const answer = document.getElementById('ap-frq-answer').value.trim();
   if (!answer || answer.length < 50) { alert('Please write a more detailed response (at least a few sentences).'); return; }
   const prompt = document.getElementById('ap-frq-question').textContent;
-  const subjName = apCurrentSubject.name;
   document.getElementById('ap-frq-loading').style.display = 'inline';
   document.getElementById('ap-frq-grade-btn').disabled = true;
   try {
-    const systemPrompt = `You are an AP exam grader for ${subjName}. Grade the student's free response answer against the official College Board rubric criteria. Provide:
-1. A score out of the maximum points (estimate based on typical AP rubrics)
-2. What the student did well
-3. What's missing or incorrect
-4. Specific suggestions for improvement
-Be encouraging but accurate. Use the actual AP rubric criteria for this subject.`;
-
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': window._essayApiKey || '',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: 'FRQ Prompt: ' + prompt + '\n\nStudent Response: ' + answer }]
-      })
-    });
-    const data = await resp.json();
-    const feedback = data.content?.[0]?.text || 'Unable to grade at this time. Please try again.';
-    document.getElementById('ap-frq-feedback-text').innerHTML = feedback.replace(/\n/g, '<br>');
+    const feedback = reviewFRQResponse(answer, prompt);
+    document.getElementById('ap-frq-feedback-text').innerHTML = feedback.map(line => `<p>${escapeHTML(line)}</p>`).join('');
     document.getElementById('ap-frq-feedback').classList.add('show');
   } catch (e) {
-    document.getElementById('ap-frq-feedback-text').innerHTML = 'Error connecting to AI grading service. Please check your connection and try again.';
+    console.error('FRQ review error:', e);
+    document.getElementById('ap-frq-feedback-text').textContent = 'Could not review this response. Your answer is unchanged; please try again.';
     document.getElementById('ap-frq-feedback').classList.add('show');
   }
   document.getElementById('ap-frq-loading').style.display = 'none';
   document.getElementById('ap-frq-grade-btn').disabled = false;
+}
+
+function reviewFRQResponse(answer, prompt) {
+  const words = answer.match(/[A-Za-zÀ-ÿ0-9'’-]+/g) || [];
+  const promptParts = prompt.match(/\([a-z]\)/gi) || [];
+  const responseParts = answer.match(/\([a-z]\)|\bpart\s+[a-z]\b/gi) || [];
+  const evidenceSignals = (answer.match(/\b(because|therefore|for example|evidence|data|shows|demonstrates|results?|justif(?:y|ies|ication))\b/gi) || []).length;
+  const quantitativeSignals = (answer.match(/\b\d+(?:\.\d+)?%?|[=+−×÷]/g) || []).length;
+  const lines = [
+    `General response review: ${words.length} words with ${responseParts.length || 0} explicitly labeled part${responseParts.length === 1 ? '' : 's'}.`,
+    promptParts.length && responseParts.length < promptParts.length
+      ? `The prompt has ${promptParts.length} labeled parts. Label and answer each part directly so none are missed.`
+      : 'The response appears to address the prompt structure; verify that every requested part has a distinct answer.',
+    evidenceSignals >= 2
+      ? 'The response uses explanation or evidence language. Check that each claim is followed by specific subject evidence.'
+      : 'Add explicit reasoning after each claim using evidence, data, a calculation, or a subject-specific example.',
+    quantitativeSignals > 0
+      ? 'Quantitative work is present. Show units, intermediate steps, and interpretations where the prompt requires them.'
+      : 'If this subject or prompt expects calculations, data, dates, or labeled evidence, make those details explicit.',
+    'This is a general completeness check, not an official AP score. Subject-specific rubric scoring requires the separate official-rubric content phase.'
+  ];
+  return lines;
 }
 
 /* ── CRAM SHEET ── */
@@ -5675,12 +5635,12 @@ window.apResetMCQ = apResetMCQ;
 ============================================================ */
 window.onload = function() {
   resetGPA(); resetWGPA(); buildSATTable();
-  document.getElementById('l-type').value = '6.53';
+  document.getElementById('l-type').value = '6.52';
   updateNavForUser();
   initDarkMode();
   initEmailCapture();
   // Show sign-in button if not logged in
-  if(!currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
+  if(!window.currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
 </script>
 </body>
