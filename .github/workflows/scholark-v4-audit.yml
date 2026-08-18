@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   audit:
@@ -24,23 +24,68 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: scripts/package-lock.json
       - name: Install test dependencies
+        id: install
         working-directory: scripts
         run: npm ci
       - name: ScholarK V4 static release audit
+        id: v4
         working-directory: scripts
         run: node scholark-v4-audit.js
       - name: Existing full test suite
+        id: tests
         working-directory: scripts
         run: npm test
       - name: SAT and ACT market-quality audit
+        id: prep
         working-directory: scripts
         run: npm run prep:market-audit
       - name: AP market-quality audit
+        id: ap
         working-directory: scripts
         run: npm run ap:audit
+      - name: Write audit report
+        if: always()
+        run: |
+          cat > SCHOLARK_V4_AUDIT.md <<EOF
+          # ScholarK V4 End-to-End Audit
+
+          Generated automatically from commit \`${GITHUB_SHA}\`.
+
+          | Check | Result |
+          |---|---|
+          | Dependencies | ${{ steps.install.outcome }} |
+          | V4 static release audit | ${{ steps.v4.outcome }} |
+          | Existing full test suite | ${{ steps.tests.outcome }} |
+          | SAT/ACT market-quality audit | ${{ steps.prep.outcome }} |
+          | AP market-quality audit | ${{ steps.ap.outcome }} |
+
+          ## Release gate
+          ${{ steps.v4.outcome == 'success' && steps.tests.outcome == 'success' && steps.prep.outcome == 'success' && steps.ap.outcome == 'success' && '**PASS** — all required checks succeeded.' || '**FAIL** — at least one required check failed; inspect the Actions run before release.' }}
+
+          ## V4 scope under test
+          - ScholarK V4 JavaScript syntax and loader wiring
+          - College Intelligence Lab
+          - Major & Career Outcomes Explorer
+          - Data & Methodology center
+          - Command palette, focus timer, quick notes, pinned tools and contextual action bars
+          - Public-source metadata presence
+          - AP Hub and SAT/ACT dedicated implementations preserved
+          - Legacy paywall copy regression check
+          EOF
+      - name: Persist audit report
+        if: always() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add SCHOLARK_V4_AUDIT.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore: update ScholarK V4 audit report"
+          git push
