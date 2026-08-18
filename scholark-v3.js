@@ -145,14 +145,12 @@
   }
 
   function patchKnownEdgeCases(){
-    // Prevent blank/invalid numeric values from silently producing nonsense in goal projections.
     if(typeof window.calcGoalProjection==='function' && !window.calcGoalProjection.__sk3){
       const original=window.calcGoalProjection;
       const wrapped=function(...args){
         try{return original.apply(this,args);}catch(err){console.error('Goal projection failed:',err);toast('Projection could not be calculated from those values.','error');return false;}
       }; wrapped.__sk3=true; window.calcGoalProjection=wrapped;
     }
-    // Provide a safe fallback when saved-result deletion is requested without a live account/DB binding.
     if(typeof window.deleteSavedItem==='function' && !window.deleteSavedItem.__sk3){
       const original=window.deleteSavedItem;
       const wrapped=function(id,...args){
@@ -173,4 +171,28 @@
     window.ScholarkV3={version:VERSION,restoreFields,activePage};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+})();
+
+;(() => {
+  'use strict';
+  if (window.__scholarkV4LoaderInstalled) return;
+  window.__scholarkV4LoaderInstalled = true;
+  const loadScript = src => new Promise((resolve,reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) { if (existing.dataset.loaded === 'true') resolve(); else existing.addEventListener('load',resolve,{once:true}); return; }
+    const s=document.createElement('script'); s.src=src; s.defer=true;
+    s.addEventListener('load',()=>{s.dataset.loaded='true';resolve();},{once:true});
+    s.addEventListener('error',()=>reject(new Error(`Could not load ${src}`)),{once:true});
+    document.body.appendChild(s);
+  });
+  const start = async () => {
+    try {
+      await loadScript('scholark-v4-data.js');
+      await loadScript('scholark-v4.js');
+    } catch (error) {
+      console.error('ScholarK V4 loader failed:', error);
+      if (typeof window.showToast === 'function') window.showToast('The newest ScholarK interface could not finish loading. Core tools are still available.','error');
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
 })();
