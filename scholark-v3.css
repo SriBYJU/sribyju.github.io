@@ -1,0 +1,97 @@
+/* ScholarK V3 — shared polish for the legacy experience.
+   AP Hub and SAT Prep retain their dedicated v2 design systems. */
+:root{
+  --sk3-shadow-sm:0 1px 2px rgba(26,23,20,.05),0 8px 22px rgba(26,23,20,.055);
+  --sk3-shadow-md:0 2px 4px rgba(26,23,20,.05),0 16px 44px rgba(26,23,20,.085);
+  --sk3-ring:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);
+  --sk3-ease:cubic-bezier(.2,.8,.2,1);
+}
+html{scroll-padding-top:78px}
+body.scholark-v3{background:
+  radial-gradient(circle at 8% -6%,color-mix(in srgb,var(--accent) 7%,transparent),transparent 30rem),
+  radial-gradient(circle at 100% 18%,color-mix(in srgb,var(--blue) 4%,transparent),transparent 27rem),
+  var(--bg)}
+body.scholark-v3 nav{height:64px;border-bottom-color:color-mix(in srgb,var(--border) 80%,transparent);box-shadow:0 1px 0 rgba(26,23,20,.02)}
+body.scholark-v3 .nav-link,body.scholark-v3 .nav-features-cta,body.scholark-v3 .nav-user-btn{min-height:36px;display:inline-flex;align-items:center;justify-content:center}
+body.scholark-v3 .nav-link{font-weight:600}
+body.scholark-v3 .nav-link.active{box-shadow:0 4px 16px rgba(26,23,20,.12)}
+body.scholark-v3 .nav-features-cta{box-shadow:0 5px 16px rgba(200,98,42,.16)}
+body.scholark-v3 .hero{padding-top:72px;padding-bottom:66px}
+body.scholark-v3 .hero h1{text-wrap:balance}
+body.scholark-v3 .hero-desc{max-width:650px}
+body.scholark-v3 .hero-card{background:color-mix(in srgb,var(--bg) 96%,white);box-shadow:var(--sk3-shadow-md);border-color:color-mix(in srgb,var(--border) 82%,transparent)}
+body.scholark-v3 .hero-tool-item{min-height:62px}
+body.scholark-v3 .hero-tool-item:hover{transform:translateX(3px)}
+body.scholark-v3 .card,
+body.scholark-v3 .dash-card,
+body.scholark-v3 .feature-overview-card,
+body.scholark-v3 .contact-card,
+body.scholark-v3 .quiz-result-card{
+  border-color:color-mix(in srgb,var(--border) 86%,transparent);
+  box-shadow:var(--sk3-shadow-sm)
+}
+body.scholark-v3 .card{padding:30px;border-radius:18px}
+body.scholark-v3 .card:hover{border-color:color-mix(in srgb,var(--accent) 20%,var(--border));box-shadow:var(--sk3-shadow-md)}
+body.scholark-v3 .card-title{letter-spacing:-.025em;text-wrap:balance}
+body.scholark-v3 .card-subtitle{max-width:760px}
+body.scholark-v3 .tool-tabs{padding-top:4px}
+body.scholark-v3 .tab-btn{min-height:38px;font-weight:650;background:color-mix(in srgb,var(--bg) 94%,white)}
+body.scholark-v3 .tab-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(26,23,20,.06)}
+body.scholark-v3 .tab-btn.active{box-shadow:0 5px 16px rgba(26,23,20,.12)}
+body.scholark-v3 input[type=text],body.scholark-v3 input[type=number],body.scholark-v3 input[type=email],body.scholark-v3 input[type=password],body.scholark-v3 input[type=date],body.scholark-v3 select,body.scholark-v3 textarea{
+  min-height:44px;border-radius:10px;border-color:color-mix(in srgb,var(--border) 92%,transparent);background:color-mix(in srgb,var(--bg2) 94%,var(--bg));
+}
+body.scholark-v3 textarea{min-height:unset}
+body.scholark-v3 input:focus,body.scholark-v3 select:focus,body.scholark-v3 textarea:focus{box-shadow:var(--sk3-ring);border-color:color-mix(in srgb,var(--accent) 70%,var(--border))}
+body.scholark-v3 button,body.scholark-v3 [role=button],body.scholark-v3 a{transition:transform .18s var(--sk3-ease),box-shadow .18s var(--sk3-ease),background .18s ease,border-color .18s ease,color .18s ease}
+body.scholark-v3 button:focus-visible,body.scholark-v3 [role=button]:focus-visible,body.scholark-v3 a:focus-visible,body.scholark-v3 input:focus-visible,body.scholark-v3 select:focus-visible,body.scholark-v3 textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+body.scholark-v3 .btn-primary,body.scholark-v3 .essay-get-feedback,body.scholark-v3 .auth-btn,body.scholark-v3 .pay-btn{min-height:44px;box-shadow:0 7px 18px rgba(200,98,42,.14)}
+body.scholark-v3 .btn-secondary{min-height:44px}
+body.scholark-v3 .result-box{border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.24)}
+body.scholark-v3 .result-value{letter-spacing:-.05em}
+body.scholark-v3 .dashboard-grid{gap:22px}
+body.scholark-v3 .dash-card{border-radius:18px;transition:transform .18s var(--sk3-ease),box-shadow .18s var(--sk3-ease)}
+body.scholark-v3 .dash-card:hover{transform:translateY(-2px);box-shadow:var(--sk3-shadow-md)}
+body.scholark-v3 .profile-menu{border-radius:14px;overflow:hidden}
+body.scholark-v3 .modal-overlay{padding:20px}
+body.scholark-v3 .modal-box{border:1px solid var(--border);box-shadow:0 30px 90px rgba(0,0,0,.26)}
+body.scholark-v3 .auth-tabs{padding:5px}
+body.scholark-v3 .uni-results{border-radius:13px;box-shadow:var(--sk3-shadow-md)}
+body.scholark-v3 .uni-result-item{min-height:48px}
+body.scholark-v3 .essay-textarea{border-radius:14px}
+body.scholark-v3 .essay-ai-panel{border-radius:15px}
+body.scholark-v3 .essay-score-item{border-radius:11px}
+body.scholark-v3 .faq-item{border-radius:14px;overflow:hidden}
+body.scholark-v3 .dark-toggle{bottom:20px;right:20px;width:46px;height:46px;border:1px solid color-mix(in srgb,var(--border) 90%,transparent);box-shadow:var(--sk3-shadow-md)}
+body.scholark-v3 .sk3-resume{max-width:1100px;margin:-18px auto 30px;padding:0 40px}
+body.scholark-v3 .sk3-resume-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));border-radius:14px;background:color-mix(in srgb,var(--accent-light) 55%,var(--bg));box-shadow:var(--sk3-shadow-sm)}
+body.scholark-v3 .sk3-resume-copy{min-width:0}
+body.scholark-v3 .sk3-resume-kicker{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+body.scholark-v3 .sk3-resume-title{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.scholark-v3 .sk3-resume-btn{flex:none;border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-radius:9px;padding:8px 12px;background:var(--bg);color:var(--accent);font:700 12px var(--font-body);cursor:pointer}
+body.scholark-v3 .sk3-resume-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(26,23,20,.08)}
+body.scholark-v3 .sk3-field-restored{animation:sk3Flash 1.15s ease}
+@keyframes sk3Flash{0%{box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 22%,transparent)}100%{box-shadow:none}}
+body.scholark-v3 .sk3-runtime-banner{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10000;max-width:min(560px,calc(100vw - 32px));padding:11px 15px;border-radius:12px;background:var(--red);color:#fff;font:600 12px/1.45 var(--font-body);box-shadow:0 12px 34px rgba(0,0,0,.2)}
+body.scholark-v3 .planner-day{min-height:42px}
+body.scholark-v3 .planner-day:not(.planner-day-head):hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,23,20,.07)}
+body.scholark-v3 .goal-scenario{border-radius:12px}
+body.scholark-v3 .quiz-option{border-radius:12px;transition:transform .15s var(--sk3-ease),border-color .15s ease,background .15s ease}
+body.scholark-v3 .quiz-option:hover{transform:translateX(2px)}
+body.scholark-v3 .counselor-msg{border-radius:14px}
+body.scholark-v3 footer{margin-top:20px}
+[data-theme=dark] body.scholark-v3 .hero-card,[data-theme=dark] body.scholark-v3 .card,[data-theme=dark] body.scholark-v3 .dash-card,[data-theme=dark] body.scholark-v3 .tab-btn,[data-theme=dark] body.scholark-v3 .modal-box,[data-theme=dark] body.scholark-v3 .auth-social-btn,[data-theme=dark] body.scholark-v3 .plan-option,[data-theme=dark] body.scholark-v3 .essay-score-item,[data-theme=dark] body.scholark-v3 .uni-results{background:var(--bg2);color:var(--ink)}
+[data-theme=dark] body.scholark-v3 input:focus,[data-theme=dark] body.scholark-v3 select:focus,[data-theme=dark] body.scholark-v3 textarea:focus{background:var(--bg2)}
+@media(max-width:900px){body.scholark-v3 .card{padding:24px}body.scholark-v3 .sk3-resume{padding:0 24px}.hero{gap:34px}}
+@media(max-width:700px){
+  body.scholark-v3 nav{height:auto;min-height:60px;padding-left:16px;padding-right:16px}
+  body.scholark-v3 .hero{padding-top:46px;padding-bottom:42px}
+  body.scholark-v3 .card{padding:20px;border-radius:15px}
+  body.scholark-v3 .result-box{align-items:flex-start}
+  body.scholark-v3 .result-value{font-size:38px}
+  body.scholark-v3 .sk3-resume{padding:0 16px;margin-top:-10px}
+  body.scholark-v3 .sk3-resume-inner{align-items:flex-start;flex-direction:column}
+  body.scholark-v3 .sk3-resume-btn{width:100%}
+  body.scholark-v3 .dark-toggle{width:42px;height:42px;bottom:14px;right:14px}
+}
+@media(prefers-reduced-motion:reduce){body.scholark-v3 *,body.scholark-v3 *:before,body.scholark-v3 *:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
