@@ -1,0 +1,46 @@
+name: ScholarK V4 Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scholark-v3.js'
+      - 'scholark-v4.js'
+      - 'scholark-v4.css'
+      - 'scholark-v4-data.js'
+      - 'index.html'
+      - 'ap-v2-*.js'
+      - 'prep-v2-*.js'
+      - 'scripts/**'
+      - '.github/workflows/scholark-v4-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
+      - name: Install test dependencies
+        working-directory: scripts
+        run: npm ci
+      - name: ScholarK V4 static release audit
+        working-directory: scripts
+        run: node scholark-v4-audit.js
+      - name: Existing full test suite
+        working-directory: scripts
+        run: npm test
+      - name: SAT and ACT market-quality audit
+        working-directory: scripts
+        run: npm run prep:market-audit
+      - name: AP market-quality audit
+        working-directory: scripts
+        run: npm run ap:audit
