@@ -1,0 +1,88 @@
+name: ScholarK regression audit
+
+on:
+  push:
+    paths:
+      - '.github/workflows/scholark-regression-audit.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JavaScript syntax checks
+        run: |
+          node --check scholark-v3.js
+          node --check ap-v2-app.js
+          node --check ap-v2-data.js
+          node --check prep-v2-app.js
+          node --check prep-v2-data.js
+
+      - name: Install audit dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Run repository test suite
+        working-directory: scripts
+        run: npm test
+
+      - name: Run SAT market-quality audit
+        working-directory: scripts
+        run: npm run prep:market-audit
+
+      - name: Run AP market-quality audit
+        working-directory: scripts
+        run: npm run ap:audit
+
+      - name: Verify shared-site integration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, sys
+          html=Path('index.html').read_text(encoding='utf-8')
+          checks={
+            'v3_css_once': html.count('href="scholark-v3.css"')==1,
+            'v3_js_once': html.count('src="scholark-v3.js"')==1,
+            'ap_assets_preserved': all(x in html for x in ('ap-v2-data.js','ap-v2-app.js')),
+            'prep_assets_preserved': all(x in html for x in ('prep-v2-data.js','prep-v2-app.js')),
+            'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about')),
+            'no_accidental_paywall_copy': 'Upgrade to Pro to access' not in html,
+          }
+          failed=[k for k,v in checks.items() if not v]
+          print('\n'.join(f'{"PASS" if v else "FAIL"}: {k}' for k,v in checks.items()))
+          if failed:
+              raise SystemExit('Integration checks failed: '+', '.join(failed))
+          PY
+
+      - name: Record successful regression audit
+        run: |
+          cat > SCHOLARK_REGRESSION_AUDIT.md <<'EOF'
+          # ScholarK Regression Audit
+
+          Status: **PASS**
+
+          This audit was run after the ScholarK shared legacy-site upgrade.
+
+          ## Verified
+          - `scholark-v3.js` syntax passes.
+          - AP v2 app/data JavaScript syntax passes.
+          - SAT/ACT prep v2 app/data JavaScript syntax passes.
+          - The repository's complete Node test suite passes.
+          - SAT/ACT market-quality audit passes.
+          - AP market-quality audit passes.
+          - The new shared CSS and JS are each injected exactly once.
+          - AP and SAT dedicated assets remain wired into the main page.
+          - Core Home, Features, and About page containers remain present.
+          - No legacy "Upgrade to Pro to access" copy is present in the main HTML.
+
+          The shared upgrade layer is additive and preserves the dedicated AP/SAT implementations.
+          EOF
+          git config user.name "scholark-audit-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add SCHOLARK_REGRESSION_AUDIT.md
+          git commit -m "test: record passing ScholarK regression audit"
+          git push
