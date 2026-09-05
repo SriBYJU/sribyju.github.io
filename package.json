@@ -4,5 +4,12 @@
   "private": true,
   "dependencies": {
     "framer-motion": "13.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "scripts": {
+    "build:motion": "esbuild assets/scholark-motion.entry.js --bundle --format=iife --target=es2020 --outfile=assets/scholark-motion.js",
+    "check:motion": "node --check assets/scholark-motion.js"
   }
 }
