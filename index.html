@@ -874,11 +874,8 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8035550913474000" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="ap-v2.css">
 <link rel="stylesheet" href="scholark-v3.css">
-<link rel="stylesheet" href="scholark-v4.css">
-<link rel="stylesheet" href="scholark-v5.css">
 </head>
-<body class="scholark-v5">
-<a class="sk5-skip" href="#page-home">Skip to content</a>
+<body>
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal">
@@ -983,38 +980,44 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <!-- HOME PAGE -->
 <div class="page active" id="page-home">
   <aside class="ad-banner" id="ad-banner-home" data-ad-placement="home-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="hero sk5-home-intro">
-    <div class="sk5-intro-copy">
-      <div class="sk5-eyebrow"><span class="sk5-index">01 / YOUR NEXT CHAPTER</span><span class="sk5-free">Always free</span></div>
-      <h1>Big plans.<br><em>Clear next steps.</em></h1>
-      <p class="hero-desc">Your grades, your college list, your next big move. Bring it all together in one free student workspace.</p>
-      <div class="hero-ctas"><button class="btn-primary" onclick="goToTools()">Open my toolkit <span aria-hidden="true">↗</span></button><button class="btn-secondary" onclick="if(showPage('prep')) ScholarkPrep.init()">Start practicing</button></div>
-      <div class="sk5-intro-note"><span aria-hidden="true">↳</span> Built for the work between where you are and where you want to be.</div>
-    </div>
-    <section class="sk5-launchpad" aria-labelledby="sk5-launch-title">
-      <div class="sk5-launch-head"><span class="sk5-eyebrow">MAKE YOUR NEXT MOVE</span><span class="sk5-launch-symbol" aria-hidden="true">✳</span></div>
-      <h2 id="sk5-launch-title">What are we<br>working on?</h2>
-      <div class="sk5-launch-links">
-        <button onclick="showTool('gpa')"><span class="sk5-mini-icon" data-sk5-icon="chart"></span><span><strong>Know my numbers</strong><small>GPA, grades & college costs</small></span><span class="sk5-arrow" aria-hidden="true">↗</span></button>
-        <button onclick="if(showPage('prep')) ScholarkPrep.init()"><span class="sk5-mini-icon" data-sk5-icon="target"></span><span><strong>Get test-day ready</strong><small>SAT, ACT & AP practice</small></span><span class="sk5-arrow" aria-hidden="true">↗</span></button>
-        <button onclick="showPage('intelligence')"><span class="sk5-mini-icon" data-sk5-icon="compass"></span><span><strong>Find my direction</strong><small>Colleges, majors & careers</small></span><span class="sk5-arrow" aria-hidden="true">↗</span></button>
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">⚡ Free · Instant results · Privacy-friendly</div>
+      <h1>The College <em>Toolkit</em><br>Students Actually Use</h1>
+      <p class="hero-desc">Seven precision calculators plus an on-device essay coach for every stage of your college journey.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">10,000+</div><div class="hero-stat-label">Students monthly</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">200+</div><div class="hero-stat-label">Universities tracked</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">19</div><div class="hero-stat-label">AP subjects</div></div>
       </div>
-      <div class="sk5-launch-foot"><span>One workspace. Your possibilities.</span><span aria-hidden="true">↗</span></div>
-    </section>
-  </div>
-  <section class="sk5-workspace" aria-labelledby="sk5-tools-title">
-    <div class="sk5-section-heading"><div><div class="sk5-eyebrow">YOUR TOOLKIT</div><h2 id="sk5-tools-title">Less scattered.<br><em>More in motion.</em></h2></div><p>Pick a starting point.<br>Everything connects from here.</p></div>
-    <div class="sk5-tool-grid">
-      <button class="sk5-tool sk5-tool-study" onclick="if(showPage('prep')) ScholarkPrep.init()"><div class="sk5-card-top"><span class="sk5-category">01 / PRACTICE</span><span class="sk5-card-icon" data-sk5-icon="target"></span></div><h3>Make practice<br>your advantage.</h3><p>Diagnostics, adaptive sessions, and a plan for what to work on next.</p><div class="sk5-study-track" aria-hidden="true"><span>Discover</span><i></i><span>Practice</span><i></i><span>Progress</span></div><div class="sk5-card-bottom"><span>SAT & ACT Prep</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
-      <button class="sk5-tool" onclick="showTool('gpa')"><div class="sk5-card-top"><span class="sk5-category">02 / CALCULATE</span><span class="sk5-card-icon" data-sk5-icon="chart"></span></div><h3>See the<br>bigger picture.</h3><p>GPA, weighted grades, and the numbers behind your next decision.</p><div class="sk5-card-bottom"><span>College Calculators</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
-      <button class="sk5-tool sk5-tool-essay" onclick="goToEssay()"><div class="sk5-card-top"><span class="sk5-category">03 / CREATE</span><span class="sk5-card-icon" data-sk5-icon="pen"></span></div><h3>Your story.<br>Your voice.</h3><p>Give your next draft more direction with private, on-device feedback.</p><div class="sk5-card-bottom"><span>Essay Coach</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
-      <button class="sk5-tool" onclick="if(showPage('ap')) initAPHub()"><div class="sk5-card-top"><span class="sk5-category">04 / LEARN</span><span class="sk5-card-icon" data-sk5-icon="book"></span></div><h3>From a concept<br>to a confident answer.</h3><p>Unit courses, adaptive practice, and applied task labs across AP subjects.</p><div class="sk5-card-bottom"><span>AP Study</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
-      <button class="sk5-tool sk5-tool-college" onclick="showPage('intelligence')"><div class="sk5-card-top"><span class="sk5-category">05 / EXPLORE</span><span class="sk5-card-icon" data-sk5-icon="compass"></span></div><h3>A college list.<br>With a point of view.</h3><p>Compare schools through cost, outcomes, and the details that matter to you.</p><div class="sk5-card-bottom"><span>College Intelligence</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
-      <button class="sk5-tool" onclick="showPage('careers')"><div class="sk5-card-top"><span class="sk5-category">06 / LOOK AHEAD</span><span class="sk5-card-icon" data-sk5-icon="path"></span></div><h3>Connect your major<br>to what comes next.</h3><p>Explore occupations, skills, and public career-outcomes data.</p><div class="sk5-card-bottom"><span>Career Explorer</span><span class="sk5-circle-arrow" aria-hidden="true">↗</span></div></button>
+      <div class="hero-ctas">
+        <button class="btn-primary" onclick="goToTools()">Open Calculators →</button>
+        <button class="btn-secondary" onclick="showPage('features')">Explore Features</button>
+      </div>
     </div>
-    <div class="sk5-shortcuts" aria-label="More planning tools"><span>Keep it together</span><button onclick="showPage('planner')">Study planner ↗</button><button onclick="showPage('apps')">Applications ↗</button><button onclick="showPage('scholarships')">Scholarships ↗</button><button onclick="showPage('goals')">GPA goals ↗</button><button onclick="showPage('features')">All tools ↗</button></div>
-  </section>
-  <div class="trust-bar sk5-trust"><div class="trust-item"><span data-sk5-icon="check"></span><span><strong>Free for every student</strong><br>Full toolkit with an account</span></div><div class="trust-item"><span data-sk5-icon="lock"></span><span><strong>Your words stay yours</strong><br>Essay feedback runs on-device</span></div><div class="trust-item"><span data-sk5-icon="compass"></span><span><strong>Explore with context</strong><br>Public data, clear methodology</span></div></div>
+    <div class="hero-card">
+      <div class="hero-card-title">Jump to a calculator</div>
+      <div class="hero-tool-list">
+        <div class="hero-tool-item" onclick="showTool('gpa')"><div class="hero-tool-icon" style="background:#fdf0e8">📊</div><div><div class="hero-tool-name">GPA Calculator</div><div class="hero-tool-desc">Semester & cumulative GPA</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('weighted')"><div class="hero-tool-icon" style="background:#e8f5ee">⭐</div><div><div class="hero-tool-name">Weighted GPA</div><div class="hero-tool-desc">AP, IB, Honors on 5.0 scale</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('chances')"><div class="hero-tool-icon" style="background:#fef8e1">🏫</div><div><div class="hero-tool-name">College Chances</div><div class="hero-tool-desc">Compare with a 200+ university dataset</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="goToEssay()"><div class="hero-tool-icon" style="background:#e8eef8">✍️</div><div><div class="hero-tool-name">Essay Rubric Coach</div><div class="hero-tool-desc">Private, on-device feedback</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showTool('loan')"><div class="hero-tool-icon" style="background:#fce8e8">💰</div><div><div class="hero-tool-name">Student Loan Calc</div><div class="hero-tool-desc">Monthly payment & total cost</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('goals')"><div class="hero-tool-icon" style="background:#e8f5ee">🎯</div><div><div class="hero-tool-name">GPA Goal Tracker</div><div class="hero-tool-desc">Set targets & track progress</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('quiz')"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz</div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="if(showPage('prep')) ScholarkPrep.init()"><div class="hero-tool-icon" style="background:#e8eef8">📝</div><div><div class="hero-tool-name">SAT/ACT Prep</div><div class="hero-tool-desc">Diagnostics, mastery & adaptive plans</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('ap');initAPHub()"><div class="hero-tool-icon" style="background:#f0e8ff">📚</div><div><div class="hero-tool-name">AP Study Tools</div><div class="hero-tool-desc">Adaptive practice, task labs & unit courses for 23 APs</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('compare')"><div class="hero-tool-icon" style="background:#fef8e1">⚖️</div><div><div class="hero-tool-name">College Compare</div><div class="hero-tool-desc">Side-by-side with radar charts</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="showPage('counselor');initCounselor()"><div class="hero-tool-icon" style="background:#fdf0e8">🧭</div><div><div class="hero-tool-name">Admissions Guide</div><div class="hero-tool-desc">Curated admissions guidance</div></div><div class="hero-tool-arrow">→</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="trust-bar">
+    <div class="trust-item">✓ <strong>100% Free</strong> for signed-in students</div>
+    <div class="trust-item">✓ <strong>200+</strong> real university acceptance rates</div>
+    <div class="trust-item">✓ <strong>Essay rubric</strong> feedback stays on-device</div>
+    <div class="trust-item">✓ <strong>Complete toolkit</strong> for every account</div>
+  </div>
   <footer>
     <div class="footer-grid">
       <div class="footer-brand"><div class="logo"><img src="scholark-mark.svg" alt=""><span>Scholar<span class="brand-k">k</span></span></div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
@@ -4780,6 +4783,5 @@ window.onload = function() {
 <script src="prep-v2-data.js"></script>
 <script src="prep-v2-app.js"></script>
 <script src="scholark-v3.js" defer></script>
-<script src="assets/scholark-motion.js" defer></script>
 </body>
 </html>
