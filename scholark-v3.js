@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const VERSION='3.1.0';
+  const VERSION='3.2.0';
+  const BUILD='561';
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
   const DYNAMIC_PAGES=new Set(['intelligence','careers','methodology']);
@@ -17,15 +18,33 @@
   if(!document.getElementById('scholark-cinematic-critical')){
     const s=document.createElement('style');s.id='scholark-cinematic-critical';s.textContent='html.scholark-cinematic-loading #page-home>.hero,html.scholark-cinematic-loading #page-home>.trust-bar,html.scholark-cinematic-loading #page-home>.sk3-resume,html.scholark-cinematic-loading #page-home>.sk4-command-center{visibility:hidden!important}html.scholark-cinematic-loading #page-home{min-height:100dvh;background:#faf9f6}';(document.head||document.documentElement).appendChild(s);
   }
-  if(!document.querySelector('link[href*="scholark-v53.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href='scholark-v53.css';(document.head||document.documentElement).appendChild(l);}
+
+  const ensureStylesheet=file=>{
+    if(document.querySelector(`link[href*="${file}"]`))return;
+    const l=document.createElement('link');l.rel='stylesheet';l.href=`${file}?build=${BUILD}`;(document.head||document.documentElement).appendChild(l);
+  };
+  ['scholark-v53.css','scholark-v54.css','scholark-v55.css','scholark-v56.css','scholark-v561.css'].forEach(ensureStylesheet);
 
   const loadScript=src=>new Promise((resolve,reject)=>{
     const existing=document.querySelector(`script[src="${src}"]`);
     if(existing){if(existing.dataset.loaded==='true'||existing.readyState==='complete')return resolve();existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
     const s=document.createElement('script');s.src=src;s.defer=true;s.addEventListener('load',()=>{s.dataset.loaded='true';resolve();},{once:true});s.addEventListener('error',()=>reject(new Error(`Could not load ${src}`)),{once:true});(document.head||document.documentElement).appendChild(s);
   });
-  loadScript('scholark-v53.js').catch(err=>{console.error('Scholark V5.3 loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
-  loadScript('scholark-v4-data.js').then(()=>loadScript('scholark-v4.js')).catch(err=>console.error('Scholark V4 loader failed:',err));
+
+  /* Disable the old timer-based enhancement loaders inside scholark-v4-data.js. V5.6.1 loads
+     every visual layer deterministically below, before a user can scroll into late layout shifts. */
+  window.__scholarkV54LoaderInstalled=true;
+  window.__scholarkV55LoaderInstalled=true;
+  window.__scholarkV56LoaderInstalled=true;
+
+  loadScript(`scholark-v53.js?build=${BUILD}`)
+    .then(()=>loadScript(`scholark-v54.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v55.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v56.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v561.js?build=${BUILD}`))
+    .catch(err=>{console.error('Scholark cinematic loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
+
+  loadScript(`scholark-v4-data.js?build=${BUILD}`).then(()=>loadScript(`scholark-v4.js?build=${BUILD}`)).catch(err=>console.error('Scholark V4 loader failed:',err));
 
   function markReady(){document.body?.classList.add('scholark-v3');document.documentElement.dataset.scholarkBaseUi=VERSION;}
   function hardenButtons(){
@@ -40,12 +59,12 @@
   function installPersistence(){restoreFields();document.addEventListener('input',e=>{const el=e.target;if(shouldPersist(el))safeSet(inputKey(el),JSON.stringify(el.type==='checkbox'||el.type==='radio'?el.checked:el.value));},true);document.addEventListener('change',e=>{const el=e.target;if(shouldPersist(el))safeSet(inputKey(el),JSON.stringify(el.type==='checkbox'||el.type==='radio'?el.checked:el.value));},true);}
   function friendlyPageName(name){const labels={tools:'Calculators',essay:'Essay Coach',dashboard:'Dashboard',profile:'Profile',planner:'Study Planner',apps:'Application Tracker',scholarships:'Scholarships',quiz:'College Match Quiz',community:'Community',counselor:'Admissions Guide',compare:'College Compare',progress:'Progress',intelligence:'College Intelligence',careers:'Career Outcomes'};return labels[name]||String(name||'').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
   function saveLastPage(name){if(name&&name!=='home'&&!EXCLUDED_PAGES.has(name))safeSet('last-page',name);}
-  function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=home.querySelector('.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
+  function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=document.querySelector('#page-home>.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
 
   function scrollFeatures(){const target=document.querySelector('.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return true}return false;}
   function waitForDynamic(name,original,args){const started=performance.now();const retry=()=>{const target=document.getElementById('page-'+name);if(target){try{return original.call(window,name,...args)}catch(err){console.error('showPage failed:',err);return false}}if(performance.now()-started<2600)return setTimeout(retry,40);toast('That section is still loading. Please try again in a moment.','info');};retry();return true;}
   function installNavigationGuards(){
-    if(typeof window.showPage==='function'&&!window.showPage.__sk3){const original=window.showPage;const wrapped=function(name,...args){if(name==='features')return scrollFeatures();const target=document.getElementById('page-'+name);if(!target){if(DYNAMIC_PAGES.has(name))return waitForDynamic(name,original,args);toast('That section is still loading. Please try again in a moment.','info');return false;}let result;try{result=original.call(this,name,...args)}catch(err){console.error('showPage failed:',err);toast('That section could not open. Your work is still safe.','error');return false}if(result!==false){saveLastPage(name);try{history.replaceState(null,'','#'+encodeURIComponent(name))}catch{}queueMicrotask(()=>{restoreFields(target);hardenButtons();hardenModals();});}return result;};wrapped.__sk3=true;window.showPage=wrapped;}
+    if(typeof window.showPage==='function'&&!window.showPage.__sk3){const original=window.showPage;const wrapped=function(name,...args){if(name==='features')return scrollFeatures();const target=document.getElementById('page-'+name);if(!target){if(DYNAMIC_PAGES.has(name))return waitForDynamic(name,original,args);toast('That section is still loading. Please try again in a moment.','info');return false;}let result;try{return result=original.call(this,name,...args),result!==false&&(saveLastPage(name),(()=>{try{history.replaceState(null,'','#'+encodeURIComponent(name))}catch{}})(),queueMicrotask(()=>{restoreFields(target);hardenButtons();hardenModals();})),result}catch(err){console.error('showPage failed:',err);toast('That section could not open. Your work is still safe.','error');return false}};wrapped.__sk3=true;window.showPage=wrapped;}
     if(typeof window.switchTab==='function'&&!window.switchTab.__sk3){const original=window.switchTab;const wrapped=function(tab,btn,...rest){if(!document.getElementById('tab-'+tab)){toast('That calculator is still loading.','info');return false}try{const out=original.call(this,tab,btn,...rest);safeSet('last-tool-tab',tab);queueMicrotask(()=>restoreFields(document.getElementById('tab-'+tab)));return out}catch(err){console.error('switchTab failed:',err);toast('That calculator could not open.','error');return false}};wrapped.__sk3=true;window.switchTab=wrapped;}
   }
   function restoreRoute(){const raw=decodeURIComponent(location.hash.replace(/^#/,''));if(!raw||raw==='home'||EXCLUDED_PAGES.has(raw))return;if(document.getElementById('page-'+raw)&&typeof window.showPage==='function')window.showPage(raw);}
@@ -53,6 +72,6 @@
   function installMutationRepair(){let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;hardenButtons();hardenModals();restoreFields();});});observer.observe(document.body,{subtree:true,childList:true});}
   function patchKnownEdgeCases(){if(typeof window.calcGoalProjection==='function'&&!window.calcGoalProjection.__sk3){const original=window.calcGoalProjection;const wrapped=function(...args){try{return original.apply(this,args)}catch(err){console.error('Goal projection failed:',err);toast('Projection could not be calculated from those values.','error');return false}};wrapped.__sk3=true;window.calcGoalProjection=wrapped;}if(typeof window.deleteSavedItem==='function'&&!window.deleteSavedItem.__sk3){const original=window.deleteSavedItem;const wrapped=function(id,...args){if(!id){toast('That saved result could not be identified.','error');return false}return original.call(this,id,...args)};wrapped.__sk3=true;window.deleteSavedItem=wrapped;}}
   function installRuntimeGuard(){window.addEventListener('unhandledrejection',e=>console.error('Unhandled Scholark promise rejection:',e.reason));window.addEventListener('error',e=>{if(e.error)console.error('Scholark runtime error:',e.error);});}
-  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,restoreFields,activePage};}
+  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,restoreFields,activePage};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
