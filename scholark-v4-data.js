@@ -97,3 +97,23 @@ window.SCHOLARK_PUBLIC_DATA = {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
   else wait();
 })();
+
+/* Scholark V5.7 theme + closing-scene loader — waits for V5.6 so all cinematic layers exist first. */
+(() => {
+  if (window.__scholarkV57LoaderInstalled) return;
+  window.__scholarkV57LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v57.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v57.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV56 || tries++ > 220) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
+})();
