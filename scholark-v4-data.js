@@ -77,3 +77,23 @@ window.SCHOLARK_PUBLIC_DATA = {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
   else wait();
 })();
+
+/* Scholark V5.6 observatory loader — waits for V5.5 so chapter/shared-transition DOM is stable first. */
+(() => {
+  if (window.__scholarkV56LoaderInstalled) return;
+  window.__scholarkV56LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v56.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v56.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV55 || tries++ > 180) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
+})();
