@@ -1,0 +1,1 @@
+This branch contains the V5.3 cinematic polish pass. It was created on the existing cinematic branch after V5.2 was merged, so the PR diff should be reviewed against current `main` before merge. No legacy calculator/AP/SAT data logic is intentionally changed in this pass beyond loader/navigation behavior.

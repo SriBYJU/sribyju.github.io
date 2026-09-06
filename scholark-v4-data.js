@@ -1,5 +1,5 @@
-/* ScholarK V4 public-data layer.
-   Sources are deliberately explicit so UI can distinguish source data from ScholarK-derived planning metrics. */
+/* Scholark V4 public-data layer.
+   Sources are deliberately explicit so UI can distinguish source data from Scholark-derived planning metrics. */
 window.SCHOLARK_PUBLIC_DATA = {
   meta: {
     version: '2026.08',
@@ -9,7 +9,7 @@ window.SCHOLARK_PUBLIC_DATA = {
     careerSourceUrl: 'https://www.bls.gov/ooh/',
     careerWagePeriod: 'May 2024 median annual wage',
     careerProjectionPeriod: '2024–2034 employment projection',
-    note: 'Public-data values are descriptive, not individual predictions. ScholarK-derived indexes are planning aids only.'
+    note: 'Public-data values are descriptive, not individual predictions. Scholark-derived indexes are planning aids only.'
   },
   careers: [
     {id:'software-developer',name:'Software Developer',cluster:'Technology',soc:'15-1252',pay:133080,growth:15.8,openings:115200,education:"Bachelor’s degree",icon:'💻',skills:['Programming','Systems thinking','Problem solving'],majors:['Computer Science','Software Engineering','Computer Engineering'],source:'BLS Employment Projections / OOH'},
@@ -24,41 +24,21 @@ window.SCHOLARK_PUBLIC_DATA = {
   ],
   methodology: {
     publicData: [
-      'College research surfaces public institutional attributes already used by ScholarK and labels them as source data.',
+      'College research surfaces public institutional attributes already used by Scholark and labels them as source data.',
       'Career outcomes use Bureau of Labor Statistics occupational wage and projection fields. Occupation outcomes are not the same as outcomes for every graduate of a particular major.',
-      'College Scorecard publishes institution- and field-of-study-level outcomes including cost, completion, debt, repayment and earnings; ScholarK directs users to the official source for current verification.'
+      'College Scorecard publishes institution- and field-of-study-level outcomes including cost, completion, debt, repayment and earnings; Scholark directs users to the official source for current verification.'
     ],
     derived: [
       'Value Lens is a transparent 0–100 planning index combining normalized displayed outcome signals with inverse cost pressure inside the selected comparison set. It is not a ranking and should not replace net-price calculations.',
-      'Career Momentum is a 0–100 planning index combining projected job growth and median pay relative to the careers displayed in ScholarK.',
-      'Fit signals reflect only preferences selected inside ScholarK and are not admissions or employment predictions.'
+      'Career Momentum is a 0–100 planning index combining projected job growth and median pay relative to the careers displayed in Scholark.',
+      'Fit signals reflect only preferences selected inside Scholark and are not admissions or employment predictions.'
     ],
     limitations: [
       'Published data can lag the current academic year and may represent different cohorts.',
       'Institution-wide averages can hide large differences by major, residency, aid, demographic group and credential level.',
       'Median occupational pay describes workers in an occupation, not guaranteed starting salary for a new graduate.',
-      'Some BLS opening counts are published at grouped occupation levels; ScholarK labels grouped values where applicable.',
+      'Some BLS opening counts are published at grouped occupation levels; Scholark labels grouped values where applicable.',
       'Students should verify current cost, admissions, aid and program information on official institution and government sites before making decisions.'
     ]
   }
 };
-
-/* Scholark V5 loader: wait for the V4 workspace to finish, then layer the cinematic home on top. */
-(() => {
-  if (window.__scholarkV5LoaderInstalled) return;
-  window.__scholarkV5LoaderInstalled = true;
-  const load = () => {
-    if (document.querySelector('script[src="scholark-v5.js"]')) return;
-    const s = document.createElement('script');
-    s.src = 'scholark-v5.js';
-    s.defer = true;
-    document.body.appendChild(s);
-  };
-  let tries = 0;
-  const waitForV4 = () => {
-    if (window.ScholarkV4 || tries++ > 80) return load();
-    setTimeout(waitForV4, 25);
-  };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitForV4, {once:true});
-  else waitForV4();
-})();
