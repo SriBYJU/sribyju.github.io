@@ -1,0 +1,7 @@
+- [ ] Verify cold load no longer flashes the legacy homepage.
+- [ ] Verify light-mode scroll at slow and fast wheel/trackpad speeds.
+- [ ] Verify dark-mode cinematic world is black + orange throughout.
+- [ ] Verify 390px / 768px / 1440px layouts and no horizontal overflow.
+- [ ] Verify College Intelligence and Career Outcomes open after dynamic V4 injection.
+- [ ] Verify Features buttons scroll to the V5.3 tools section.
+- [ ] Verify reduced-motion and keyboard focus states.
