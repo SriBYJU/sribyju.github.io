@@ -42,3 +42,18 @@ window.SCHOLARK_PUBLIC_DATA = {
     ]
   }
 };
+
+/* Scholark V5.4 atmosphere loader — additive layer over the stable V5.3 cinematic build. */
+(() => {
+  if (window.__scholarkV54LoaderInstalled) return;
+  window.__scholarkV54LoaderInstalled = true;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v54.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v54.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load, {once:true});
+  else load();
+})();
