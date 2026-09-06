@@ -1,0 +1,98 @@
+/* Scholark V5.5 — premium interaction, spatial continuity, and narrative detail.
+   Additive over V5.3/V5.4. UI UX Pro Max principles: meaningful motion, shared-element
+   continuity, compositor-friendly transforms, clear focus states, mobile simplification,
+   reduced-motion fallbacks, and brand-consistent cream / burnt orange art direction. */
+
+body.scholark-v55 .sk6-experience{--sk8-hero-p:0;--sk8-p:0;--sk8-wind:0;--sk8-speed:0}
+
+/* HERO NETWORK — makes the floating tools feel physically connected to the S */
+.sk8-hero-network{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:var(--sk6-intro,1);transform-style:preserve-3d;mix-blend-mode:multiply}
+.sk8-hero-network svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 9px rgba(200,98,42,.07))}
+.sk8-network-lines path{fill:none;stroke:rgba(200,98,42,.20);stroke-width:.085;vector-effect:non-scaling-stroke;stroke-dasharray:2.2 2.8;animation:sk8NetworkFlow 8s linear infinite}
+.sk8-network-lines path:nth-child(2n){animation-direction:reverse;animation-duration:10s}.sk8-network-lines path:nth-child(3n){animation-delay:-4s}
+.sk8-network-nodes circle{fill:#c8622a;opacity:.52;transform-box:fill-box;transform-origin:center;animation:sk8NodePulse 2.8s ease-in-out infinite}
+.sk8-network-nodes circle:nth-child(2n){animation-delay:-1.1s}.sk8-network-nodes circle:nth-child(3n){animation-delay:-2s}
+@keyframes sk8NetworkFlow{to{stroke-dashoffset:-24}}@keyframes sk8NodePulse{50%{scale:1.8;opacity:.18}}
+
+/* CLICKABLE STORY CHAPTERS */
+.sk6-stage-index{pointer-events:auto!important;align-items:center;gap:7px!important;z-index:15!important}
+.sk8-stage-btn{appearance:none;border:0;background:transparent;color:var(--sk6-ink-3);display:flex;align-items:center;gap:6px;min-height:32px;padding:5px 7px;border-radius:999px;cursor:pointer;font:700 7px/1 var(--font-body);letter-spacing:.14em;transition:background .22s ease,color .22s ease,transform .22s var(--sk6-ease);touch-action:manipulation}
+.sk8-stage-btn i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.38;transition:scale .22s var(--sk6-ease),opacity .22s ease,box-shadow .22s ease}
+.sk8-stage-btn:hover{background:rgba(200,98,42,.08);color:var(--sk6-orange-deep);transform:translateY(-1px)}
+.sk8-stage-btn.active{color:var(--sk6-orange);background:rgba(200,98,42,.08)}.sk8-stage-btn.active i{scale:1.5;opacity:1;box-shadow:0 0 0 5px rgba(200,98,42,.09),0 0 14px rgba(200,98,42,.25)}
+.sk8-stage-btn:focus-visible{outline:2px solid var(--sk6-orange);outline-offset:2px}
+
+/* SECOND CAMPUS PLANE + WINDOW LIGHTS */
+.sk8-campus-depth{position:absolute;z-index:.5;right:-7vw;bottom:-6vh;width:min(82vw,1280px);pointer-events:none;color:rgba(200,98,42,.12);opacity:var(--sk8-p,0);transform:translate3d(38px,38px,-70px) scale(1.035);filter:blur(.25px) drop-shadow(0 42px 90px rgba(150,60,25,.05))}
+.sk8-campus-depth-svg{width:100%;height:auto;opacity:.55}
+.sk8-campus-lights{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:var(--sk8-p,0)}
+.sk8-campus-lights i{position:absolute;left:var(--lx);top:var(--ly);width:4px;height:4px;border-radius:1px;background:#eeb468;box-shadow:0 0 0 2px rgba(238,180,104,.08),0 0 13px rgba(226,138,85,.34);animation:sk8WindowGlow 3.6s ease-in-out infinite;animation-delay:calc(var(--ls) * -10s)}
+.sk8-campus-lights i:nth-child(3n){width:5px;height:3px}.sk8-campus-lights i:nth-child(4n){animation-duration:4.8s}
+.sk8-campus-lights.fit-lights{inset:auto -2% -1% auto;width:min(54vw,760px);height:min(43vw,570px);opacity:var(--sk8-p,0)}
+@keyframes sk8WindowGlow{0%,100%{opacity:.14}48%{opacity:.92}62%{opacity:.38}}
+
+/* JOURNEY BEACON — a live point physically travels the planning path */
+.sk8-journey-beacon{opacity:0;filter:drop-shadow(0 4px 10px rgba(200,98,42,.28));will-change:transform,opacity}
+.sk8-beacon-halo{fill:rgba(200,98,42,.10);stroke:rgba(200,98,42,.34);stroke-width:1.2;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:sk8BeaconHalo 1.8s ease-out infinite}
+.sk8-beacon-core{fill:#fff8ef;stroke:#c8622a;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.sk8-beacon-star{fill:#c8622a;transform:scale(.42);transform-box:fill-box;transform-origin:center;animation:sk8BeaconSpin 7s linear infinite}
+@keyframes sk8BeaconHalo{0%{scale:.55;opacity:.8}100%{scale:1.75;opacity:0}}@keyframes sk8BeaconSpin{to{rotate:360deg}}
+
+/* TOOL CARDS — tiny live-system signal rather than static decoration */
+.sk8-card-signal{position:absolute;left:21px;top:62px;z-index:3;width:74px;height:13px;display:flex;align-items:center;gap:4px;opacity:.34;transform:translateZ(26px);transition:opacity .24s ease,translate .3s var(--sk6-ease)}
+.sk8-card-signal i{width:4px;height:4px;border-radius:50%;background:var(--sk6-orange);box-shadow:0 0 0 3px rgba(200,98,42,.06)}.sk8-card-signal i:nth-child(2){opacity:.6}.sk8-card-signal i:nth-child(3){opacity:.3}
+.sk8-card-signal b{height:1px;flex:1;background:linear-gradient(90deg,rgba(200,98,42,.45),transparent);transform-origin:left;scale:.35 1;transition:scale .34s var(--sk6-ease)}
+.sk6-tool-card:hover,.sk6-path-card:hover{scale:1.012}.sk6-tool-card:hover .sk8-card-signal,.sk6-path-card:hover .sk8-card-signal{opacity:.88;translate:5px 0}.sk6-tool-card:hover .sk8-card-signal b,.sk6-path-card:hover .sk8-card-signal b{scale:1 1}
+.sk6-tool-card:hover .sk6-tool-art i:nth-child(1){translate:0 -5px}.sk6-tool-card:hover .sk6-tool-art i:nth-child(2){translate:0 -12px}.sk6-tool-card:hover .sk6-tool-art i:nth-child(3){translate:0 -8px}
+.sk6-tool-art i{transition:translate .34s var(--sk6-ease),filter .34s ease}.sk6-tool-card:hover .sk6-tool-art i{filter:drop-shadow(0 8px 8px rgba(200,98,42,.12))}
+
+/* COLLEGE FIT — let the existing glass stack behave more like a spatial object */
+.sk6-fit-stack{transition:scale .38s var(--sk6-ease)}.sk6-fit-stack:hover{scale:1.015}
+.sk6-fit-stack:hover .sk6-search-glass{transform:rotateY(-4deg) rotateX(1deg) translateZ(52px)}
+.sk6-fit-stack:hover .sk6-mini-card.m1{transform:translate3d(10px,-12px,105px) rotate(7deg)}.sk6-fit-stack:hover .sk6-mini-card.m2{transform:translate3d(-10px,8px,75px) rotate(-8deg)}
+.sk6-search-glass,.sk6-mini-card{transition:transform .48s var(--sk6-ease),box-shadow .48s ease}.sk6-fit-stack:hover .sk6-search-glass{box-shadow:0 44px 105px rgba(0,0,0,.34)}
+
+/* FINAL BRAND REVEAL — a huge quiet S returns behind the closing statement */
+.sk8-final-mark{position:absolute;left:50%;top:50%;z-index:1;width:min(70vw,900px);aspect-ratio:1;color:rgba(200,98,42,.085);transform:translate3d(-50%,-50%,0) scale(.92) rotate(-5deg);opacity:var(--sk8-p,0);pointer-events:none;will-change:transform,opacity}
+.sk8-final-mark svg{position:absolute;inset:14%;width:72%;height:72%;filter:drop-shadow(0 28px 60px rgba(150,60,25,.08))}
+.sk8-final-ring{position:absolute;inset:5%;border:1px solid rgba(200,98,42,.09);border-radius:50%;animation:sk8FinalOrbit 26s linear infinite}.sk8-final-ring.b{inset:17%;border-style:dashed;animation-direction:reverse;animation-duration:19s}
+@keyframes sk8FinalOrbit{to{rotate:360deg}}
+
+/* SCROLL MOMENTUM: no layout movement, only tiny atmospheric lean */
+.sk7-cross-cloud,.sk7-cloud{transition:filter .16s linear}.sk6-experience:active .sk7-cross-cloud{filter:saturate(1.03)}
+
+/* SHARED-ELEMENT ROUTE TRANSITION — transforms the source card into the next workspace */
+html.sk8-shared-transition{overflow:hidden}html.sk8-shared-transition .sk6-route-wipe{display:none!important}
+.sk8-shared-ghost{position:fixed;inset:0;z-index:2395;pointer-events:none;transform-origin:0 0;transform:translate3d(var(--gx),var(--gy),0) scale(var(--gsx),var(--gsy));border-radius:25px;background:var(--ghost-bg,var(--sk6-paper));color:var(--ghost-color,var(--sk6-ink));box-shadow:0 45px 140px rgba(53,29,16,.22);overflow:hidden;will-change:transform,opacity;border:1px solid rgba(200,98,42,.14);transition:transform .36s cubic-bezier(.76,0,.24,1),border-radius .36s cubic-bezier(.76,0,.24,1),opacity .16s ease}
+.sk8-shared-ghost:before{content:"S";position:absolute;right:-4vw;bottom:-16vh;font:700 min(75vw,950px)/1 var(--font-display);color:rgba(200,98,42,.075);font-style:italic;transform:rotate(-8deg)}
+.sk8-shared-ghost.go{transform:translate3d(0,0,0) scale(1);border-radius:0}.sk8-shared-ghost.finish{opacity:0}
+.sk8-shared-inner{position:absolute;left:50%;top:50%;width:min(84vw,900px);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;text-align:center;gap:13px;opacity:0;transition:opacity .18s ease .12s}
+.sk8-shared-ghost.go .sk8-shared-inner{opacity:1}.sk8-shared-inner>.sk6-icon{width:42px;height:42px;color:var(--sk6-orange)}
+.sk8-shared-kicker{font:700 9px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--sk6-orange)}.sk8-shared-inner strong{font:500 clamp(48px,8vw,116px)/.9 var(--font-display);letter-spacing:-.055em;text-wrap:balance}.sk8-shared-line{width:clamp(80px,12vw,170px);height:1px;background:linear-gradient(90deg,transparent,var(--sk6-orange),transparent);transform-origin:center;animation:sk8SharedLine .45s var(--sk6-ease) both}@keyframes sk8SharedLine{from{scale:0 1;opacity:0}}
+
+/* DARK MODE — keep every new layer black + burnt orange */
+[data-theme="dark"] .sk8-hero-network{mix-blend-mode:screen}[data-theme="dark"] .sk8-network-lines path{stroke:rgba(232,138,85,.20)}[data-theme="dark"] .sk8-network-nodes circle{fill:#e28a55}
+[data-theme="dark"] .sk8-stage-btn{color:#9f8c7d}[data-theme="dark"] .sk8-stage-btn:hover,[data-theme="dark"] .sk8-stage-btn.active{color:#f0a675;background:rgba(200,98,42,.11)}
+[data-theme="dark"] .sk8-campus-depth{color:rgba(226,138,85,.17)}[data-theme="dark"] .sk8-campus-lights i{background:#e28a55;box-shadow:0 0 0 2px rgba(200,98,42,.10),0 0 17px rgba(226,138,85,.45)}
+[data-theme="dark"] .sk8-beacon-core{fill:#120b08;stroke:#e28a55}[data-theme="dark"] .sk8-beacon-star{fill:#e28a55}[data-theme="dark"] .sk8-beacon-halo{fill:rgba(200,98,42,.12);stroke:rgba(232,138,85,.44)}
+[data-theme="dark"] .sk8-card-signal i{background:#e28a55}[data-theme="dark"] .sk8-card-signal b{background:linear-gradient(90deg,rgba(232,138,85,.52),transparent)}
+[data-theme="dark"] .sk8-final-mark{color:rgba(226,138,85,.10)}[data-theme="dark"] .sk8-final-ring{border-color:rgba(232,138,85,.13)}
+[data-theme="dark"] .sk8-shared-ghost{background:linear-gradient(145deg,#0b0806,#160c08)!important;color:#f6eee8;border-color:rgba(232,138,85,.18);box-shadow:0 50px 150px rgba(0,0,0,.58)}[data-theme="dark"] .sk8-shared-ghost:before{color:rgba(226,138,85,.08)}
+
+/* PHONE / TABLET — keep the spectacle but remove costly nonessential layers */
+@media(max-width:760px){
+  .sk8-hero-network{opacity:.20}.sk8-network-lines path:nth-child(2n){display:none}.sk6-stage-index{display:none!important}
+  .sk8-campus-depth{width:142vw;right:-56vw;bottom:-1vh;opacity:.10}.sk8-campus-lights i:nth-child(even){display:none}.sk8-campus-lights.fit-lights{width:104vw;height:86vw;right:-38vw;opacity:.35}
+  .sk8-journey-beacon{display:none}.sk8-card-signal{top:58px;left:19px;opacity:.24}.sk6-tool-card:hover,.sk6-path-card:hover{scale:1}
+  .sk6-fit-stack:hover{scale:1}.sk6-fit-stack:hover .sk6-search-glass{transform:none}.sk6-fit-stack:hover .sk6-mini-card.m1{transform:rotate(4deg)}.sk6-fit-stack:hover .sk6-mini-card.m2{transform:rotate(-5deg)}
+  .sk8-final-mark{width:128vw;opacity:.09}.sk8-final-ring.b{display:none}.sk8-shared-ghost{display:none!important}
+}
+@media(max-width:390px){.sk8-hero-network{display:none}.sk8-campus-depth{display:none}.sk8-campus-lights i:nth-child(n+9){display:none}.sk8-card-signal{display:none}}
+
+@media(prefers-reduced-motion:reduce){
+  .sk8-network-lines path,.sk8-network-nodes circle,.sk8-campus-lights i,.sk8-beacon-halo,.sk8-beacon-star,.sk8-final-ring,.sk8-shared-line{animation:none!important}
+  .sk8-hero-network{opacity:.14}.sk8-campus-depth{opacity:.10;transform:none}.sk8-campus-lights{opacity:.35}.sk8-journey-beacon{display:none}.sk8-final-mark{opacity:.08;transform:translate(-50%,-50%)}
+  .sk6-tool-card:hover,.sk6-path-card:hover,.sk6-fit-stack:hover{scale:1}.sk8-shared-ghost{display:none!important}
+}
+html.sk6-paused .sk8-network-lines path,html.sk6-paused .sk8-network-nodes circle,html.sk6-paused .sk8-campus-lights i,html.sk6-paused .sk8-beacon-halo,html.sk6-paused .sk8-beacon-star,html.sk6-paused .sk8-final-ring{animation-play-state:paused!important}
+@media(forced-colors:active){.sk8-stage-btn{border:1px solid ButtonText}.sk8-stage-btn.active{outline:2px solid Highlight}.sk8-shared-ghost{border:1px solid CanvasText}.sk8-hero-network,.sk8-campus-depth,.sk8-campus-lights,.sk8-final-mark{display:none}}
