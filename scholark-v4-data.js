@@ -1,5 +1,23 @@
 /* Scholark V4 public-data layer.
    Sources are deliberately explicit so UI can distinguish source data from Scholark-derived planning metrics. */
+
+/* Fresh visits should always begin at the top of Scholark instead of inheriting a stale
+   browser scroll position from a previous session/reload. Keep real deep links intact. */
+(() => {
+  const shouldReset = () => !location.hash || location.hash === '#home';
+  const reset = () => {
+    if (!shouldReset()) return;
+    try { window.scrollTo(0, 0); } catch {}
+    const scroller = document.scrollingElement || document.documentElement;
+    if (scroller) scroller.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  };
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch {}
+  reset();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reset, {once:true});
+  window.addEventListener('pageshow', reset, {once:true});
+})();
+
 window.SCHOLARK_PUBLIC_DATA = {
   meta: {
     version: '2026.08',
@@ -112,6 +130,26 @@ window.SCHOLARK_PUBLIC_DATA = {
   };
   const wait = () => {
     if (window.ScholarkV56 || tries++ > 220) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
+})();
+
+/* Scholark V5.8 seam + scroll-position fix — waits for V5.7 so it can override the final composition cleanly. */
+(() => {
+  if (window.__scholarkV58LoaderInstalled) return;
+  window.__scholarkV58LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v58.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v58.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV57 || tries++ > 240) return load();
     setTimeout(wait, 30);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
