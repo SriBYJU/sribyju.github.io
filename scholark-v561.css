@@ -1,0 +1,55 @@
+/* Scholark V5.6.1 — stability layer.
+   Priority: preserve the cinematic experience without scroll jumps, delayed layout shifts,
+   accidental touch navigation, or HTML overflow resets. */
+
+/* Interactive sections must participate in layout from first paint. `content-visibility:auto`
+   plus a guessed intrinsic height can cause large anchor corrections in Safari when a section
+   becomes visible. The homepage is small enough that deterministic geometry is the safer choice. */
+.sk6-journey-section,
+.sk6-fit-scene,
+.sk6-tools-section,
+.sk6-final,
+.sk9-observatory{
+  content-visibility:visible!important;
+  contain-intrinsic-size:auto!important;
+}
+
+/* Layout containment around a very tall sticky scrollytelling scene is fragile on mobile Safari.
+   Keep style containment only; the expensive moving children are already compositor-driven. */
+.sk6-story{contain:style!important}
+
+/* Never change the root scrolling mode during the shared-element route animation. Toggling
+   html overflow is a common cause of iOS/Desktop Safari snapping the page to scrollY=0. */
+html.sk8-shared-transition,
+html.sk8-shared-transition body{
+  overflow-x:clip!important;
+  overflow-y:auto!important;
+}
+
+/* Make touch intent explicit: vertical swipes remain scroll gestures, while taps still work. */
+.sk6-tool-card,
+.sk6-path-card,
+.sk9-stage,
+.sk9-observatory{
+  touch-action:pan-y pinch-zoom!important;
+}
+
+/* Decorative layers must never become scroll anchors. */
+.sk6-grain,.sk6-world,.sk7-atmosphere,.sk7-hero-depth,.sk8-hero-network,
+.sk8-campus-depth,.sk8-campus-lights,.sk8-final-mark,.sk9-observatory-atmosphere,
+.sk9-speed-bloom,.sk9-stage-world{overflow-anchor:none}
+
+/* Stable anchor geometry for programmatic chapter / section navigation. */
+.sk6-proof-shell,.sk6-journey-section,.sk6-fit-scene,.sk9-observatory,.sk6-tools-section,.sk6-final{
+  scroll-margin-top:72px;
+}
+
+/* Avoid an expensive filter spike while the user is actively scrolling on mobile. */
+@media(max-width:760px){
+  .sk6-portal-object{filter:drop-shadow(0 22px 34px rgba(91,34,9,.18))!important}
+  .sk9-panel{backdrop-filter:blur(10px)!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+}
