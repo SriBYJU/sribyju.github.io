@@ -1,0 +1,72 @@
+/* Scholark V5.8 — closing-scene continuity + load-position hardening.
+   This layer removes the oversized dead-air spacer between the cinematic campus scene
+   and the final Scholark statement, while preserving the V5.7 composition. */
+
+body.scholark-v58 .sk10-final-upgraded{
+  min-height:auto!important;
+  background:var(--sk6-paper)!important;
+}
+
+/* Let the cinematic scene dissolve into the final statement instead of ending in a hard block. */
+body.scholark-v58 .sk10-closing-stage{
+  background:linear-gradient(180deg,#fffaf3 0%,#f9efe5 48%,#ead6c4 82%,var(--sk6-paper) 100%)!important;
+}
+body.scholark-v58 .sk10-closing-stage:after{
+  background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 46%,rgba(111,53,24,.045) 78%,transparent 100%)!important;
+}
+
+/* V5.7 intentionally reserved ~36vh here. On real laptop viewports it reads as a giant blank gap.
+   Pull the brand lockup to the seam and let the next scene begin immediately underneath it. */
+body.scholark-v58 .sk10-brand-lockup{
+  bottom:-3.5vh!important;
+  z-index:7;
+}
+body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner{
+  margin:0 auto 9vh!important;
+  padding:10vh 24px 5vh!important;
+}
+
+/* Make the seam itself feel intentional and continuous. */
+body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  width:min(74vw,900px);
+  height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,rgba(200,98,42,.20),transparent);
+  opacity:.62;
+  pointer-events:none;
+}
+
+[data-theme="dark"] body.scholark-v58 .sk10-closing-stage{
+  background:linear-gradient(180deg,#0b0806 0%,#100b08 46%,#1b0e09 82%,#0c0907 100%)!important;
+}
+[data-theme="dark"] body.scholark-v58 .sk10-closing-stage:after{
+  background:linear-gradient(180deg,rgba(255,255,255,.01),transparent 45%,rgba(0,0,0,.16) 78%,transparent 100%)!important;
+}
+[data-theme="dark"] body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner:before{
+  background:linear-gradient(90deg,transparent,rgba(232,138,85,.22),transparent);
+}
+
+@media(max-width:980px){
+  body.scholark-v58 .sk10-brand-lockup{bottom:-3vh!important}
+  body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner{margin-top:0!important;padding-top:9vh!important}
+}
+
+@media(max-width:760px){
+  body.scholark-v58 .sk10-brand-lockup{bottom:-2.5vh!important}
+  body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner{margin:0 auto 7vh!important;padding:8vh 12px 3vh!important}
+  body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner:before{width:82vw}
+}
+
+@media(max-width:480px){
+  body.scholark-v58 .sk10-brand-lockup{bottom:-2vh!important}
+  body.scholark-v58 .sk10-final-upgraded>.sk6-final-inner{margin-top:0!important;padding-top:7vh!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body.scholark-v58 .sk10-closing-stage{background:var(--sk6-paper)!important}
+  [data-theme="dark"] body.scholark-v58 .sk10-closing-stage{background:#0c0907!important}
+}
