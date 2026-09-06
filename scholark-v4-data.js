@@ -42,3 +42,23 @@ window.SCHOLARK_PUBLIC_DATA = {
     ]
   }
 };
+
+/* Scholark V5 loader: wait for the V4 workspace to finish, then layer the cinematic home on top. */
+(() => {
+  if (window.__scholarkV5LoaderInstalled) return;
+  window.__scholarkV5LoaderInstalled = true;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v5.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v5.js';
+    s.defer = true;
+    document.body.appendChild(s);
+  };
+  let tries = 0;
+  const waitForV4 = () => {
+    if (window.ScholarkV4 || tries++ > 80) return load();
+    setTimeout(waitForV4, 25);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitForV4, {once:true});
+  else waitForV4();
+})();
