@@ -38,7 +38,7 @@ window.SCHOLARK_PUBLIC_DATA = {
       'Institution-wide averages can hide large differences by major, residency, aid, demographic group and credential level.',
       'Median occupational pay describes workers in an occupation, not guaranteed starting salary for a new graduate.',
       'Some BLS opening counts are published at grouped occupation levels; Scholark labels grouped values where applicable.',
-      'Students should verify current cost, admissions, aid and program information on official institution and government sites before making decisions.'
+      'Students should verify current cost, admissions, aid, and program information on official institution and government sites before making decisions.'
     ]
   }
 };
@@ -56,4 +56,24 @@ window.SCHOLARK_PUBLIC_DATA = {
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load, {once:true});
   else load();
+})();
+
+/* Scholark V5.5 premium interaction loader — waits for V5.4 so its atmospheric DOM exists first. */
+(() => {
+  if (window.__scholarkV55LoaderInstalled) return;
+  window.__scholarkV55LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v55.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v55.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV54 || tries++ > 150) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
 })();
