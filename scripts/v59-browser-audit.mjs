@@ -55,25 +55,29 @@ async function desktopAudit(browser) {
   assert.ok(state.overflow <= 4, `desktop horizontal overflow is ${state.overflow}px`);
 
   await dismissConsent(page);
+
+  // Logged-out users are intentionally gated from account-linked GPA Goals.
+  // The bridge must either open Goals for an authenticated session or surface the sign-in dialog.
   const goalButton = page.locator('.sk12-continuity button[data-page="goals"]').first();
   assert.equal(await goalButton.count(), 1, 'GPA goal bridge action should exist');
   await goalButton.scrollIntoViewIfNeeded();
   await goalButton.click();
-  await page.waitForTimeout(350);
-  let routeState = await page.evaluate(() => ({
-    active:document.querySelector('.page.active')?.id || '',
+  await page.waitForTimeout(250);
+  const goalRouteState = await page.evaluate(() => ({
     goals:document.querySelector('#page-goals')?.classList.contains('active') || false,
-    hash:location.hash
+    authOpen:document.querySelector('#authModal')?.classList.contains('open') || document.querySelector('#authModal')?.style.display === 'flex',
+    active:document.querySelector('.page.active')?.id || ''
   }));
-  if (!routeState.goals) {
-    const diagnostic = await page.evaluate(() => {
-      const result = window.ScholarkV59.route('goals');
-      return {result, goalsExists:!!document.querySelector('#page-goals'), showPageType:typeof window.showPage};
-    });
-    await page.waitForTimeout(200);
-    routeState = await page.evaluate(() => ({active:document.querySelector('.page.active')?.id || '',goals:document.querySelector('#page-goals')?.classList.contains('active')||false,hash:location.hash}));
-    assert.fail(`bridge click did not open Goals. clickState=${JSON.stringify(routeState)} directDiagnostic=${JSON.stringify(diagnostic)}`);
-  }
+  assert.ok(goalRouteState.goals || goalRouteState.authOpen, `Goals action should open Goals or the intentional auth gate: ${JSON.stringify(goalRouteState)}`);
+  if (goalRouteState.authOpen) await page.evaluate(() => window.closeAuth?.());
+  await page.evaluate(() => window.showPage?.('home'));
+
+  // College Intelligence is public and must route directly from the new continuity scene.
+  const publicButton = page.locator('.sk12-continuity button[data-page="intelligence"]').first();
+  assert.equal(await publicButton.count(), 1, 'College Intelligence bridge action should exist');
+  await publicButton.scrollIntoViewIfNeeded();
+  await publicButton.click();
+  await page.waitForFunction(() => document.querySelector('#page-intelligence')?.classList.contains('active'), null, {timeout:5000});
   await page.evaluate(() => window.showPage?.('home'));
 
   await page.evaluate(() => document.documentElement.dataset.theme='dark');
@@ -126,7 +130,7 @@ try {
   await desktopAudit(browser);
   await mobileAudit(browser);
   await reducedMotionAudit(browser);
-  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, routes, non-commercial identity, ad removal, and reduced-motion behavior.');
+  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, public routes/auth gates, non-commercial identity, ad removal, and reduced-motion behavior.');
 } finally {
   await browser.close();
 }
