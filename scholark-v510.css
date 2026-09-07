@@ -1,172 +1,96 @@
-/* ScholarK V5.10 — hard layout + mobile stability hotfix.
-   Purpose: remove every legacy circular/orbit filler, make the route scene fit normal laptop widths,
-   and dramatically simplify the cinematic stack on phones to prevent WebKit memory reloads. */
+/* ScholarK V5.10.1 — hard layout + iPhone stability hotfix.
+   Removes all rejected circle/orbit decoration, prevents the closing scene from overlapping on phones,
+   and reduces mobile compositor/memory pressure without changing the desktop tool functionality. */
 
-/* Kill the legacy circular/orbit fillers the user explicitly rejected. */
+/* Never render the rejected orbit/circle scenes. */
 .sk6-orbit-scene,
 .sk6-orbit,
 .sk11-orbit-shell,
 .sk11-orbit-lines,
+.sk11-core,
+.sk11-orbit-dot,
 .sk13-orbit,
 .sk6-final-halo,
 .sk9-observatory,
 .sk9-orbit-line{display:none!important}
 
-/* Make the "From what now? to what's next." handoff impossible to clip. */
-.sk13-flightdeck{
-  width:100%!important;
-  max-width:none!important;
-  margin:0!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-.sk13-flight-inner{
-  width:min(1180px,calc(100% - 72px))!important;
-  max-width:1180px!important;
-  margin-inline:auto!important;
-  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;
-  gap:clamp(32px,5vw,72px)!important;
-  box-sizing:border-box!important;
-}
-.sk13-flight-copy{min-width:0!important;padding-inline:clamp(0px,1.2vw,16px)!important}
-.sk13-flight-copy h4{
-  max-width:560px!important;
-  font-size:clamp(44px,5vw,78px)!important;
-  line-height:.9!important;
-  letter-spacing:-.05em!important;
-  overflow-wrap:normal!important;
-  word-break:normal!important;
-  hyphens:none!important;
-}
-.sk13-flight-copy p{max-width:540px!important}
-.sk13-map{min-width:0!important;width:100%!important}
+/* V5.8 also drew large circular pseudo-elements even after the orbit DOM was removed. */
+.sk11-next-move::before,
+.sk11-next-move::after,
+.sk6-final::before,
+.sk10-final-upgraded::before{display:none!important;content:none!important}
 
-/* The next-move scene is a route board, never a circle. */
-.sk11-next-move-linear .sk11-bridge-inner{align-items:stretch!important}
-.sk11-route-rail{min-width:0!important}
-.sk11-route-node{min-width:0!important}
+/* Keep the next-move board dense instead of leaving decorative empty space. */
+body.scholark-v58 .sk6-tools-section{min-height:0!important;height:auto!important;padding-bottom:clamp(36px,5vw,72px)!important;overflow:hidden}
+body.scholark-v58 .sk10-final-upgraded{margin-top:0!important}
+body.scholark-v58 .sk11-next-move{margin-bottom:0!important}
+body.scholark-v58 .sk11-next-move-linear{max-width:1450px!important;min-height:0!important;margin:clamp(38px,6vh,76px) auto 0!important;overflow:hidden!important}
+body.scholark-v58 .sk11-next-move-linear .sk11-bridge-inner{min-height:0!important;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr)!important;gap:clamp(30px,5vw,70px)!important;padding:clamp(34px,4.5vw,68px)!important}
+.sk11-route-rail{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-self:stretch;align-content:center;padding:8px;isolation:isolate}
+.sk11-route-rail:before{content:"";position:absolute;left:12%;right:12%;top:50%;height:2px;z-index:-2;background:linear-gradient(90deg,transparent,rgba(200,98,42,.18),rgba(200,98,42,.55),rgba(200,98,42,.18),transparent);transform:translateY(-50%)}
+.sk11-route-rail:after{content:"S";position:absolute;left:50%;top:50%;z-index:-3;translate:-50% -50%;font:italic 800 clamp(160px,20vw,330px)/1 var(--font-display,'Playfair Display',serif);color:rgba(200,98,42,.045);pointer-events:none}
+.sk11-route-node{position:relative;min-height:132px;padding:18px;border:1px solid rgba(200,98,42,.15);border-radius:22px;background:rgba(255,253,248,.72);backdrop-filter:blur(14px);box-shadow:0 18px 48px rgba(69,39,23,.08);display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto auto;gap:5px 10px;text-align:left;color:var(--sk6-ink,#1a1714);cursor:pointer;transition:transform .28s var(--sk6-ease),border-color .28s ease,box-shadow .28s ease,background .28s ease}
+.sk11-route-node>span{grid-row:1/4;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(200,98,42,.08);color:var(--sk6-orange,#c8622a);font:800 9px var(--font-body,Outfit,sans-serif);letter-spacing:.06em}
+.sk11-route-node>b{position:absolute;right:14px;top:13px;font:600 17px var(--font-display,'Playfair Display',serif);color:var(--sk6-orange,#c8622a)}
+.sk11-route-node>strong{align-self:end;font:750 12px/1.2 var(--font-body,Outfit,sans-serif)}
+.sk11-route-node>small{font:500 9px/1.35 var(--font-body,Outfit,sans-serif);color:var(--sk6-ink-3,#7e746a)}
+.sk11-route-node:hover{transform:translateY(-4px);border-color:rgba(200,98,42,.34);box-shadow:0 25px 62px rgba(69,39,23,.13)}
+.sk11-route-node.is-active{background:linear-gradient(145deg,var(--sk6-orange,#c8622a),var(--sk6-orange-deep,#963c19));border-color:transparent;box-shadow:0 25px 65px rgba(150,60,25,.22);color:#fff8f1}
+.sk11-route-node.is-active>span{background:rgba(255,255,255,.14);color:#ffe0c8}.sk11-route-node.is-active>b,.sk11-route-node.is-active>small{color:#ffe0c8}
+.sk11-route-node:focus-visible{outline:3px solid rgba(200,98,42,.28);outline-offset:3px}
+.sk11-route-beam{position:absolute;z-index:-1;left:8%;right:8%;top:50%;height:86%;translate:0 -50%;border-radius:36px;background:linear-gradient(90deg,transparent,rgba(226,138,85,.08),rgba(226,138,85,.12),rgba(226,138,85,.08),transparent);pointer-events:none}
 
-/* Stack before a MacBook-sized viewport gets cramped. */
+/* Full-width cinematic handoff: fitted to normal laptops and never clipped. */
+.sk13-flightdeck{position:relative;width:100%!important;max-width:none!important;min-height:clamp(620px,78vh,980px);margin:0!important;overflow:hidden!important;isolation:isolate;background:linear-gradient(180deg,#f8eee4 0%,#f1dcc9 34%,#e7c0a3 68%,#c96533 100%);border-block:1px solid rgba(200,98,42,.12);color:#1a1714;box-sizing:border-box!important}
+.sk13-flight-inner{position:relative;z-index:3;width:min(1180px,calc(100% - 72px))!important;max-width:1180px!important;min-height:inherit;margin-inline:auto!important;padding:clamp(68px,8vh,110px) 0;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;gap:clamp(32px,5vw,72px)!important;align-items:center;box-sizing:border-box!important}
+.sk13-flight-copy{min-width:0!important;padding-inline:clamp(0px,1.2vw,16px)!important}.sk13-flight-copy h4{max-width:560px!important;font-size:clamp(44px,5vw,78px)!important;line-height:.9!important;letter-spacing:-.05em!important;overflow-wrap:normal!important;word-break:normal!important;hyphens:none!important}.sk13-flight-copy p{max-width:540px!important}.sk13-map{min-width:0!important;width:100%!important}
+.sk13-orbit{display:none!important}
+
+[data-theme="dark"] .sk11-route-node{background:rgba(22,14,10,.70);border-color:rgba(232,138,85,.14);color:#f7eee8}[data-theme="dark"] .sk11-route-node>small{color:#aa9181}
+
 @media(max-width:1280px){
-  .sk13-flight-inner{
-    grid-template-columns:1fr!important;
-    width:min(900px,calc(100% - 48px))!important;
-    gap:34px!important;
-    padding-block:58px!important;
-  }
-  .sk13-flight-copy{text-align:center!important;padding-inline:0!important}
-  .sk13-flight-copy h4{max-width:760px!important;margin-inline:auto!important;font-size:clamp(48px,7vw,72px)!important}
-  .sk13-flight-copy p{margin-inline:auto!important}
-  .sk13-flight-tags{justify-content:center!important}
-  .sk13-map{min-height:430px!important}
+  .sk13-flight-inner{grid-template-columns:1fr!important;width:min(900px,calc(100% - 48px))!important;gap:34px!important;padding-block:58px!important}
+  .sk13-flight-copy{text-align:center!important;padding-inline:0!important}.sk13-flight-copy h4{max-width:760px!important;margin-inline:auto!important;font-size:clamp(48px,7vw,72px)!important}.sk13-flight-copy p{margin-inline:auto!important}.sk13-flight-tags{justify-content:center!important}.sk13-map{min-height:430px!important}
 }
 
-/* Phone: use a stable one-screen intro instead of a 5–6 viewport sticky animation stack. */
+@media(max-width:1100px){
+  body.scholark-v58 .sk11-next-move-linear .sk11-bridge-inner{grid-template-columns:1fr!important}
+  .sk11-route-rail{grid-template-columns:repeat(4,minmax(0,1fr))}.sk11-route-node{min-height:118px;grid-template-columns:1fr;padding:15px}.sk11-route-node>span{grid-row:auto;width:30px;height:30px}.sk11-route-node>b{right:12px;top:11px}.sk11-route-node>small{display:none}
+}
+
+/* iPhone/mobile: normal document flow, no overlapping absolute desk/brand, no giant sticky stack. */
 @media(max-width:760px){
   html,body{overscroll-behavior-y:auto!important}
   body.scholark-v5 #page-home.sk5-home{overflow-x:hidden!important;overflow-y:visible!important}
-  .sk6-story{
-    height:auto!important;
-    min-height:100svh!important;
-    contain:none!important;
-  }
-  .sk6-sticky{
-    position:relative!important;
-    top:auto!important;
-    height:100svh!important;
-    min-height:620px!important;
-    max-height:820px!important;
-    overflow:hidden!important;
-    perspective:none!important;
-  }
-  .sk6-through-copy,
-  .sk6-wave-scene,
-  .sk6-orbit-scene,
-  .sk6-exit-copy,
-  .sk6-progress,
-  .sk9-observatory,
-  .sk6-grain{display:none!important}
-  .sk6-world,
-  .sk6-portal-stage,
-  .sk6-campus-wrap,
-  .sk6-book-stack,
-  .sk6-float-card,
-  .sk6-fit-bg,
-  .sk10-closing-stage,
-  .sk12-path-scene,
-  .sk13-flightdeck:before{
-    will-change:auto!important;
-  }
-  .sk6-cloud,
-  .sk7-cross-cloud,
-  .sk10-close-cloud,
-  .sk12-cloud,
-  .sk13-cloud,
-  .sk13-route:after{animation:none!important}
-  .sk6-float-card,
-  .sk6-search-glass,
-  .sk6-mini-card,
-  .sk10-close-card,
-  .sk11-status,
-  .sk11-route-node,
-  .sk12-project-status,
-  .sk13-stop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 
-  .sk13-flight-inner{
-    width:calc(100% - 28px)!important;
-    padding:44px 0 38px!important;
-    gap:24px!important;
-  }
-  .sk13-flight-copy h4{
-    max-width:100%!important;
-    font-size:clamp(42px,12.5vw,60px)!important;
-    line-height:.94!important;
-    letter-spacing:-.045em!important;
-    margin:15px auto 16px!important;
-  }
-  .sk13-flight-copy p{font-size:13px!important;line-height:1.58!important}
-  .sk13-flight-tags{margin-top:18px!important}
-  .sk13-map{
-    min-height:0!important;
-    grid-template-columns:1fr!important;
-    grid-template-rows:auto!important;
-    padding:16px!important;
-    gap:9px!important;
-    border-radius:24px!important;
-  }
-  .sk13-center{grid-column:1!important;min-height:82px!important;padding:13px 16px!important;border-radius:18px!important}
-  .sk13-center b{font-size:48px!important}
-  .sk13-stop{padding:12px 13px!important}
-  .sk13-route,.sk13-campus{display:none!important}
+  .sk6-story{height:auto!important;min-height:100svh!important;contain:none!important}
+  .sk6-sticky{position:relative!important;top:auto!important;height:100svh!important;min-height:620px!important;max-height:820px!important;overflow:hidden!important;perspective:none!important}
+  .sk6-through-copy,.sk6-wave-scene,.sk6-orbit-scene,.sk6-exit-copy,.sk6-progress,.sk9-observatory,.sk6-grain{display:none!important}
+  .sk6-cloud,.sk7-cross-cloud,.sk10-close-cloud,.sk12-cloud,.sk13-cloud,.sk13-route:after{animation:none!important}
+  .sk6-float-card,.sk6-search-glass,.sk6-mini-card,.sk10-close-card,.sk11-status,.sk11-route-node,.sk12-project-status,.sk13-stop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 
-  .sk11-next-move-linear{margin-top:26px!important;border-radius:24px!important}
-  .sk11-next-move-linear .sk11-bridge-inner{padding:28px 14px!important;gap:22px!important}
-  .sk11-bridge-copy h3{font-size:clamp(42px,11vw,58px)!important}
-  .sk11-route-rail{grid-template-columns:1fr!important;gap:8px!important}
-  .sk11-route-node{min-height:86px!important;padding:13px!important}
-  .sk11-status{grid-template-columns:38px 1fr!important;padding:14px!important}
-  .sk11-open{grid-column:1/-1!important;width:100%!important}
+  /* Closing scene from the screenshot: all content now participates in normal flow. */
+  .sk10-final-upgraded{min-height:0!important;display:block!important}
+  .sk10-closing-stage{min-height:0!important;height:auto!important;padding:56px 14px 36px!important;overflow:hidden!important}
+  .sk10-closing-content{display:block!important;max-width:620px!important;margin:0 auto!important}
+  .sk10-closing-copy{text-align:center!important;padding-top:0!important}.sk10-closing-copy h3{font-size:clamp(44px,12vw,60px)!important;line-height:.93!important;margin:14px 0 16px!important}.sk10-closing-copy p{font-size:13px!important;line-height:1.58!important;margin-inline:auto!important}
+  .sk10-close-grid{grid-template-columns:1fr!important;gap:10px!important;margin-top:26px!important;max-width:none!important}
+  .sk10-close-card{min-height:94px!important;padding:14px!important;grid-template-columns:38px minmax(0,1fr)!important;align-items:center!important}.sk10-close-card>b{display:none!important}.sk10-close-icon{width:38px!important;height:38px!important}.sk10-close-card strong{font-size:13px!important}.sk10-close-card small{font-size:10px!important;margin-top:4px!important}
+  .sk10-closing-sky,.sk10-close-desk,.sk10-campus-back,.sk10-campus-lights,.sk10-close-tree,.sk10-close-cloud{display:none!important}
+  .sk10-brand-lockup{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;translate:none!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:12px!important;min-width:0!important;width:100%!important;margin:28px auto 0!important;padding:18px 8px 0!important;z-index:2!important}
+  .sk10-brand-lockup img{width:44px!important;height:44px!important}.sk10-brand-lockup strong{font-size:31px!important}.sk10-brand-lockup span{font-size:7px!important;white-space:normal!important}
+  .sk10-final-upgraded>.sk6-final-inner{position:relative!important;margin:0 auto!important;padding:58px 16px 54px!important;width:min(100%,680px)!important}.sk10-final-upgraded>.sk6-final-inner h2{font-size:clamp(44px,12vw,64px)!important}
 
-  /* Stop offscreen layout virtualization from changing page geometry mid-scroll in Safari. */
-  .sk6-experience section,
-  .sk6-experience [class*="sk7-"],
-  .sk6-experience [class*="sk8-"],
-  .sk6-experience [class*="sk10-"],
-  .sk6-experience [class*="sk11-"],
-  .sk6-experience [class*="sk12-"],
-  .sk6-experience [class*="sk13-"]{
-    content-visibility:visible!important;
-    contain-intrinsic-size:auto!important;
-  }
+  /* Keep the next-move picker compact. */
+  .sk11-next-move-linear{margin-top:26px!important;border-radius:24px!important}.sk11-next-move-linear .sk11-bridge-inner{padding:28px 14px!important;gap:22px!important}.sk11-bridge-copy h3{font-size:clamp(42px,11vw,58px)!important}.sk11-route-rail{grid-template-columns:1fr!important;gap:8px!important;padding:0!important}.sk11-route-node{min-height:86px!important;padding:13px!important}.sk11-status{grid-template-columns:38px 1fr!important;padding:14px!important}.sk11-open{grid-column:1/-1!important;width:100%!important}
+
+  /* The desktop-only cinematic handoff is removed on touch devices by JS; hide it as a CSS fallback. */
+  body.scholark-mobile-lite .sk13-flightdeck,body.scholark-mobile-lite .sk12-continuity{display:none!important}
+
+  /* Avoid Safari recalculating offscreen geometry while scrolling. */
+  .sk6-experience section,.sk6-experience [class*="sk7-"],.sk6-experience [class*="sk8-"],.sk6-experience [class*="sk10-"],.sk6-experience [class*="sk11-"],.sk6-experience [class*="sk12-"],.sk6-experience [class*="sk13-"]{content-visibility:visible!important;contain-intrinsic-size:auto!important;will-change:auto!important}
 }
 
-@media(max-width:390px){
-  .sk13-flight-copy h4{font-size:42px!important}
-  .sk13-flight-inner{width:calc(100% - 22px)!important}
-  .sk11-next-move-linear .sk11-bridge-inner{padding-inline:11px!important}
-}
+@media(max-width:390px){.sk10-closing-stage{padding-inline:11px!important}.sk10-brand-lockup strong{font-size:28px!important}.sk13-flight-copy h4{font-size:42px!important}.sk11-next-move-linear .sk11-bridge-inner{padding-inline:11px!important}}
 
-@media(prefers-reduced-motion:reduce){
-  .sk6-story{height:auto!important;min-height:100svh!important}
-  .sk6-sticky{position:relative!important}
-}
+@media(prefers-reduced-motion:reduce){.sk6-story{height:auto!important;min-height:100svh!important}.sk6-sticky{position:relative!important}}
