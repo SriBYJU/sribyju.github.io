@@ -8,6 +8,7 @@
   const reduce=matchMedia('(prefers-reduced-motion: reduce)');
   const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
   const q=(s,r=document)=>r.querySelector(s);
+  const dynamicPages=new Set(['intelligence','careers','methodology']);
 
   const tools=[
     ['01','GPA Calculator','Semester and cumulative GPA with instant feedback.','tools','gpa'],
@@ -29,13 +30,14 @@
       q('.skm-tools')?.scrollIntoView({behavior:reduce.matches?'auto':'smooth',block:'start'});
       return;
     }
+    if(dynamicPages.has(page)) window.ScholarkV3?.ensureV4?.().catch?.(()=>{});
     const attempt=(n=0)=>{
       if(typeof window.showPage==='function'&&document.getElementById('page-'+page)){
         window.showPage(page);
         queueMicrotask(()=>{ if(tab) window.switchTab?.(tab); });
         return;
       }
-      if(n<70) return setTimeout(()=>attempt(n+1),40);
+      if(n<90) return setTimeout(()=>attempt(n+1),40);
       window.showToast?.('That section is still loading. Please try again in a moment.','info');
     };
     attempt();
@@ -130,7 +132,7 @@
       addEventListener('orientationchange',()=>setTimeout(()=>{measure();request()},140),{passive:true});
       request();
     }
-    window.ScholarkMobile={version:'1.0.0',refresh:request,measure,get progress(){return clamp((scrollY-start)/range)}};
+    window.ScholarkMobile={version:'1.0.1',refresh:request,measure,get progress(){return clamp((scrollY-start)/range)}};
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>boot(),{once:true}); else boot();
