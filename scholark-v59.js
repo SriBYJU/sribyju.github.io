@@ -3,7 +3,7 @@
   if (window.__scholarkV59Installed) return;
   window.__scholarkV59Installed = true;
 
-  const VERSION = '5.9.0';
+  const VERSION = '5.9.1';
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
@@ -49,7 +49,7 @@
     return `<div class="sk12-project-status ${extraClass}">
       <div class="sk12-status-mark" aria-hidden="true">S</div>
       <div><strong>Independent educational project — not a company</strong>
-      <p>Scholark is an independent, student-built, non-commercial educational project. It is not an incorporated company, business, employer, or revenue-generating operation, and it does not sell paid access or services. The platform exists to provide free educational planning and academic-support tools for students. <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a></p></div>
+      <p>Scholark is an independent, student-built, non-commercial educational project. It is not an incorporated company, business, employer, or revenue-generating operation, and it does not sell paid access or services. The platform exists to provide free educational planning and academic-support tools for students. <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="security.html">Security</a></p></div>
     </div>`;
   }
 
@@ -122,7 +122,7 @@
         copy:'Your academic plan, college research, test preparation, and writing should feel like one connected path — not four disconnected websites.',
         actions:[
           {label:'Set a GPA goal',page:'goals'},
-          {label:'Compare colleges',page:'intelligence'},
+          {label:'Compare colleges',page:'compare'},
           {label:'Plan applications',page:'apps'}
         ]
       });
