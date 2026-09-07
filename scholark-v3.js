@@ -1,7 +1,7 @@
 (() => {
   'use strict';
-  const VERSION='3.2.0';
-  const BUILD='561';
+  const VERSION='3.3.0';
+  const BUILD='5100';
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
   const DYNAMIC_PAGES=new Set(['intelligence','careers','methodology']);
@@ -23,28 +23,52 @@
     if(document.querySelector(`link[href*="${file}"]`))return;
     const l=document.createElement('link');l.rel='stylesheet';l.href=`${file}?build=${BUILD}`;(document.head||document.documentElement).appendChild(l);
   };
-  ['scholark-v53.css','scholark-v54.css','scholark-v55.css','scholark-v56.css','scholark-v561.css'].forEach(ensureStylesheet);
+  [
+    'scholark-v53.css','scholark-v54.css','scholark-v55.css',
+    'scholark-v57.css','scholark-v58.css','scholark-v59.css',
+    'scholark-gapfill.css','scholark-v510.css'
+  ].forEach(ensureStylesheet);
 
   const loadScript=src=>new Promise((resolve,reject)=>{
-    const existing=document.querySelector(`script[src="${src}"]`);
+    const existing=[...document.scripts].find(s=>s.src&&s.src.includes(src.split('?')[0]));
     if(existing){if(existing.dataset.loaded==='true'||existing.readyState==='complete')return resolve();existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
     const s=document.createElement('script');s.src=src;s.defer=true;s.addEventListener('load',()=>{s.dataset.loaded='true';resolve();},{once:true});s.addEventListener('error',()=>reject(new Error(`Could not load ${src}`)),{once:true});(document.head||document.documentElement).appendChild(s);
   });
 
-  /* Disable the old timer-based enhancement loaders inside scholark-v4-data.js. V5.6.1 loads
-     every visual layer deterministically below, before a user can scroll into late layout shifts. */
+  /* Own every late enhancement loader here. V4-data previously started V5.7–V5.9 on timers,
+     which let large DOM sections appear after a phone user had already started scrolling. */
   window.__scholarkV54LoaderInstalled=true;
   window.__scholarkV55LoaderInstalled=true;
   window.__scholarkV56LoaderInstalled=true;
+  window.__scholarkV57LoaderInstalled=true;
+  window.__scholarkV58LoaderInstalled=true;
+  window.__scholarkV59LoaderInstalled=true;
 
-  loadScript(`scholark-v53.js?build=${BUILD}`)
+  /* V5.6's large orbit/observatory and V5.6.1's mutation scroll-restorer are intentionally
+     omitted. They were the remaining circular scene and the last code path that could
+     programmatically reposition a scrolling phone. */
+  const cinematicReady = loadScript(`scholark-v53.js?build=${BUILD}`)
     .then(()=>loadScript(`scholark-v54.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v55.js?build=${BUILD}`))
-    .then(()=>loadScript(`scholark-v56.js?build=${BUILD}`))
-    .then(()=>loadScript(`scholark-v561.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v57.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v58.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v59.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v510.js?build=${BUILD}`))
     .catch(err=>{console.error('Scholark cinematic loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
 
-  loadScript(`scholark-v4-data.js?build=${BUILD}`).then(()=>loadScript(`scholark-v4.js?build=${BUILD}`)).catch(err=>console.error('Scholark V4 loader failed:',err));
+  /* V4 is useful, but it contains legacy start-at-top code. Loading it only when a V4 page is
+     requested means its one-time pageshow listener is registered after the initial pageshow and
+     can no longer interrupt normal homepage scrolling. */
+  let v4Promise=null;
+  function ensureV4(){
+    if(window.ScholarkV4)return Promise.resolve(window.ScholarkV4);
+    if(v4Promise)return v4Promise;
+    v4Promise=loadScript(`scholark-v4-data.js?build=${BUILD}`)
+      .then(()=>loadScript(`scholark-v4.js?build=${BUILD}`))
+      .then(()=>window.ScholarkV4||true)
+      .catch(err=>{v4Promise=null;console.error('Scholark V4 loader failed:',err);throw err;});
+    return v4Promise;
+  }
 
   function markReady(){document.body?.classList.add('scholark-v3');document.documentElement.dataset.scholarkBaseUi=VERSION;}
   function hardenButtons(){
@@ -62,16 +86,29 @@
   function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=document.querySelector('#page-home>.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
 
   function scrollFeatures(){const target=document.querySelector('.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return true}return false;}
-  function waitForDynamic(name,original,args){const started=performance.now();const retry=()=>{const target=document.getElementById('page-'+name);if(target){try{return original.call(window,name,...args)}catch(err){console.error('showPage failed:',err);return false}}if(performance.now()-started<2600)return setTimeout(retry,40);toast('That section is still loading. Please try again in a moment.','info');};retry();return true;}
+  function waitForDynamic(name,original,args){
+    const started=performance.now();
+    ensureV4().catch(()=>{});
+    const retry=()=>{const target=document.getElementById('page-'+name);if(target){try{return original.call(window,name,...args)}catch(err){console.error('showPage failed:',err);return false}}if(performance.now()-started<5000)return setTimeout(retry,40);toast('That section is still loading. Please try again in a moment.','info');};
+    retry();return true;
+  }
   function installNavigationGuards(){
     if(typeof window.showPage==='function'&&!window.showPage.__sk3){const original=window.showPage;const wrapped=function(name,...args){if(name==='features')return scrollFeatures();const target=document.getElementById('page-'+name);if(!target){if(DYNAMIC_PAGES.has(name))return waitForDynamic(name,original,args);toast('That section is still loading. Please try again in a moment.','info');return false;}let result;try{return result=original.call(this,name,...args),result!==false&&(saveLastPage(name),(()=>{try{history.replaceState(null,'','#'+encodeURIComponent(name))}catch{}})(),queueMicrotask(()=>{restoreFields(target);hardenButtons();hardenModals();})),result}catch(err){console.error('showPage failed:',err);toast('That section could not open. Your work is still safe.','error');return false}};wrapped.__sk3=true;window.showPage=wrapped;}
     if(typeof window.switchTab==='function'&&!window.switchTab.__sk3){const original=window.switchTab;const wrapped=function(tab,btn,...rest){if(!document.getElementById('tab-'+tab)){toast('That calculator is still loading.','info');return false}try{const out=original.call(this,tab,btn,...rest);safeSet('last-tool-tab',tab);queueMicrotask(()=>restoreFields(document.getElementById('tab-'+tab)));return out}catch(err){console.error('switchTab failed:',err);toast('That calculator could not open.','error');return false}};wrapped.__sk3=true;window.switchTab=wrapped;}
   }
-  function restoreRoute(){const raw=decodeURIComponent(location.hash.replace(/^#/,''));if(!raw||raw==='home'||EXCLUDED_PAGES.has(raw))return;if(document.getElementById('page-'+raw)&&typeof window.showPage==='function')window.showPage(raw);}
+  function restoreRoute(){
+    const raw=decodeURIComponent(location.hash.replace(/^#/,''));
+    if(!raw||raw==='home'||EXCLUDED_PAGES.has(raw))return;
+    if(DYNAMIC_PAGES.has(raw)&&!document.getElementById('page-'+raw)){
+      ensureV4().then(()=>{if(typeof window.showPage==='function'&&document.getElementById('page-'+raw))window.showPage(raw);}).catch(()=>{});
+      return;
+    }
+    if(document.getElementById('page-'+raw)&&typeof window.showPage==='function')window.showPage(raw);
+  }
   function installKeyboard(){document.addEventListener('keydown',e=>{if(e.key==='Escape'){const modal=document.querySelector('.modal-overlay.open');if(modal&&typeof window.closeAuth==='function')window.closeAuth();document.querySelector('.profile-dropdown.open')?.classList.remove('open');if(typeof window.closeMobileNav==='function')window.closeMobileNav();}if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||'')){const search=[...document.querySelectorAll('input[type=search],input[placeholder*="Search" i]')].find(visible);if(search){e.preventDefault();search.focus();}}});}
   function installMutationRepair(){let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;hardenButtons();hardenModals();restoreFields();});});observer.observe(document.body,{subtree:true,childList:true});}
   function patchKnownEdgeCases(){if(typeof window.calcGoalProjection==='function'&&!window.calcGoalProjection.__sk3){const original=window.calcGoalProjection;const wrapped=function(...args){try{return original.apply(this,args)}catch(err){console.error('Goal projection failed:',err);toast('Projection could not be calculated from those values.','error');return false}};wrapped.__sk3=true;window.calcGoalProjection=wrapped;}if(typeof window.deleteSavedItem==='function'&&!window.deleteSavedItem.__sk3){const original=window.deleteSavedItem;const wrapped=function(id,...args){if(!id){toast('That saved result could not be identified.','error');return false}return original.call(this,id,...args)};wrapped.__sk3=true;window.deleteSavedItem=wrapped;}}
   function installRuntimeGuard(){window.addEventListener('unhandledrejection',e=>console.error('Unhandled Scholark promise rejection:',e.reason));window.addEventListener('error',e=>{if(e.error)console.error('Scholark runtime error:',e.error);});}
-  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,restoreFields,activePage};}
+  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,restoreFields,activePage,ensureV4,cinematicReady};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
