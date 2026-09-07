@@ -1,0 +1,67 @@
+name: Scholark V5.9 browser audit
+
+on:
+  push:
+    branches:
+      - scholark-v58-polish
+    paths:
+      - 'index.html'
+      - 'scholark-v5*.js'
+      - 'scholark-v5*.css'
+      - 'scholark-v4-data.js'
+      - 'scholark-legal.js'
+      - 'privacy.html'
+      - 'terms.html'
+      - 'scripts/v59-browser-audit.mjs'
+      - '.github/workflows/scholark-v59-browser.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'scholark-v5*.js'
+      - 'scholark-v5*.css'
+      - 'scholark-v4-data.js'
+      - 'scholark-legal.js'
+      - 'privacy.html'
+      - 'terms.html'
+      - 'scripts/v59-browser-audit.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Scholark server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/scholark-server.log 2>&1 &
+          echo $! > /tmp/scholark-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/scholark-server.log
+          exit 1
+
+      - name: Run desktop, mobile, dark-mode and reduced-motion audit
+        env:
+          SCHOLARK_TEST_URL: http://127.0.0.1:4173/
+        run: node scripts/v59-browser-audit.mjs
+
+      - name: Server log on failure
+        if: failure()
+        run: cat /tmp/scholark-server.log || true
