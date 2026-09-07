@@ -1,9 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const root = path.join(__dirname, '..');
 const allowedExt = new Set(['.html','.js','.mjs','.cjs','.json','.yml','.yaml','.md','.css','.txt']);
 const ignored = new Set(['.git','node_modules','.firebase']);
+const ignoredFiles = new Set(['scripts/secret-scan.js']);
 const findings = [];
 
 const rules = [
@@ -24,7 +28,8 @@ function walk(dir){
   }
 }
 function scan(file){
-  const rel=path.relative(root,file);
+  const rel=path.relative(root,file).split(path.sep).join('/');
+  if(ignoredFiles.has(rel)) return;
   const text=fs.readFileSync(file,'utf8');
   for(const [name,re] of rules){
     re.lastIndex=0;
