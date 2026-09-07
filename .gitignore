@@ -1,2 +1,14 @@
-
 node_modules/
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*service-account*.json
+serviceAccount*.json
+secrets.*
+.firebase/
