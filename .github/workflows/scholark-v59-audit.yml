@@ -1,0 +1,70 @@
+name: Scholark V5.9 audit
+
+on:
+  push:
+    branches:
+      - scholark-v58-polish
+    paths:
+      - 'scholark-v59.js'
+      - 'scholark-v59.css'
+      - 'scholark-v4-data.js'
+      - 'scholark-legal.js'
+      - 'privacy.html'
+      - 'terms.html'
+      - 'scripts/apply-legal-hardening.js'
+      - '.github/workflows/scholark-v59-audit.yml'
+  pull_request:
+    paths:
+      - 'scholark-v59.js'
+      - 'scholark-v59.css'
+      - 'scholark-v4-data.js'
+      - 'scholark-legal.js'
+      - 'privacy.html'
+      - 'terms.html'
+      - 'scripts/apply-legal-hardening.js'
+
+permissions:
+  contents: read
+
+jobs:
+  static-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JavaScript syntax
+        run: |
+          node --check scholark-v59.js
+          node --check scholark-legal.js
+          node --check scripts/apply-legal-hardening.js
+
+      - name: Verify V5.9 loader and motion fallbacks
+        run: |
+          grep -q 'scholark-v59.js' scholark-v4-data.js
+          grep -q 'prefers-reduced-motion' scholark-v59.css
+          grep -q 'sk12-continuity' scholark-v59.css
+          grep -q 'sk12-project-status' scholark-v59.css
+
+      - name: Verify project identity language
+        run: |
+          grep -qi 'not an incorporated company' privacy.html
+          grep -qi 'not revenue-generating' privacy.html
+          grep -qi 'not an incorporated company' terms.html
+          grep -qi 'not revenue-generating' terms.html
+          grep -qi 'non-commercial' scholark-legal.js
+
+      - name: Verify non-commercial index hardening
+        run: |
+          node scripts/apply-legal-hardening.js
+          ! grep -q 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' index.html
+          grep -q "ad_storage:'denied'" index.html
+          grep -qi 'non-commercial educational project' index.html
+
+      - name: Verify no accidental ad activation in V5.9
+        run: |
+          grep -q 'window.SCHOLARK_AD_SLOTS = {}' scholark-v59.js
+          grep -q 'ins.adsbygoogle' scholark-v59.js
+
+      - name: Summary
+        run: echo 'Scholark V5.9 static audit passed.'
