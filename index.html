@@ -2432,7 +2432,6 @@ document.addEventListener('DOMContentLoaded', function() {
    FIREBASE INIT
 ============================================================ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -2471,7 +2470,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
@@ -4797,10 +4795,7 @@ window.onload = function() {
   if(!window.currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
 </script>
-<script src="ap-v2-data.js"></script>
-<script src="ap-v2-app.js"></script>
-<script src="prep-v2-data.js"></script>
-<script src="prep-v2-app.js"></script>
+<script src="scholark-feature-loader.js" defer></script>
 <script src="scholark-v3.js" defer></script>
 <script src="scholark-legal.js" defer></script>
 </body>
