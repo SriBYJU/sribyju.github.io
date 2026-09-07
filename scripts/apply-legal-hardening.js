@@ -1,6 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const file = path.join(__dirname, '..', 'index.html');
 let html = fs.readFileSync(file, 'utf8');
 const before = html;
@@ -11,14 +14,14 @@ const headBlock = `<!-- SCHOLARK_LEGAL_HEAD -->
 <meta property="og:description" content="Student-built tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sribyju.github.io/">
-<meta property="og:image" content="https://sribyju.github.io/scholark-social-preview.png">
+<meta property="og:image" content="https://sribyju.github.io/scholark-social-preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Scholark student-built college planning and academic support platform">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Scholark — Free College Planning & Academic Support">
 <meta name="twitter:description" content="Student-built tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
-<meta name="twitter:image" content="https://sribyju.github.io/scholark-social-preview.png">
+<meta name="twitter:image" content="https://sribyju.github.io/scholark-social-preview.jpg">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- /SCHOLARK_LEGAL_HEAD -->`;
 
@@ -43,7 +46,7 @@ const consentBootstrap = `<!-- SCHOLARK_CONSENT_BOOTSTRAP -->
 <!-- /SCHOLARK_CONSENT_BOOTSTRAP -->`;
 
 if (!html.includes('SCHOLARK_CONSENT_BOOTSTRAP')) {
-  const ads = /<script\s+async\s+src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^>]*><\/script>/i;
+  const ads = /<script[^>]+pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^>]*><\/script>/i;
   if (!ads.test(html)) throw new Error('AdSense script not found');
   html = html.replace(ads, m => `${consentBootstrap}\n${m}`);
 }
