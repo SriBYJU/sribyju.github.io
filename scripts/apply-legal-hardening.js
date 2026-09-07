@@ -54,8 +54,14 @@ if (consentMarker.test(html)) html = html.replace(consentMarker, consentBootstra
 else if (html.includes('</head>')) html = html.replace('</head>', `${consentBootstrap}\n</head>`);
 else throw new Error('Closing head tag not found');
 
-/* Scholark is intentionally non-commercial: remove the AdSense loader from the static page. */
+/* Scholark is intentionally non-commercial: remove all static ad loading and reserved ad UI. */
 html = html.replace(/\s*<script[^>]+pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^>]*><\/script>\s*/ig, '\n');
+html = html.replace(/\s*<aside\s+class="ad-(?:banner|reserve)[^"]*"[^>]*>[\s\S]*?<\/aside>\s*/ig, '\n');
+
+/* Keep the project identity visible even if enhancement JavaScript fails. */
+const aboutSubtitle = /<p class="subtitle">Scholark was created by Shriyan Avadhanula, an 11th-grade student building the college-planning platform he wanted for himself and other students\.<\/p>/i;
+html = html.replace(aboutSubtitle, '<p class="subtitle">Scholark was created by Shriyan Avadhanula as an independent, student-built, non-commercial educational project. It is not an incorporated company, business, or employer, and it is not revenue-generating. The platform exists to provide free college-planning and academic-support tools for students.</p>');
+html = html.replace(/© 2026 Scholark\. All rights reserved\. Results are estimates only\./g, '© 2026 Scholark · Independent student-built non-commercial educational project · Not a company or employer. Results are estimates only.');
 
 const legacySignup = /<p style="font-size:12px;color:#8a847b;margin:8px 0 0;line-height:1\.4">By creating an account, you'll receive weekly college tips & deadline reminders\. You can unsubscribe anytime\.<\/p>/g;
 const existingSignup = /<p class="sk-auth-legal">[\s\S]*?<\/p>/g;
