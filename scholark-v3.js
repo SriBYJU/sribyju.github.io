@@ -1,19 +1,18 @@
 (() => {
   'use strict';
-  const VERSION='3.3.0';
-  const BUILD='5100';
+  const VERSION='3.3.1';
+  const BUILD='5120';
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
   const DYNAMIC_PAGES=new Set(['intelligence','careers','methodology']);
   const isSafeStorage=(()=>{try{const k=STORE_PREFIX+'probe';localStorage.setItem(k,'1');localStorage.removeItem(k);return true}catch{return false}})();
   const safeGet=k=>{if(!isSafeStorage)return null;try{return localStorage.getItem(STORE_PREFIX+k)}catch{return null}};
-  const safeSet=(k,v)=>{if(!isSafeStorage)return;try{localStorage.setItem(STORE_PREFIX+k,v)}catch{}};
+  const safeSet=(k,v)=>{if(!isSafeStorage)return;try{return localStorage.setItem(STORE_PREFIX+k,v)}catch{}};
   const pageName=el=>(el?.id||'').replace(/^page-/,'');
   const activePage=()=>pageName(document.querySelector('.page.active'))||'home';
   const visible=el=>!!el&&!el.hidden&&getComputedStyle(el).display!=='none'&&getComputedStyle(el).visibility!=='hidden';
   const toast=(msg,type='info')=>typeof window.showToast==='function'?window.showToast(msg,type):console[type==='error'?'error':'log'](msg);
 
-  /* Cinematic preflight starts before DOMContentLoaded to remove the legacy-home flash. */
   document.documentElement.classList.add('scholark-cinematic-loading');
   if(!document.getElementById('scholark-cinematic-critical')){
     const s=document.createElement('style');s.id='scholark-cinematic-critical';s.textContent='html.scholark-cinematic-loading #page-home>.hero,html.scholark-cinematic-loading #page-home>.trust-bar,html.scholark-cinematic-loading #page-home>.sk3-resume,html.scholark-cinematic-loading #page-home>.sk4-command-center{visibility:hidden!important}html.scholark-cinematic-loading #page-home{min-height:100dvh;background:#faf9f6}';(document.head||document.documentElement).appendChild(s);
@@ -26,7 +25,7 @@
   [
     'scholark-v53.css','scholark-v54.css','scholark-v55.css',
     'scholark-v57.css','scholark-v58.css','scholark-v59.css',
-    'scholark-gapfill.css','scholark-v510.css'
+    'scholark-gapfill.css','scholark-v510.css','scholark-v512.css'
   ].forEach(ensureStylesheet);
 
   const loadScript=src=>new Promise((resolve,reject)=>{
@@ -35,8 +34,6 @@
     const s=document.createElement('script');s.src=src;s.defer=true;s.addEventListener('load',()=>{s.dataset.loaded='true';resolve();},{once:true});s.addEventListener('error',()=>reject(new Error(`Could not load ${src}`)),{once:true});(document.head||document.documentElement).appendChild(s);
   });
 
-  /* Own every late enhancement loader here. V4-data previously started V5.7–V5.9 on timers,
-     which let large DOM sections appear after a phone user had already started scrolling. */
   window.__scholarkV54LoaderInstalled=true;
   window.__scholarkV55LoaderInstalled=true;
   window.__scholarkV56LoaderInstalled=true;
@@ -44,9 +41,6 @@
   window.__scholarkV58LoaderInstalled=true;
   window.__scholarkV59LoaderInstalled=true;
 
-  /* V5.6's large orbit/observatory and V5.6.1's mutation scroll-restorer are intentionally
-     omitted. They were the remaining circular scene and the last code path that could
-     programmatically reposition a scrolling phone. */
   const cinematicReady = loadScript(`scholark-v53.js?build=${BUILD}`)
     .then(()=>loadScript(`scholark-v54.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v55.js?build=${BUILD}`))
@@ -56,9 +50,6 @@
     .then(()=>loadScript(`scholark-v510.js?build=${BUILD}`))
     .catch(err=>{console.error('Scholark cinematic loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
 
-  /* V4 is useful, but it contains legacy start-at-top code. Loading it only when a V4 page is
-     requested means its one-time pageshow listener is registered after the initial pageshow and
-     can no longer interrupt normal homepage scrolling. */
   let v4Promise=null;
   function ensureV4(){
     if(window.ScholarkV4)return Promise.resolve(window.ScholarkV4);
