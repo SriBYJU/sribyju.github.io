@@ -31,15 +31,15 @@
     const max = Math.max(1, story.offsetHeight - innerHeight);
     const p = clamp(-rect.top / max);
 
-    const hero = clamp(1 - p / .28);
-    const heroY = -22 * clamp(p / .28);
-    const dive = clamp((p - .10) / .58);
-    const scale = 1 + dive * 1.35;
-    const logoY = -58 * dive;
-    const logoOpacity = 1 - clamp((p - .67) / .16);
-    const exit = clamp((p - .70) / .22);
-    const exitY = 20 * (1 - exit);
-    const worldY = -18 * clamp(p / .65);
+    const hero = clamp(1 - p / .30);
+    const heroY = -18 * clamp(p / .30);
+    const dive = clamp((p - .11) / .56);
+    const scale = 1 + dive * .95;
+    const logoY = -38 * dive;
+    const logoOpacity = 1 - clamp((p - .69) / .15);
+    const exit = clamp((p - .72) / .20);
+    const exitY = 16 * (1 - exit);
+    const worldY = -10 * clamp(p / .65);
 
     set('--skm-hero', hero.toFixed(3));
     set('--skm-hero-y', heroY.toFixed(1)+'px');
@@ -49,8 +49,8 @@
     set('--skm-exit', exit.toFixed(3));
     set('--skm-exit-y', exitY.toFixed(1)+'px');
     set('--skm-world-y', worldY.toFixed(1)+'px');
-    set('--skm-bg', (.20 + p*.42).toFixed(3));
-    set('--skm-dive', clamp((p-.35)/.55).toFixed(3));
+    set('--skm-bg', (.18 + p*.30).toFixed(3));
+    set('--skm-dive', clamp((p-.42)/.48).toFixed(3));
   }
 
   function request(){ if (!raf) raf=requestAnimationFrame(render); }
@@ -68,7 +68,7 @@
     addEventListener('resize',request,{passive:true});
     addEventListener('orientationchange',()=>setTimeout(request,100),{passive:true});
     request();
-    window.ScholarkV513={version:'5.13.0',refresh:request};
+    window.ScholarkV513={version:'5.13.1',refresh:request};
   }
 
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
