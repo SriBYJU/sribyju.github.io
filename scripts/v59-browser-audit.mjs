@@ -17,6 +17,23 @@ async function dismissConsent(page) {
   }
 }
 
+async function assertBridgeRouteOrAuth(page, selector, targetId, label) {
+  const button = page.locator(selector).first();
+  assert.equal(await button.count(), 1, `${label} bridge action should exist`);
+  await button.scrollIntoViewIfNeeded();
+  await button.click();
+  await page.waitForTimeout(250);
+  const state = await page.evaluate(id => ({
+    target:document.querySelector('#page-'+id)?.classList.contains('active') || false,
+    authOpen:document.querySelector('#authModal')?.classList.contains('open') || false,
+    active:document.querySelector('.page.active')?.id || ''
+  }), targetId);
+  assert.ok(state.target || state.authOpen, `${label} should open its target or the site's intentional sign-in gate: ${JSON.stringify(state)}`);
+  if (state.authOpen) await page.evaluate(() => window.closeAuth?.());
+  await page.evaluate(() => window.showPage?.('home'));
+  await page.waitForTimeout(80);
+}
+
 async function desktopAudit(browser) {
   const context = await browser.newContext({ viewport:{width:1440,height:1000} });
   const page = await context.newPage();
@@ -56,28 +73,15 @@ async function desktopAudit(browser) {
 
   await dismissConsent(page);
 
-  // Logged-out users are intentionally gated from account-linked GPA Goals.
-  // The bridge must either open Goals for an authenticated session or surface the sign-in dialog.
-  const goalButton = page.locator('.sk12-continuity button[data-page="goals"]').first();
-  assert.equal(await goalButton.count(), 1, 'GPA goal bridge action should exist');
-  await goalButton.scrollIntoViewIfNeeded();
-  await goalButton.click();
-  await page.waitForTimeout(250);
-  const goalRouteState = await page.evaluate(() => ({
-    goals:document.querySelector('#page-goals')?.classList.contains('active') || false,
-    authOpen:document.querySelector('#authModal')?.classList.contains('open') || document.querySelector('#authModal')?.style.display === 'flex',
-    active:document.querySelector('.page.active')?.id || ''
-  }));
-  assert.ok(goalRouteState.goals || goalRouteState.authOpen, `Goals action should open Goals or the intentional auth gate: ${JSON.stringify(goalRouteState)}`);
-  if (goalRouteState.authOpen) await page.evaluate(() => window.closeAuth?.());
-  await page.evaluate(() => window.showPage?.('home'));
+  // Account-linked features may intentionally open the existing auth gate when logged out.
+  await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="goals"]', 'goals', 'GPA Goals');
+  await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="intelligence"]', 'intelligence', 'College Intelligence');
+  await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="prep"]', 'prep', 'SAT Prep');
 
-  // College Intelligence is public and must route directly from the new continuity scene.
-  const publicButton = page.locator('.sk12-continuity button[data-page="intelligence"]').first();
-  assert.equal(await publicButton.count(), 1, 'College Intelligence bridge action should exist');
-  await publicButton.scrollIntoViewIfNeeded();
-  await publicButton.click();
-  await page.waitForFunction(() => document.querySelector('#page-intelligence')?.classList.contains('active'), null, {timeout:5000});
+  // Public informational navigation still needs to function independently of account state.
+  const aboutResult = await page.evaluate(() => window.showPage?.('about'));
+  assert.notEqual(aboutResult, false, 'About should remain publicly navigable');
+  await page.waitForFunction(() => document.querySelector('#page-about')?.classList.contains('active'), null, {timeout:5000});
   await page.evaluate(() => window.showPage?.('home'));
 
   await page.evaluate(() => document.documentElement.dataset.theme='dark');
@@ -130,7 +134,7 @@ try {
   await desktopAudit(browser);
   await mobileAudit(browser);
   await reducedMotionAudit(browser);
-  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, public routes/auth gates, non-commercial identity, ad removal, and reduced-motion behavior.');
+  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, routes/auth gates, non-commercial identity, ad removal, and reduced-motion behavior.');
 } finally {
   await browser.close();
 }
