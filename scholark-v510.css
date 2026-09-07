@@ -1,0 +1,172 @@
+/* ScholarK V5.10 — hard layout + mobile stability hotfix.
+   Purpose: remove every legacy circular/orbit filler, make the route scene fit normal laptop widths,
+   and dramatically simplify the cinematic stack on phones to prevent WebKit memory reloads. */
+
+/* Kill the legacy circular/orbit fillers the user explicitly rejected. */
+.sk6-orbit-scene,
+.sk6-orbit,
+.sk11-orbit-shell,
+.sk11-orbit-lines,
+.sk13-orbit,
+.sk6-final-halo,
+.sk9-observatory,
+.sk9-orbit-line{display:none!important}
+
+/* Make the "From what now? to what's next." handoff impossible to clip. */
+.sk13-flightdeck{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.sk13-flight-inner{
+  width:min(1180px,calc(100% - 72px))!important;
+  max-width:1180px!important;
+  margin-inline:auto!important;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;
+  gap:clamp(32px,5vw,72px)!important;
+  box-sizing:border-box!important;
+}
+.sk13-flight-copy{min-width:0!important;padding-inline:clamp(0px,1.2vw,16px)!important}
+.sk13-flight-copy h4{
+  max-width:560px!important;
+  font-size:clamp(44px,5vw,78px)!important;
+  line-height:.9!important;
+  letter-spacing:-.05em!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  hyphens:none!important;
+}
+.sk13-flight-copy p{max-width:540px!important}
+.sk13-map{min-width:0!important;width:100%!important}
+
+/* The next-move scene is a route board, never a circle. */
+.sk11-next-move-linear .sk11-bridge-inner{align-items:stretch!important}
+.sk11-route-rail{min-width:0!important}
+.sk11-route-node{min-width:0!important}
+
+/* Stack before a MacBook-sized viewport gets cramped. */
+@media(max-width:1280px){
+  .sk13-flight-inner{
+    grid-template-columns:1fr!important;
+    width:min(900px,calc(100% - 48px))!important;
+    gap:34px!important;
+    padding-block:58px!important;
+  }
+  .sk13-flight-copy{text-align:center!important;padding-inline:0!important}
+  .sk13-flight-copy h4{max-width:760px!important;margin-inline:auto!important;font-size:clamp(48px,7vw,72px)!important}
+  .sk13-flight-copy p{margin-inline:auto!important}
+  .sk13-flight-tags{justify-content:center!important}
+  .sk13-map{min-height:430px!important}
+}
+
+/* Phone: use a stable one-screen intro instead of a 5–6 viewport sticky animation stack. */
+@media(max-width:760px){
+  html,body{overscroll-behavior-y:auto!important}
+  body.scholark-v5 #page-home.sk5-home{overflow-x:hidden!important;overflow-y:visible!important}
+  .sk6-story{
+    height:auto!important;
+    min-height:100svh!important;
+    contain:none!important;
+  }
+  .sk6-sticky{
+    position:relative!important;
+    top:auto!important;
+    height:100svh!important;
+    min-height:620px!important;
+    max-height:820px!important;
+    overflow:hidden!important;
+    perspective:none!important;
+  }
+  .sk6-through-copy,
+  .sk6-wave-scene,
+  .sk6-orbit-scene,
+  .sk6-exit-copy,
+  .sk6-progress,
+  .sk9-observatory,
+  .sk6-grain{display:none!important}
+  .sk6-world,
+  .sk6-portal-stage,
+  .sk6-campus-wrap,
+  .sk6-book-stack,
+  .sk6-float-card,
+  .sk6-fit-bg,
+  .sk10-closing-stage,
+  .sk12-path-scene,
+  .sk13-flightdeck:before{
+    will-change:auto!important;
+  }
+  .sk6-cloud,
+  .sk7-cross-cloud,
+  .sk10-close-cloud,
+  .sk12-cloud,
+  .sk13-cloud,
+  .sk13-route:after{animation:none!important}
+  .sk6-float-card,
+  .sk6-search-glass,
+  .sk6-mini-card,
+  .sk10-close-card,
+  .sk11-status,
+  .sk11-route-node,
+  .sk12-project-status,
+  .sk13-stop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+  .sk13-flight-inner{
+    width:calc(100% - 28px)!important;
+    padding:44px 0 38px!important;
+    gap:24px!important;
+  }
+  .sk13-flight-copy h4{
+    max-width:100%!important;
+    font-size:clamp(42px,12.5vw,60px)!important;
+    line-height:.94!important;
+    letter-spacing:-.045em!important;
+    margin:15px auto 16px!important;
+  }
+  .sk13-flight-copy p{font-size:13px!important;line-height:1.58!important}
+  .sk13-flight-tags{margin-top:18px!important}
+  .sk13-map{
+    min-height:0!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto!important;
+    padding:16px!important;
+    gap:9px!important;
+    border-radius:24px!important;
+  }
+  .sk13-center{grid-column:1!important;min-height:82px!important;padding:13px 16px!important;border-radius:18px!important}
+  .sk13-center b{font-size:48px!important}
+  .sk13-stop{padding:12px 13px!important}
+  .sk13-route,.sk13-campus{display:none!important}
+
+  .sk11-next-move-linear{margin-top:26px!important;border-radius:24px!important}
+  .sk11-next-move-linear .sk11-bridge-inner{padding:28px 14px!important;gap:22px!important}
+  .sk11-bridge-copy h3{font-size:clamp(42px,11vw,58px)!important}
+  .sk11-route-rail{grid-template-columns:1fr!important;gap:8px!important}
+  .sk11-route-node{min-height:86px!important;padding:13px!important}
+  .sk11-status{grid-template-columns:38px 1fr!important;padding:14px!important}
+  .sk11-open{grid-column:1/-1!important;width:100%!important}
+
+  /* Stop offscreen layout virtualization from changing page geometry mid-scroll in Safari. */
+  .sk6-experience section,
+  .sk6-experience [class*="sk7-"],
+  .sk6-experience [class*="sk8-"],
+  .sk6-experience [class*="sk10-"],
+  .sk6-experience [class*="sk11-"],
+  .sk6-experience [class*="sk12-"],
+  .sk6-experience [class*="sk13-"]{
+    content-visibility:visible!important;
+    contain-intrinsic-size:auto!important;
+  }
+}
+
+@media(max-width:390px){
+  .sk13-flight-copy h4{font-size:42px!important}
+  .sk13-flight-inner{width:calc(100% - 22px)!important}
+  .sk11-next-move-linear .sk11-bridge-inner{padding-inline:11px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .sk6-story{height:auto!important;min-height:100svh!important}
+  .sk6-sticky{position:relative!important}
+}
