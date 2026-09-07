@@ -18,6 +18,36 @@
   window.addEventListener('pageshow', reset, {once:true});
 })();
 
+/* V4 creates its flagship pages immediately before the first <footer>. The legacy home footer
+   lives inside #page-home rather than directly under <body>, which made body.insertBefore()
+   throw in real browsers. Give V4 a temporary direct-body footer anchor during boot, then
+   remove it once the workspace has initialized. This keeps the existing V4 file untouched
+   while fixing the underlying DOM-parent mismatch for Intelligence / Careers / Methodology. */
+(() => {
+  const install = () => {
+    if (!document.body || document.getElementById('sk4-runtime-anchor')) return;
+    const existingFooter = document.querySelector('footer');
+    if (!existingFooter || existingFooter.parentElement === document.body) return;
+    const anchor = document.createElement('footer');
+    anchor.id = 'sk4-runtime-anchor';
+    anchor.hidden = true;
+    anchor.setAttribute('aria-hidden','true');
+    anchor.style.display = 'none';
+    document.body.insertBefore(anchor, document.body.firstChild);
+    let tries = 0;
+    const cleanup = () => {
+      if (window.ScholarkV4 || tries++ > 240) {
+        setTimeout(() => anchor.remove(), 0);
+        return;
+      }
+      setTimeout(cleanup, 25);
+    };
+    cleanup();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true});
+  else install();
+})();
+
 window.SCHOLARK_PUBLIC_DATA = {
   meta: {
     version: '2026.08',
@@ -150,6 +180,26 @@ window.SCHOLARK_PUBLIC_DATA = {
   };
   const wait = () => {
     if (window.ScholarkV57 || tries++ > 240) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
+})();
+
+/* Scholark V5.9 continuity + non-commercial identity layer — waits for V5.8. */
+(() => {
+  if (window.__scholarkV59LoaderInstalled) return;
+  window.__scholarkV59LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v59.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v59.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV58 || tries++ > 260) return load();
     setTimeout(wait, 30);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});

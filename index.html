@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scholark — The Free College Toolkit: GPA, AP Study, SAT Prep & More - By Shriyan Avadhanula</title>
-<meta name="description" content="Free college planning tools used by 10,000+ students monthly for GPA, essays, applications, financial planning, SAT/ACT practice, and AP study.">
+<meta name="description" content="Scholark is an independent, student-built, non-commercial educational project with free tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
 <!-- SCHOLARK_LEGAL_HEAD -->
 <link rel="canonical" href="https://sribyju.github.io/">
 <meta property="og:title" content="Scholark — Free College Planning & Academic Support">
-<meta property="og:description" content="Student-built tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
+<meta property="og:description" content="Independent, student-built, non-commercial educational tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sribyju.github.io/">
 <meta property="og:image" content="https://sribyju.github.io/scholark-social-preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Scholark student-built college planning and academic support platform">
+<meta property="og:image:alt" content="Scholark independent student-built educational platform">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Scholark — Free College Planning & Academic Support">
-<meta name="twitter:description" content="Student-built tools for GPA planning, admissions research, essays, SAT/ACT prep, AP study, and more.">
+<meta name="twitter:description" content="Independent, student-built, non-commercial educational tools for college planning and academic support.">
 <meta name="twitter:image" content="https://sribyju.github.io/scholark-social-preview.jpg">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <!-- /SCHOLARK_LEGAL_HEAD -->
@@ -891,16 +891,14 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <script id="scholark-consent-bootstrap">
 (function(){
   var p=null;try{p=JSON.parse(localStorage.getItem('scholark:cookie-consent:v1')||'null')}catch(e){}
-  var analytics=!!(p&&p.analytics),ads=!!(p&&p.ads);
+  var analytics=!!(p&&p.analytics);
+  window.SCHOLARK_AD_SLOTS={};
   window.dataLayer=window.dataLayer||[];
   window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};
-  window.gtag('consent','default',{analytics_storage:analytics?'granted':'denied',ad_storage:ads?'granted':'denied',ad_user_data:ads?'granted':'denied',ad_personalization:ads?'granted':'denied',functionality_storage:'granted',security_storage:'granted',wait_for_update:500});
-  window.adsbygoogle=window.adsbygoogle||[];
-  window.adsbygoogle.requestNonPersonalizedAds=ads?0:1;
+  window.gtag('consent','default',{analytics_storage:analytics?'granted':'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'granted',security_storage:'granted',wait_for_update:500});
 })();
 </script>
 <!-- /SCHOLARK_CONSENT_BOOTSTRAP -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8035550913474000" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="ap-v2.css">
 <link rel="stylesheet" href="scholark-v3.css">
 </head>
@@ -934,7 +932,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <label class="field-label">Password</label>
         <input type="password" id="signup-password" placeholder="Min. 6 characters">
       </div>
-      <p class="sk-auth-legal">By creating an account or continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>, and acknowledge the cookie choices you make in Cookie Preferences. Optional cookie consent can be changed at any time.</p>
+      <p class="sk-auth-legal">By creating an account or continuing with Google, you agree to the <a href="terms.html" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a> and <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>. Scholark is an independent, non-commercial student-built educational project, not an incorporated company or employer.</p>
       <button class="auth-btn" onclick="handleSignup()">Create Free Account →</button>
       <div class="auth-divider">or</div>
       <button class="auth-social-btn" onclick="handleGoogleAuth()">
@@ -1008,8 +1006,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 <!-- HOME PAGE -->
 <div class="page active" id="page-home">
-  <aside class="ad-banner" id="ad-banner-home" data-ad-placement="home-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="hero">
+<div class="hero">
     <div>
       <div class="hero-eyebrow">⚡ Free · Instant results · Privacy-friendly</div>
       <h1>The College <em>Toolkit</em><br>Students Actually Use</h1>
@@ -1055,14 +1052,13 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay Coach</a></div>
       <div class="footer-col"><h4>Important</h4><p>Calculators and admissions guidance provide estimates for educational use.</p></div>
     </div>
-    <div class="footer-bottom"><span>© 2026 Scholark. All rights reserved. Results are estimates only.</span></div>
+    <div class="footer-bottom"><span>© 2026 Scholark · Independent student-built non-commercial educational project · Not a company or employer. Results are estimates only.</span></div>
   </footer>
 </div>
 
 <!-- TOOLS PAGE -->
 <div class="page" id="page-tools">
-  <aside class="ad-banner" id="ad-banner-tools" data-ad-placement="tools-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="tool-section-banner"><h2>Free College Calculators</h2></div>
+<div class="tool-section-banner"><h2>Free College Calculators</h2></div>
   <div class="tool-tabs">
     <button class="tab-btn active" onclick="switchTab('gpa',this)"><span class="tab-icon">📊</span>GPA Calc</button>
     <button class="tab-btn" onclick="switchTab('weighted',this)"><span class="tab-icon">⭐</span>Weighted GPA</button>
@@ -1349,8 +1345,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <aside class="ad-reserve ad-reserve-rectangle" data-ad-placement="tools-sidebar" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-      <div class="sidebar-card">
+<div class="sidebar-card">
         <div class="sidebar-title">4.0 Grade Scale</div>
         <div class="scale-grid">
           <div class="scale-item"><span class="scale-grade">A+ / A</span><span class="scale-pts">4.0</span></div>
@@ -1559,8 +1554,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 <!-- FEATURES PAGE -->
 <div class="page" id="page-features">
-  <aside class="ad-reserve ad-reserve-leaderboard" data-ad-placement="features-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="features-hero">
+<div class="features-hero">
     <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);border:1px solid rgba(200,98,42,.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px">✦ Complete Student Toolkit</div>
     <h1>Every Feature.<br>Free for Students.</h1>
     <p>Sign in once to use the complete Scholark toolkit and keep your saved work synced across devices.</p>
@@ -1952,8 +1946,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 
 <!-- SAT/ACT PREP MODE -->
 <div class="page" id="page-prep">
-  <aside class="ad-reserve ad-reserve-leaderboard" data-ad-placement="prep-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="feat-section">
+<div class="feat-section">
     <div class="feat-header">
       <h1>📝 Scholark Test Prep <span class="feat-badge free">Free</span></h1>
       <p>Diagnostic testing, topic mastery, adaptive practice, lessons, and realistic SAT and ACT simulations—all in one personalized plan.</p>
@@ -1976,13 +1969,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     </div>
     <div id="prep-app" aria-live="polite"></div>
   </div>
-  <aside class="ad-reserve ad-reserve-page-end" data-ad-placement="prep-page-end" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
 </div>
 
 <!-- COLLEGE COMPARISON TOOL -->
 <div class="page" id="page-compare">
-  <aside class="ad-reserve ad-reserve-leaderboard" data-ad-placement="compare-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="feat-section">
+<div class="feat-section">
     <div class="feat-header">
       <h1>⚖️ College Head-to-Head</h1>
       <p>Compare colleges side-by-side on what matters most — acceptance rate, cost, size, ranking, and more.</p>
@@ -2044,12 +2035,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <!-- ABOUT PAGE -->
 
 <div class="page" id="page-about">
-  <aside class="ad-reserve ad-reserve-leaderboard" data-ad-placement="about-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside>
-  <div class="about-hero">
+<div class="about-hero">
     <div class="about-hero-content">
       <div class="about-avatar"><img src="IMG_7529.png" alt="Profile Picture"></div>
       <h1>Built by a Student,<br>for Students</h1>
-      <p class="subtitle">Scholark was created by Shriyan Avadhanula, an 11th-grade student building the college-planning platform he wanted for himself and other students.</p>
+      <p class="subtitle">Scholark was created by Shriyan Avadhanula as an independent, student-built, non-commercial educational project. It is not an incorporated company, business, or employer, and it is not revenue-generating. The platform exists to provide free college-planning and academic-support tools for students.</p>
     </div>
   </div>
   <div class="about-content">
