@@ -11,6 +11,7 @@ on:
       - 'scholark-legal.js'
       - 'privacy.html'
       - 'terms.html'
+      - 'security.html'
       - 'scripts/apply-legal-hardening.js'
       - '.github/workflows/scholark-v59-audit.yml'
   pull_request:
@@ -21,6 +22,7 @@ on:
       - 'scholark-legal.js'
       - 'privacy.html'
       - 'terms.html'
+      - 'security.html'
       - 'scripts/apply-legal-hardening.js'
 
 permissions:
@@ -52,14 +54,27 @@ jobs:
           grep -qi 'not revenue-generating' privacy.html
           grep -qi 'not an incorporated company' terms.html
           grep -qi 'not revenue-generating' terms.html
+          grep -qi 'non-commercial' security.html
+          grep -qi 'not revenue-generating' security.html
           grep -qi 'non-commercial' scholark-legal.js
+
+      - name: Verify policy navigation
+        run: |
+          grep -q 'href="security.html"' privacy.html
+          grep -q 'href="security.html"' terms.html
+          grep -q 'href="privacy.html"' security.html
+          grep -q 'href="terms.html"' security.html
+          grep -q 'href="security.html"' scholark-legal.js
 
       - name: Verify non-commercial index hardening
         run: |
           node scripts/apply-legal-hardening.js
           ! grep -q 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' index.html
+          ! grep -q '<aside class="ad-banner' index.html
+          ! grep -q '<aside class="ad-reserve' index.html
           grep -q "ad_storage:'denied'" index.html
           grep -qi 'non-commercial educational project' index.html
+          grep -qi 'not revenue-generating' index.html
 
       - name: Verify no accidental ad activation in V5.9
         run: |
