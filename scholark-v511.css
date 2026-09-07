@@ -1,0 +1,68 @@
+/* Scholark V5.11 — lightweight mobile cinematic restoration.
+   Restores the scroll-through-S experience on phones while keeping the heavy desktop-only
+   scenes pruned so iOS Safari stays stable. Loaded after V5.10. */
+
+@media(max-width:760px){
+  /* Restore a real scrollytelling runway. V5.10 had intentionally collapsed this to one screen,
+     which made the cinematic animation appear broken on phones. */
+  body.scholark-v510 .sk6-story{
+    height:300svh!important;
+    min-height:0!important;
+    contain:layout style!important;
+    overflow:visible!important;
+  }
+  body.scholark-v510 .sk6-sticky{
+    position:sticky!important;
+    top:0!important;
+    height:100svh!important;
+    min-height:100svh!important;
+    max-height:none!important;
+    overflow:hidden!important;
+    perspective:900px!important;
+  }
+
+  /* Keep the important animated layers alive and GPU-cheap. */
+  body.scholark-v510 .sk6-world,
+  body.scholark-v510 .sk6-portal-stage,
+  body.scholark-v510 .sk6-hero-copy,
+  body.scholark-v510 .sk6-exit-copy,
+  body.scholark-v510 .sk6-scroll-cue{
+    will-change:transform,opacity!important;
+  }
+
+  /* Restore the end beat and progress feedback, but keep the expensive intermediate scenes off. */
+  body.scholark-v510 .sk6-exit-copy{display:block!important}
+  body.scholark-v510 .sk6-progress{display:block!important}
+  body.scholark-v510 .sk6-scroll-cue{display:flex!important}
+  body.scholark-v510 .sk6-through-copy,
+  body.scholark-v510 .sk6-wave-scene,
+  body.scholark-v510 .sk6-orbit-scene,
+  body.scholark-v510 .sk9-observatory,
+  body.scholark-v510 .sk6-grain{display:none!important}
+
+  /* Two floating cards are enough to retain depth without recreating the desktop compositor load. */
+  body.scholark-v510 .sk6-float-field{display:block!important}
+  body.scholark-v510 .sk6-float-card:nth-child(n+3){display:none!important}
+  body.scholark-v510 .sk6-book-stack,
+  body.scholark-v510 .sk6-leaf,
+  body.scholark-v510 .sk6-dust-field,
+  body.scholark-v510 .sk6-ray.r3,
+  body.scholark-v510 .sk6-cloud-5,
+  body.scholark-v510 .sk6-cloud-6,
+  body.scholark-v510 .sk6-cloud-7{display:none!important}
+
+  body.scholark-v510 .sk6-cloud{animation:none!important}
+
+  /* Prevent the sticky scene from bleeding underneath the following content on iOS. */
+  body.scholark-v510 .sk6-proof-shell{position:relative!important;z-index:3!important}
+}
+
+@media(max-width:390px){
+  body.scholark-v510 .sk6-story{height:280svh!important}
+  body.scholark-v510 .sk6-sticky{perspective:720px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body.scholark-v510 .sk6-story{height:auto!important;min-height:100svh!important}
+  body.scholark-v510 .sk6-sticky{position:relative!important;height:100svh!important}
+}
