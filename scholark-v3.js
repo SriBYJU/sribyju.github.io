@@ -1,7 +1,7 @@
 (() => {
   'use strict';
-  const VERSION='3.3.2';
-  const BUILD='5130';
+  const VERSION='3.3.3';
+  const BUILD='5150';
   const MOBILE=matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
@@ -24,7 +24,7 @@
     const l=document.createElement('link');l.rel='stylesheet';l.href=`${file}?build=${BUILD}`;(document.head||document.documentElement).appendChild(l);
   };
   const styleFiles=MOBILE
-    ? ['scholark-v53.css','scholark-v513.css']
+    ? ['scholark-mobile.css']
     : ['scholark-v53.css','scholark-v54.css','scholark-v55.css','scholark-v57.css','scholark-v58.css','scholark-v59.css','scholark-gapfill.css','scholark-v510.css','scholark-v512.css'];
   styleFiles.forEach(ensureStylesheet);
 
@@ -49,8 +49,7 @@
     .then(()=>loadScript(`scholark-v59.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v510.js?build=${BUILD}`));
 
-  const mobileCinematic=()=>loadScript(`scholark-v53.js?build=${BUILD}`)
-    .then(()=>loadScript(`scholark-v513.js?build=${BUILD}`));
+  const mobileCinematic=()=>loadScript(`scholark-mobile.js?build=${BUILD}`);
 
   const cinematicReady=(MOBILE?mobileCinematic():desktopCinematic())
     .catch(err=>{console.error('Scholark cinematic loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
@@ -81,7 +80,7 @@
   function saveLastPage(name){if(name&&name!=='home'&&!EXCLUDED_PAGES.has(name))safeSet('last-page',name);}
   function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=document.querySelector('#page-home>.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
 
-  function scrollFeatures(){const target=document.querySelector('.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return true}return false;}
+  function scrollFeatures(){const target=document.querySelector('.skm-tools,.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return true}return false;}
   function waitForDynamic(name,original,args){
     const started=performance.now();
     ensureV4().catch(()=>{});
