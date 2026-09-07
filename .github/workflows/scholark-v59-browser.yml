@@ -12,6 +12,7 @@ on:
       - 'scholark-legal.js'
       - 'privacy.html'
       - 'terms.html'
+      - 'security.html'
       - 'scripts/v59-browser-audit.mjs'
       - '.github/workflows/scholark-v59-browser.yml'
   pull_request:
@@ -23,7 +24,12 @@ on:
       - 'scholark-legal.js'
       - 'privacy.html'
       - 'terms.html'
+      - 'security.html'
       - 'scripts/v59-browser-audit.mjs'
+
+concurrency:
+  group: scholark-v59-browser-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
