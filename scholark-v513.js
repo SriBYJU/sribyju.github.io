@@ -6,6 +6,13 @@
   const mobile = matchMedia('(max-width:760px), (pointer:coarse)');
   if (!mobile.matches) return;
 
+  if (!document.querySelector('link[href*="scholark-v514.css"]')) {
+    const l=document.createElement('link');
+    l.rel='stylesheet';
+    l.href='scholark-v514.css?build=5140';
+    (document.head||document.documentElement).appendChild(l);
+  }
+
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const q = (s, r=document) => r.querySelector(s);
   const qa = (s, r=document) => [...r.querySelectorAll(s)];
@@ -19,7 +26,7 @@
       '.sk6-logo-depth','.sk6-portal-ring','.sk6-glint','.sk6-core-glow','.sk6-final-halo'
     ].join(',')).forEach(el => el.remove());
     document.body?.classList.add('scholark-mobile-safe');
-    document.documentElement.dataset.scholarkMobile = 'safe-513';
+    document.documentElement.dataset.scholarkMobile = 'safe-514';
   }
 
   function set(name,val){ sticky?.style.setProperty(name,val); }
@@ -68,7 +75,7 @@
     addEventListener('resize',request,{passive:true});
     addEventListener('orientationchange',()=>setTimeout(request,100),{passive:true});
     request();
-    window.ScholarkV513={version:'5.13.1',refresh:request};
+    window.ScholarkV513={version:'5.14.0',refresh:request};
   }
 
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
