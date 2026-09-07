@@ -155,3 +155,23 @@ window.SCHOLARK_PUBLIC_DATA = {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
   else wait();
 })();
+
+/* Scholark V5.9 continuity + non-commercial identity layer — waits for V5.8. */
+(() => {
+  if (window.__scholarkV59LoaderInstalled) return;
+  window.__scholarkV59LoaderInstalled = true;
+  let tries = 0;
+  const load = () => {
+    if (document.querySelector('script[src="scholark-v59.js"]')) return;
+    const s = document.createElement('script');
+    s.src = 'scholark-v59.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  };
+  const wait = () => {
+    if (window.ScholarkV58 || tries++ > 260) return load();
+    setTimeout(wait, 30);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wait, {once:true});
+  else wait();
+})();
