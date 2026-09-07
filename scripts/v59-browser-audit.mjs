@@ -62,6 +62,7 @@ async function desktopAudit(browser) {
   assert.ok(state.audit.projectDisclosureCount >= 2, 'expected multiple project-status disclosures');
   assert.equal(state.audit.adScripts, 0, 'runtime should contain no AdSense scripts');
   assert.equal(state.audit.adNodes, 0, 'runtime should contain no AdSense nodes');
+  assert.equal(state.audit.largeGaps.length, 0, `homepage should have no accidental >180px inter-section gaps: ${JSON.stringify(state.audit.largeGaps)}`);
   assert.equal(state.adReserves, 0, 'static ad reserve UI should be removed');
   assert.equal(state.adsenseScripts, 0, 'static AdSense loader should be absent');
   assert.ok(/not an incorporated company/i.test(state.about), 'About copy must clearly say Scholark is not an incorporated company');
@@ -75,7 +76,7 @@ async function desktopAudit(browser) {
 
   // Account-linked features may intentionally open the existing auth gate when logged out.
   await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="goals"]', 'goals', 'GPA Goals');
-  await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="intelligence"]', 'intelligence', 'College Intelligence');
+  await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="compare"]', 'compare', 'College Compare');
   await assertBridgeRouteOrAuth(page, '.sk12-continuity button[data-page="prep"]', 'prep', 'SAT Prep');
 
   // Public informational navigation still needs to function independently of account state.
@@ -134,7 +135,7 @@ try {
   await desktopAudit(browser);
   await mobileAudit(browser);
   await reducedMotionAudit(browser);
-  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, routes/auth gates, non-commercial identity, ad removal, and reduced-motion behavior.');
+  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, routes/auth gates, zero large dead gaps, non-commercial identity, ad removal, and reduced-motion behavior.');
 } finally {
   await browser.close();
 }
