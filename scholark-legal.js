@@ -3,7 +3,7 @@
   if (window.__scholarkLegalInstalled) return;
   window.__scholarkLegalInstalled = true;
 
-  const VERSION='2.0.0';
+  const VERSION='2.0.1';
   const KEY='scholark:cookie-consent:v1';
   const defaults={necessary:true,analytics:false,ads:false};
   const $=(s,r=document)=>r.querySelector(s);
@@ -102,7 +102,7 @@
   function ensureModal(){
     let overlay=$('#sk-legal-overlay');if(overlay)return overlay;
     overlay=document.createElement('div');overlay.id='sk-legal-overlay';overlay.className='sk-legal-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','sk-cookie-title');
-    overlay.innerHTML=`<div class="sk-legal-modal"><h2 id="sk-cookie-title">Cookie Preferences</h2><p>Choose the optional storage you want Scholark to use. Necessary storage cannot be turned off because it supports authentication, security, preferences, and your consent choice. Scholark does not use advertising cookies.</p><div class="sk-pref-row"><div><strong>Necessary</strong><span>Authentication, security, preferences, and consent state.</span></div><input type="checkbox" checked disabled aria-label="Necessary storage enabled"></div><div class="sk-pref-row"><div><strong>Analytics</strong><span>Optional measurement that can help understand site usage and improve the educational experience.</span></div><input id="sk-pref-analytics" type="checkbox" aria-label="Allow analytics storage"></div><p style="margin-top:12px"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms &amp; Conditions</a> · <a href="SECURITY.md">Security</a></p><div class="sk-legal-modal-actions"><button class="sk-legal-btn" data-cancel>Cancel</button><button class="sk-legal-btn primary" data-save>Save preferences</button></div></div>`;
+    overlay.innerHTML=`<div class="sk-legal-modal"><h2 id="sk-cookie-title">Cookie Preferences</h2><p>Choose the optional storage you want Scholark to use. Necessary storage cannot be turned off because it supports authentication, security, preferences, and your consent choice. Scholark does not use advertising cookies.</p><div class="sk-pref-row"><div><strong>Necessary</strong><span>Authentication, security, preferences, and consent state.</span></div><input type="checkbox" checked disabled aria-label="Necessary storage enabled"></div><div class="sk-pref-row"><div><strong>Analytics</strong><span>Optional measurement that can help understand site usage and improve the educational experience.</span></div><input id="sk-pref-analytics" type="checkbox" aria-label="Allow analytics storage"></div><p style="margin-top:12px"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms &amp; Conditions</a> · <a href="security.html">Security</a></p><div class="sk-legal-modal-actions"><button class="sk-legal-btn" data-cancel>Cancel</button><button class="sk-legal-btn primary" data-save>Save preferences</button></div></div>`;
     document.body.appendChild(overlay);
     $('[data-cancel]',overlay).onclick=closeModal;
     $('[data-save]',overlay).onclick=()=>savePrefs({necessary:true,analytics:$('#sk-pref-analytics',overlay).checked,ads:false});
@@ -129,7 +129,7 @@
     $$('footer').forEach(footer=>{
       if($('.sk-footer-legal',footer))return;
       const row=document.createElement('div');row.className='sk-footer-legal';
-      row.innerHTML='<a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="SECURITY.md">Security</a><button type="button">Cookie Preferences</button>';
+      row.innerHTML='<a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="security.html">Security</a><button type="button">Cookie Preferences</button>';
       row.querySelector('button').onclick=openModal;
       const target=footer.querySelector('.footer-bottom')||footer;target.appendChild(row);
     });
