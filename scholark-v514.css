@@ -3,14 +3,14 @@
   html,body,body.scholark-v5{max-width:100%!important;overflow-x:visible!important}
   body.scholark-v5 nav{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation:none!important}
   body.scholark-v5 .sk6-story{height:205svh!important}
-  body.scholark-v5 .sk6-sticky{top:0!important;height:100svh!important;perspective:none!important;transform-style:flat!important}
-  body.scholark-v5 .sk6-portal-object{top:58%!important;width:min(41vw,170px)!important}
-  body.scholark-v5 .sk6-hero-copy{top:clamp(18px,3.2svh,30px)!important}
+  body.scholark-v5 .sk6-sticky{top:60px!important;height:calc(100svh - 60px)!important;perspective:none!important;transform-style:flat!important}
+  body.scholark-v5 .sk6-portal-object{top:56%!important;width:min(41vw,170px)!important}
+  body.scholark-v5 .sk6-hero-copy{top:clamp(16px,2.8svh,26px)!important}
   body.scholark-v5 .sk6-progress{display:none!important}
   body.scholark-v5 .sk6-route-wipe{display:none!important}
 }
 @media (max-width:390px){
   body.scholark-v5 .sk6-story{height:195svh!important}
-  body.scholark-v5 .sk6-portal-object{top:57%!important;width:min(40vw,155px)!important}
-  body.scholark-v5 .sk6-hero-copy{top:14px!important}
+  body.scholark-v5 .sk6-portal-object{top:55%!important;width:min(40vw,155px)!important}
+  body.scholark-v5 .sk6-hero-copy{top:12px!important}
 }
