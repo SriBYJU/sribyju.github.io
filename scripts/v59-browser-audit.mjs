@@ -9,6 +9,14 @@ async function waitForV59(page) {
   await page.waitForTimeout(650);
 }
 
+async function dismissConsent(page) {
+  const necessary = page.locator('#sk-legal-banner [data-necessary]');
+  if (await necessary.count()) {
+    await necessary.first().click();
+    await page.waitForTimeout(100);
+  }
+}
+
 async function desktopAudit(browser) {
   const context = await browser.newContext({ viewport:{width:1440,height:1000} });
   const page = await context.newPage();
@@ -28,7 +36,7 @@ async function desktopAudit(browser) {
       overflow,
       adReserves: document.querySelectorAll('.ad-banner,.ad-reserve,[data-ad-placement]').length,
       adsenseScripts: document.querySelectorAll('script[src*="googlesyndication.com/pagead/js/adsbygoogle.js"]').length,
-      legalLinks: document.querySelectorAll('a[href="privacy.html"],a[href="terms.html"]').length,
+      legalLinks: document.querySelectorAll('a[href="privacy.html"],a[href="terms.html"],a[href="security.html"]').length,
       finalText: document.querySelector('.sk12-final-status')?.textContent || ''
     };
   });
@@ -43,12 +51,29 @@ async function desktopAudit(browser) {
   assert.ok(/not revenue-generating/i.test(state.about), 'About copy must clearly say Scholark is not revenue-generating');
   assert.ok(/non-commercial educational project/i.test(state.meta), 'metadata must identify Scholark as non-commercial');
   assert.ok(/not revenue-generating/i.test(state.finalText), 'cinematic closing disclosure must say not revenue-generating');
-  assert.ok(state.legalLinks >= 4, 'Privacy and Terms should remain easy to find');
+  assert.ok(state.legalLinks >= 5, 'Privacy, Terms, and Security should remain easy to find');
   assert.ok(state.overflow <= 4, `desktop horizontal overflow is ${state.overflow}px`);
 
+  await dismissConsent(page);
   const goalButton = page.locator('.sk12-continuity button[data-page="goals"]').first();
+  assert.equal(await goalButton.count(), 1, 'GPA goal bridge action should exist');
+  await goalButton.scrollIntoViewIfNeeded();
   await goalButton.click();
-  await page.waitForFunction(() => document.querySelector('#page-goals')?.classList.contains('active'), null, {timeout:5000});
+  await page.waitForTimeout(350);
+  let routeState = await page.evaluate(() => ({
+    active:document.querySelector('.page.active')?.id || '',
+    goals:document.querySelector('#page-goals')?.classList.contains('active') || false,
+    hash:location.hash
+  }));
+  if (!routeState.goals) {
+    const diagnostic = await page.evaluate(() => {
+      const result = window.ScholarkV59.route('goals');
+      return {result, goalsExists:!!document.querySelector('#page-goals'), showPageType:typeof window.showPage};
+    });
+    await page.waitForTimeout(200);
+    routeState = await page.evaluate(() => ({active:document.querySelector('.page.active')?.id || '',goals:document.querySelector('#page-goals')?.classList.contains('active')||false,hash:location.hash}));
+    assert.fail(`bridge click did not open Goals. clickState=${JSON.stringify(routeState)} directDiagnostic=${JSON.stringify(diagnostic)}`);
+  }
   await page.evaluate(() => window.showPage?.('home'));
 
   await page.evaluate(() => document.documentElement.dataset.theme='dark');
