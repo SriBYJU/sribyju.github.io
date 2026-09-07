@@ -6,22 +6,17 @@ on:
       - main
     paths:
       - 'scholark-v3.js'
-      - 'scholark-v53.js'
-      - 'scholark-v53.css'
-      - 'scholark-v513.js'
-      - 'scholark-v513.css'
-      - 'scholark-v514.css'
+      - 'scholark-mobile.js'
+      - 'scholark-mobile.css'
       - 'scripts/mobile-webkit-stability.mjs'
       - '.github/workflows/scholark-mobile-webkit.yml'
   pull_request:
     paths:
       - 'scholark-v3.js'
-      - 'scholark-v53.js'
-      - 'scholark-v53.css'
-      - 'scholark-v513.js'
-      - 'scholark-v513.css'
-      - 'scholark-v514.css'
+      - 'scholark-mobile.js'
+      - 'scholark-mobile.css'
       - 'scripts/mobile-webkit-stability.mjs'
+      - '.github/workflows/scholark-mobile-webkit.yml'
 
 concurrency:
   group: scholark-mobile-webkit-${{ github.ref }}
