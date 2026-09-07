@@ -3,24 +3,38 @@
   if (window.__scholarkV58Installed) return;
   window.__scholarkV58Installed = true;
 
-  const VERSION = '5.8.1';
+  const VERSION = '5.8.2';
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const coarsePointer = matchMedia('(pointer: coarse)');
+  let userInteracted = false;
 
   function ensureStyles() {
-    if (q('link[href*="scholark-v58.css"]')) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'scholark-v58.css';
-    document.head.appendChild(link);
+    if (!q('link[href*="scholark-v58.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'scholark-v58.css';
+      document.head.appendChild(link);
+    }
+    if (!q('link[href*="scholark-gapfill.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'scholark-gapfill.css';
+      document.head.appendChild(link);
+    }
   }
+
+  const markInteraction = () => { userInteracted = true; };
+  ['touchstart','pointerdown','wheel'].forEach(type => addEventListener(type, markInteraction, {passive:true, once:true}));
+  addEventListener('keydown', event => {
+    if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' ','Spacebar'].includes(event.key)) markInteraction();
+  }, {once:true});
 
   const canResetTop = () => !location.hash || location.hash === '#home';
   const resetTop = (force = false) => {
-    if (!force && !canResetTop()) return;
+    if (!force && (userInteracted || !canResetTop())) return;
     try { window.scrollTo(0, 0); } catch {}
     const scroller = document.scrollingElement || document.documentElement;
     if (scroller) scroller.scrollTop = 0;
@@ -30,29 +44,20 @@
   function installInitialTopReset() {
     try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch {}
     resetTop();
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => resetTop(), {once:true});
-    addEventListener('load', () => {
-      resetTop();
-      requestAnimationFrame(() => {
-        resetTop();
-        requestAnimationFrame(() => resetTop());
-      });
-      setTimeout(() => resetTop(), 120);
-      setTimeout(() => resetTop(), 420);
-    }, {once:true});
-    addEventListener('pageshow', () => resetTop(), {once:true});
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => resetTop(), {once:true});
+    }
+    addEventListener('load', () => resetTop(), {once:true});
   }
 
   function wrapHomeRouting() {
     const original = window.showPage;
     if (typeof original !== 'function' || original.__scholarkV58Wrapped) return false;
     function wrappedShowPage(page, ...args) {
+      const wasHome = !!document.querySelector('#page-home.active');
       const result = original.call(this, page, ...args);
-      if (page === 'home') {
-        requestAnimationFrame(() => {
-          resetTop(true);
-          requestAnimationFrame(() => resetTop(true));
-        });
+      if (page === 'home' && !wasHome) {
+        requestAnimationFrame(() => resetTop(true));
       }
       return result;
     }
@@ -100,6 +105,26 @@
           <div class="sk11-core" aria-hidden="true"><span>S</span><small>Choose<br>your path</small></div>
           ${moves.map((m, i) => `<button type="button" class="sk11-move-node n${i}${i===0?' is-active':''}" data-move="${i}" role="tab" aria-selected="${i===0?'true':'false'}"><b>${m.num}</b><span>${m.glyph}</span><strong>${m.short}</strong></button>`).join('')}
           <span class="sk11-orbit-dot d1" aria-hidden="true"></span><span class="sk11-orbit-dot d2" aria-hidden="true"></span><span class="sk11-orbit-dot d3" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="sk13-flightdeck" aria-label="ScholarK planning journey">
+        <span class="sk13-cloud c1" aria-hidden="true"></span><span class="sk13-cloud c2" aria-hidden="true"></span><span class="sk13-cloud c3" aria-hidden="true"></span>
+        <div class="sk13-flight-inner">
+          <div class="sk13-flight-copy">
+            <small>One student · one route · zero paywall</small>
+            <h4>From “what now?”<br>to <em>what's next.</em></h4>
+            <p>ScholarK turns the space between planning and applying into an actual route: understand where you stand, sharpen what matters, compare your options, and keep moving.</p>
+            <div class="sk13-flight-tags" aria-label="ScholarK journey stages"><span>Academic profile</span><span>College fit</span><span>Essay strength</span><span>Test readiness</span></div>
+          </div>
+          <div class="sk13-map" aria-hidden="true">
+            <div class="sk13-orbit"></div><div class="sk13-route"></div>
+            <div class="sk13-center"><b>S</b><small>ScholarK route</small></div>
+            <div class="sk13-stop s1"><b>01 · KNOW</b><strong>Your academic profile</strong><span>GPA · goals · progress</span></div>
+            <div class="sk13-stop s2"><b>02 · EXPLORE</b><strong>Your college fit</strong><span>compare · outcomes · cost</span></div>
+            <div class="sk13-stop s3"><b>03 · BUILD</b><strong>Your strongest story</strong><span>essay · activities · direction</span></div>
+            <div class="sk13-stop s4"><b>04 · MOVE</b><strong>Your next milestone</strong><span>prep · plan · apply</span></div>
+            <div class="sk13-campus"></div>
+          </div>
         </div>
       </div>`;
     tools.appendChild(bridge);
@@ -163,7 +188,7 @@
         if (!entry.isIntersecting) return;
         bridge.classList.add('is-visible');
         io.disconnect();
-      }), {threshold:.16});
+      }), {threshold:.08});
       io.observe(bridge);
     }
   }
@@ -185,9 +210,6 @@
     }
 
     buildNextMoveBridge();
-    requestAnimationFrame(() => requestAnimationFrame(() => resetTop()));
-    setTimeout(() => resetTop(), 260);
-
     window.ScholarkV58 = {version:VERSION, resetTop, buildNextMoveBridge};
   }
 
