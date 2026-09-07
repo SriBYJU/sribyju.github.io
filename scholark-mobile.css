@@ -3,7 +3,7 @@
    orbit systems, giant compositor layers, or desktop enhancement stack. */
 
 @media (max-width:760px), (pointer:coarse){
-  html{max-width:100%;overflow-x:clip}
+  html{scroll-behavior:auto!important;max-width:100%;overflow-x:clip}
   body{max-width:100%;overflow-x:visible}
   body.scholark-mobile-cinematic{background:var(--bg,#faf9f6)}
 
@@ -66,11 +66,11 @@
   .skm-btn.secondary{background:#fffaf5;color:var(--ink,#1a1714)}
 
   .skm-mark{
-    position:absolute;z-index:3;left:50%;top:59%;width:min(41vw,168px);aspect-ratio:1;
+    position:absolute;z-index:3;left:50%;top:53%;width:min(39vw,158px);aspect-ratio:1;
     transform:translate3d(-50%,-50%,0);transform-origin:50% 50%;will-change:transform,opacity
   }
   .skm-mark img{display:block;width:100%;height:100%;object-fit:contain}
-  .skm-mark-shadow{position:absolute;left:50%;top:72%;width:46%;height:4%;translate:-50% 0;border-radius:50%;background:rgba(111,53,24,.13);filter:blur(8px);z-index:1;pointer-events:none}
+  .skm-mark-shadow{position:absolute;left:50%;top:64%;width:42%;height:3%;translate:-50% 0;border-radius:50%;background:rgba(111,53,24,.11);z-index:1;pointer-events:none}
 
   .skm-exit{position:absolute;z-index:6;left:18px;right:18px;top:45%;translate:0 -50%;text-align:center;opacity:0;pointer-events:none;will-change:transform,opacity}
   .skm-exit small{display:block;margin-bottom:12px;font:700 8px/1 var(--font-body,Outfit,sans-serif);letter-spacing:.18em;text-transform:uppercase;color:var(--accent,#c8622a)}
@@ -119,7 +119,7 @@
 @media (max-width:390px){
   .skm-story{height:195svh}
   .skm-hero{top:12px}.skm-hero h1{font-size:39px}.skm-hero p{font-size:12px;max-width:315px}
-  .skm-mark{top:58%;width:min(39vw,150px)}
+  .skm-mark{top:52%;width:min(37vw,145px)}
 }
 
 @media (prefers-reduced-motion:reduce){
