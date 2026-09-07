@@ -5,16 +5,20 @@ on:
     branches:
       - main
     paths:
+      - 'index.html'
       - 'scholark-v3.js'
       - 'scholark-mobile.js'
       - 'scholark-mobile.css'
+      - 'scholark-feature-loader.js'
       - 'scripts/mobile-webkit-stability.mjs'
       - '.github/workflows/scholark-mobile-webkit.yml'
   pull_request:
     paths:
+      - 'index.html'
       - 'scholark-v3.js'
       - 'scholark-mobile.js'
       - 'scholark-mobile.css'
+      - 'scholark-feature-loader.js'
       - 'scripts/mobile-webkit-stability.mjs'
       - '.github/workflows/scholark-mobile-webkit.yml'
 
@@ -28,7 +32,7 @@ permissions:
 jobs:
   webkit-mobile:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
