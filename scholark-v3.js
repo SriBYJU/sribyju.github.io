@@ -1,7 +1,8 @@
 (() => {
   'use strict';
-  const VERSION='3.3.1';
-  const BUILD='5120';
+  const VERSION='3.3.2';
+  const BUILD='5130';
+  const MOBILE=matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
   const DYNAMIC_PAGES=new Set(['intelligence','careers','methodology']);
@@ -22,11 +23,10 @@
     if(document.querySelector(`link[href*="${file}"]`))return;
     const l=document.createElement('link');l.rel='stylesheet';l.href=`${file}?build=${BUILD}`;(document.head||document.documentElement).appendChild(l);
   };
-  [
-    'scholark-v53.css','scholark-v54.css','scholark-v55.css',
-    'scholark-v57.css','scholark-v58.css','scholark-v59.css',
-    'scholark-gapfill.css','scholark-v510.css','scholark-v512.css'
-  ].forEach(ensureStylesheet);
+  const styleFiles=MOBILE
+    ? ['scholark-v53.css','scholark-v513.css']
+    : ['scholark-v53.css','scholark-v54.css','scholark-v55.css','scholark-v57.css','scholark-v58.css','scholark-v59.css','scholark-gapfill.css','scholark-v510.css','scholark-v512.css'];
+  styleFiles.forEach(ensureStylesheet);
 
   const loadScript=src=>new Promise((resolve,reject)=>{
     const existing=[...document.scripts].find(s=>s.src&&s.src.includes(src.split('?')[0]));
@@ -41,13 +41,18 @@
   window.__scholarkV58LoaderInstalled=true;
   window.__scholarkV59LoaderInstalled=true;
 
-  const cinematicReady = loadScript(`scholark-v53.js?build=${BUILD}`)
+  const desktopCinematic=()=>loadScript(`scholark-v53.js?build=${BUILD}`)
     .then(()=>loadScript(`scholark-v54.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v55.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v57.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v58.js?build=${BUILD}`))
     .then(()=>loadScript(`scholark-v59.js?build=${BUILD}`))
-    .then(()=>loadScript(`scholark-v510.js?build=${BUILD}`))
+    .then(()=>loadScript(`scholark-v510.js?build=${BUILD}`));
+
+  const mobileCinematic=()=>loadScript(`scholark-v53.js?build=${BUILD}`)
+    .then(()=>loadScript(`scholark-v513.js?build=${BUILD}`));
+
+  const cinematicReady=(MOBILE?mobileCinematic():desktopCinematic())
     .catch(err=>{console.error('Scholark cinematic loader failed:',err);document.documentElement.classList.remove('scholark-cinematic-loading');});
 
   let v4Promise=null;
@@ -100,6 +105,6 @@
   function installMutationRepair(){let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;hardenButtons();hardenModals();restoreFields();});});observer.observe(document.body,{subtree:true,childList:true});}
   function patchKnownEdgeCases(){if(typeof window.calcGoalProjection==='function'&&!window.calcGoalProjection.__sk3){const original=window.calcGoalProjection;const wrapped=function(...args){try{return original.apply(this,args)}catch(err){console.error('Goal projection failed:',err);toast('Projection could not be calculated from those values.','error');return false}};wrapped.__sk3=true;window.calcGoalProjection=wrapped;}if(typeof window.deleteSavedItem==='function'&&!window.deleteSavedItem.__sk3){const original=window.deleteSavedItem;const wrapped=function(id,...args){if(!id){toast('That saved result could not be identified.','error');return false}return original.call(this,id,...args)};wrapped.__sk3=true;window.deleteSavedItem=wrapped;}}
   function installRuntimeGuard(){window.addEventListener('unhandledrejection',e=>console.error('Unhandled Scholark promise rejection:',e.reason));window.addEventListener('error',e=>{if(e.error)console.error('Scholark runtime error:',e.error);});}
-  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,restoreFields,activePage,ensureV4,cinematicReady};}
+  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,mobile:MOBILE,restoreFields,activePage,ensureV4,cinematicReady};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
