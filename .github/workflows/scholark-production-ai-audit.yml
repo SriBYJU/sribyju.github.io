@@ -1,0 +1,132 @@
+name: ScholarK production AI audit
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scholark-ai-*.css'
+      - 'scripts/scholark-ai-browser.spec.mjs'
+      - 'scripts/scholark-ai-mobile-smoke.spec.mjs'
+      - 'scripts/playwright.config.mjs'
+      - '.github/workflows/scholark-production-ai-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: scholark-production-ai-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  production-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SCHOLARK_PRODUCTION_URL: https://sribyju.github.io/
+    steps:
+      - name: Checkout deployed commit
+        uses: actions/checkout@v4
+
+      - name: Wait until GitHub Pages serves this AI release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/scholark-production-audit
+          for attempt in $(seq 1 90); do
+            loader="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SCHOLARK_PRODUCTION_URL}scholark-feature-loader.js?sha=${GITHUB_SHA}" 2>/dev/null || true)"
+            health_code="$(curl --location --silent --output /tmp/scholark-production-audit/health.js --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SCHOLARK_PRODUCTION_URL}scholark-ai-health.js?sha=${GITHUB_SHA}" || true)"
+            if grep -q "ai-104" <<<"$loader" && [ "$health_code" = "200" ]; then
+              printf '%s\n' "$loader" > /tmp/scholark-production-audit/loader.js
+              echo "Production AI release detected on attempt ${attempt}." | tee /tmp/scholark-production-audit/deployment.txt
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "GitHub Pages did not expose the expected AI release within the audit window." >&2
+          exit 1
+
+      - name: Audit production HTTP assets and document contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          report=/tmp/scholark-production-audit/http-report.txt
+          : > "$report"
+          check_asset() {
+            local asset="$1"
+            local code
+            code="$(curl --location --silent --output "/tmp/scholark-production-audit/${asset//\//_}" --write-out '%{http_code}' --connect-timeout 15 --max-time 45 "${SCHOLARK_PRODUCTION_URL}${asset}?sha=${GITHUB_SHA}")"
+            echo "${asset} ${code}" | tee -a "$report"
+            test "$code" = "200"
+          }
+          for asset in \
+            index.html \
+            scholark-feature-loader.js \
+            scholark-ai-algorithms.js \
+            scholark-ai-core.js \
+            scholark-ai-agents.js \
+            scholark-ai-context.js \
+            scholark-ai-bridge.js \
+            scholark-ai-dashboard.js \
+            scholark-ai-ui.js \
+            scholark-ai-practice.js \
+            scholark-ai-practice-ui.js \
+            scholark-ai-health.js \
+            scholark-ai.css \
+            scholark-ai-dashboard.css \
+            scholark-ai-practice.css; do
+            check_asset "$asset"
+          done
+
+          curl --fail --location --silent --show-error "${SCHOLARK_PRODUCTION_URL}?sha=${GITHUB_SHA}" > /tmp/scholark-production-audit/live-index.html
+          grep -q 'scholark-feature-loader.js' /tmp/scholark-production-audit/live-index.html
+          grep -q 'scholark-v3.js' /tmp/scholark-production-audit/live-index.html
+          grep -q 'scholark-ai-practice.js' /tmp/scholark-production-audit/loader.js
+          grep -q 'scholark-ai-health.js' /tmp/scholark-production-audit/loader.js
+
+          for optional in robots.txt sitemap.xml; do
+            code="$(curl --location --silent --output "/tmp/scholark-production-audit/${optional}" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SCHOLARK_PRODUCTION_URL}${optional}?sha=${GITHUB_SHA}" || true)"
+            echo "${optional} ${code}" | tee -a "$report"
+          done
+
+          canonical_count="$(grep -Eic '<link[^>]+rel=["'"']canonical["'"']' /tmp/scholark-production-audit/live-index.html || true)"
+          echo "canonical_tags ${canonical_count}" | tee -a "$report"
+          echo "production_url ${SCHOLARK_PRODUCTION_URL}" | tee -a "$report"
+          echo "git_sha ${GITHUB_SHA}" | tee -a "$report"
+
+      - name: Install production browser audit runner
+        working-directory: scripts
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install --with-deps chromium firefox webkit
+
+      - name: Run AI E2E against live production
+        working-directory: scripts
+        env:
+          SCHOLARK_BASE_URL: https://sribyju.github.io/
+        run: npx playwright test --config=playwright.config.mjs
+
+      - name: Production network sanity
+        shell: bash
+        run: |
+          set -euo pipefail
+          core="$(curl --fail --location --silent --show-error "${SCHOLARK_PRODUCTION_URL}scholark-ai-core.js?sha=${GITHUB_SHA}")"
+          if grep -Eqi 'api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com|api\.together\.xyz|api\.fireworks\.ai|api\.groq\.com|api\.replicate\.com' <<<"$core"; then
+            echo 'Paid model-provider endpoint detected in production AI core.' >&2
+            exit 1
+          fi
+          echo 'Production AI core contains no configured paid inference endpoint.' | tee -a /tmp/scholark-production-audit/http-report.txt
+
+      - name: Preserve production audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scholark-production-ai-audit-${{ github.sha }}
+          path: /tmp/scholark-production-audit
+          if-no-files-found: warn
+          retention-days: 14
