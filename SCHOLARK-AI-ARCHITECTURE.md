@@ -1,6 +1,6 @@
 # Scholark AI Architecture
 
-Status: **Foundation implemented on `scholark-ai-foundation`; production rollout requires merge/deployment plus live audit.**
+Status: **Implementation, additive integration, compatibility-mode browser E2E, adaptive practice, and runtime diagnostics are present on `scholark-ai-foundation`. Production rollout/live audit and a real compatible-device WebGPU inference run remain release checks.**
 
 ## Design principle
 
@@ -11,33 +11,35 @@ CURRENT SCHOLARK
   + local-first AI runtime
   + specialist agents
   + shared mastery/adaptive planning
-  + grounded retrieval adapters
+  + deterministic adaptive practice
+  + grounded legacy-data adapters
+  + runtime/data-safety health checks
   + native UI surfaces
 ```
 
-It is explicitly not a replacement of the existing site with a chatbot.
+It does not replace the existing site with a chatbot and does not migrate or delete legacy student data.
 
 ## Runtime diagram
 
 ```text
-Existing Scholark UI / Ask Scholark / Essay Coach
+Existing Scholark UI / Ask Scholark / Essay Reader / Practice
                          |
                          v
-                  Agent Router
+                  Agent / Task Router
                          |
-        +----------------+----------------+
-        |                |                |
-        v                v                v
-      Tutor         Essay Reader      Planner
-      SAT/AP        College           Scholarship
-        |                |                |
-        +----------------+----------------+
-                         |
-                         v
-                 Context Manager
+      +------------------+------------------+
+      |                  |                  |
+      v                  v                  v
+    Tutor          Essay Reader         Planner
+   SAT / AP        College / Aid      Practice Engine
+      |                  |                  |
+      +------------------+------------------+
                          |
                          v
-                ScholarkAI Runtime
+             Context + Grounding Layer
+                         |
+                         v
+                 ScholarkAI Runtime
                          |
               Device Capability Manager
                          |
@@ -54,106 +56,148 @@ Existing Scholark UI / Ask Scholark / Essay Coach
                    Native Scholark UI
 ```
 
-## Files
+## Modules
 
 ### `scholark-ai-algorithms.js`
-Pure deterministic logic with no DOM dependency. It contains:
+Pure deterministic logic with no DOM dependency:
 
 - hardware capability classification;
 - Ask Scholark intent routing;
-- mastery scoring and labels;
+- mastery scoring/labels;
 - error classification;
-- adaptive-practice selection;
+- next-practice recommendation;
 - deterministic planner prioritization;
-- full deterministic essay-rubric baseline;
+- deterministic essay rubric;
 - structured essay-output validation;
 - essay-version comparison;
 - bounded conversation trimming;
 - stable hashing.
 
-Keeping this logic pure makes it unit-testable and ensures core educational behavior still exists without a local LLM.
+This keeps important educational behavior testable and available without a local LLM.
 
 ### `scholark-ai-core.js`
-Local runtime abstraction. It owns:
+Local runtime abstraction:
 
+- pinned WebLLM import/version;
 - model manifest;
-- WebLLM import/version pin;
+- capability detection;
 - model loading/unloading;
-- tier fallback;
-- model progress events;
-- generation timeout;
-- cancellation;
-- structured-output parsing/repair;
-- bounded local session memory;
-- operational telemetry without student-content logging.
+- high → standard → low tier fallback;
+- progress events;
+- generation timeout/cancel;
+- structured-output extraction/repair/fallback;
+- bounded local sessions;
+- operational telemetry;
+- `preflightRuntime()` to verify the exact browser runtime bundle without downloading model weights.
 
-Specialist code calls the runtime abstraction rather than importing a particular model directly.
+The current runtime is WebLLM 0.2.82. Specialist code talks to this abstraction rather than importing a model directly.
 
 ### `scholark-ai-agents.js`
-Specialist layer. It centralizes prompts and task behavior for:
+Specialists:
 
 - Tutor;
-- AI Admissions Reader Simulation;
+- Admissions Reader Simulation;
 - SAT Coach;
 - AP Coach;
 - Study Planner;
 - College Research;
 - Scholarship Assistant;
-- Ask Scholark routing.
+- unified Ask Scholark routing;
+- shared mastery store.
 
-Each specialist receives task-specific context rather than one huge profile prompt.
+Each specialist receives narrow task context instead of a giant student-profile prompt.
+
+### `scholark-ai-context.js`
+Read-only compatibility/grounding layer around the existing application:
+
+- reads legacy planner tasks from `gs_tasks_*`;
+- reads legacy application records from `gs_apps_*`;
+- enriches college context from structured legacy rows without exposing unsourced legacy acceptance-rate fields;
+- diagnoses existing SAT/AP histories without double-counting them into mastery;
+- gives Tutor shared mastery context;
+- limits Scholarship AI to provider-verified structured scholarship rows rather than presenting generic legacy rows as authoritative facts.
+
+It does not write legacy state.
+
+### `scholark-ai-bridge.js`
+Connects existing SAT/AP evidence to shared AI mastery without mutating native SAT/AP stores. Stable fingerprints prevent duplicate ingestion. SAT evidence can carry skill, correctness, difficulty, confidence, error type, timing, hints, and session kind; AP evidence is mapped by subject/unit.
+
+### `scholark-ai-practice.js`
+Deterministic adaptive-practice engine in a separate AI namespace. It supports objectively gradable generated practice for:
+
+- linear equations;
+- quadratics;
+- percentages;
+- ratios/proportions;
+- probability;
+- statistics/mean;
+- grammar;
+- reading/evidence.
+
+Difficulty/count are chosen from the mastery recommendation. Unknown/open-ended topics become retrieval prompts with `gradable:false`. They never update mastery automatically.
+
+### `scholark-ai-practice-ui.js`
+Accessible adaptive-practice experience launched from Ask Scholark. It provides topic selection, adaptive sets, hints, objective checking, verified deterministic explanation, optional Tutor explanation, and a completion/mastery summary.
+
+### `scholark-ai-health.js`
+Browser runtime self-test. It verifies module presence, routing, deterministic essay stability, model manifest completeness, practice grading rules, context availability, capability detection, and fallback readiness.
+
+It snapshots legacy `gs_*`/Firebase localStorage entries as hash/length metadata before behavioral probes and verifies they are unchanged afterward. The diagnostic report itself is stored only in the AI namespace.
 
 ### `scholark-ai-dashboard.js`
-Adds a signed-in intelligence surface above the existing dashboard results grid. It does not replace existing dashboard content. It renders:
+Adds an intelligence surface above the existing saved-results grid:
 
 - Today;
 - Attention Needed;
 - Improving;
 - Upcoming;
 - Recommended;
-- compact mastery map.
+- compact mastery map/trends.
 
-It also records mastery deltas in a separate AI trend store and adds keyboard focus containment for the Ask Scholark dialog.
-
-### `scholark-ai-bridge.js`
-Connects existing SAT/AP evidence into the shared AI mastery model without mutating native SAT/AP state.
-
-SAT evidence includes existing fields such as skill, difficulty, correctness, confidence, error type, response time, hints, and session type. AP evidence is mapped by subject and unit. Fingerprints prevent duplicate ingestion.
+It does not replace existing dashboard content or old scores.
 
 ### `scholark-ai-ui.js`
-Native UI integration:
+Native AI integration:
 
-- Ask Scholark command dialog;
-- specialist routing status;
-- on-device vs guided-fallback transparency;
-- enhanced Essay Admissions Reader panel;
+- Ask Scholark dialog;
+- specialist routing/progress;
+- on-device vs compatibility transparency;
+- cancel/new conversation;
+- enhanced Admissions Reader panel;
 - essay autosave/restore;
-- full category matrix;
-- follow-up questions;
-- version comparison.
+- full rubric matrix;
+- follow-up;
+- revision/version comparison.
 
-The legacy essay review runs first and remains available as the final compatibility fallback.
+The legacy essay review remains intact and runs independently.
 
-### `scholark-ai.css` / `scholark-ai-dashboard.css`
-Responsive, reduced-motion-aware styling that uses Scholark's existing tokens and visual identity.
+### CSS
 
-## Data flow: SAT/AP closed loop
+`scholark-ai.css`, `scholark-ai-dashboard.css`, and `scholark-ai-practice.css` use existing theme tokens, visible focus states, responsive layouts, and reduced-motion handling.
+
+## Loader/integration boundary
+
+`scholark-feature-loader.js` is the integration point. The existing `index.html` boot remains in place. SAT/AP lazy modules are preserved. The small AI orchestration/UI shell loads after normal rendering/idle time; WebLLM and model weights do not load merely because the page opened.
+
+If the optional AI shell fails, the legacy application remains usable.
+
+## SAT/AP closed loop
 
 ```text
-Existing SAT/AP answer
-  -> existing SAT/AP state saves normally
-  -> read-only AI bridge notices new evidence
-  -> duplicate fingerprint check
+Existing SAT/AP response
+  -> existing native store saves normally
+  -> read-only AI bridge sees new evidence
+  -> stable fingerprint de-duplicates
   -> shared mastery update
-  -> adaptive practice recommendation
-  -> dashboard / planner / Tutor context
+  -> next-practice recommendation
+  -> deterministic adaptive set / planner / dashboard / Tutor context
 ```
 
-The bridge does not rewrite `gs_prep_v2_*` or `gs_ap_v2_*` state.
+The bridge does not rewrite `gs_prep_v2_*` or AP native state.
 
 ## Mastery model
 
-The shared AI layer uses six human-readable states:
+Human-readable states:
 
 - Not Started
 - Learning
@@ -162,19 +206,17 @@ The shared AI layer uses six human-readable states:
 - Strong
 - Mastered
 
-A mastery update considers correctness, difficulty, hints, attempts, confidence, and recency where available. A single correct response cannot immediately produce mastery. Repeated misses can route toward prerequisite review, while high mastery/high accuracy can route toward harder practice.
+Updates consider correctness, difficulty, hints, attempts, confidence, and recency where available. One correct response cannot create immediate mastery. Repeated misses can route toward prerequisite review; sustained strong evidence can route to harder practice.
 
-This is intentionally deterministic and debuggable.
+Only objectively graded adaptive-practice items update mastery automatically. Open-ended retrieval responses are deliberately excluded from automatic scoring.
 
 ## Study planner
 
-The planner is deterministic first. It scores tasks using deadline urgency, current mastery weakness, importance, and completion state. The local model may explain the plan, but it does not invent or override dates.
-
-The planner supports rebalance events such as completed or missed tasks. A missed task raises priority modestly rather than adding punitive language or unrealistic workload.
+The planner is deterministic first. It scores tasks from deadline urgency, current mastery weakness, importance, completion state, and supplied daily availability. The local model may explain a plan but does not invent/override due dates. Missed work rebalances rather than adding punitive language or impossible workload.
 
 ## Essay architecture
 
-The Essay Admissions Reader uses thirteen scored categories:
+The Admissions Reader scores thirteen categories:
 
 1. Opening / Hook
 2. Authenticity
@@ -190,61 +232,81 @@ The Essay Admissions Reader uses thirteen scored categories:
 12. Personal / Intellectual Depth
 13. Admissions Impact
 
-The generative reader uses low randomness and a fixed seed when supported. Structured JSON is validated before rendering. Malformed output gets one local repair attempt; if validation still fails, the deterministic rubric supplies the evaluation.
+Generative scoring uses low randomness/fixed seed where supported. Structured JSON is extracted and validated before rendering. Invalid output gets one repair attempt; if still invalid, the deterministic rubric supplies the evaluation.
 
-Essay text is wrapped as content and the system prompt explicitly instructs the model not to obey instructions inside the essay. The feature coaches rather than replacing the entire essay.
+Essay text is explicitly treated as untrusted content rather than instructions. The feature gives coaching/feedback and is labeled as a simulation, not an actual university decision.
 
 ## Grounding boundaries
 
-College and scholarship agents accept explicit structured rows as their authoritative source. If a requested fact is absent, they say the current Scholark dataset does not include it instead of inventing data.
+College and scholarship agents treat supplied structured rows as authoritative. If requested information is absent, the assistant states that the current Scholark dataset does not contain it rather than inventing it.
 
-The direct filter/search interfaces remain intact; natural-language assistance is an additional interface.
+Legacy direct filters/search/database interfaces remain intact.
 
 ## Conversation memory
 
-Each specialist can keep bounded local session context. Context is trimmed from the oldest turns first to stay within resource constraints. Students can start a fresh conversation from the UI, which clears AI session memory without touching unrelated Scholark data.
+Each specialist can keep bounded local context. Old turns are trimmed first. Starting a fresh conversation clears only AI session state and does not touch unrelated Scholark data.
 
-## Existing data protection
+## Existing-data protection
 
-The foundation adds new local keys under the `scholark_ai_v1_` namespace. It does not:
+New state uses the `scholark_ai_v1_` namespace. The branch does not:
 
 - reset Firebase;
-- change user IDs;
-- delete localStorage namespaces used by legacy tools;
-- overwrite SAT/AP native mastery;
-- alter existing Firestore schemas;
-- migrate or delete saved essays;
-- change authentication mappings.
+- change user IDs/auth mappings;
+- delete legacy localStorage namespaces;
+- overwrite SAT/AP native progress;
+- alter Firestore schemas;
+- migrate/delete saved essays;
+- replace the planner/application stores.
 
-Existing essay save/sync continues through the legacy code path.
+Browser E2E includes a legacy localStorage sentinel plus the health module's before/after legacy-state snapshot.
 
 ## Security boundaries
 
-- Model output is escaped before chat rendering.
-- Essay structured output is type/range validated.
-- Essay content is explicitly treated as untrusted content, not prompt instructions.
-- The AI layer does not render raw model HTML.
-- No provider API keys are present in the client.
-- Diagnostic telemetry excludes prompt/essay content.
-- Inputs are length-bounded to reduce memory/freezing risk.
+- model output is inserted as text/escaped content rather than raw HTML;
+- essay structured output is type/range validated;
+- essay/document text is untrusted prompt content;
+- no paid-provider API secrets are needed or present;
+- diagnostic telemetry excludes essay/prompt contents;
+- input/context lengths are bounded;
+- frontend secret scanning remains active; its OpenAI detector was tightened to distinguish real key shapes from Scholark's own `sk-*` CSS/DOM IDs without weakening real key detection.
 
 ## Performance
 
-- AI shell loads after initial rendering/idle time.
-- Model runtime/model weights are lazy.
-- One model is active at a time.
-- Smaller output limits are used on the low tier.
-- Existing calculators remain deterministic and do not load AI.
-- SAT/AP modules remain independently lazy-loaded.
+- normal page rendering precedes the AI shell;
+- WebLLM/model weights are lazy;
+- only one local model stays active;
+- low tier uses smaller output limits;
+- deterministic calculators never load AI;
+- SAT/AP remain independently lazy;
+- runtime preflight tests code availability without forcing a model-weight download.
 
-## Accessibility and mobile
+## Accessibility/mobile
 
-The AI dialog includes semantic dialog markup, labels, keyboard close behavior, a Tab focus loop, visible focus styling, reduced-motion support, and responsive bottom-sheet behavior on small screens. The essay matrix and dashboard collapse to single-column layouts on narrow phones.
+Ask Scholark and Practice use semantic dialogs, labels, Escape close, Tab focus containment, visible focus states, reduced-motion styles, and responsive mobile layouts. Automated browser coverage includes desktop Chromium/Firefox/WebKit plus mobile Chromium/WebKit smoke tests.
 
-## Feature discovery
+The repository's existing iPhone WebKit cinematic stress test also remains active. Its DOM budget was aligned with the verified untouched production cinematic baseline (149 descendants) while retaining no-desktop-graph, sticky-scroll, bounded-transform, no-overflow, repeated-stress-scroll, and no-page-error assertions.
 
-Ask Scholark offers concise specialist shortcuts without turning the entire application into chat. Existing calculators, tables, filters, dashboard, test-prep engines, and structured pages remain direct interfaces.
+## Automated verification architecture
+
+The regression workflow now verifies:
+
+- JS syntax;
+- existing repository/unit tests;
+- SAT and AP quality audits;
+- additive integration contract;
+- no paid-provider runtime endpoints;
+- legacy essay analyzer still present;
+- bridge/context no legacy writes;
+- adaptive-practice isolation/non-grading rules;
+- runtime health guard;
+- exact runtime/model source availability;
+- actual browser import of WebLLM 0.2.82;
+- compatibility-mode specialist behavior;
+- practice UI/Ask Scholark accessibility smoke paths;
+- Chromium/Firefox/WebKit desktop and Chromium/WebKit mobile projects.
+
+Separate secret-scan and mobile-WebKit workflows remain release gates.
 
 ## Deployment boundary
 
-The implementation is currently isolated on `scholark-ai-foundation`. This document does **not** claim that production has passed the mandatory live audit. Production verification can only be recorded after the branch is merged/deployed and the actual GitHub Pages build is navigated in browser environments.
+This branch is not yet the production GitHub Pages build. A successful CI/preview-equivalent browser pass is not a substitute for the required post-deploy audit. Production authentication/data smoke tests, actual live assets/network/console/SEO checks, and a compatible-device WebGPU model-weight inference are only marked PASS after execution evidence exists.
