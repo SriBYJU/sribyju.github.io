@@ -16,6 +16,7 @@ on:
       - 'REGRESSION-CHECKLIST.md'
       - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
+      - '.github/workflows/scholark-production-ai-audit.yml'
   push:
     branches:
       - main
@@ -34,6 +35,7 @@ on:
       - 'REGRESSION-CHECKLIST.md'
       - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
+      - '.github/workflows/scholark-production-ai-audit.yml'
 
 permissions:
   contents: read
@@ -45,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: JavaScript syntax checks
+      - name: JavaScript and shell syntax checks
         run: |
           node --check scholark-feature-loader.js
           node --check scholark-v3.js
@@ -66,6 +68,7 @@ jobs:
           node --check ap-v2-data.js
           node --check prep-v2-app.js
           node --check prep-v2-data.js
+          bash -n scripts/scholark-production-audit.sh
 
       - name: Install audit dependencies
         working-directory: scripts
@@ -111,7 +114,9 @@ jobs:
             'REGRESSION-CHECKLIST.md','AI-E2E-RESULTS.md'
           )
           required_e2e=(
-            'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs','scripts/playwright.config.mjs'
+            'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs',
+            'scripts/playwright.config.mjs','scripts/scholark-production-audit.sh',
+            '.github/workflows/scholark-production-ai-audit.yml'
           )
           paid_hosts=(
             'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
@@ -142,6 +147,7 @@ jobs:
             'practice_has_objective_grader': 'function grade(question, response)' in practice,
             'health_checks_legacy_snapshot': 'legacySnapshot' in health and 'legacy-state:unchanged' in health,
             'runtime_health_public_api': 'window.ScholarkAIHealth' in health,
+            'runtime_preflight_public_api': 'preflightRuntime' in core,
             'required_ai_docs_present': all(Path(x).exists() for x in required_docs),
             'required_e2e_present': all(Path(x).exists() for x in required_e2e),
           }
