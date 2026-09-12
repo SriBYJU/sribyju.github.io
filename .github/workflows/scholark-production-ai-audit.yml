@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'index.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
       - 'scholark-feature-loader.js'
       - 'scholark-ai-*.js'
       - 'scholark-ai-*.css'
@@ -40,7 +42,7 @@ jobs:
           cache: npm
           cache-dependency-path: scripts/package-lock.json
 
-      - name: Audit live GitHub Pages assets and network contract
+      - name: Audit live GitHub Pages assets, network, and SEO contract
         run: bash scripts/scholark-production-audit.sh
 
       - name: Install production browser audit runner
