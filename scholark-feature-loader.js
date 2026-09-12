@@ -3,7 +3,7 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='5160';
+  const BUILD='ai-100';
   const pending=new Map();
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
@@ -20,7 +20,12 @@
 
   const suites={
     prep:{files:['prep-v2-data.js','prep-v2-app.js'],ready:()=>!!window.ScholarkPrep,init:()=>window.ScholarkPrep?.init?.()},
-    ap:{files:['ap-v2-data.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>window.initAPHub?.()}
+    ap:{files:['ap-v2-data.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>window.initAPHub?.()},
+    ai:{
+      files:['scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js','scholark-ai-ui.js'],
+      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIUI,
+      init:()=>window.ScholarkAIUI?.enhanceEssay?.()
+    }
   };
 
   function ensure(name){
@@ -30,7 +35,11 @@
     if(pending.has(name)) return pending.get(name);
     const promise=suite.files.reduce((p,file)=>p.then(()=>load(file)),Promise.resolve())
       .then(()=>{suite.init();return true;})
-      .catch(err=>{console.error(`ScholarK ${name} lazy loader failed:`,err);window.showToast?.('That study module could not load. Please check your connection and try again.','error');throw err;})
+      .catch(err=>{
+        console.error(`ScholarK ${name} lazy loader failed:`,err);
+        if(name!=='ai') window.showToast?.('That study module could not load. Please check your connection and try again.','error');
+        throw err;
+      })
       .finally(()=>pending.delete(name));
     pending.set(name,promise);
     return promise;
@@ -42,8 +51,6 @@
     const wrapped=function(name,...args){
       const suite=suites[name];
       if(!suite||suite.ready()) return original.call(this,name,...args);
-      // Preserve the normal authentication gate. Do not download a large study engine for a visitor
-      // who cannot enter the feature page yet.
       if(!window.currentUser) return original.call(this,name,...args);
       const result=original.call(this,name,...args);
       if(result===false) return false;
@@ -56,8 +63,6 @@
     return true;
   }
 
-  // The main inline app defines showPage before this deferred script runs. Retry briefly in case
-  // another enhancement replaces it during the same boot turn.
   if(!installShowPageHook()){
     let tries=0;
     const timer=setInterval(()=>{tries++;if(installShowPageHook()||tries>80)clearInterval(timer);},25);
@@ -66,5 +71,12 @@
   setTimeout(installShowPageHook,300);
   setTimeout(installShowPageHook,1200);
 
-  window.ScholarkFeatureLoader={version:'1.0.0',ensure,installShowPageHook};
+  // Load only the small orchestration/UI shell after normal rendering. No model weights are loaded
+  // until a student actively requests a generative feature. If this optional layer fails, legacy
+  // Scholark remains available because the integration is strictly additive.
+  const bootAI=()=>ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
+  if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1500});
+  else setTimeout(bootAI,700);
+
+  window.ScholarkFeatureLoader={version:'1.1.0',ensure,installShowPageHook};
 })();
