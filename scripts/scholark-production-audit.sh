@@ -8,17 +8,20 @@ mkdir -p "$OUT"
 
 wait_for_release() {
   for attempt in $(seq 1 90); do
-    local loader health_code reliability_code robots_code sitemap_code
+    local loader health_code reliability_code polish_code robots_code sitemap_code
     loader="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SITE}scholark-feature-loader.js?sha=${SHA}" 2>/dev/null || true)"
     health_code="$(curl --location --silent --output "$OUT/health.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-health.js?sha=${SHA}" || true)"
     reliability_code="$(curl --location --silent --output "$OUT/reliability.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-reliability.js?sha=${SHA}" || true)"
+    polish_code="$(curl --location --silent --output "$OUT/ui-polish.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-ui-polish.js?sha=${SHA}" || true)"
     robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
     sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
-    if grep -q 'ai-105' <<<"$loader" \
+    if grep -q 'ai-106' <<<"$loader" \
       && grep -q 'scholark-ai-reliability.js' <<<"$loader" \
+      && grep -q 'scholark-ai-ui-polish.js' <<<"$loader" \
       && grep -q 'afterCinematicReady' <<<"$loader" \
       && [ "$health_code" = '200' ] \
       && [ "$reliability_code" = '200' ] \
+      && [ "$polish_code" = '200' ] \
       && [ "$robots_code" = '200' ] \
       && [ "$sitemap_code" = '200' ] \
       && cmp -s robots.txt "$OUT/robots-wait.txt" \
@@ -55,6 +58,7 @@ for asset in \
   scholark-ai-bridge.js \
   scholark-ai-dashboard.js \
   scholark-ai-ui.js \
+  scholark-ai-ui-polish.js \
   scholark-ai-practice.js \
   scholark-ai-practice-ui.js \
   scholark-ai-health.js \
@@ -72,6 +76,7 @@ grep -q 'scholark-v3.js' "$OUT/live-index.html"
 grep -q 'scholark-ai-practice.js' "$OUT/loader.js"
 grep -q 'scholark-ai-health.js' "$OUT/loader.js"
 grep -q 'scholark-ai-reliability.js' "$OUT/loader.js"
+grep -q 'scholark-ai-ui-polish.js' "$OUT/loader.js"
 grep -q 'afterCinematicReady' "$OUT/loader.js"
 
 grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
@@ -97,6 +102,7 @@ fi
 
 grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' "$OUT/scholark-ai-reliability.js"
 grep -q "\['standard', 'rescue', 'low'\]" "$OUT/scholark-ai-reliability.js"
+grep -q 'last resort' "$OUT/scholark-ai-ui-polish.js"
 
 echo 'Production AI runtime contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
 echo 'Production HTTP/network/SEO/reliability audit passed.' | tee -a "$OUT/http-report.txt"
