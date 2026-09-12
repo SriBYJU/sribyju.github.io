@@ -1,0 +1,66 @@
+name: ScholarK production AI audit
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scholark-ai-*.css'
+      - 'scripts/scholark-ai-browser.spec.mjs'
+      - 'scripts/scholark-ai-mobile-smoke.spec.mjs'
+      - 'scripts/playwright.config.mjs'
+      - 'scripts/scholark-production-audit.sh'
+      - '.github/workflows/scholark-production-ai-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: scholark-production-ai-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  production-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SCHOLARK_PRODUCTION_URL: https://sribyju.github.io/
+    steps:
+      - name: Checkout deployed commit
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
+
+      - name: Audit live GitHub Pages assets and network contract
+        run: bash scripts/scholark-production-audit.sh
+
+      - name: Install production browser audit runner
+        working-directory: scripts
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false @playwright/test@1.63.0
+          npx playwright install --with-deps chromium firefox webkit
+
+      - name: Run AI E2E against live production
+        working-directory: scripts
+        env:
+          SCHOLARK_BASE_URL: https://sribyju.github.io/
+        run: npx playwright test --config=playwright.config.mjs
+
+      - name: Preserve production audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scholark-production-ai-audit-${{ github.sha }}
+          path: /tmp/scholark-production-audit
+          if-no-files-found: warn
+          retention-days: 14

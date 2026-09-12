@@ -1,30 +1,101 @@
 name: ScholarK regression audit
 
 on:
-  push:
+  pull_request:
     paths:
+      - 'index.html'
+      - 'scholark-*.js'
+      - 'scholark-*.css'
+      - 'prep-v2-*.js'
+      - 'ap-v2-*.js'
+      - 'ap-v2.css'
+      - 'scripts/**'
+      - 'ZERO-COST-AI-ARCHITECTURE.md'
+      - 'SCHOLARK-AI-ARCHITECTURE.md'
+      - 'AI-EVALUATION.md'
+      - 'REGRESSION-CHECKLIST.md'
+      - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
+      - '.github/workflows/scholark-production-ai-audit.yml'
+  push:
+    branches:
+      - main
+      - 'scholark-ai-*'
+    paths:
+      - 'index.html'
+      - 'scholark-*.js'
+      - 'scholark-*.css'
+      - 'prep-v2-*.js'
+      - 'ap-v2-*.js'
+      - 'ap-v2.css'
+      - 'scripts/**'
+      - 'ZERO-COST-AI-ARCHITECTURE.md'
+      - 'SCHOLARK-AI-ARCHITECTURE.md'
+      - 'AI-EVALUATION.md'
+      - 'REGRESSION-CHECKLIST.md'
+      - 'AI-E2E-RESULTS.md'
+      - '.github/workflows/scholark-regression-audit.yml'
+      - '.github/workflows/scholark-production-ai-audit.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: JavaScript syntax checks
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
+
+      - name: JavaScript and shell syntax checks
         run: |
+          node --check scholark-feature-loader.js
           node --check scholark-v3.js
+          node --check scholark-ai-algorithms.js
+          node --check scholark-ai-core.js
+          node --check scholark-ai-agents.js
+          node --check scholark-ai-dashboard.js
+          node --check scholark-ai-bridge.js
+          node --check scholark-ai-context.js
+          node --check scholark-ai-ui.js
+          node --check scholark-ai-practice.js
+          node --check scholark-ai-practice-ui.js
+          node --check scholark-ai-health.js
+          node --check scripts/scholark-ai-browser.spec.mjs
+          node --check scripts/scholark-ai-mobile-smoke.spec.mjs
+          node --check scripts/playwright.config.mjs
           node --check ap-v2-app.js
           node --check ap-v2-data.js
           node --check prep-v2-app.js
           node --check prep-v2-data.js
+          bash -n scripts/scholark-production-audit.sh
 
       - name: Install audit dependencies
         working-directory: scripts
         run: npm ci
+
+      - name: Verify patched brace-expansion maintenance release
+        working-directory: scripts
+        run: |
+          node - <<'NODE'
+          const lock = require('./package-lock.json');
+          const record = lock.packages?.['node_modules/brace-expansion'];
+          if (!record?.version) throw new Error('brace-expansion missing from lockfile');
+          const [major, minor, patch] = record.version.split('.').map(Number);
+          const patched = (major === 1 && (minor > 1 || (minor === 1 && patch >= 16))) ||
+            (major === 2 && (minor > 1 || (minor === 1 && patch >= 2))) ||
+            (major === 3 && (minor > 0 || patch >= 3)) ||
+            (major >= 5 && (major > 5 || minor > 0 || patch >= 8));
+          if (!patched) throw new Error(`brace-expansion ${record.version} is not on a patched maintenance line`);
+          console.log(`brace-expansion ${record.version}: patched maintenance release verified.`);
+          NODE
 
       - name: Run repository test suite
         working-directory: scripts
@@ -38,19 +109,70 @@ jobs:
         working-directory: scripts
         run: npm run ap:audit
 
-      - name: Verify shared-site integration
+      - name: Verify zero-regression integration contract
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re, sys
+
           html=Path('index.html').read_text(encoding='utf-8')
+          loader=Path('scholark-feature-loader.js').read_text(encoding='utf-8')
+          core=Path('scholark-ai-core.js').read_text(encoding='utf-8')
+          agents=Path('scholark-ai-agents.js').read_text(encoding='utf-8')
+          bridge=Path('scholark-ai-bridge.js').read_text(encoding='utf-8')
+          context=Path('scholark-ai-context.js').read_text(encoding='utf-8')
+          dashboard=Path('scholark-ai-dashboard.js').read_text(encoding='utf-8')
+          ui=Path('scholark-ai-ui.js').read_text(encoding='utf-8')
+          practice=Path('scholark-ai-practice.js').read_text(encoding='utf-8')
+          practice_ui=Path('scholark-ai-practice-ui.js').read_text(encoding='utf-8')
+          health=Path('scholark-ai-health.js').read_text(encoding='utf-8')
+          ai_js='\n'.join([core,agents,bridge,context,dashboard,ui,practice,practice_ui,health]).lower()
+
+          required_ai_files=(
+            'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
+            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+            'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
+          )
+          required_docs=(
+            'ZERO-COST-AI-ARCHITECTURE.md','SCHOLARK-AI-ARCHITECTURE.md','AI-EVALUATION.md',
+            'REGRESSION-CHECKLIST.md','AI-E2E-RESULTS.md'
+          )
+          required_e2e=(
+            'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs',
+            'scripts/playwright.config.mjs','scripts/scholark-production-audit.sh',
+            '.github/workflows/scholark-production-ai-audit.yml'
+          )
+          paid_hosts=(
+            'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
+            'api.together.xyz','api.fireworks.ai','api.groq.com','api.replicate.com'
+          )
+
           checks={
             'v3_css_once': html.count('href="scholark-v3.css"')==1,
             'v3_js_once': html.count('src="scholark-v3.js"')==1,
             'ap_assets_preserved': all(x in html for x in ('ap-v2-data.js','ap-v2-app.js')),
             'prep_assets_preserved': all(x in html for x in ('prep-v2-data.js','prep-v2-app.js')),
-            'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about')),
+            'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about','essay','dashboard')),
             'no_accidental_paywall_copy': 'Upgrade to Pro to access' not in html,
+            'ai_is_additive_loader_suite': all(x in loader for x in required_ai_files),
+            'ai_does_not_replace_index_boot': 'scholark-feature-loader.js' in html and 'scholark-v3.js' in html,
+            'no_paid_ai_runtime_dependency': not any(x in ai_js for x in paid_hosts),
+            'deterministic_fallback_present': 'deterministic-fallback' in core and 'fallbackTutor' in agents,
+            'legacy_essay_fallback_preserved': 'analyzeEssayLocally' in html,
+            'bridge_does_not_write_legacy_prep_keys': "localstorage.setitem(`gs_prep" not in bridge.lower() and "localstorage.setitem('gs_prep" not in bridge.lower(),
+            'bridge_does_not_write_legacy_ap_keys': "localstorage.setitem(`gs_ap" not in bridge.lower() and "localstorage.setitem('gs_ap" not in bridge.lower(),
+            'context_reads_existing_planner': 'gs_tasks_' in context and 'existing-scholark-planner' in context,
+            'context_reads_existing_applications': 'gs_apps_' in context and 'existing-scholark-application-tracker' in context,
+            'context_does_not_expose_unsourced_acceptance_rates': 'item.rate' not in context,
+            'context_does_not_write_legacy_state': 'localstorage.setitem' not in context.lower(),
+            'dashboard_is_additive': '#dash-saved-list' in dashboard and 'insertBefore' in dashboard,
+            'practice_is_separate_state': 'practice_sessions_' in practice and 'gs_prep_' not in practice and 'gs_ap_' not in practice,
+            'practice_open_ended_not_auto_graded': "domain: 'retrieval', gradable: false" in practice,
+            'practice_has_objective_grader': 'function grade(question, response)' in practice,
+            'health_checks_legacy_snapshot': 'legacySnapshot' in health and 'legacy-state:unchanged' in health,
+            'runtime_health_public_api': 'window.ScholarkAIHealth' in health,
+            'runtime_preflight_public_api': 'preflightRuntime' in core,
+            'required_ai_docs_present': all(Path(x).exists() for x in required_docs),
+            'required_e2e_present': all(Path(x).exists() for x in required_e2e),
           }
           failed=[k for k,v in checks.items() if not v]
           print('\n'.join(f'{"PASS" if v else "FAIL"}: {k}' for k,v in checks.items()))
@@ -58,31 +180,38 @@ jobs:
               raise SystemExit('Integration checks failed: '+', '.join(failed))
           PY
 
-      - name: Record successful regression audit
+      - name: Verify pinned free runtime and model sources resolve
         run: |
-          cat > SCHOLARK_REGRESSION_AUDIT.md <<'EOF'
-          # ScholarK Regression Audit
+          set -euo pipefail
+          npm view @mlc-ai/web-llm@0.2.82 version | grep -qx '0.2.82'
+          for url in \
+            'https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC' \
+            'https://huggingface.co/mlc-ai/Qwen3-0.6B-q4f16_1-MLC' \
+            'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC'; do
+              curl --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 20 --max-time 90 --output /dev/null "$url"
+          done
 
-          Status: **PASS**
+      - name: Install cross-browser E2E runner
+        working-directory: scripts
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.63.0
+          npx playwright install --with-deps chromium firefox webkit
 
-          This audit was run after the ScholarK shared legacy-site upgrade.
+      - name: Run AI browser E2E suite
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/scholark-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+          cd scripts
+          SCHOLARK_BASE_URL=http://127.0.0.1:4173 npx playwright test --config=playwright.config.mjs
 
-          ## Verified
-          - `scholark-v3.js` syntax passes.
-          - AP v2 app/data JavaScript syntax passes.
-          - SAT/ACT prep v2 app/data JavaScript syntax passes.
-          - The repository's complete Node test suite passes.
-          - SAT/ACT market-quality audit passes.
-          - AP market-quality audit passes.
-          - The new shared CSS and JS are each injected exactly once.
-          - AP and SAT dedicated assets remain wired into the main page.
-          - Core Home, Features, and About page containers remain present.
-          - No legacy "Upgrade to Pro to access" copy is present in the main HTML.
-
-          The shared upgrade layer is additive and preserves the dedicated AP/SAT implementations.
-          EOF
-          git config user.name "scholark-audit-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add SCHOLARK_REGRESSION_AUDIT.md
-          git commit -m "test: record passing ScholarK regression audit"
-          git push
+      - name: Regression summary
+        run: |
+          echo 'ScholarK regression contract passed.'
+          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, cross-browser tested in compatibility mode, and legacy AP/SAT/Essay paths remain present.'

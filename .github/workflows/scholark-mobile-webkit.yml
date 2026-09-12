@@ -10,6 +10,8 @@ on:
       - 'scholark-mobile.js'
       - 'scholark-mobile.css'
       - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scholark-ai-*.css'
       - 'scripts/mobile-webkit-stability.mjs'
       - '.github/workflows/scholark-mobile-webkit.yml'
   pull_request:
@@ -19,6 +21,8 @@ on:
       - 'scholark-mobile.js'
       - 'scholark-mobile.css'
       - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scholark-ai-*.css'
       - 'scripts/mobile-webkit-stability.mjs'
       - '.github/workflows/scholark-mobile-webkit.yml'
 
@@ -35,16 +39,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Install Playwright WebKit
         run: |
-          npm install --no-save --ignore-scripts playwright@1.55.0
+          npm install --no-save --ignore-scripts playwright@1.63.0
           npx playwright install --with-deps webkit
 
       - name: Start local ScholarK server
@@ -61,7 +65,24 @@ jobs:
       - name: Run iPhone-like WebKit scroll stability audit
         env:
           SCHOLARK_TEST_URL: http://127.0.0.1:4173/
-        run: node scripts/mobile-webkit-stability.mjs
+        shell: bash
+        run: |
+          set +e
+          node scripts/mobile-webkit-stability.mjs 2>&1 | tee /tmp/scholark-mobile-audit.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+
+      - name: Preserve mobile audit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scholark-mobile-webkit-diagnostics
+          path: |
+            /tmp/scholark-mobile-audit.log
+            /tmp/scholark-mobile-server.log
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Server log on failure
         if: failure()

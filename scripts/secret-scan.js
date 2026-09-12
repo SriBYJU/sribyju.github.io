@@ -10,9 +10,13 @@ const ignored = new Set(['.git','node_modules','.firebase']);
 const ignoredFiles = new Set(['scripts/secret-scan.js']);
 const findings = [];
 
+// Keep secret patterns specific enough that ordinary public UI identifiers do not become false
+// positives. In particular, Scholark intentionally uses many CSS/DOM ids beginning with `sk-`.
+// OpenAI project/service keys have a recognizable prefix, while legacy keys are long alphanumeric
+// tokens rather than kebab-case UI names.
 const rules = [
   ['Private key block', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/g],
-  ['OpenAI-style secret', /\bsk-[A-Za-z0-9_-]{20,}\b/g],
+  ['OpenAI project/service secret', /\bsk-(?:(?:proj|svcacct)-[A-Za-z0-9_-]{20,}|[A-Za-z0-9]{32,})\b/g],
   ['GitHub personal token', /\bgh[pousr]_[A-Za-z0-9]{30,}\b/g],
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/g],
   ['Hard-coded client secret', /client_secret\s*[:=]\s*["'][^"'\n]{12,}["']/gi],
