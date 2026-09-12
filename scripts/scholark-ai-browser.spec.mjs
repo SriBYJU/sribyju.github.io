@@ -45,6 +45,21 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(aiConsoleErrors).toEqual([]);
   });
 
+  test('the pinned WebLLM browser bundle imports without downloading model weights', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+
+    const preflight = await page.evaluate(() => window.ScholarkAI.preflightRuntime());
+    expect(preflight.webllmVersion).toBe('0.2.82');
+    expect(preflight.runtimeSource).toContain('@mlc-ai/web-llm@0.2.82');
+    expect(preflight.runtimeImport, JSON.stringify(preflight.error || {})).toBe('ok');
+    expect(preflight.modelManifest.map(row => row.id)).toEqual([
+      'Qwen3-1.7B-q4f16_1-MLC',
+      'Qwen3-0.6B-q4f16_1-MLC',
+      'SmolLM2-360M-Instruct-q4f32_1-MLC'
+    ]);
+  });
+
   test('all specialists return useful compatibility-mode results with WebGPU unavailable', async ({ page }) => {
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     await waitForAI(page);
