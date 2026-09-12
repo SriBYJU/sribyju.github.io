@@ -45,7 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
 
       - name: JavaScript and shell syntax checks
         run: |
@@ -73,6 +80,22 @@ jobs:
       - name: Install audit dependencies
         working-directory: scripts
         run: npm ci
+
+      - name: Verify patched brace-expansion maintenance release
+        working-directory: scripts
+        run: |
+          node - <<'NODE'
+          const lock = require('./package-lock.json');
+          const record = lock.packages?.['node_modules/brace-expansion'];
+          if (!record?.version) throw new Error('brace-expansion missing from lockfile');
+          const [major, minor, patch] = record.version.split('.').map(Number);
+          const patched = (major === 1 && (minor > 1 || (minor === 1 && patch >= 16))) ||
+            (major === 2 && (minor > 1 || (minor === 1 && patch >= 2))) ||
+            (major === 3 && (minor > 0 || patch >= 3)) ||
+            (major >= 5 && (major > 5 || minor > 0 || patch >= 8));
+          if (!patched) throw new Error(`brace-expansion ${record.version} is not on a patched maintenance line`);
+          console.log(`brace-expansion ${record.version}: patched maintenance release verified.`);
+          NODE
 
       - name: Run repository test suite
         working-directory: scripts
@@ -171,7 +194,7 @@ jobs:
       - name: Install cross-browser E2E runner
         working-directory: scripts
         run: |
-          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npm install --no-save --package-lock=false @playwright/test@1.63.0
           npx playwright install --with-deps chromium firefox webkit
 
       - name: Run AI browser E2E suite
