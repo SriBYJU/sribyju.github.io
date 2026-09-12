@@ -9,7 +9,7 @@
     return;
   }
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const WEBLLM_VERSION = '0.2.82';
   const WEBLLM_IMPORT = `https://esm.sh/@mlc-ai/web-llm@${WEBLLM_VERSION}?bundle`;
   const STORAGE_PREFIX = 'scholark_ai_v1_';
@@ -163,8 +163,33 @@
     state.runtime = 'loading-runtime';
     emit('runtime', { status: state.runtime });
     const module = await import(WEBLLM_IMPORT);
+    if (!module || typeof module.CreateMLCEngine !== 'function') throw new Error('webllm-runtime-invalid');
     state.webllm = module;
     return module;
+  }
+
+  async function preflightRuntime() {
+    const result = {
+      at: Date.now(),
+      webllmVersion: WEBLLM_VERSION,
+      runtimeSource: WEBLLM_IMPORT,
+      webgpu: !!navigator.gpu,
+      runtimeImport: 'not-attempted',
+      modelManifest: Object.values(MODEL_MANIFEST).map(({ id, family, contextWindow, fallback }) => ({ id, family, contextWindow, fallback }))
+    };
+    try {
+      // Importing the bundle itself does not download model weights. This is safe to expose as a
+      // diagnostics action and gives us a direct way to distinguish bundle/CDN failure from GPU or
+      // model-loading failure.
+      const module = await import(WEBLLM_IMPORT);
+      result.runtimeImport = typeof module?.CreateMLCEngine === 'function' ? 'ok' : 'invalid';
+      if (result.runtimeImport === 'ok') state.webllm = module;
+    } catch (error) {
+      result.runtimeImport = 'failed';
+      result.error = normalizeError(error);
+    }
+    Telemetry.record('runtime-preflight', { runtimeImport: result.runtimeImport, webgpu: result.webgpu });
+    return result;
   }
 
   async function loadModel(tier, options = {}) {
@@ -395,6 +420,7 @@
   window.ScholarkAI = {
     version: VERSION,
     webllmVersion: WEBLLM_VERSION,
+    runtimeSource: WEBLLM_IMPORT,
     modelManifest: MODEL_MANIFEST,
     state,
     algorithms: A,
@@ -403,6 +429,7 @@
     generate,
     generateStructured,
     loadModel,
+    preflightRuntime,
     cancelGeneration,
     unload,
     sessions: Sessions,
