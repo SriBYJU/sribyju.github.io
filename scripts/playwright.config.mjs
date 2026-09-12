@@ -2,7 +2,6 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
-  testMatch: 'scholark-ai-browser.spec.mjs',
   timeout: 30000,
   expect: { timeout: 10000 },
   fullyParallel: false,
@@ -15,10 +14,10 @@ export default defineConfig({
     screenshot: 'only-on-failure'
   },
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox-desktop', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit-desktop', use: { ...devices['Desktop Safari'] } },
-    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
-    { name: 'webkit-mobile', use: { ...devices['iPhone 14'] } }
+    { name: 'chromium-desktop', testMatch: 'scholark-ai-browser.spec.mjs', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox-desktop', testMatch: 'scholark-ai-browser.spec.mjs', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit-desktop', testMatch: 'scholark-ai-browser.spec.mjs', use: { ...devices['Desktop Safari'] } },
+    { name: 'chromium-mobile', testMatch: 'scholark-ai-mobile-smoke.spec.mjs', use: { ...devices['Pixel 7'] } },
+    { name: 'webkit-mobile', testMatch: 'scholark-ai-mobile-smoke.spec.mjs', use: { ...devices['iPhone 14'] } }
   ]
 });
