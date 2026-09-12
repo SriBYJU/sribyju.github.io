@@ -13,7 +13,12 @@ wait_for_release() {
     health_code="$(curl --location --silent --output "$OUT/health.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-health.js?sha=${SHA}" || true)"
     robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
     sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
-    if grep -q 'ai-104' <<<"$loader" && [ "$health_code" = '200' ] && [ "$robots_code" = '200' ] && [ "$sitemap_code" = '200' ]; then
+    if grep -q 'ai-104' <<<"$loader" \
+      && [ "$health_code" = '200' ] \
+      && [ "$robots_code" = '200' ] \
+      && [ "$sitemap_code" = '200' ] \
+      && cmp -s robots.txt "$OUT/robots-wait.txt" \
+      && cmp -s sitemap.xml "$OUT/sitemap-wait.xml"; then
       printf '%s\n' "$loader" > "$OUT/loader.js"
       echo "Production AI/SEO release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
       return 0
@@ -64,6 +69,8 @@ grep -q 'scholark-ai-health.js' "$OUT/loader.js"
 
 grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
 grep -Fq '<loc>https://sribyju.github.io/</loc>' "$OUT/sitemap.xml"
+cmp -s robots.txt "$OUT/robots.txt"
+cmp -s sitemap.xml "$OUT/sitemap.xml"
 
 canonical_count="$(grep -Eic "rel=[\"']canonical[\"']" "$OUT/live-index.html" || true)"
 echo "canonical_tags ${canonical_count}" | tee -a "$OUT/http-report.txt"
