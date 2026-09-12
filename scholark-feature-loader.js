@@ -3,7 +3,7 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='ai-104';
+  const BUILD='ai-105';
   const pending=new Map();
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
@@ -28,10 +28,10 @@
     ai:{
       files:[
         'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
-        'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+        'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-reliability.js','scholark-ai-ui.js',
         'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
       ],
-      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIUI&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
+      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIReliability&&!!window.ScholarkAIUI&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
       init:()=>{window.ScholarkAIUI?.enhanceEssay?.();notify('ai');}
     }
   };
@@ -79,12 +79,43 @@
   setTimeout(installShowPageHook,300);
   setTimeout(installShowPageHook,1200);
 
-  // Load only the small orchestration/UI shell after normal rendering. No model weights are loaded
-  // until a student actively requests a generative feature. If this optional layer fails, legacy
-  // Scholark remains available because the integration is strictly additive.
   const bootAI=()=>ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
-  if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1500});
-  else setTimeout(bootAI,700);
 
-  window.ScholarkFeatureLoader={version:'1.2.0',ensure,installShowPageHook};
+  function afterCinematicReady(){
+    return new Promise(resolve=>{
+      let tries=0;
+      let settled=false;
+      const finish=()=>{
+        if(settled)return;
+        settled=true;
+        // Give the original desktop/mobile cinematic two clean paints before any AI DOM/CSS work.
+        requestAnimationFrame(()=>requestAnimationFrame(resolve));
+      };
+      const probe=()=>{
+        if(settled)return;
+        const cinematic=window.ScholarkV3?.cinematicReady;
+        if(cinematic&&typeof cinematic.then==='function'){
+          Promise.resolve(cinematic).then(finish,finish);
+          return;
+        }
+        if(document.documentElement.classList.contains('scholark-cinematic-ready')){
+          finish();
+          return;
+        }
+        tries+=1;
+        if(tries>=240){finish();return;}
+        setTimeout(probe,25);
+      };
+      probe();
+    });
+  }
+
+  // The original Scholark S/cinematic experience owns startup. AI is strictly additive and only
+  // attaches after the cinematic loader has resolved and the browser has painted it.
+  afterCinematicReady().then(()=>{
+    if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1800});
+    else setTimeout(bootAI,700);
+  });
+
+  window.ScholarkFeatureLoader={version:'1.3.0',ensure,installShowPageHook,afterCinematicReady};
 })();
