@@ -10,6 +10,11 @@ on:
       - 'ap-v2-*.js'
       - 'ap-v2.css'
       - 'scripts/**'
+      - 'ZERO-COST-AI-ARCHITECTURE.md'
+      - 'SCHOLARK-AI-ARCHITECTURE.md'
+      - 'AI-EVALUATION.md'
+      - 'REGRESSION-CHECKLIST.md'
+      - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
   push:
     branches:
@@ -23,6 +28,11 @@ on:
       - 'ap-v2-*.js'
       - 'ap-v2.css'
       - 'scripts/**'
+      - 'ZERO-COST-AI-ARCHITECTURE.md'
+      - 'SCHOLARK-AI-ARCHITECTURE.md'
+      - 'AI-EVALUATION.md'
+      - 'REGRESSION-CHECKLIST.md'
+      - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
 
 permissions:
@@ -31,7 +41,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
@@ -46,6 +56,12 @@ jobs:
           node --check scholark-ai-bridge.js
           node --check scholark-ai-context.js
           node --check scholark-ai-ui.js
+          node --check scholark-ai-practice.js
+          node --check scholark-ai-practice-ui.js
+          node --check scholark-ai-health.js
+          node --check scripts/scholark-ai-browser.spec.mjs
+          node --check scripts/scholark-ai-mobile-smoke.spec.mjs
+          node --check scripts/playwright.config.mjs
           node --check ap-v2-app.js
           node --check ap-v2-data.js
           node --check prep-v2-app.js
@@ -80,15 +96,22 @@ jobs:
           context=Path('scholark-ai-context.js').read_text(encoding='utf-8')
           dashboard=Path('scholark-ai-dashboard.js').read_text(encoding='utf-8')
           ui=Path('scholark-ai-ui.js').read_text(encoding='utf-8')
-          ai_js='\n'.join([core,agents,bridge,context,dashboard,ui]).lower()
+          practice=Path('scholark-ai-practice.js').read_text(encoding='utf-8')
+          practice_ui=Path('scholark-ai-practice-ui.js').read_text(encoding='utf-8')
+          health=Path('scholark-ai-health.js').read_text(encoding='utf-8')
+          ai_js='\n'.join([core,agents,bridge,context,dashboard,ui,practice,practice_ui,health]).lower()
 
           required_ai_files=(
             'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
-            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js'
+            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+            'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
           )
           required_docs=(
             'ZERO-COST-AI-ARCHITECTURE.md','SCHOLARK-AI-ARCHITECTURE.md','AI-EVALUATION.md',
             'REGRESSION-CHECKLIST.md','AI-E2E-RESULTS.md'
+          )
+          required_e2e=(
+            'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs','scripts/playwright.config.mjs'
           )
           paid_hosts=(
             'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
@@ -114,7 +137,13 @@ jobs:
             'context_does_not_expose_unsourced_acceptance_rates': 'item.rate' not in context,
             'context_does_not_write_legacy_state': 'localstorage.setitem' not in context.lower(),
             'dashboard_is_additive': '#dash-saved-list' in dashboard and 'insertBefore' in dashboard,
+            'practice_is_separate_state': 'practice_sessions_' in practice and 'gs_prep_' not in practice and 'gs_ap_' not in practice,
+            'practice_open_ended_not_auto_graded': "domain: 'retrieval', gradable: false" in practice,
+            'practice_has_objective_grader': 'function grade(question, response)' in practice,
+            'health_checks_legacy_snapshot': 'legacySnapshot' in health and 'legacy-state:unchanged' in health,
+            'runtime_health_public_api': 'window.ScholarkAIHealth' in health,
             'required_ai_docs_present': all(Path(x).exists() for x in required_docs),
+            'required_e2e_present': all(Path(x).exists() for x in required_e2e),
           }
           failed=[k for k,v in checks.items() if not v]
           print('\n'.join(f'{"PASS" if v else "FAIL"}: {k}' for k,v in checks.items()))
@@ -122,7 +151,38 @@ jobs:
               raise SystemExit('Integration checks failed: '+', '.join(failed))
           PY
 
+      - name: Verify pinned free runtime and model sources resolve
+        run: |
+          set -euo pipefail
+          npm view @mlc-ai/web-llm@0.2.82 version | grep -qx '0.2.82'
+          for url in \
+            'https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC' \
+            'https://huggingface.co/mlc-ai/Qwen3-0.6B-q4f16_1-MLC' \
+            'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC'; do
+              curl --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 20 --max-time 90 --output /dev/null "$url"
+          done
+
+      - name: Install cross-browser E2E runner
+        working-directory: scripts
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install --with-deps chromium firefox webkit
+
+      - name: Run AI browser E2E suite
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/scholark-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ >/dev/null
+          cd scripts
+          SCHOLARK_BASE_URL=http://127.0.0.1:4173 npx playwright test --config=playwright.config.mjs
+
       - name: Regression summary
         run: |
           echo 'ScholarK regression contract passed.'
-          echo 'The AI layer remains additive, grounded, zero-paid-provider at runtime, and legacy AP/SAT/Essay paths remain present.'
+          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, cross-browser tested in compatibility mode, and legacy AP/SAT/Essay paths remain present.'
