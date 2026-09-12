@@ -3,7 +3,7 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='ai-103';
+  const BUILD='ai-104';
   const pending=new Map();
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
@@ -26,9 +26,13 @@
     prep:{files:['prep-v2-data.js','prep-v2-app.js'],ready:()=>!!window.ScholarkPrep,init:()=>{window.ScholarkPrep?.init?.();notify('prep');}},
     ap:{files:['ap-v2-data.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>{window.initAPHub?.();notify('ap');}},
     ai:{
-      files:['scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js','scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js'],
-      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIUI,
-      init:()=>window.ScholarkAIUI?.enhanceEssay?.()
+      files:[
+        'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
+        'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+        'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
+      ],
+      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIUI&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
+      init:()=>{window.ScholarkAIUI?.enhanceEssay?.();notify('ai');}
     }
   };
 
@@ -82,5 +86,5 @@
   if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1500});
   else setTimeout(bootAI,700);
 
-  window.ScholarkFeatureLoader={version:'1.1.3',ensure,installShowPageHook};
+  window.ScholarkFeatureLoader={version:'1.2.0',ensure,installShowPageHook};
 })();
