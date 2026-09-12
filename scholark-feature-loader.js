@@ -5,6 +5,7 @@
 
   const BUILD='ai-105';
   const pending=new Map();
+  const loaderState={cinematicReadyAt:0,aiBootStartedAt:0,aiReadyAt:0};
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
     if(loaded(src)) return Promise.resolve();
@@ -32,7 +33,7 @@
         'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
       ],
       ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIReliability&&!!window.ScholarkAIUI&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
-      init:()=>{window.ScholarkAIUI?.enhanceEssay?.();notify('ai');}
+      init:()=>{window.ScholarkAIUI?.enhanceEssay?.();loaderState.aiReadyAt=performance.now();notify('ai');}
     }
   };
 
@@ -79,7 +80,10 @@
   setTimeout(installShowPageHook,300);
   setTimeout(installShowPageHook,1200);
 
-  const bootAI=()=>ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
+  const bootAI=()=>{
+    loaderState.aiBootStartedAt=performance.now();
+    return ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
+  };
 
   function afterCinematicReady(){
     return new Promise(resolve=>{
@@ -88,6 +92,7 @@
       const finish=()=>{
         if(settled)return;
         settled=true;
+        loaderState.cinematicReadyAt=performance.now();
         // Give the original desktop/mobile cinematic two clean paints before any AI DOM/CSS work.
         requestAnimationFrame(()=>requestAnimationFrame(resolve));
       };
@@ -117,5 +122,5 @@
     else setTimeout(bootAI,700);
   });
 
-  window.ScholarkFeatureLoader={version:'1.3.0',ensure,installShowPageHook,afterCinematicReady};
+  window.ScholarkFeatureLoader={version:'1.3.0',ensure,installShowPageHook,afterCinematicReady,state:loaderState};
 })();
