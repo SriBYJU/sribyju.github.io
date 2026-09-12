@@ -93,7 +93,7 @@ jobs:
             echo "${optional} ${code}" | tee -a "$report"
           done
 
-          canonical_count="$(grep -Eic '<link[^>]+rel=["'"']canonical["'"']' /tmp/scholark-production-audit/live-index.html || true)"
+          canonical_count="$(grep -Eic "rel=[\"']canonical[\"']" /tmp/scholark-production-audit/live-index.html || true)"
           echo "canonical_tags ${canonical_count}" | tee -a "$report"
           echo "production_url ${SCHOLARK_PRODUCTION_URL}" | tee -a "$report"
           echo "git_sha ${GITHUB_SHA}" | tee -a "$report"
