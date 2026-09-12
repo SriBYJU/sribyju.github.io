@@ -42,6 +42,8 @@ jobs:
           node --check scholark-ai-algorithms.js
           node --check scholark-ai-core.js
           node --check scholark-ai-agents.js
+          node --check scholark-ai-dashboard.js
+          node --check scholark-ai-bridge.js
           node --check scholark-ai-ui.js
           node --check ap-v2-app.js
           node --check ap-v2-data.js
@@ -73,19 +75,40 @@ jobs:
           loader=Path('scholark-feature-loader.js').read_text(encoding='utf-8')
           core=Path('scholark-ai-core.js').read_text(encoding='utf-8')
           agents=Path('scholark-ai-agents.js').read_text(encoding='utf-8')
+          bridge=Path('scholark-ai-bridge.js').read_text(encoding='utf-8')
+          dashboard=Path('scholark-ai-dashboard.js').read_text(encoding='utf-8')
+          ui=Path('scholark-ai-ui.js').read_text(encoding='utf-8')
+          ai_js='\n'.join([core,agents,bridge,dashboard,ui]).lower()
+
+          required_ai_files=(
+            'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
+            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-ui.js'
+          )
+          required_docs=(
+            'ZERO-COST-AI-ARCHITECTURE.md','SCHOLARK-AI-ARCHITECTURE.md','AI-EVALUATION.md',
+            'REGRESSION-CHECKLIST.md','AI-E2E-RESULTS.md'
+          )
+          paid_hosts=(
+            'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
+            'api.together.xyz','api.fireworks.ai','api.groq.com','api.replicate.com'
+          )
 
           checks={
             'v3_css_once': html.count('href="scholark-v3.css"')==1,
             'v3_js_once': html.count('src="scholark-v3.js"')==1,
             'ap_assets_preserved': all(x in html for x in ('ap-v2-data.js','ap-v2-app.js')),
             'prep_assets_preserved': all(x in html for x in ('prep-v2-data.js','prep-v2-app.js')),
-            'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about','essay')),
+            'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about','essay','dashboard')),
             'no_accidental_paywall_copy': 'Upgrade to Pro to access' not in html,
-            'ai_is_additive_loader_suite': all(x in loader for x in ('scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js','scholark-ai-ui.js')),
+            'ai_is_additive_loader_suite': all(x in loader for x in required_ai_files),
             'ai_does_not_replace_index_boot': 'scholark-feature-loader.js' in html and 'scholark-v3.js' in html,
-            'no_paid_ai_runtime_dependency': not any(x in core.lower() for x in ('api.openai.com','api.anthropic.com','generativelanguage.googleapis.com','api.together.xyz','api.fireworks.ai')),
+            'no_paid_ai_runtime_dependency': not any(x in ai_js for x in paid_hosts),
             'deterministic_fallback_present': 'deterministic-fallback' in core and 'fallbackTutor' in agents,
             'legacy_essay_fallback_preserved': 'analyzeEssayLocally' in html,
+            'bridge_does_not_write_legacy_prep_keys': "localstorage.setitem(`gs_prep" not in bridge.lower() and "localstorage.setitem('gs_prep" not in bridge.lower(),
+            'bridge_does_not_write_legacy_ap_keys': "localstorage.setitem(`gs_ap" not in bridge.lower() and "localstorage.setitem('gs_ap" not in bridge.lower(),
+            'dashboard_is_additive': '#dash-saved-list' in dashboard and 'insertBefore' in dashboard,
+            'required_ai_docs_present': all(Path(x).exists() for x in required_docs),
           }
           failed=[k for k,v in checks.items() if not v]
           print('\n'.join(f'{"PASS" if v else "FAIL"}: {k}' for k,v in checks.items()))
