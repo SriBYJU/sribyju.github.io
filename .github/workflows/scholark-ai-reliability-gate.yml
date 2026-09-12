@@ -1,0 +1,99 @@
+name: ScholarK AI reliability gate
+
+on:
+  pull_request:
+    paths:
+      - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scripts/scholark-ai-*.mjs'
+      - 'scripts/scholark-production-audit.sh'
+      - '.github/workflows/scholark-ai-reliability-gate.yml'
+  push:
+    branches:
+      - main
+      - 'scholark-ai-*'
+    paths:
+      - 'scholark-feature-loader.js'
+      - 'scholark-ai-*.js'
+      - 'scripts/scholark-ai-*.mjs'
+      - 'scripts/scholark-production-audit.sh'
+      - '.github/workflows/scholark-ai-reliability-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Syntax checks
+        run: |
+          set -euo pipefail
+          node --check scholark-feature-loader.js
+          node --check scholark-ai-reliability.js
+          node --check scholark-ai-ui-polish.js
+          node --check scripts/scholark-ai-browser.spec.mjs
+          node --check scripts/scholark-ai-mobile-smoke.spec.mjs
+          bash -n scripts/scholark-production-audit.sh
+
+      - name: Verify reliability and cinematic contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          loader = Path('scholark-feature-loader.js').read_text(encoding='utf-8')
+          reliability = Path('scholark-ai-reliability.js').read_text(encoding='utf-8')
+          polish = Path('scholark-ai-ui-polish.js').read_text(encoding='utf-8')
+          browser = Path('scripts/scholark-ai-browser.spec.mjs').read_text(encoding='utf-8')
+          mobile = Path('scripts/scholark-ai-mobile-smoke.spec.mjs').read_text(encoding='utf-8')
+          prod = Path('scripts/scholark-production-audit.sh').read_text(encoding='utf-8')
+
+          paid_hosts = (
+              'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
+              'api.together.xyz','api.fireworks.ai','api.groq.com','api.replicate.com'
+          )
+          checks = {
+              'final_loader_build': "const BUILD='ai-106'" in loader,
+              'reliability_loaded': 'scholark-ai-reliability.js' in loader and 'ScholarkAIReliability' in loader,
+              'ui_polish_loaded': 'scholark-ai-ui-polish.js' in loader and 'ScholarkAIUIPolish' in loader,
+              'cinematic_first_boot': 'afterCinematicReady' in loader and 'cinematicReadyAt' in loader and 'aiBootStartedAt' in loader,
+              'balanced_mobile_default': "reason: mobile ? 'mobile-webgpu' : 'webgpu'" in reliability,
+              'llama_rescue_model': 'Llama-3.2-1B-Instruct-q4f16_1-MLC' in reliability,
+              'standard_recovery_ladder': "['standard', 'rescue', 'low']" in reliability,
+              'quality_gate': 'quality-gate-rejected-weak-response' in reliability,
+              'final_fallback_only': 'all-local-models-unavailable' in reliability and 'finalFallback' in reliability,
+              'grounded_product_route': "agent: 'knowledge'" in reliability and 'grounded-product-knowledge' in reliability,
+              'creator_fact_grounded': "creator: 'Shriyan Avadhanula'" in reliability,
+              'last_resort_ui_copy': 'last resort' in polish.lower(),
+              'desktop_cinematic_e2e': '.sk6-portal-object' in browser and 'aiBootStartedAt' in browser,
+              'creator_question_e2e': 'Who made Scholark?' in browser and 'Shriyan Avadhanula' in browser,
+              'mobile_creator_e2e': 'Who made Scholark?' in mobile and 'Shriyan Avadhanula' in mobile,
+              'production_requires_ai106': 'ai-106' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
+              'no_paid_provider_endpoint': not any(host in reliability.lower() for host in paid_hosts),
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          print('\n'.join(f'{"PASS" if ok else "FAIL"}: {name}' for name, ok in checks.items()))
+          if failed:
+              raise SystemExit('Reliability contract failed: ' + ', '.join(failed))
+          PY
+
+      - name: Verify pinned runtime and rescue model source
+        run: |
+          set -euo pipefail
+          npm view @mlc-ai/web-llm@0.2.82 version | grep -qx '0.2.82'
+          curl --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 20 --max-time 90 --output /dev/null \
+            'https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC'
+          curl --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 20 --max-time 90 --output /tmp/webllm-config.ts \
+            'https://raw.githubusercontent.com/mlc-ai/web-llm/v0.2.82/src/config.ts'
+          grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' /tmp/webllm-config.ts
+
+      - name: Reliability gate summary
+        run: echo 'ScholarK AI reliability, grounded routing, multi-model recovery, and cinematic-first startup contract passed.'
