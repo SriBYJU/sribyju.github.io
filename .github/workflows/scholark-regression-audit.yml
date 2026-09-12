@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
       - 'scholark-*.js'
       - 'scholark-*.css'
       - 'prep-v2-*.js'
@@ -23,6 +25,8 @@ on:
       - 'scholark-ai-*'
     paths:
       - 'index.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
       - 'scholark-*.js'
       - 'scholark-*.css'
       - 'prep-v2-*.js'
@@ -125,6 +129,8 @@ jobs:
           practice=Path('scholark-ai-practice.js').read_text(encoding='utf-8')
           practice_ui=Path('scholark-ai-practice-ui.js').read_text(encoding='utf-8')
           health=Path('scholark-ai-health.js').read_text(encoding='utf-8')
+          robots=Path('robots.txt').read_text(encoding='utf-8')
+          sitemap=Path('sitemap.xml').read_text(encoding='utf-8')
           ai_js='\n'.join([core,agents,bridge,context,dashboard,ui,practice,practice_ui,health]).lower()
 
           required_ai_files=(
@@ -149,6 +155,10 @@ jobs:
           checks={
             'v3_css_once': html.count('href="scholark-v3.css"')==1,
             'v3_js_once': html.count('src="scholark-v3.js"')==1,
+            'canonical_present': ('rel="canonical"' in html.lower() or "rel='canonical'" in html.lower()),
+            'robots_allows_public_site': 'User-agent: *' in robots and 'Allow: /' in robots,
+            'robots_references_sitemap': 'Sitemap: https://sribyju.github.io/sitemap.xml' in robots,
+            'sitemap_contains_canonical_home': '<loc>https://sribyju.github.io/</loc>' in sitemap,
             'ap_assets_preserved': all(x in html for x in ('ap-v2-data.js','ap-v2-app.js')),
             'prep_assets_preserved': all(x in html for x in ('prep-v2-data.js','prep-v2-app.js')),
             'core_pages_present': all(f'id="page-{p}"' in html for p in ('home','features','about','essay','dashboard')),
@@ -214,4 +224,4 @@ jobs:
       - name: Regression summary
         run: |
           echo 'ScholarK regression contract passed.'
-          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, cross-browser tested in compatibility mode, and legacy AP/SAT/Essay paths remain present.'
+          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, cross-browser tested in compatibility mode, SEO assets are present, and legacy AP/SAT/Essay paths remain present.'

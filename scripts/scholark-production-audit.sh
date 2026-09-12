@@ -8,17 +8,24 @@ mkdir -p "$OUT"
 
 wait_for_release() {
   for attempt in $(seq 1 90); do
-    local loader health_code
+    local loader health_code robots_code sitemap_code
     loader="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SITE}scholark-feature-loader.js?sha=${SHA}" 2>/dev/null || true)"
     health_code="$(curl --location --silent --output "$OUT/health.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-health.js?sha=${SHA}" || true)"
-    if grep -q 'ai-104' <<<"$loader" && [ "$health_code" = '200' ]; then
+    robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
+    sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
+    if grep -q 'ai-104' <<<"$loader" \
+      && [ "$health_code" = '200' ] \
+      && [ "$robots_code" = '200' ] \
+      && [ "$sitemap_code" = '200' ] \
+      && cmp -s robots.txt "$OUT/robots-wait.txt" \
+      && cmp -s sitemap.xml "$OUT/sitemap-wait.xml"; then
       printf '%s\n' "$loader" > "$OUT/loader.js"
-      echo "Production AI release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
+      echo "Production AI/SEO release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
       return 0
     fi
     sleep 10
   done
-  echo 'GitHub Pages did not expose the expected AI release within the audit window.' >&2
+  echo 'GitHub Pages did not expose the expected AI/SEO release within the audit window.' >&2
   return 1
 }
 
@@ -48,7 +55,9 @@ for asset in \
   scholark-ai-health.js \
   scholark-ai.css \
   scholark-ai-dashboard.css \
-  scholark-ai-practice.css; do
+  scholark-ai-practice.css \
+  robots.txt \
+  sitemap.xml; do
   check_asset "$asset"
 done
 
@@ -58,13 +67,18 @@ grep -q 'scholark-v3.js' "$OUT/live-index.html"
 grep -q 'scholark-ai-practice.js' "$OUT/loader.js"
 grep -q 'scholark-ai-health.js' "$OUT/loader.js"
 
-for optional in robots.txt sitemap.xml; do
-  code="$(curl --location --silent --output "$OUT/$optional" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}${optional}?sha=${SHA}" || true)"
-  echo "${optional} ${code}" | tee -a "$OUT/http-report.txt"
-done
+grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
+grep -Fq '<loc>https://sribyju.github.io/</loc>' "$OUT/sitemap.xml"
+cmp -s robots.txt "$OUT/robots.txt"
+cmp -s sitemap.xml "$OUT/sitemap.xml"
 
 canonical_count="$(grep -Eic "rel=[\"']canonical[\"']" "$OUT/live-index.html" || true)"
 echo "canonical_tags ${canonical_count}" | tee -a "$OUT/http-report.txt"
+if [ "$canonical_count" -lt 1 ]; then
+  echo 'Canonical link tag missing from production index.' >&2
+  exit 1
+fi
+
 echo "production_url ${SITE}" | tee -a "$OUT/http-report.txt"
 echo "git_sha ${SHA}" | tee -a "$OUT/http-report.txt"
 
@@ -75,4 +89,4 @@ if grep -Eqi 'api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapi
 fi
 
 echo 'Production AI core contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
-echo 'Production HTTP/network audit passed.' | tee -a "$OUT/http-report.txt"
+echo 'Production HTTP/network/SEO audit passed.' | tee -a "$OUT/http-report.txt"

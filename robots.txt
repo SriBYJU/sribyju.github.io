@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sribyju.github.io/sitemap.xml
