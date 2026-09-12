@@ -6,11 +6,12 @@ async function waitForAI(page) {
   await page.waitForFunction(() => !!(
     window.ScholarkAI &&
     window.ScholarkAIAgents &&
+    window.ScholarkAIReliability &&
     window.ScholarkAIPractice &&
     window.ScholarkAIHealth &&
     window.ScholarkAIUI &&
     window.ScholarkAIPracticeUI
-  ), null, { timeout: 20000 });
+  ), null, { timeout: 25000 });
 }
 
 test.beforeEach(async ({ page }) => {
@@ -29,9 +30,11 @@ test('mobile fallback runtime, dialogs, and adaptive practice stay usable', asyn
   await page.evaluate(() => window.ScholarkAIUI.open());
   await expect(page.locator('#sk-ai-dialog')).toBeVisible();
   await expect(page.locator('#sk-ai-input')).toBeFocused();
-  await page.locator('#sk-ai-input').fill('Explain probability simply');
+  await page.locator('#sk-ai-input').fill('Who made Scholark?');
   await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-  await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant')).toHaveCount(1, { timeout: 10000 });
+  const assistant = page.locator('#sk-ai-transcript .sk-ai-message.assistant').last();
+  await expect(assistant).toContainText('Shriyan Avadhanula', { timeout: 10000 });
+  await expect(assistant).not.toContainText('Break the task into three pieces');
 
   await page.evaluate(() => { window.ScholarkAIUI.close(); window.ScholarkAIPracticeUI.open(); });
   await expect(page.locator('#sk-practice-dialog')).toBeVisible();
