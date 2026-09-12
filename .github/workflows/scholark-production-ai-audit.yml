@@ -31,7 +31,14 @@ jobs:
       SCHOLARK_PRODUCTION_URL: https://sribyju.github.io/
     steps:
       - name: Checkout deployed commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
 
       - name: Audit live GitHub Pages assets and network contract
         run: bash scripts/scholark-production-audit.sh
@@ -40,7 +47,7 @@ jobs:
         working-directory: scripts
         run: |
           npm ci
-          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npm install --no-save --package-lock=false @playwright/test@1.63.0
           npx playwright install --with-deps chromium firefox webkit
 
       - name: Run AI E2E against live production
@@ -51,7 +58,7 @@ jobs:
 
       - name: Preserve production audit evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: scholark-production-ai-audit-${{ github.sha }}
           path: /tmp/scholark-production-audit
