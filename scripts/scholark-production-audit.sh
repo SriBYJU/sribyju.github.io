@@ -8,24 +8,28 @@ mkdir -p "$OUT"
 
 wait_for_release() {
   for attempt in $(seq 1 90); do
-    local loader health_code robots_code sitemap_code
+    local loader health_code reliability_code robots_code sitemap_code
     loader="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SITE}scholark-feature-loader.js?sha=${SHA}" 2>/dev/null || true)"
     health_code="$(curl --location --silent --output "$OUT/health.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-health.js?sha=${SHA}" || true)"
+    reliability_code="$(curl --location --silent --output "$OUT/reliability.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-reliability.js?sha=${SHA}" || true)"
     robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
     sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
-    if grep -q 'ai-104' <<<"$loader" \
+    if grep -q 'ai-105' <<<"$loader" \
+      && grep -q 'scholark-ai-reliability.js' <<<"$loader" \
+      && grep -q 'afterCinematicReady' <<<"$loader" \
       && [ "$health_code" = '200' ] \
+      && [ "$reliability_code" = '200' ] \
       && [ "$robots_code" = '200' ] \
       && [ "$sitemap_code" = '200' ] \
       && cmp -s robots.txt "$OUT/robots-wait.txt" \
       && cmp -s sitemap.xml "$OUT/sitemap-wait.xml"; then
       printf '%s\n' "$loader" > "$OUT/loader.js"
-      echo "Production AI/SEO release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
+      echo "Production AI/SEO/reliability release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
       return 0
     fi
     sleep 10
   done
-  echo 'GitHub Pages did not expose the expected AI/SEO release within the audit window.' >&2
+  echo 'GitHub Pages did not expose the expected AI/SEO/reliability release within the audit window.' >&2
   return 1
 }
 
@@ -47,6 +51,7 @@ for asset in \
   scholark-ai-core.js \
   scholark-ai-agents.js \
   scholark-ai-context.js \
+  scholark-ai-reliability.js \
   scholark-ai-bridge.js \
   scholark-ai-dashboard.js \
   scholark-ai-ui.js \
@@ -66,6 +71,8 @@ grep -q 'scholark-feature-loader.js' "$OUT/live-index.html"
 grep -q 'scholark-v3.js' "$OUT/live-index.html"
 grep -q 'scholark-ai-practice.js' "$OUT/loader.js"
 grep -q 'scholark-ai-health.js' "$OUT/loader.js"
+grep -q 'scholark-ai-reliability.js' "$OUT/loader.js"
+grep -q 'afterCinematicReady' "$OUT/loader.js"
 
 grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
 grep -Fq '<loc>https://sribyju.github.io/</loc>' "$OUT/sitemap.xml"
@@ -82,11 +89,14 @@ fi
 echo "production_url ${SITE}" | tee -a "$OUT/http-report.txt"
 echo "git_sha ${SHA}" | tee -a "$OUT/http-report.txt"
 
-core="$(curl --fail --location --silent --show-error "${SITE}scholark-ai-core.js?sha=${SHA}")"
-if grep -Eqi 'api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com|api\.together\.xyz|api\.fireworks\.ai|api\.groq\.com|api\.replicate\.com' <<<"$core"; then
-  echo 'Paid model-provider endpoint detected in production AI core.' >&2
+runtime_sources="$(cat "$OUT/scholark-ai-core.js" "$OUT/scholark-ai-reliability.js")"
+if grep -Eqi 'api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com|api\.together\.xyz|api\.fireworks\.ai|api\.groq\.com|api\.replicate\.com' <<<"$runtime_sources"; then
+  echo 'Paid model-provider endpoint detected in production AI runtime.' >&2
   exit 1
 fi
 
-echo 'Production AI core contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
-echo 'Production HTTP/network/SEO audit passed.' | tee -a "$OUT/http-report.txt"
+grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' "$OUT/scholark-ai-reliability.js"
+grep -q "\['standard', 'rescue', 'low'\]" "$OUT/scholark-ai-reliability.js"
+
+echo 'Production AI runtime contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
+echo 'Production HTTP/network/SEO/reliability audit passed.' | tee -a "$OUT/http-report.txt"
