@@ -44,6 +44,7 @@ jobs:
           node --check scholark-ai-agents.js
           node --check scholark-ai-dashboard.js
           node --check scholark-ai-bridge.js
+          node --check scholark-ai-context.js
           node --check scholark-ai-ui.js
           node --check ap-v2-app.js
           node --check ap-v2-data.js
@@ -76,13 +77,14 @@ jobs:
           core=Path('scholark-ai-core.js').read_text(encoding='utf-8')
           agents=Path('scholark-ai-agents.js').read_text(encoding='utf-8')
           bridge=Path('scholark-ai-bridge.js').read_text(encoding='utf-8')
+          context=Path('scholark-ai-context.js').read_text(encoding='utf-8')
           dashboard=Path('scholark-ai-dashboard.js').read_text(encoding='utf-8')
           ui=Path('scholark-ai-ui.js').read_text(encoding='utf-8')
-          ai_js='\n'.join([core,agents,bridge,dashboard,ui]).lower()
+          ai_js='\n'.join([core,agents,bridge,context,dashboard,ui]).lower()
 
           required_ai_files=(
             'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
-            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-ui.js'
+            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js'
           )
           required_docs=(
             'ZERO-COST-AI-ARCHITECTURE.md','SCHOLARK-AI-ARCHITECTURE.md','AI-EVALUATION.md',
@@ -107,6 +109,10 @@ jobs:
             'legacy_essay_fallback_preserved': 'analyzeEssayLocally' in html,
             'bridge_does_not_write_legacy_prep_keys': "localstorage.setitem(`gs_prep" not in bridge.lower() and "localstorage.setitem('gs_prep" not in bridge.lower(),
             'bridge_does_not_write_legacy_ap_keys': "localstorage.setitem(`gs_ap" not in bridge.lower() and "localstorage.setitem('gs_ap" not in bridge.lower(),
+            'context_reads_existing_planner': 'gs_tasks_' in context and 'existing-scholark-planner' in context,
+            'context_reads_existing_applications': 'gs_apps_' in context and 'existing-scholark-application-tracker' in context,
+            'context_does_not_expose_unsourced_acceptance_rates': 'item.rate' not in context,
+            'context_does_not_write_legacy_state': 'localstorage.setitem' not in context.lower(),
             'dashboard_is_additive': '#dash-saved-list' in dashboard and 'insertBefore' in dashboard,
             'required_ai_docs_present': all(Path(x).exists() for x in required_docs),
           }
@@ -119,4 +125,4 @@ jobs:
       - name: Regression summary
         run: |
           echo 'ScholarK regression contract passed.'
-          echo 'The AI layer remains additive, zero-paid-provider at runtime, and legacy AP/SAT/Essay paths remain present.'
+          echo 'The AI layer remains additive, grounded, zero-paid-provider at runtime, and legacy AP/SAT/Essay paths remain present.'
