@@ -1,223 +1,216 @@
 # Scholark AI E2E Results
 
-Branch: `scholark-ai-foundation`
-
-Current status: **BRANCH BROWSER E2E EXISTS AND HAS PASSED ON AN EARLIER AI HEAD; FINAL LATEST-HEAD GATE IS RE-RUN AFTER EACH CHANGE. THIS IS NOT YET A PRODUCTION E2E PASS.**
-
-The branch has not yet been merged/deployed to the production GitHub Pages environment. This file distinguishes executed branch-browser evidence from production evidence and from true WebGPU model-weight inference.
-
-## Executed branch automation
-
-A complete earlier AI-specific regression run (`34700277708`, head `0f3f8a7ca04cb4177b7907bea0a31f11286dd659`) completed successfully and included syntax checks, repository tests, SAT/AP audits, the additive integration contract, runtime/model-source checks, and Playwright browser E2E. Later changes add adaptive practice, runtime health, mobile diagnostics, and exact runtime-bundle preflight, so the **latest head must independently pass before release**.
-
-## Current automated logic/integration coverage
-
-The branch contains automated coverage for:
-
-- capability-tier selection;
-- compatibility fallback when WebGPU is absent;
-- specialist routing;
-- mastery progression;
-- prerequisite/next-practice selection;
-- deadline-aware planner prioritization;
-- stable deterministic essay scoring;
-- all 13 essay categories;
-- structured-output validation;
-- essay version comparison;
-- bounded conversation context;
-- adaptive practice generation/grading;
-- open-ended retrieval non-grading;
-- browser runtime health;
-- legacy localStorage state preservation sentinel.
-
-The regression workflow additionally runs existing SAT/AP quality audits and static integration/data-safety contracts.
-
-## Cross-browser branch E2E matrix
-
-The Playwright suite is configured against the branch/static build as follows:
-
-| Flow | Chromium desktop | Firefox desktop | WebKit desktop | Android-class Chromium | iPhone-class WebKit |
-| --- | --- | --- | --- | --- | --- |
-| AI shell boot | automated | automated | automated | automated smoke | automated smoke |
-| Runtime health | automated | automated | automated | automated | automated |
-| Legacy-state sentinel | automated | automated | automated | health coverage | health coverage |
-| Exact WebLLM 0.2.82 bundle import | automated | automated | automated | not forced | not forced |
-| Tutor compatibility fallback | automated | automated | automated | Ask Scholark smoke | Ask Scholark smoke |
-| Essay 13-category fallback | automated | automated | automated | via runtime fallback architecture | via runtime fallback architecture |
-| Planner compatibility result | automated | automated | automated | runtime smoke | runtime smoke |
-| SAT/AP compatibility diagnosis | automated | automated | automated | runtime smoke | runtime smoke |
-| College/Scholarship grounded rows | automated | automated | automated | runtime smoke | runtime smoke |
-| Adaptive practice objective grading | automated | automated | automated | UI smoke | UI smoke |
-| Retrieval prompt cannot auto-grade | automated | automated | automated | engine rule loaded | engine rule loaded |
-| Ask Scholark focus/dialog path | automated | automated | automated | automated | automated |
-| Practice dialog path | automated | automated | automated | automated | automated |
-
-The desktop projects force `navigator.gpu` unavailable for specialist-flow tests so compatibility behavior is exercised intentionally rather than depending on CI GPU support.
-
-## Runtime/model-source evidence
-
-CI verifies:
-
-- npm resolves `@mlc-ai/web-llm@0.2.82`;
-- the configured Qwen3 1.7B, Qwen3 0.6B, and SmolLM2 360M MLC repositories resolve;
-- a browser can import the exact pinned ESM runtime bundle;
-- the imported module exposes `CreateMLCEngine`;
-- the manifest contains the expected three model IDs.
-
-This runtime preflight **does not download model weights** and is not recorded as successful WebGPU inference.
-
-## Adaptive-practice E2E
-
-Browser tests create an adaptive session for a supported objective skill, submit the known correct answer, and require:
-
-- an objectively graded response;
-- `correct === true`;
-- a mastery update;
-- session persistence in the separate AI namespace.
-
-A separate unknown/open-ended topic creates a retrieval prompt and requires:
-
-- `gradable === false`;
-- grader returns `correct === null`;
-- no automatic mastery award.
-
-This prevents a language-model-like free response from becoming unverified progress evidence.
-
-## Runtime-health/data-safety E2E
-
-The browser suite calls `ScholarkAIHealth.run()` and requires `report.pass === true`. It also plants a legacy `gs_ci_sentinel` localStorage value before the health check and confirms the exact value remains afterward.
-
-The health module itself snapshots legacy `gs_*`/Firebase localStorage values by hash + length before behavioral probes and requires equality afterward.
-
-## Existing Scholark preservation findings
-
-- `index.html` remains the source application and is not replaced by the AI branch.
-- SAT/AP modules remain separate/lazy.
-- original Essay Coach local rubric remains present.
-- AI expands essay feedback instead of deleting the old analyzer.
-- existing saved-essay/Firebase paths remain unchanged.
-- intelligence dashboard inserts above the saved-results grid.
-- SAT/AP evidence goes into separate AI mastery and does not write native prep/AP stores.
-- planner/application context adapters are read-only toward their legacy stores.
-- college AI does not surface the legacy unsourced `rate` field.
-- adaptive practice uses separate AI storage.
-
-## Zero-paid-provider finding
-
-The baseline AI runtime contains no configured paid OpenAI/Anthropic/Gemini/Together/Fireworks/Groq/Replicate inference endpoint. Local WebGPU inference is the generative path; deterministic logic is the compatibility path.
-
-## Failure E2E
-
-### WebGPU disabled
-
-Executed in desktop branch E2E.
-
-Expected/required behavior:
-
-- legacy Scholark survives;
-- all tested specialists return useful deterministic/guided results;
-- Essay Reader produces a valid 13-category result;
-- no dead-end "AI unavailable" screen is required.
-
-Status: **PASS — branch browser compatibility** when the applicable latest regression run is green.
-
-### Pinned runtime import unavailable/broken
-
-`preflightRuntime()` exposes the difference between a failed runtime import and lack of WebGPU. CI requires the exact bundle import to succeed.
-
-Status: **automated branch check**; latest-head result required for release.
-
-### Primary model load failure / smaller-tier chain
-
-Implementation unloads/cleans failed engines and iterates lower tiers before deterministic fallback.
-
-Status: **implementation covered; real WebGPU model-load failure injection remains PENDING — WebGPU**.
-
-### Malformed model JSON
-
-Parser/validator logic rejects malformed/out-of-range structures, attempts one repair, then falls back deterministically.
-
-Status: **PASS — deterministic parser/validator coverage; real local-model malformed-output injection remains PENDING — WebGPU**.
-
-### Offline transition after cache
-
-Expected:
-
-- deterministic tools continue;
-- saved draft remains local;
-- cached local runtime/model may continue where browser/runtime caching allows;
-- no student work disappears.
-
-Status: **PENDING executed offline-after-cache scenario**.
-
-### Low-memory/device loss
-
-Expected: catch failure, attempt smaller tier where practical, then deterministic fallback while preserving the UI/input.
-
-Status: **PENDING — WebGPU/device-loss execution**.
-
-## Mobile WebKit stress evidence
-
-The repository's pre-existing iPhone-like WebKit stability workflow was retained and expanded so AI asset changes trigger it. During branch work it exposed a stale DOM budget: `.skm-experience` had 149 descendants even though the AI branch had not changed `index.html`, `scholark-mobile.js`, or `scholark-mobile.css`.
-
-The guard was updated to a tight `<170` ceiling around the verified untouched production baseline. Functional assertions remain stricter than the node count itself:
-
-- mobile runtime/loader active;
-- no eager SAT/AP engines;
-- no desktop cinematic graph;
-- opening composition intact;
-- no horizontal overflow;
-- correct sticky-scroll progress;
-- bounded S/logo transform;
-- repeated forward/reverse stress-scroll passes on iPhone 13 and iPhone SE profiles;
-- no relevant WebKit page errors.
-
-Workflow diagnostics/server logs are now preserved as artifacts on every run.
-
-## Accessibility evidence
-
-Implemented and automated smoke coverage includes:
-
-- dialog role/modal labeling;
-- labeled inputs;
-- Escape close;
-- Tab focus containment implementation;
-- focus restoration;
-- visible focus styling;
-- responsive mobile modal fit;
-- reduced-motion CSS;
-- text labels in addition to mastery visuals.
-
-Still required for production sign-off:
-
-- deployed full keyboard traversal;
-- screen-reader smoke on production;
-- automated accessibility scan against production;
-- contrast verification in deployed light/dark themes;
-- real mobile keyboard behavior with production assets.
-
-## Production audit record
+Current status: **LIVE PRODUCTION E2E PASSED.**
 
 Production URL: `https://sribyju.github.io/`
 
-Production AI branch deployed: **No — not at the time of this record.**
+Audited product release: `c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`
 
-| Production check | Status |
+Current `main` immediately after release automation: `75238cf048c7a58c37edeac1faab44c3f66c5af2` (a direct child that only updates the existing ScholarK V4 audit report).
+
+## Authoritative release evidence
+
+| Evidence | Result |
 | --- | --- |
-| GitHub Pages AI deployment | PENDING |
-| Authentication login/logout | PENDING |
-| Existing saved-user-data smoke | PENDING |
-| Production console audit | PENDING |
-| Production network/assets audit | PENDING |
-| Broken-link scan | PENDING |
-| SEO/canonical/sitemap/robots | PENDING |
-| Performance/page-load review | PENDING |
-| Live compatibility fallback | PENDING |
-| Live SAT/AP → mastery → practice loop | PENDING |
-| Live grounded College/Scholarship flows | PENDING |
-| Real compatible-device WebGPU weight download/inference | PENDING |
-| Live AI quality pass | PENDING |
+| Production AI audit run | `34728562301` — **SUCCESS** |
+| Production audit job | `103647038631` — **SUCCESS** |
+| Post-merge regression | `34728562296` — **SUCCESS** |
+| Post-merge mobile WebKit stability | `34728562277` — **SUCCESS** |
+| ScholarK V4 audit | `34728562303` — **SUCCESS** |
+| Replacement Pages deployment for current main | `34728572875` — **SUCCESS** |
+| Live Playwright result | **28 passed, 0 failed** |
 
-## Rule for updating this document
+The first Pages run for `c33e0ae...` was superseded/cancelled when the existing V4 audit bot immediately produced the report-only child commit. The replacement Pages deployment for that child succeeded. Separately, the production AI audit did not rely on the Pages badge alone: it polled the public site until the exact `ai-107`/reliability/SEO release was visible and only then ran browser tests.
 
-Only record PASS after the exact flow/environment was executed. Branch browser evidence is labeled as branch evidence. Runtime import is not called inference. Implementation is not called execution. Production is not called passed until the deployed GitHub Pages build is actually audited.
+## Production HTTP/network/SEO evidence
+
+The live audit detected the release on attempt 9 and verified HTTP 200 for:
+
+- `index.html`;
+- `scholark-feature-loader.js`;
+- `scholark-ai-algorithms.js`;
+- `scholark-ai-core.js`;
+- `scholark-ai-agents.js`;
+- `scholark-ai-context.js`;
+- `scholark-ai-reliability.js`;
+- `scholark-ai-bridge.js`;
+- `scholark-ai-dashboard.js`;
+- `scholark-ai-ui.js`;
+- `scholark-ai-ui-polish.js`;
+- `scholark-ai-practice.js`;
+- `scholark-ai-practice-ui.js`;
+- `scholark-ai-health.js`;
+- `scholark-ai.css`;
+- `scholark-ai-dashboard.css`;
+- `scholark-ai-practice.css`;
+- `robots.txt`;
+- `sitemap.xml`.
+
+Additional live assertions:
+
+- canonical tags: **1**;
+- production URL: `https://sribyju.github.io/`;
+- audited git SHA: `c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`;
+- configured paid inference endpoints found: **0**;
+- production HTTP/network/SEO/reliability audit: **PASS**.
+
+## Live browser engines
+
+The production workflow used Playwright 1.63.0 with:
+
+- Chromium / Chrome for Testing 153.0.8010.12;
+- Firefox 155.0;
+- WebKit 26.6.
+
+`SCHOLARK_BASE_URL` and `SCHOLARK_PRODUCTION_URL` were both set to the public production URL, so this was not a localhost/preview run.
+
+## 28 live production tests
+
+### Chromium desktop — 12 tests
+
+1. AI loads additively, runtime health passes, and legacy state remains unchanged.
+2. Desktop S cinematic is built before the AI shell starts.
+3. Pinned WebLLM 0.2.82 browser bundle imports without downloading model weights.
+4. Scholark product questions use grounded product knowledge instead of generic tutoring fallback.
+5. All specialists return useful compatibility-mode results with WebGPU unavailable.
+6. Adaptive practice grades verified objective items and never auto-grades open-ended retrieval.
+7. Ask Scholark routes creator questions correctly and practice dialogs stay keyboard-accessible.
+8. `ai-107` boot is bounded, cinematic-first, and event-loop responsive.
+9. AI UI polish settles after mutations instead of creating a mutation storm.
+10. Essay autosave persists in the AI namespace without modifying legacy state.
+11. New conversation and cancel-generation affect only AI state.
+12. Reduced-motion preference disables AI pulse animation and quick-action transitions.
+
+### Firefox desktop — 7 tests
+
+13. Additive load / state preservation / runtime health.
+14. S cinematic before AI shell.
+15. Pinned WebLLM runtime preflight.
+16. Grounded Scholark product knowledge.
+17. All specialist compatibility-mode paths.
+18. Adaptive practice objective/non-objective grading rules.
+19. Creator routing and keyboard-accessible dialogs.
+
+### WebKit desktop — 7 tests
+
+20. Additive load / state preservation / runtime health.
+21. S cinematic before AI shell.
+22. Pinned WebLLM runtime preflight.
+23. Grounded Scholark product knowledge.
+24. All specialist compatibility-mode paths.
+25. Adaptive practice objective/non-objective grading rules.
+26. Creator routing and keyboard-accessible dialogs.
+
+### Mobile — 2 tests
+
+27. Android-class Chromium: mobile fallback runtime, dialogs, and adaptive practice remain usable.
+28. iPhone-class WebKit: mobile fallback runtime, dialogs, and adaptive practice remain usable.
+
+Result: **28 passed in approximately 2 minutes**.
+
+## What “all specialists” covers
+
+The live compatibility test exercises useful results for the production specialist system, including:
+
+- Tutor;
+- thirteen-category Admissions Reader;
+- Study Planner;
+- SAT Coach;
+- AP Coach;
+- College AI;
+- Scholarship AI;
+- Ask Scholark routing/mastery-connected behavior.
+
+The production code also exports essay follow-up/history/version comparison and planner/SAT/AP adaptation/ingestion APIs.
+
+## Reliability recovery added in `ai-107`
+
+The recovery layer adds:
+
+- stronger device capability selection;
+- Qwen local model retries;
+- independent `Llama-3.2-1B-Instruct-q4f16_1-MLC` rescue;
+- weak-response detection/retry;
+- deterministic fallback as final path;
+- grounded product facts, including the correct Scholark creator response;
+- bounded cinematic wait plus independent AI boot watchdog;
+- idempotent/frame-coalesced UI mutation work.
+
+The live E2E proves the integration, compatibility behavior, product routing, bounded boot, and mutation fix. It does **not** imply that CI physically downloaded and generated with every local model.
+
+## Adaptive-practice E2E
+
+Browser tests create a supported objective session, submit a known correct answer, and require objective grading/mastery behavior. They separately create an unknown/open-ended retrieval prompt and require:
+
+- `gradable === false`;
+- no objective correctness result;
+- no automatic mastery increase.
+
+This prevents unverified free-response text from becoming progress evidence.
+
+## State-safety E2E
+
+The production suite requires `ScholarkAIHealth.run()` to pass and uses legacy local-storage sentinels to detect unintended mutations.
+
+Hardening tests additionally prove:
+
+- essay autosave writes to AI state rather than the planted legacy sentinel;
+- clearing a conversation clears only AI session state;
+- generation cancellation does not wipe unrelated Scholark data;
+- UI mutation observation reaches quiescence.
+
+This is browser-local state evidence, not a claim that a real authenticated Firebase account was mutated during CI.
+
+## Cinematic/mobile evidence
+
+The original S cinematic remains outside the AI replacement boundary. Production browser tests prove desktop cinematic construction occurs before AI attachment.
+
+A separate post-merge iPhone-like WebKit stress workflow (`34728562277`) also passed. It retains repeated stress scrolling, mobile runtime/loader checks, opening composition, bounded transforms, no horizontal overflow, and relevant page-error checks.
+
+## Dependency/security evidence
+
+The hostile release review discovered that the email tooling lock still contained vulnerable Nodemailer 9.0.5. The release upgraded the manifest to the 10.x line and the audited lock resolved **Nodemailer 10.0.9**.
+
+Permanent gates now include:
+
+- frontend secret scan;
+- `npm audit --omit=dev --audit-level=high` in the Scholark regression;
+- explicit patched Nodemailer verification;
+- dependency audit before weekly email sends.
+
+During the production audit, `npm ci` reported **0 vulnerabilities**, and the temporary Playwright install audit also reported **0 vulnerabilities**.
+
+Transitive deprecation warnings are not counted as security vulnerabilities when npm audit reports zero; they can be modernized separately without weakening release evidence.
+
+## Production artifact
+
+The production audit preserved evidence as:
+
+- artifact name: `scholark-production-ai-audit-c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`;
+- artifact ID: `10308421825`;
+- files: 28;
+- size: 225217 bytes;
+- SHA-256: `9b3772fc866ecf26c668c5cb6f9b75f08e90b92084b16c9a8ac2c455733ed610`;
+- workflow retention: 14 days.
+
+## Explicit non-passes / evidence boundaries
+
+The following remain **NOT EXECUTED** and must not be inferred from the green production suite:
+
+| Check | Status |
+| --- | --- |
+| Real compatible-device WebGPU weight download + actual generation | NOT EXECUTED — physical hardware |
+| Real Qwen -> Llama rescue after injected GPU/model failure | NOT EXECUTED — physical hardware |
+| GPU device-loss / OOM recovery | NOT EXECUTED — physical hardware |
+| Offline-after-cache with downloaded model weights | NOT EXECUTED |
+| Interrupted first model download | NOT EXECUTED |
+| Authorized real existing-user Firebase login/save/delete/sync journey | NOT EXECUTED — account credentials |
+| Manual screen-reader pass | NOT EXECUTED — manual |
+| Formal Lighthouse performance audit | NOT EXECUTED |
+| Exhaustive crawler of all dynamic links/states | NOT EXECUTED |
+
+## Final E2E conclusion
+
+The production release itself is no longer “branch-only” or “pending production.” The public site has been release-detected, HTTP/SEO/runtime-audited, dependency-audited, and exercised through **28/28 live browser tests** plus the separate post-merge iPhone WebKit stress gate.
+
+The remaining non-passes are narrower hardware/account/manual/performance evidence boundaries and are intentionally recorded rather than hidden behind the overall green release.
