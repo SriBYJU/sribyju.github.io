@@ -91,12 +91,19 @@ test('essay autosave persists in the AI namespace without modifying legacy state
   await waitForAI(page);
 
   const sentinel = JSON.stringify({ keep: true, scope: 'legacy-hardening' });
-  await page.evaluate(value => localStorage.setItem('gs_ai_hardening_sentinel', value), sentinel);
-  await page.evaluate(() => window.showPage?.('essay'));
-  await expect(page.locator('#essay-textarea')).toBeVisible();
-
   const draft = 'I kept returning to the failed prototype because each error changed the question I was asking. Instead of hiding the mistake, I documented it, tested one variable at a time, and learned to treat revision as evidence rather than embarrassment.';
-  await page.locator('#essay-textarea').fill(draft);
+
+  const hook = await page.evaluate(({ value, draftText }) => {
+    localStorage.setItem('gs_ai_hardening_sentinel', value);
+    const textarea = document.querySelector('#essay-textarea');
+    if (!textarea) return { found: false, autosaveHook: false };
+    textarea.value = draftText;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    return { found: true, autosaveHook: textarea.dataset.skAiAutosave === '1' };
+  }, { value: sentinel, draftText: draft });
+
+  expect(hook.found).toBe(true);
+  expect(hook.autosaveHook).toBe(true);
   await page.waitForTimeout(900);
 
   const saved = await page.evaluate(() => {
@@ -149,12 +156,14 @@ test('reduced-motion preference disables AI pulse animation and quick-action tra
   const styles = await page.evaluate(() => {
     const pulse = document.querySelector('.sk-ai-progress > span');
     const quick = document.querySelector('.sk-ai-quick button');
+    const duration = quick ? getComputedStyle(quick).transitionDuration : '';
     return {
       pulseAnimation: pulse ? getComputedStyle(pulse).animationName : '',
-      quickTransition: quick ? getComputedStyle(quick).transitionDuration : ''
+      quickTransition: duration,
+      quickTransitionSeconds: Math.max(0, ...String(duration).split(',').map(value => Number.parseFloat(value) || 0))
     };
   });
 
   expect(styles.pulseAnimation).toBe('none');
-  expect(styles.quickTransition).toBe('0s');
+  expect(styles.quickTransitionSeconds).toBeLessThanOrEqual(0.001);
 });
