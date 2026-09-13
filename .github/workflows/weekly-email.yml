@@ -27,6 +27,14 @@ jobs:
         working-directory: scripts
         run: npm ci
 
+      - name: Block high-severity production dependency advisories
+        working-directory: scripts
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validate email script
+        working-directory: scripts
+        run: node --check send-weekly-email.js
+
       - name: Send weekly emails
         working-directory: scripts
         env:
