@@ -19,6 +19,8 @@ on:
       - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
       - '.github/workflows/scholark-production-ai-audit.yml'
+      - '.github/workflows/scholark-ai-reliability-gate.yml'
+      - '.github/workflows/weekly-email.yml'
   push:
     branches:
       - main
@@ -40,6 +42,8 @@ on:
       - 'AI-E2E-RESULTS.md'
       - '.github/workflows/scholark-regression-audit.yml'
       - '.github/workflows/scholark-production-ai-audit.yml'
+      - '.github/workflows/scholark-ai-reliability-gate.yml'
+      - '.github/workflows/weekly-email.yml'
 
 permissions:
   contents: read
@@ -68,13 +72,17 @@ jobs:
           node --check scholark-ai-dashboard.js
           node --check scholark-ai-bridge.js
           node --check scholark-ai-context.js
+          node --check scholark-ai-reliability.js
           node --check scholark-ai-ui.js
+          node --check scholark-ai-ui-polish.js
           node --check scholark-ai-practice.js
           node --check scholark-ai-practice-ui.js
           node --check scholark-ai-health.js
           node --check scripts/scholark-ai-browser.spec.mjs
           node --check scripts/scholark-ai-mobile-smoke.spec.mjs
+          node --check scripts/scholark-ai-hardening.spec.mjs
           node --check scripts/playwright.config.mjs
+          node --check scripts/send-weekly-email.js
           node --check ap-v2-app.js
           node --check ap-v2-data.js
           node --check prep-v2-app.js
@@ -84,6 +92,10 @@ jobs:
       - name: Install audit dependencies
         working-directory: scripts
         run: npm ci
+
+      - name: Block high-severity production dependency advisories
+        working-directory: scripts
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Verify patched brace-expansion maintenance release
         working-directory: scripts
@@ -99,6 +111,19 @@ jobs:
             (major >= 5 && (major > 5 || minor > 0 || patch >= 8));
           if (!patched) throw new Error(`brace-expansion ${record.version} is not on a patched maintenance line`);
           console.log(`brace-expansion ${record.version}: patched maintenance release verified.`);
+          NODE
+
+      - name: Verify patched Nodemailer release
+        working-directory: scripts
+        run: |
+          node - <<'NODE'
+          const lock = require('./package-lock.json');
+          const record = lock.packages?.['node_modules/nodemailer'];
+          if (!record?.version) throw new Error('nodemailer missing from lockfile');
+          const [major, minor, patch] = record.version.split('.').map(Number);
+          const patched = major > 10 || (major === 10 && (minor > 0 || patch >= 6));
+          if (!patched) throw new Error(`nodemailer ${record.version} is below the patched 10.0.6 release`);
+          console.log(`nodemailer ${record.version}: patched release verified.`);
           NODE
 
       - name: Run repository test suite
@@ -125,17 +150,20 @@ jobs:
           bridge=Path('scholark-ai-bridge.js').read_text(encoding='utf-8')
           context=Path('scholark-ai-context.js').read_text(encoding='utf-8')
           dashboard=Path('scholark-ai-dashboard.js').read_text(encoding='utf-8')
+          reliability=Path('scholark-ai-reliability.js').read_text(encoding='utf-8')
           ui=Path('scholark-ai-ui.js').read_text(encoding='utf-8')
+          ui_polish=Path('scholark-ai-ui-polish.js').read_text(encoding='utf-8')
           practice=Path('scholark-ai-practice.js').read_text(encoding='utf-8')
           practice_ui=Path('scholark-ai-practice-ui.js').read_text(encoding='utf-8')
           health=Path('scholark-ai-health.js').read_text(encoding='utf-8')
           robots=Path('robots.txt').read_text(encoding='utf-8')
           sitemap=Path('sitemap.xml').read_text(encoding='utf-8')
-          ai_js='\n'.join([core,agents,bridge,context,dashboard,ui,practice,practice_ui,health]).lower()
+          ai_js='\n'.join([core,agents,bridge,context,dashboard,reliability,ui,ui_polish,practice,practice_ui,health]).lower()
 
           required_ai_files=(
             'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
-            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+            'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js',
+            'scholark-ai-reliability.js','scholark-ai-ui.js','scholark-ai-ui-polish.js',
             'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
           )
           required_docs=(
@@ -144,8 +172,9 @@ jobs:
           )
           required_e2e=(
             'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs',
-            'scripts/playwright.config.mjs','scripts/scholark-production-audit.sh',
-            '.github/workflows/scholark-production-ai-audit.yml'
+            'scripts/scholark-ai-hardening.spec.mjs','scripts/playwright.config.mjs',
+            'scripts/scholark-production-audit.sh','.github/workflows/scholark-production-ai-audit.yml',
+            '.github/workflows/scholark-ai-reliability-gate.yml'
           )
           paid_hosts=(
             'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
@@ -165,8 +194,11 @@ jobs:
             'no_accidental_paywall_copy': 'Upgrade to Pro to access' not in html,
             'ai_is_additive_loader_suite': all(x in loader for x in required_ai_files),
             'ai_does_not_replace_index_boot': 'scholark-feature-loader.js' in html and 'scholark-v3.js' in html,
+            'ai107_boot_safeguards': "const BUILD='ai-107'" in loader and 'bounded-timeout' in loader and 'aiBootScheduledAt' in loader,
             'no_paid_ai_runtime_dependency': not any(x in ai_js for x in paid_hosts),
             'deterministic_fallback_present': 'deterministic-fallback' in core and 'fallbackTutor' in agents,
+            'multi_model_recovery_present': 'Llama-3.2-1B-Instruct-q4f16_1-MLC' in reliability and "['standard', 'rescue', 'low']" in reliability,
+            'ui_polish_loop_guarded': 'setTextIfChanged' in ui_polish and 'schedulePolish' in ui_polish,
             'legacy_essay_fallback_preserved': 'analyzeEssayLocally' in html,
             'bridge_does_not_write_legacy_prep_keys': "localstorage.setitem(`gs_prep" not in bridge.lower() and "localstorage.setitem('gs_prep" not in bridge.lower(),
             'bridge_does_not_write_legacy_ap_keys': "localstorage.setitem(`gs_ap" not in bridge.lower() and "localstorage.setitem('gs_ap" not in bridge.lower(),
@@ -197,7 +229,8 @@ jobs:
           for url in \
             'https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC' \
             'https://huggingface.co/mlc-ai/Qwen3-0.6B-q4f16_1-MLC' \
-            'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC'; do
+            'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC' \
+            'https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC'; do
               curl --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 20 --max-time 90 --output /dev/null "$url"
           done
 
@@ -224,4 +257,4 @@ jobs:
       - name: Regression summary
         run: |
           echo 'ScholarK regression contract passed.'
-          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, cross-browser tested in compatibility mode, SEO assets are present, and legacy AP/SAT/Essay paths remain present.'
+          echo 'The AI layer is additive, grounded, zero-paid-provider at runtime, high-severity dependency-audited, cross-browser tested, and legacy AP/SAT/Essay/data paths remain present.'

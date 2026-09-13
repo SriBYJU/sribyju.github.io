@@ -3,8 +3,9 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='ai-104';
+  const BUILD='ai-107';
   const pending=new Map();
+  const loaderState={cinematicReadyAt:0,cinematicReadyReason:'pending',aiBootScheduledAt:0,aiBootStartedAt:0,aiReadyAt:0,aiBootError:null};
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
     if(loaded(src)) return Promise.resolve();
@@ -28,11 +29,11 @@
     ai:{
       files:[
         'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
-        'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-ui.js',
+        'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-reliability.js','scholark-ai-ui.js','scholark-ai-ui-polish.js',
         'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
       ],
-      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIUI&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
-      init:()=>{window.ScholarkAIUI?.enhanceEssay?.();notify('ai');}
+      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIReliability&&!!window.ScholarkAIUI&&!!window.ScholarkAIUIPolish&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
+      init:()=>{window.ScholarkAIUI?.enhanceEssay?.();window.ScholarkAIUIPolish?.refresh?.();loaderState.aiReadyAt=performance.now();notify('ai');}
     }
   };
 
@@ -79,12 +80,75 @@
   setTimeout(installShowPageHook,300);
   setTimeout(installShowPageHook,1200);
 
-  // Load only the small orchestration/UI shell after normal rendering. No model weights are loaded
-  // until a student actively requests a generative feature. If this optional layer fails, legacy
-  // Scholark remains available because the integration is strictly additive.
-  const bootAI=()=>ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
-  if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1500});
-  else setTimeout(bootAI,700);
+  let aiBootPromise=null;
+  const bootAI=()=>{
+    if(aiBootPromise) return aiBootPromise;
+    loaderState.aiBootStartedAt=performance.now();
+    aiBootPromise=ensure('ai')
+      .catch(err=>{
+        loaderState.aiBootError={name:err?.name||'Error',message:String(err?.message||err||'unknown').slice(0,300)};
+        console.warn('[Scholark AI] optional shell did not load',err);
+        throw err;
+      });
+    return aiBootPromise;
+  };
 
-  window.ScholarkFeatureLoader={version:'1.2.0',ensure,installShowPageHook};
+  function afterCinematicReady(options={}){
+    const maxWaitMs=Math.max(1500,Number(options.maxWaitMs)||7000);
+    return new Promise(resolve=>{
+      let settled=false;
+      let probeTimer=0;
+      let watchedPromise=null;
+      const finish=reason=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(hardTimer);
+        if(probeTimer)clearTimeout(probeTimer);
+        loaderState.cinematicReadyAt=performance.now();
+        loaderState.cinematicReadyReason=reason;
+        // Preserve the original S/cinematic's ownership of startup: two full paints occur before AI work.
+        requestAnimationFrame(()=>requestAnimationFrame(resolve));
+      };
+      const hardTimer=setTimeout(()=>finish('bounded-timeout'),maxWaitMs);
+      const probe=()=>{
+        if(settled)return;
+        const cinematic=window.ScholarkV3?.cinematicReady;
+        if(cinematic&&typeof cinematic.then==='function'&&cinematic!==watchedPromise){
+          watchedPromise=cinematic;
+          // Never let a stalled cinematic promise permanently block the optional AI shell.
+          Promise.resolve(cinematic).then(()=>finish('cinematic-promise'),()=>finish('cinematic-rejected'));
+        }
+        if(document.documentElement.classList.contains('scholark-cinematic-ready')){
+          finish('ready-class');
+          return;
+        }
+        probeTimer=setTimeout(probe,40);
+      };
+      probe();
+    });
+  }
+
+  function scheduleAIBoot(){
+    if(loaderState.aiBootScheduledAt)return;
+    loaderState.aiBootScheduledAt=performance.now();
+    let started=false;
+    let idleId=null;
+    const start=()=>{
+      if(started)return;
+      started=true;
+      clearTimeout(watchdog);
+      if(idleId!==null&&'cancelIdleCallback' in window){try{cancelIdleCallback(idleId);}catch(_){ }}
+      bootAI().catch(()=>{});
+    };
+    // requestIdleCallback is an optimization, not a correctness dependency. The watchdog guarantees boot.
+    const watchdog=setTimeout(start,1200);
+    if('requestIdleCallback' in window) idleId=requestIdleCallback(start,{timeout:700});
+    else setTimeout(start,350);
+  }
+
+  // The original Scholark S/cinematic experience owns startup. AI remains additive, but neither a
+  // stalled cinematic promise nor a browser idle-callback quirk can block it forever.
+  afterCinematicReady().then(scheduleAIBoot,scheduleAIBoot);
+
+  window.ScholarkFeatureLoader={version:'1.4.0',build:BUILD,ensure,installShowPageHook,afterCinematicReady,scheduleAIBoot,state:loaderState};
 })();

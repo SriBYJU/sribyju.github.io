@@ -84,7 +84,12 @@ async function auditDevice(deviceName){
     }
 
     await page.evaluate(({y})=>scrollTo(0,y),{y:Math.round(metrics.start+metrics.range*.84)});
-    await page.waitForTimeout(120);
+    // Prove the actual rendered state instead of assuming WebKit paints within a fixed sleep.
+    // The product requirement is unchanged: by this point the opening copy must be faded away.
+    await page.waitForFunction(()=>{
+      const hero=document.querySelector('.skm-hero');
+      return (window.ScholarkMobile?.progress||0)>.75 && hero && +getComputedStyle(hero).opacity<.15;
+    },null,{timeout:1800});
     const mid=await page.evaluate(()=>{
       const hero=document.querySelector('.skm-hero');
       const logo=document.querySelector('.skm-mark');
@@ -93,6 +98,7 @@ async function auditDevice(deviceName){
         progress:window.ScholarkMobile?.progress,
         stickyTop:sticky.getBoundingClientRect().top,
         heroOpacity:+getComputedStyle(hero).opacity,
+        heroInlineOpacity:+(hero.style.opacity||1),
         logoTransform:getComputedStyle(logo).transform,
         logoRect:logo.getBoundingClientRect(),
         overflow:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)-innerWidth
@@ -100,7 +106,7 @@ async function auditDevice(deviceName){
     });
     assert.ok(mid.progress>.75,`${deviceName}: mobile scroll runtime must advance through the cinematic`);
     assert.ok(Math.abs(mid.stickyTop-60)<=3,`${deviceName}: sticky stage must remain directly beneath the nav`);
-    assert.ok(mid.heroOpacity<.15,`${deviceName}: opening copy should fade during the scroll`);
+    assert.ok(mid.heroOpacity<.15&&mid.heroInlineOpacity<.15,`${deviceName}: opening copy must actually fade during the scroll (computed=${mid.heroOpacity}, inline=${mid.heroInlineOpacity})`);
     assert.notEqual(mid.logoTransform,'none',`${deviceName}: S must actually move/scale during scroll`);
     assert.ok(mid.logoRect.top>-500&&mid.logoRect.bottom<1200,`${deviceName}: S transform must remain bounded`);
     assert.ok(mid.overflow<=2,`${deviceName}: scrolled horizontal overflow is ${mid.overflow}px`);
