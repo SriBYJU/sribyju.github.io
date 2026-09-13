@@ -9,6 +9,17 @@ async function waitForV59(page) {
   await page.waitForTimeout(650);
 }
 
+async function waitForMobileCinematic(page) {
+  await page.goto(BASE, { waitUntil:'domcontentloaded', timeout:30000 });
+  await page.waitForFunction(() => !!(
+    window.ScholarkMobile &&
+    document.body.classList.contains('scholark-mobile-cinematic') &&
+    document.documentElement.classList.contains('scholark-cinematic-ready') &&
+    document.querySelector('.skm-experience .skm-story .skm-stage .skm-mark')
+  ), null, { timeout:25000 });
+  await page.waitForTimeout(350);
+}
+
 async function dismissConsent(page) {
   const necessary = page.locator('#sk-legal-banner [data-necessary]');
   if (await necessary.count()) {
@@ -102,17 +113,31 @@ async function desktopAudit(browser) {
 async function mobileAudit(browser) {
   const context = await browser.newContext({ viewport:{width:390,height:844}, isMobile:true, hasTouch:true });
   const page = await context.newPage();
-  await waitForV59(page);
+  const consoleErrors=[];
+  page.on('pageerror', e => consoleErrors.push(String(e.message||e)));
+  await waitForMobileCinematic(page);
   const state = await page.evaluate(() => ({
-    scenes:document.querySelectorAll('.sk12-continuity').length,
-    overflow:document.documentElement.scrollWidth-innerWidth,
-    disclosures:document.querySelectorAll('.sk12-project-status').length,
-    adNodes:document.querySelectorAll('ins.adsbygoogle').length
+    mobileRuntime: !!window.ScholarkMobile,
+    mobileExperience: document.querySelectorAll('.skm-experience').length,
+    mobileStory: document.querySelectorAll('.skm-story').length,
+    mobileStage: document.querySelectorAll('.skm-stage').length,
+    mobileMark: document.querySelectorAll('.skm-mark').length,
+    desktopGraph: document.querySelectorAll('.sk6-experience,.sk12-continuity').length,
+    overflow: document.documentElement.scrollWidth-innerWidth,
+    disclosure: document.querySelector('.skm-final p')?.textContent || '',
+    adNodes: document.querySelectorAll('ins.adsbygoogle,.ad-banner,.ad-reserve,[data-ad-placement]').length
   }));
-  assert.ok(state.scenes>=2,'mobile should retain the continuity scenes');
-  assert.ok(state.disclosures>=2,'mobile should retain project disclosures');
+  assert.equal(state.mobileRuntime,true,'mobile should initialize the dedicated ScholarkMobile runtime');
+  assert.equal(state.mobileExperience,1,'mobile should build exactly one mobile cinematic experience');
+  assert.equal(state.mobileStory,1,'mobile should retain its scrollytelling story');
+  assert.equal(state.mobileStage,1,'mobile should retain its cinematic stage');
+  assert.equal(state.mobileMark,1,'mobile should retain the S mark');
+  assert.equal(state.desktopGraph,0,'mobile must not load the desktop V5 cinematic scene graph');
   assert.equal(state.adNodes,0,'mobile should contain no ad nodes');
+  assert.ok(/non-commercial educational project/i.test(state.disclosure),'mobile closing disclosure should retain non-commercial project status');
   assert.ok(state.overflow<=4,`mobile horizontal overflow is ${state.overflow}px`);
+  const relevantErrors = consoleErrors.filter(x => !/firebase|auth\/operation-not-supported|network|failed to fetch/i.test(x));
+  assert.equal(relevantErrors.length,0,`unexpected mobile page errors: ${relevantErrors.join(' | ')}`);
   await context.close();
 }
 
@@ -135,7 +160,7 @@ try {
   await desktopAudit(browser);
   await mobileAudit(browser);
   await reducedMotionAudit(browser);
-  console.log('Scholark V5.9 browser audit passed: desktop, mobile, dark mode, routes/auth gates, zero large dead gaps, non-commercial identity, ad removal, and reduced-motion behavior.');
+  console.log('Scholark browser audit passed: desktop V5.9 continuity, current mobile cinematic, dark mode, routes/auth gates, zero large dead gaps, non-commercial identity, ad removal, and reduced-motion behavior.');
 } finally {
   await browser.close();
 }

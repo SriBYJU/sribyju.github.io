@@ -157,3 +157,26 @@
   body.scholark-v5 .sk6-story{height:auto!important;min-height:100svh!important;}
   body.scholark-v5 .sk6-sticky{position:relative!important;top:auto!important;height:auto!important;min-height:calc(100svh - 60px)!important;}
 }
+
+/* Desktop S-portal cohesion repair.
+   The original edge-on rings and deep extrusion become detached diagonal bars when
+   the mark scales toward the camera. Preserve the dimensional opening, then collapse
+   it into one clean S before the large scroll-through zoom. Mobile remains untouched. */
+@media (min-width:761px){
+  body.scholark-v5 .sk6-portal-object{isolation:isolate;}
+  body.scholark-v5 .sk6-logo-depth{
+    opacity:clamp(0,calc(.82 - var(--sk6-approach,0)*1.65),.82)!important;
+  }
+  body.scholark-v5 .sk6-logo-layer{opacity:.58!important;}
+  body.scholark-v5 .sk6-portal-ring{display:none!important;}
+  body.scholark-v5 .sk6-logo-face{
+    transform:translateZ(10px)!important;
+    filter:drop-shadow(0 8px 10px rgba(91,34,9,.16))!important;
+  }
+  body.scholark-v5 .sk6-glint{
+    opacity:clamp(0,calc(.68 - var(--sk6-dive,0)*.42),.68)!important;
+  }
+  body.scholark-v5 .sk6-core-glow{
+    opacity:clamp(0,calc(var(--sk6-approach,0) - var(--sk6-through,0)*.72),.72)!important;
+  }
+}
