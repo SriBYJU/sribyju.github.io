@@ -1,180 +1,165 @@
 # Scholark AI Regression Checklist
 
-Branch: `scholark-ai-foundation`
+Release status: **PRODUCTION-AUDITED**
+
+Audited product release: `c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`
+
+Current main after the existing V4 audit bot's report-only child commit: `75238cf048c7a58c37edeac1faab44c3f66c5af2`
 
 Legend:
 
-- **PASS — static/additive:** repository structure proves the old capability remains and the AI layer does not replace it.
-- **PASS — automated:** executed in repository/unit/browser automation.
-- **PASS — browser compatibility:** executed against the branch through real browser engines with WebGPU disabled/compatibility behavior.
-- **PENDING — WebGPU:** requires an executed compatible-device model-weight load/inference scenario.
-- **PENDING — production:** requires the deployed production build.
+- **PASS — live production:** executed against `https://sribyju.github.io/`.
+- **PASS — automated:** executed in CI/browser/unit automation.
+- **PASS — static/additive:** repository comparison proves the existing capability was preserved; not claimed as a full interactive user journey.
+- **NOT EXECUTED — hardware:** needs physical WebGPU/model-weight execution.
+- **NOT EXECUTED — account:** needs authorized real test-account credentials/data.
+- **NOT EXECUTED — manual:** requires a manual/human evaluation environment.
 
-Implementation intent alone is never counted as execution evidence.
+Implementation intent alone is not execution evidence.
+
+## Release/deployment contract
+
+| Check | Status | Evidence |
+| --- | --- | --- |
+| Product release merged | PASS — automated | PR #43 merged as `c33e0ae...`. |
+| GitHub Pages current-main deployment | PASS — production | Replacement Pages run `34728572875` succeeded for audit-only child `75238cf...`. |
+| Production release detection | PASS — live production | Live audit detected `ai-107`/SEO/reliability release after propagation. |
+| Required AI assets | PASS — live production | Loader, algorithms, core, agents, context, reliability, bridge, dashboard, UI, UI polish, practice, health and CSS all returned 200. |
+| `robots.txt` | PASS — live production | HTTP 200 and release contract verified. |
+| `sitemap.xml` | PASS — live production | HTTP 200 and release contract verified. |
+| Canonical tag | PASS — live production | Exactly one canonical tag. |
+| No configured paid inference endpoint | PASS — live production | Production runtime scan clear. |
+| Live cross-browser suite | PASS — live production | 28/28 passed. |
 
 ## Data-safety contract
 
 | Check | Status | Notes |
 | --- | --- | --- |
-| No database reset | PASS — static/additive | No destructive database operation introduced. |
+| No database reset introduced | PASS — static/additive | No destructive DB operation added by AI release. |
 | No user-ID/auth migration | PASS — static/additive | Authentication mapping untouched. |
-| No deletion of legacy localStorage | PASS — automated | New AI state is namespaced; browser health hashes legacy values before/after probes. |
-| Existing essay storage preserved | PASS — static/additive | Legacy local/Firebase save/sync remains primary saved-essay path. |
-| Existing SAT progress preserved | PASS — automated/static | Bridge is read-only toward native prep; CI enforces no native-store writes. |
-| Existing AP progress preserved | PASS — automated/static | Bridge is read-only toward native AP state. |
-| Existing planner/apps preserved | PASS — automated/static | Context adapter reads `gs_tasks_*` / `gs_apps_*` without writing them. |
-| No destructive schema migration | PASS — static/additive | No Firestore migration added. |
-| Existing accounts preserved | PASS — static/additive | No account mutation code added. |
-| Browser legacy-state sentinel survives AI health | PASS — automated | Playwright plants/checks a `gs_*` sentinel; health also checks legacy snapshot equality. |
+| No deletion of legacy localStorage | PASS — live production | Health + browser sentinel prove tested legacy values survive AI probes. |
+| Existing essay storage preserved | PASS — static/additive | Legacy local/Firebase paths remain; AI autosave is additive. |
+| Existing SAT progress preserved | PASS — automated/static | Bridge cannot write native prep keys. |
+| Existing AP progress preserved | PASS — automated/static | Bridge cannot write native AP keys. |
+| Existing planner/apps preserved | PASS — automated/static | Context reads `gs_tasks_*` / `gs_apps_*` without writing them. |
+| No destructive Firestore migration | PASS — static/additive | None added. |
+| Existing accounts preserved by release code | PASS — static/additive | No account mutation/migration added. |
+| Real existing-account save/delete/sync E2E | NOT EXECUTED — account | No authorized test credentials were used. |
+| AI autosave isolated from legacy state | PASS — live production | Chromium hardening test. |
+| New conversation/cancel clears only AI state | PASS — live production | Chromium hardening test. |
 
-## Existing functionality contract
+## Existing functionality preservation
 
 | Existing capability | Status | Regression strategy |
 | --- | --- | --- |
-| Home page | PASS — static/additive | `index.html` remains source; AI loads after normal render. |
-| Navigation | PASS — static/additive | Existing navigation remains; Ask Scholark is additive. |
-| GPA calculators | PASS — static/additive | Deterministic legacy calculations untouched. |
-| Weighted GPA | PASS — static/additive | Untouched. |
-| Grade-needed calculator | PASS — static/additive | Untouched. |
-| College-chance estimator | PASS — static/additive | Untouched legacy tool. AI does not rewrite it. |
-| Student-loan calculator | PASS — static/additive | Untouched. |
-| SAT/ACT converter | PASS — static/additive | Untouched. |
-| GPA Goal Tracker | PASS — static/additive | Untouched. |
-| Essay Coach | PASS — automated/static | Legacy analyzer remains; AI enhancement is appended. |
-| Saved essays | PASS — static/additive | Existing save/load/delete/sync preserved. |
-| SAT/ACT prep | PASS — automated/static | Prep v2 assets/quality audit preserved. |
-| AP Study Hub | PASS — automated/static | AP v2 assets/quality audit preserved. |
-| College database/comparison | PASS — static/additive | Existing structured UI remains. |
-| Scholarship tools | PASS — static/additive | Existing UI remains; AI only promotes verified structured rows. |
-| Study planner | PASS — automated/static | Existing planner remains; AI planning is separate/read-only to legacy tasks. |
-| Dashboard saved results | PASS — automated/static | Intelligence panel inserts above existing saved-results grid. |
-| Profile | PASS — static/additive | No profile mutation. |
-| Dark mode | PASS — static/additive | AI CSS uses existing tokens. |
-| Mobile navigation / cinematic | PASS — automated branch WebKit gate when latest run is green | Dedicated iPhone-like stress workflow remains active. |
-| Community Q&A | PASS — static/additive | No replacement. |
-| Existing SEO metadata | PASS — static/additive | Main document/routes remain intact. |
-| Existing legal/privacy pages | PASS — static/additive | No removal. |
+| Home/navigation | PASS — static/additive | Existing document/nav retained; AI is additive. |
+| GPA calculators | PASS — static/additive | Existing deterministic code untouched. |
+| Weighted GPA / grade-needed | PASS — static/additive | Existing deterministic code untouched. |
+| College-chance estimator | PASS — static/additive | Legacy tool remains independent. |
+| Student-loan calculator | PASS — static/additive | Existing implementation retained. |
+| SAT/ACT converter | PASS — static/additive | Existing implementation retained. |
+| GPA Goal Tracker | PASS — static/additive | Existing implementation retained. |
+| Legacy Essay Coach | PASS — automated/static | Legacy analyzer presence enforced by regression contract. |
+| Saved essays | PASS — static/additive | Existing save/load/sync paths not rewritten. |
+| SAT/ACT prep | PASS — automated/static | Prep assets + SAT quality audit green. |
+| AP Study Hub | PASS — automated/static | AP assets + AP quality audit green. |
+| College comparison/database | PASS — static/additive | Existing structured UI retained. |
+| Scholarship tools | PASS — static/additive | Existing UI retained. |
+| Study planner | PASS — automated/static | Existing store retained; AI context read-only. |
+| Dashboard saved results | PASS — automated/static | AI panel inserts above existing grid. |
+| Profile/dark mode/community/legal pages | PASS — static/additive | No replacement/removal by AI release. |
+| Desktop S cinematic before AI | PASS — live production | Chromium/Firefox/WebKit core suite verifies ordering. |
+| Mobile cinematic/stability | PASS — automated | Post-merge dedicated WebKit run `34728562277` succeeded. |
 
-## New AI behavior
+## AI capability contract
 
 | AI capability | Status | Notes |
 | --- | --- | --- |
-| Device capability detection | PASS — automated | Algorithm + runtime health. |
-| Local runtime abstraction | PASS — automated/static | Pinned WebLLM runtime abstraction. |
-| Exact runtime browser import | PASS — automated when latest E2E run is green | `preflightRuntime()` imports WebLLM 0.2.82 without model weights. |
-| Model repository/source availability | PASS — automated when latest CI is green | npm + three configured model repositories checked. |
-| Real WebGPU model-weight inference | PENDING — WebGPU | Not inferred from bundle/source checks. |
-| Primary/smaller model sequence | PASS — static/additive | high → standard → low → deterministic path implemented. |
-| Deterministic compatibility fallback | PASS — browser compatibility | Specialists exercised with WebGPU unavailable. |
-| No required paid model API | PASS — automated/static | Paid-provider endpoint strings prohibited in AI runtime suite. |
-| Ask Scholark routing | PASS — automated/browser | Intent + dialog smoke coverage. |
-| AI Tutor | PASS — browser compatibility | Useful deterministic fallback exercised. WebGPU quality run pending. |
-| Essay Admissions Reader | PASS — browser compatibility | 13-category deterministic fallback exercised. WebGPU quality run pending. |
-| Essay autosave | PASS — implementation | Additive local draft protection. |
-| Essay follow-up | PASS — implementation | Current evaluation/excerpt context. |
-| Essay version comparison | PASS — automated | Delta logic covered. |
-| Shared mastery model | PASS — automated | Evidence behavior covered. |
-| SAT evidence bridge | PASS — automated/static | Separate mastery namespace; native store protected. |
-| AP evidence bridge | PASS — automated/static | Separate mastery namespace; native store protected. |
-| Adaptive-practice recommendation | PASS — automated | Mastery-to-next-practice logic covered. |
-| Adaptive-practice session engine | PASS — browser compatibility | Real browser session creation/answer grading executed. |
-| Objective practice grading | PASS — browser compatibility | Known-answer item self-grade is tested. |
-| Open-ended mastery protection | PASS — browser compatibility | Retrieval prompts are `gradable:false`; no auto mastery. |
-| Adaptive-practice UI | PASS — browser compatibility | Desktop/mobile dialog smoke paths. |
-| AI Study Planner | PASS — browser compatibility | Deterministic browser plan exercised. |
-| SAT Coach | PASS — browser compatibility | Recorded-evidence diagnosis exercised. |
-| AP Coach | PASS — browser compatibility | Recorded-evidence diagnosis exercised. |
-| College AI | PASS — browser compatibility | Supplied-row grounding exercised. |
-| Scholarship AI | PASS — browser compatibility | Supplied-row grounding exercised. |
-| Intelligence dashboard | PASS — implementation/static | Additive panel + mastery map. |
-| Conversation clear/new session | PASS — implementation | Only AI session state clears. |
-| Cancel generation | PASS — implementation | Local-engine interrupt where supported. |
-| Runtime health self-test | PASS — browser compatibility | Module/routing/state-safety probes run in page. |
-| Reduced-motion support | PASS — implementation | AI CSS includes reduced-motion handling. |
-| Keyboard dialog containment | PASS — browser compatibility | Dialog focus smoke paths + focus-loop implementation. |
-| Frontend secret scan | PASS — automated when latest run is green | Scanner distinguishes real key shapes from Scholark `sk-*` IDs. |
+| Device capability detection | PASS — automated/live integration | Health + startup tests. |
+| Local runtime abstraction | PASS — automated | WebLLM 0.2.82 pinned. |
+| Exact runtime browser import | PASS — live production | `preflightRuntime()` imports bundle without weights. |
+| Model/source availability | PASS — automated | Release workflow checks configured sources. |
+| Physical WebGPU model-weight inference | NOT EXECUTED — hardware | Runtime import is not inference. |
+| Qwen retry/recovery architecture | PASS — automated/static | Reliability layer installed and integrated. |
+| Independent Llama rescue model | PASS — automated/static | `Llama-3.2-1B-Instruct-q4f16_1-MLC` configured. Physical inference still hardware-bound. |
+| Deterministic compatibility fallback | PASS — live production | All specialists exercised with WebGPU unavailable. |
+| No required paid model API | PASS — live production | Deployed runtime endpoint scan clear. |
+| Ask Scholark routing | PASS — live production | Routing/dialog and creator-question path executed. |
+| Grounded Scholark product/about answers | PASS — live production | Creator question tested. |
+| Tutor | PASS — live production compatibility | Useful fallback path executed. |
+| Essay Admissions Reader | PASS — live production compatibility | Thirteen-category path executed. |
+| Essay autosave | PASS — live production | Namespaced persistence test executed. |
+| Essay follow-up API | PASS — automated/static | Export/integration present; full generative physical-GPU quality remains hardware-bound. |
+| Essay version comparison | PASS — automated | Deterministic delta logic covered. |
+| Shared mastery | PASS — automated | Evidence behavior covered. |
+| SAT/AP evidence bridges | PASS — automated/static | Separate namespace; native stores protected. |
+| Adaptive recommendation | PASS — automated | Mastery-to-next-practice logic. |
+| Adaptive session engine | PASS — live production | Session creation/grading executed. |
+| Objective practice grading | PASS — live production | Known-answer grading executed. |
+| Open-ended mastery protection | PASS — live production | `gradable:false`; no auto mastery. |
+| Adaptive-practice UI | PASS — live production | Dialog/mobile smoke paths. |
+| Study Planner | PASS — live production compatibility | Deterministic plan path executed. |
+| SAT Coach | PASS — live production compatibility | Recorded-evidence diagnosis executed. |
+| AP Coach | PASS — live production compatibility | Recorded-evidence diagnosis executed. |
+| College AI | PASS — live production compatibility | Supplied-row grounding executed. |
+| Scholarship AI | PASS — live production compatibility | Supplied-row grounding executed. |
+| Runtime health | PASS — live production | Browser health report required. |
+| Event-loop responsiveness / bounded AI boot | PASS — live production | `ai-107` hardening test. |
+| UI mutation quiescence | PASS — live production | Mutation storm regression test. |
+| Reduced motion | PASS — live production | Chromium hardening test. |
+| Keyboard dialog containment | PASS — live production | Ask/practice dialog path executed across desktop engines. |
+| Manual screen-reader evaluation | NOT EXECUTED — manual | Automation is not a screen-reader pass. |
 
-## Automated workflows
+## Security/dependency contract
 
-### Scholark regression audit
+| Check | Status | Notes |
+| --- | --- | --- |
+| Frontend secret scan | PASS — automated | Post-merge gate green. |
+| High/critical production npm advisory gate | PASS — automated | `npm audit --omit=dev --audit-level=high`. |
+| Nodemailer vulnerable 9.x removed | PASS — automated | Audited lock resolves 10.0.9. |
+| Production-audit npm install | PASS — automated | 0 vulnerabilities reported. |
+| Weekly email blocks on high advisory | PASS — static/CI contract | Audit step runs before send action. |
 
-For relevant PR/push changes it executes:
+## Browser matrix
 
-- JS syntax checks for legacy/AI modules and browser specs;
-- repository unit tests;
-- Scholark AI algorithm tests;
-- SAT market-quality audit;
-- AP market-quality audit;
-- preservation of key page/AP/SAT assets;
-- no accidental paywall copy;
-- additive loader contract;
-- no paid-provider runtime endpoints;
-- legacy essay analyzer preservation;
-- bridge/context no native-store writes;
-- no unsourced legacy acceptance-rate exposure through the AI context adapter;
-- adaptive-practice isolation and non-grading rule;
-- runtime health legacy snapshot contract;
-- required docs/spec files;
-- pinned WebLLM/model source resolution;
-- Chromium/Firefox/WebKit desktop browser E2E;
-- Chromium/WebKit mobile smoke E2E.
-
-### Mobile WebKit stability
-
-Dedicated iPhone-like WebKit audit enforces:
-
-- mobile loader path;
-- lightweight/mobile runtime;
-- no eager AP/Test Prep engines;
-- no desktop cinematic scene graph;
-- opening composition/layout;
-- bounded mobile cinematic DOM budget around the verified production baseline;
-- sticky scroll behavior/progress;
-- bounded logo transform;
-- no horizontal overflow;
-- four repeated stress-scroll passes per device;
-- no relevant page errors.
-
-The workflow preserves diagnostic logs as artifacts even when it fails.
-
-### Secret scan
-
-Frontend source is scanned for private-key blocks and known token/secret shapes. Firebase web configuration is intentionally not treated as a private secret; access must be enforced through Firebase rules/backend controls.
-
-## Branch browser matrix vs production matrix
-
-The branch browser suite gives real compatibility evidence before merge, but it is not equivalent to a post-deploy production audit.
-
-| Environment | Current evidence |
+| Environment | Status |
 | --- | --- |
-| Desktop Chromium branch | Automated E2E configured/executed by regression gate |
-| Desktop Firefox branch | Automated E2E configured/executed by regression gate |
-| Desktop WebKit branch | Automated E2E configured/executed by regression gate |
-| Mobile Chromium branch | Automated smoke configured/executed |
-| Mobile WebKit branch | Automated smoke + dedicated iPhone stress audit configured/executed |
-| Production GitHub Pages AI build | PENDING — production until merged/deployed |
-| Real compatible-device WebGPU inference | PENDING — WebGPU |
+| Chromium desktop production | PASS — live production |
+| Firefox desktop production | PASS — live production |
+| WebKit desktop production | PASS — live production |
+| Android-class Chromium production | PASS — live production |
+| iPhone-class WebKit production | PASS — live production |
+| Dedicated iPhone WebKit stress workflow | PASS — automated post-merge |
+| Physical WebGPU model inference | NOT EXECUTED — hardware |
 
-## Mandatory deployed checks still pending
+## Live production audit details
 
-Until the AI branch is in production, these remain **PENDING — production**:
+Production audit run `34728562301` executed against the public URL and passed:
 
-- production authentication login/logout;
-- existing-account saved-data smoke with non-destructive records;
-- live model runtime/weight download/cache behavior;
-- live Admissions Reader generative run where WebGPU is available;
-- live compatibility fallback;
-- live SAT/AP → mastery → adaptive-practice loop;
-- live planner adaptation;
-- live College/Scholarship grounded flows;
-- production console/network audit;
-- production broken-link/assets scan;
-- production accessibility/keyboard smoke;
-- production page-load/performance review;
-- live responsive check of key widths/layouts;
-- SEO/canonical/sitemap/robots verification;
-- GitHub Pages deployment status/build verification.
+- release propagation detection;
+- HTTP/network/SEO/reliability contract;
+- required assets 200;
+- canonical count 1;
+- no paid inference endpoint;
+- Chromium/Firefox/WebKit desktop;
+- Android-class Chromium mobile;
+- iPhone-class WebKit mobile;
+- 28/28 total Playwright tests.
+
+Post-merge regression run `34728562296`, mobile WebKit run `34728562277`, and V4 audit run `34728562303` also succeeded.
+
+## Checks deliberately still open
+
+These are not hidden failures; they require environments not used by the automated release suite:
+
+- real Qwen/Llama/SmolLM weight download + generation on physical WebGPU;
+- injected physical-GPU loss/OOM and real multi-model failover;
+- offline-after-cache with real model weights;
+- authorized real existing-user Firebase login/save/delete/sync journey;
+- manual screen-reader pass;
+- formal Lighthouse/performance scoring;
+- exhaustive crawler of every possible dynamic link/state combination.
 
 ## Completion rule
 
-A `PENDING` label becomes `PASS` only after the exact applicable environment has executed it. Branch E2E can prove branch browser behavior; it cannot be relabeled as a production pass before deployment.
+A check becomes PASS only when the stated environment actually executes it. Production browser evidence can prove production browser behavior; it does not retroactively prove physical-GPU generation, real-account mutation safety, or manual accessibility/performance work.

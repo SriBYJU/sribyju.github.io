@@ -1,152 +1,158 @@
 # Scholark Zero-Cost AI Architecture
 
-Status: **Implemented and browser-tested on `scholark-ai-foundation`; production deployment/live audit and a real WebGPU model-weight inference run remain release checks, not claimed passes.**
+Status: **DEPLOYED AND LIVE-AUDITED.** The `ai-107` local-first AI release is live at `https://sribyju.github.io/`. The audited product release is `c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`; current `main` may be a direct audit-report-only descendant created by the existing ScholarK V4 workflow.
 
 ## Goal
 
-Scholark's baseline AI experience must remain useful without a paid per-token provider, student API key, credit card, trial balance, or inference quota. Browser-local inference is an enhancement layer above deterministic academic logic that remains available when a local model cannot run.
-
-## Baseline inference path
+Scholark's baseline AI experience must remain useful without a paid per-token provider, student API key, credit card, trial balance, or hosted inference quota. Browser-local inference is an optional enhancement above deterministic academic systems that remain useful when WebGPU, model loading, or generation is unavailable.
 
 ```text
 Student action
-  -> specialist router / task adapter
-  -> deterministic context + grounded product data
+  -> task / specialist router
+  -> grounded context + deterministic academic logic
   -> device capability manager
-  -> strongest practical local model
-  -> smaller local model if loading/inference fails
-  -> task-specific deterministic fallback
-  -> useful result instead of a dead-end "AI unavailable" state
+  -> preferred local Qwen model
+  -> alternate local Qwen tier when appropriate
+  -> independent Llama 3.2 rescue model when useful
+  -> smaller local model where practical
+  -> task-specific deterministic / guided fallback
+  -> useful result, never a required paid-cloud fallback
 ```
 
-No baseline code calls OpenAI, Anthropic, Gemini, Groq, Together, Fireworks, Replicate, or another metered LLM provider.
+The production audit scans the deployed AI runtime and found no configured OpenAI, Anthropic, Gemini, Groq, Together, Fireworks, Replicate, or other metered hosted inference endpoint.
 
-## Runtime
+## Browser runtime
 
-The generative runtime is `@mlc-ai/web-llm` pinned to **0.2.82** and loaded lazily from an ESM CDN. Model weights are loaded only when a student actively requests a generative feature and their browser/device is eligible for a WebGPU path.
+The generative runtime is `@mlc-ai/web-llm` pinned to **0.2.82** and lazy-loaded from the browser. The version is intentionally pinned because later WebLLM releases have had reported low-end GPU regressions. Specialist code talks through the `ScholarkAI` abstraction rather than importing models directly.
 
-The runtime is intentionally pinned instead of tracking `latest`. WebLLM issue #844 documents a regression introduced after 0.2.82 in which some low-end integrated GPUs can hit disposed-object/GPU-device failures; the report identifies 0.2.82 as unaffected for the tested Qwen3 configurations. The runtime remains abstracted behind `ScholarkAI.generate()` / `generateStructured()` so it can be replaced without rewriting specialist agents.
+`ScholarkAI.preflightRuntime()` imports the exact pinned browser bundle and verifies `CreateMLCEngine` without downloading model weights. This separates runtime/CDN verification from a real GPU model-weight inference test.
 
-Reference: https://github.com/mlc-ai/web-llm/issues/844
+Structured generation does not depend on grammar-mode support. Scholark extracts JSON, validates schema/ranges, attempts bounded repair where appropriate, then uses deterministic output rather than crashing or exposing malformed model text.
 
-Scholark also avoids depending on WebLLM grammar-mode structured generation. Structured specialist output uses ordinary local generation, JSON extraction, schema/range validation, one repair attempt, then a deterministic fallback. This keeps malformed JSON from becoming a dead-end.
+## Local model manifest and recovery
 
-## Runtime preflight
+Primary model tiers:
 
-`ScholarkAI.preflightRuntime()` imports the exact pinned browser bundle and verifies that `CreateMLCEngine` is present **without downloading model weights**. The automated browser suite calls this preflight so a broken CDN/runtime bundle is detected separately from GPU/model-loading failure.
+| Tier | Model ID | Role |
+| --- | --- | --- |
+| High | `Qwen3-1.7B-q4f16_1-MLC` | Stronger capable-device generation |
+| Standard | `Qwen3-0.6B-q4f16_1-MLC` | Balanced/default local generation |
+| Low | `SmolLM2-360M-Instruct-q4f32_1-MLC` | Constrained local fallback |
 
-This is deliberately different from claiming a successful WebGPU model inference. CI validates the bundle, manifests, source repositories, no-WebGPU fallbacks, and product flows. A true model-weight download + inference run requires a compatible WebGPU environment and is recorded separately when executed.
+Independent rescue model:
 
-## Model manifest
+- `Llama-3.2-1B-Instruct-q4f16_1-MLC`
+- family: Llama 3.2
+- purpose: a separate local recovery path when the preferred Qwen path fails or produces a weak/generic response.
 
-| Tier | Model ID | Purpose | Approximate class | License |
-| --- | --- | --- | --- | --- |
-| High | `Qwen3-1.7B-q4f16_1-MLC` | Stronger desktop/local generation | ~1.7B parameter class | Apache-2.0 family |
-| Standard | `Qwen3-0.6B-q4f16_1-MLC` | Balanced local generation | ~0.6B parameter class | Apache-2.0 family |
-| Low | `SmolLM2-360M-Instruct-q4f32_1-MLC` | Constrained WebGPU fallback | 360M parameter class | Apache-2.0 family |
+`scholark-ai-reliability.js` adds the recovery layer on top of the core runtime. It can reject weak generic responses, unload failed engines, retry with another practical local tier, and eventually fall back deterministically. A capable mobile WebGPU device is not automatically demoted merely because it has a coarse pointer; practical memory/CPU/data-saving signals are considered instead.
 
-License/model references:
-
-- Qwen3-1.7B: https://huggingface.co/Qwen/Qwen3-1.7B
-- Qwen3-0.6B: https://huggingface.co/Qwen/Qwen3-0.6B
-- SmolLM2-360M-Instruct: https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct
-- WebLLM: https://github.com/mlc-ai/web-llm
-
-The regression workflow verifies that the pinned npm runtime version and all three model repositories resolve. Future model replacements must repeat license, availability, and browser-compatibility review before entering the manifest.
+The exact sequence depends on the requested/capability tier. For example, a high-tier request can attempt `high -> standard -> rescue -> low` before deterministic guidance.
 
 ## Capability tiers
 
-`scholark-ai-core.js` evaluates practical browser signals including WebGPU availability, WASM availability, device memory when exposed, logical CPU count, coarse/mobile pointer behavior, and reduced-data preference.
+Scholark considers WebGPU, WASM, device memory when exposed, logical CPU count, mobile/coarse input, and reduced-data preference.
 
-- **High:** stronger local model when WebGPU and hardware signals are strong.
-- **Standard:** balanced local model.
-- **Low:** smallest generative model when WebGPU exists but the device is constrained.
-- **Compatibility:** no full generative model required; guided/task-specific/deterministic logic remains useful.
+- **High:** strong desktop-class WebGPU signals.
+- **Standard:** balanced WebGPU path, including capable mobile devices.
+- **Low:** constrained WebGPU path.
+- **Compatibility:** no full local generative model required; deterministic/guided systems remain useful.
 
-Scholark changes execution paths automatically rather than telling a student their device is inadequate.
+Students are not sent to an “AI unavailable” dead end merely because a local model cannot run.
 
-## Reliability ladder
+## `ai-107` startup reliability
 
-1. Preferred local WebGPU model.
-2. Smaller WebGPU model.
-3. Browser-local deterministic/task-specific academic logic when a practical full-model path is unavailable or fails.
-4. Existing Scholark engines stay independently available: original essay rubric, SAT/AP engines, GPA/calculator tools, planner, college/scholarship interfaces, saved data, and account flows.
+The AI shell is additive to the existing Scholark experience. The release loader now:
 
-Fallback behavior is not misrepresented as model-generated AI. The UI distinguishes on-device generative capability from compatibility/guided behavior.
+- gives the original Scholark S cinematic priority;
+- waits only within a bounded safety window rather than awaiting cinematic readiness forever;
+- gives the cinematic clean paint frames before AI attachment;
+- has an independent AI boot watchdog so `requestIdleCallback` or cinematic readiness cannot permanently block startup;
+- records the cinematic-ready reason for diagnostics;
+- uses the `ai-107` cache-busting build so browsers do not reuse the prior broken loader.
 
-## Adaptive practice remains free without a model
+A separate UI-polish mutation loop was also eliminated by making text updates idempotent and frame-coalesced.
 
-`scholark-ai-practice.js` generates and grades deterministic practice for supported domains such as linear equations, quadratics, percentages, ratios, probability, statistics, grammar, and reading evidence. It adapts count/difficulty from the shared mastery model without calling a paid service.
+## Deterministic free systems
 
-For unknown/open-ended topics, Scholark creates retrieval-practice prompts but marks them `gradable:false`; those responses never auto-inflate mastery. A local Tutor may explain them if available, while the practice engine itself remains functional without a model.
+The free fallback is not a single generic canned response. Task-specific systems remain available for:
 
-## Runtime health / data-safety checks
+- Tutor guidance;
+- thirteen-category essay evaluation;
+- study-plan prioritization;
+- SAT/AP evidence diagnosis;
+- college/scholarship grounded responses;
+- mastery recommendations;
+- adaptive practice generation and objective grading;
+- product/about questions grounded in Scholark's own facts.
 
-`scholark-ai-health.js` runs browser self-checks for module readiness, routing, deterministic essay stability, practice grading rules, context availability, model manifest completeness, capability detection, and fallback availability.
-
-Before behavioral probes it hashes/records length metadata for legacy `gs_*`/Firebase localStorage entries; afterward it verifies those values are unchanged. Health data is written only to the AI namespace. This gives the release suite a concrete guard against an additive AI check accidentally mutating legacy student state.
-
-## Why no paid server fallback
-
-A paid cloud fallback would make reliability depend on billing and make operating cost scale with student token usage. That violates the product requirement. A local model failure therefore routes downward toward smaller/local/deterministic systems rather than outward toward a metered provider.
+`scholark-ai-practice.js` deterministically generates and grades supported objective topics such as linear equations, quadratics, percentages, ratios, probability, statistics, grammar, and reading evidence. Unknown/open-ended topics are marked `gradable:false` and cannot inflate mastery automatically.
 
 ## Cost model
 
-| Component | Baseline AI inference cost to Scholark | Notes |
+| Component | Baseline inference cost to Scholark | Notes |
 | --- | ---: | --- |
-| WebLLM inference | $0 per token | Compute occurs on the student's device. |
-| Deterministic mastery/planning/rubric/practice logic | $0 per token | Browser JavaScript. |
-| SAT/AP evidence bridge | $0 per token | Reads existing application state; no AI-provider call. |
+| WebLLM local inference | $0 per token | Compute runs on the student's device. |
+| Qwen / Llama / SmolLM local models | $0 per token | No hosted per-token inference bill. |
+| Deterministic rubric/mastery/planner/practice logic | $0 per token | Browser JavaScript. |
+| SAT/AP evidence bridge | $0 per token | Reads existing application evidence. |
 | Runtime health checks | $0 per token | Browser-local diagnostics. |
-| Local AI conversation/practice state | $0 per token | Bounded local storage. |
-| Existing GitHub Pages hosting | Existing project infrastructure | Normal bandwidth/platform limits still apply. |
-| Runtime/model downloads | No per-token inference fee | CDN/model-host bandwidth and user download/cache storage still exist. |
-| Existing Firebase sync | Existing project infrastructure | Existing quotas/costs are separate from model inference. |
+| Local AI session/practice state | $0 per token | Namespaced local storage. |
+| GitHub Pages / existing Firebase use | Existing project infrastructure | Subject to their normal quotas/limits; separate from model inference. |
 
-"Zero-cost AI" means the baseline architecture does not create a proportional paid inference bill as student token usage rises. It does **not** mean that third-party hosting/CDN/bandwidth is unlimited or costless forever.
+“Zero-cost AI” means the baseline architecture does not create a proportional paid LLM inference bill as usage rises. It does not mean bandwidth, CDN hosting, Firebase, or every third-party service has unlimited resources forever.
 
-## First-use network behavior
+## Loading and caching
 
-Local generative AI is not falsely described as offline from first launch. A device that has never loaded the runtime/model needs network access for those assets. Once cached, supported local capabilities may continue without continuous network access depending on browser/runtime cache behavior. Deterministic fallbacks do not require a model download.
+- Normal Scholark rendering and the S cinematic are not replaced by AI boot.
+- WebLLM/model weights do not load simply because the page opened.
+- Models are lazy-loaded when a generative feature is requested and the device is eligible.
+- Failed engines are cleaned up before recovery attempts.
+- Conversation context and input lengths are bounded.
+- Runtime preflight imports code only; it intentionally does not force a large model download in CI.
 
-## Caching and loading
+A first-time local-generative user still needs network access to obtain runtime/model assets. Cached behavior depends on browser/runtime caching. Deterministic compatibility behavior does not require a model-weight download.
 
-- The AI orchestration shell loads after normal Scholark rendering/idle time.
-- Model weights do **not** load on first paint or merely because the AI shell exists.
-- Only one model is kept active at a time.
-- Model loading exposes progress events.
-- Failure unloads/cleans the active model before trying a lower tier.
-- Conversation context is bounded.
-- Runtime preflight imports code only; it does not force a multi-hundred-MB/GB model download in CI.
+## Privacy and state boundaries
 
-## Data and privacy
+AI state uses the `scholark_ai_v1_` namespace. Operational telemetry records runtime/health information, not raw student prompts or essay text. Essay version history stores evaluation metadata/content hashes, while draft autosave protects the working draft locally.
 
-Prompts intended for the local model are processed by the browser-local runtime. Operational telemetry records only runtime/health information such as failures, fallbacks, counts, and timing-oriented diagnostics; it intentionally does not put essay/prompt content into diagnostic history.
+Legacy planner, application, SAT, and AP data are read through adapters. The AI bridge/context layer does not rewrite those native stores. `ScholarkAIHealth` snapshots legacy `gs_*` / Firebase-related local-storage entries by hash/length around behavioral probes and requires them to remain unchanged.
 
-Essay version history stores evaluation summaries and a content hash rather than raw essay copies. A separate local autosave protects the working draft. Existing signed-in essay/Firebase behavior remains unchanged.
+BYOK/external paid-provider mode is not part of the baseline architecture.
 
-Legacy planner, application, SAT, and AP data are read through adapters. The adapters do not rewrite their native stores.
+## Production evidence
 
-## Optional external keys
+Live production audit:
 
-BYOK/external-provider mode is **not implemented**. It is intentionally omitted until there is a secure design that does not expose secrets in client code and does not weaken the free local baseline.
+- URL: `https://sribyju.github.io/`
+- audited release: `c33e0ae937a422cccc2a3c6533dfe71cdeefadcc`
+- workflow run: `34728562301`
+- release detection: live `ai-107`/SEO/reliability build detected after deployment propagation
+- required AI/reliability/UI/CSS assets: HTTP 200
+- `robots.txt`: HTTP 200
+- `sitemap.xml`: HTTP 200
+- canonical tags: exactly 1
+- configured paid inference endpoints: none detected
+- Playwright production E2E: **28/28 passed**
+- engines: Chromium 153.0.8010.12, Firefox 155.0, WebKit 26.6
+- production-audit dependency installation: **0 npm vulnerabilities reported**
 
-## Automated proof currently available
+The live matrix verifies additive boot, S-cinematic-before-AI ordering, runtime preflight, grounded product routing, all specialist compatibility flows, adaptive-practice grading rules, keyboard dialog paths, event-loop responsiveness, mutation quiescence, essay autosave isolation, AI-only conversation clearing/cancellation, reduced motion, and mobile compatibility.
 
-The branch regression suite exercises:
+## Evidence boundaries that remain open
 
-- JavaScript/unit/integration contracts;
-- existing SAT/AP audits;
-- no paid-provider endpoints in the AI runtime;
-- pinned runtime/model source availability;
-- actual browser import of the pinned WebLLM bundle;
-- no-WebGPU deterministic behavior for every specialist;
-- adaptive practice grading/non-grading rules;
-- runtime health and legacy-state sentinel;
-- desktop Chromium/Firefox/WebKit and mobile Chromium/WebKit smoke paths.
+The following are deliberately **not** claimed as completed by the automated production audit:
 
-A successful compatible-device WebGPU model-weight download/inference and the final deployed production audit are intentionally recorded separately; implementation alone is not accepted as proof of those checks.
+- a real Qwen/Llama/SmolLM model-weight download and successful generation on physical WebGPU hardware;
+- injected physical-GPU device-loss / out-of-memory recovery;
+- offline-after-cache behavior with real downloaded model weights;
+- non-destructive E2E using an authorized real existing Firebase student account;
+- manual screen-reader testing;
+- a formal Lighthouse performance audit.
+
+These limitations do not mean the features are missing; they mean the exact environments were not executed and therefore are not mislabeled as proof.
 
 ## Scaling conclusion
 
-More students increase static asset delivery and normal application usage, but do not automatically create a per-token LLM invoice for Scholark. That is the central sustainability property of this architecture.
+More students increase normal static asset delivery and application usage, but they do not automatically create a per-token LLM invoice for Scholark. That is the central sustainability property of the deployed architecture.
