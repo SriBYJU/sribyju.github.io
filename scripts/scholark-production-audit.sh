@@ -15,10 +15,12 @@ wait_for_release() {
     polish_code="$(curl --location --silent --output "$OUT/ui-polish.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-ui-polish.js?sha=${SHA}" || true)"
     robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
     sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
-    if grep -q 'ai-106' <<<"$loader" \
+    if grep -q 'ai-107' <<<"$loader" \
       && grep -q 'scholark-ai-reliability.js' <<<"$loader" \
       && grep -q 'scholark-ai-ui-polish.js' <<<"$loader" \
       && grep -q 'afterCinematicReady' <<<"$loader" \
+      && grep -q 'bounded-timeout' <<<"$loader" \
+      && grep -q 'aiBootScheduledAt' <<<"$loader" \
       && [ "$health_code" = '200' ] \
       && [ "$reliability_code" = '200' ] \
       && [ "$polish_code" = '200' ] \
@@ -78,6 +80,8 @@ grep -q 'scholark-ai-health.js' "$OUT/loader.js"
 grep -q 'scholark-ai-reliability.js' "$OUT/loader.js"
 grep -q 'scholark-ai-ui-polish.js' "$OUT/loader.js"
 grep -q 'afterCinematicReady' "$OUT/loader.js"
+grep -q 'bounded-timeout' "$OUT/loader.js"
+grep -q 'aiBootScheduledAt' "$OUT/loader.js"
 
 grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
 grep -Fq '<loc>https://sribyju.github.io/</loc>' "$OUT/sitemap.xml"
@@ -103,6 +107,8 @@ fi
 grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' "$OUT/scholark-ai-reliability.js"
 grep -q "\['standard', 'rescue', 'low'\]" "$OUT/scholark-ai-reliability.js"
 grep -q 'last resort' "$OUT/scholark-ai-ui-polish.js"
+grep -q 'setTextIfChanged' "$OUT/scholark-ai-ui-polish.js"
+grep -q 'schedulePolish' "$OUT/scholark-ai-ui-polish.js"
 
 echo 'Production AI runtime contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
 echo 'Production HTTP/network/SEO/reliability audit passed.' | tee -a "$OUT/http-report.txt"
