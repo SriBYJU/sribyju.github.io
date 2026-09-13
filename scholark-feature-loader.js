@@ -3,9 +3,9 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='ai-106';
+  const BUILD='ai-107';
   const pending=new Map();
-  const loaderState={cinematicReadyAt:0,aiBootStartedAt:0,aiReadyAt:0};
+  const loaderState={cinematicReadyAt:0,cinematicReadyReason:'pending',aiBootScheduledAt:0,aiBootStartedAt:0,aiReadyAt:0,aiBootError:null};
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
     if(loaded(src)) return Promise.resolve();
@@ -80,47 +80,75 @@
   setTimeout(installShowPageHook,300);
   setTimeout(installShowPageHook,1200);
 
+  let aiBootPromise=null;
   const bootAI=()=>{
+    if(aiBootPromise) return aiBootPromise;
     loaderState.aiBootStartedAt=performance.now();
-    return ensure('ai').catch(err=>console.warn('[Scholark AI] optional shell did not load',err));
+    aiBootPromise=ensure('ai')
+      .catch(err=>{
+        loaderState.aiBootError={name:err?.name||'Error',message:String(err?.message||err||'unknown').slice(0,300)};
+        console.warn('[Scholark AI] optional shell did not load',err);
+        throw err;
+      });
+    return aiBootPromise;
   };
 
-  function afterCinematicReady(){
+  function afterCinematicReady(options={}){
+    const maxWaitMs=Math.max(1500,Number(options.maxWaitMs)||7000);
     return new Promise(resolve=>{
-      let tries=0;
       let settled=false;
-      const finish=()=>{
+      let probeTimer=0;
+      let watchedPromise=null;
+      const finish=reason=>{
         if(settled)return;
         settled=true;
+        clearTimeout(hardTimer);
+        if(probeTimer)clearTimeout(probeTimer);
         loaderState.cinematicReadyAt=performance.now();
-        // Give the original desktop/mobile cinematic two clean paints before any AI DOM/CSS work.
+        loaderState.cinematicReadyReason=reason;
+        // Preserve the original S/cinematic's ownership of startup: two full paints occur before AI work.
         requestAnimationFrame(()=>requestAnimationFrame(resolve));
       };
+      const hardTimer=setTimeout(()=>finish('bounded-timeout'),maxWaitMs);
       const probe=()=>{
         if(settled)return;
         const cinematic=window.ScholarkV3?.cinematicReady;
-        if(cinematic&&typeof cinematic.then==='function'){
-          Promise.resolve(cinematic).then(finish,finish);
-          return;
+        if(cinematic&&typeof cinematic.then==='function'&&cinematic!==watchedPromise){
+          watchedPromise=cinematic;
+          // Never let a stalled cinematic promise permanently block the optional AI shell.
+          Promise.resolve(cinematic).then(()=>finish('cinematic-promise'),()=>finish('cinematic-rejected'));
         }
         if(document.documentElement.classList.contains('scholark-cinematic-ready')){
-          finish();
+          finish('ready-class');
           return;
         }
-        tries+=1;
-        if(tries>=240){finish();return;}
-        setTimeout(probe,25);
+        probeTimer=setTimeout(probe,40);
       };
       probe();
     });
   }
 
-  // The original Scholark S/cinematic experience owns startup. AI is strictly additive and only
-  // attaches after the cinematic loader has resolved and the browser has painted it.
-  afterCinematicReady().then(()=>{
-    if('requestIdleCallback' in window) requestIdleCallback(bootAI,{timeout:1800});
-    else setTimeout(bootAI,700);
-  });
+  function scheduleAIBoot(){
+    if(loaderState.aiBootScheduledAt)return;
+    loaderState.aiBootScheduledAt=performance.now();
+    let started=false;
+    let idleId=null;
+    const start=()=>{
+      if(started)return;
+      started=true;
+      clearTimeout(watchdog);
+      if(idleId!==null&&'cancelIdleCallback' in window){try{cancelIdleCallback(idleId);}catch(_){ }}
+      bootAI().catch(()=>{});
+    };
+    // requestIdleCallback is an optimization, not a correctness dependency. The watchdog guarantees boot.
+    const watchdog=setTimeout(start,1200);
+    if('requestIdleCallback' in window) idleId=requestIdleCallback(start,{timeout:700});
+    else setTimeout(start,350);
+  }
 
-  window.ScholarkFeatureLoader={version:'1.3.0',ensure,installShowPageHook,afterCinematicReady,state:loaderState};
+  // The original Scholark S/cinematic experience owns startup. AI remains additive, but neither a
+  // stalled cinematic promise nor a browser idle-callback quirk can block it forever.
+  afterCinematicReady().then(scheduleAIBoot,scheduleAIBoot);
+
+  window.ScholarkFeatureLoader={version:'1.4.0',build:BUILD,ensure,installShowPageHook,afterCinematicReady,scheduleAIBoot,state:loaderState};
 })();
