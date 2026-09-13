@@ -61,10 +61,14 @@ jobs:
               'api.together.xyz','api.fireworks.ai','api.groq.com','api.replicate.com'
           )
           checks = {
-              'final_loader_build': "const BUILD='ai-106'" in loader,
+              'final_loader_build': "const BUILD='ai-107'" in loader,
               'reliability_loaded': 'scholark-ai-reliability.js' in loader and 'ScholarkAIReliability' in loader,
               'ui_polish_loaded': 'scholark-ai-ui-polish.js' in loader and 'ScholarkAIUIPolish' in loader,
               'cinematic_first_boot': 'afterCinematicReady' in loader and 'cinematicReadyAt' in loader and 'aiBootStartedAt' in loader,
+              'cinematic_wait_is_bounded': "finish('bounded-timeout')" in loader and 'maxWaitMs' in loader,
+              'ai_boot_has_watchdog': 'aiBootScheduledAt' in loader and 'setTimeout(start,1200)' in loader,
+              'ui_polish_is_idempotent': 'setTextIfChanged' in polish and 'node.textContent !== value' in polish,
+              'ui_polish_is_frame_coalesced': 'schedulePolish' in polish and 'requestAnimationFrame' in polish,
               'balanced_mobile_default': "reason: mobile ? 'mobile-webgpu' : 'webgpu'" in reliability,
               'llama_rescue_model': 'Llama-3.2-1B-Instruct-q4f16_1-MLC' in reliability,
               'standard_recovery_ladder': "['standard', 'rescue', 'low']" in reliability,
@@ -76,7 +80,8 @@ jobs:
               'desktop_cinematic_e2e': '.sk6-portal-object' in browser and 'aiBootStartedAt' in browser,
               'creator_question_e2e': 'Who made Scholark?' in browser and 'Shriyan Avadhanula' in browser,
               'mobile_creator_e2e': 'Who made Scholark?' in mobile and 'Shriyan Avadhanula' in mobile,
-              'production_requires_ai106': 'ai-106' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
+              'production_requires_ai107': 'ai-107' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
+              'production_checks_boot_safeguards': 'bounded-timeout' in prod and 'setTextIfChanged' in prod,
               'no_paid_provider_endpoint': not any(host in reliability.lower() for host in paid_hosts),
           }
           failed = [name for name, ok in checks.items() if not ok]
@@ -96,4 +101,4 @@ jobs:
           grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' /tmp/webllm-config.ts
 
       - name: Reliability gate summary
-        run: echo 'ScholarK AI reliability, grounded routing, multi-model recovery, and cinematic-first startup contract passed.'
+        run: echo 'ScholarK AI reliability, grounded routing, multi-model recovery, bounded cinematic-first startup, and mutation-loop prevention contract passed.'
