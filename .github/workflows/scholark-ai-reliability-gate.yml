@@ -7,6 +7,8 @@ on:
       - 'scholark-ai-*.js'
       - 'scripts/scholark-ai-*.mjs'
       - 'scripts/scholark-production-audit.sh'
+      - 'scripts/playwright.config.mjs'
+      - '.github/workflows/scholark-production-ai-audit.yml'
       - '.github/workflows/scholark-ai-reliability-gate.yml'
   push:
     branches:
@@ -17,6 +19,8 @@ on:
       - 'scholark-ai-*.js'
       - 'scripts/scholark-ai-*.mjs'
       - 'scripts/scholark-production-audit.sh'
+      - 'scripts/playwright.config.mjs'
+      - '.github/workflows/scholark-production-ai-audit.yml'
       - '.github/workflows/scholark-ai-reliability-gate.yml'
 
 permissions:
@@ -42,6 +46,8 @@ jobs:
           node --check scholark-ai-ui-polish.js
           node --check scripts/scholark-ai-browser.spec.mjs
           node --check scripts/scholark-ai-mobile-smoke.spec.mjs
+          node --check scripts/scholark-ai-hardening.spec.mjs
+          node --check scripts/playwright.config.mjs
           bash -n scripts/scholark-production-audit.sh
 
       - name: Verify reliability and cinematic contract
@@ -54,7 +60,10 @@ jobs:
           polish = Path('scholark-ai-ui-polish.js').read_text(encoding='utf-8')
           browser = Path('scripts/scholark-ai-browser.spec.mjs').read_text(encoding='utf-8')
           mobile = Path('scripts/scholark-ai-mobile-smoke.spec.mjs').read_text(encoding='utf-8')
+          hardening = Path('scripts/scholark-ai-hardening.spec.mjs').read_text(encoding='utf-8')
+          config = Path('scripts/playwright.config.mjs').read_text(encoding='utf-8')
           prod = Path('scripts/scholark-production-audit.sh').read_text(encoding='utf-8')
+          prod_workflow = Path('.github/workflows/scholark-production-ai-audit.yml').read_text(encoding='utf-8')
 
           paid_hosts = (
               'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
@@ -80,8 +89,14 @@ jobs:
               'desktop_cinematic_e2e': '.sk6-portal-object' in browser and 'aiBootStartedAt' in browser,
               'creator_question_e2e': 'Who made Scholark?' in browser and 'Shriyan Avadhanula' in browser,
               'mobile_creator_e2e': 'Who made Scholark?' in mobile and 'Shriyan Avadhanula' in mobile,
+              'hardening_event_loop_and_mutations': 'heartbeatMs' in hardening and 'mutationRecords' in hardening,
+              'hardening_essay_autosave': 'essay autosave persists' in hardening and 'gs_ai_hardening_sentinel' in hardening,
+              'hardening_ai_only_clear': 'remainingAISessions' in hardening and 'gs_ai_clear_sentinel' in hardening,
+              'hardening_reduced_motion': 'reduced-motion preference' in hardening and "pulseAnimation" in hardening,
+              'hardening_is_executed': 'scholark-ai-hardening.spec.mjs' in config,
               'production_requires_ai107': 'ai-107' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
               'production_checks_boot_safeguards': 'bounded-timeout' in prod and 'setTextIfChanged' in prod,
+              'production_runs_all_ai_specs': "scripts/scholark-ai-*.spec.mjs" in prod_workflow and 'npx playwright test --config=playwright.config.mjs' in prod_workflow,
               'no_paid_provider_endpoint': not any(host in reliability.lower() for host in paid_hosts),
           }
           failed = [name for name, ok in checks.items() if not ok]
@@ -101,4 +116,4 @@ jobs:
           grep -q 'Llama-3.2-1B-Instruct-q4f16_1-MLC' /tmp/webllm-config.ts
 
       - name: Reliability gate summary
-        run: echo 'ScholarK AI reliability, grounded routing, multi-model recovery, bounded cinematic-first startup, and mutation-loop prevention contract passed.'
+        run: echo 'ScholarK AI reliability, grounded routing, multi-model recovery, bounded cinematic-first startup, mutation-loop prevention, and hostile state hardening contract passed.'
