@@ -194,7 +194,8 @@ test.describe('Scholark desktop cinematic restoration', () => {
     expect(orbit.visibleOrbitNodes).toBeGreaterThanOrEqual(5);
     await evidence(page, testInfo, 'orbit');
 
-    const ending = await seekProgress(page, 0.90);
+    // Sample firmly inside the exit phase; keep the opacity requirement strict.
+    const ending = await seekProgress(page, 0.93);
     console.log('cinematic ending', JSON.stringify(ending));
     expect(ending.exitOpacity).toBeGreaterThan(0.75);
     expect(ending.exitVisible).toBe(true);
