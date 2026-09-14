@@ -9,9 +9,13 @@ on:
       - 'robots.txt'
       - 'sitemap.xml'
       - 'scholark-feature-loader.js'
+      - 'scholark-v3.js'
+      - 'scholark-v5*.js'
+      - 'scholark-v5*.css'
       - 'scholark-ai-*.js'
       - 'scholark-ai-*.css'
       - 'scripts/scholark-ai-*.spec.mjs'
+      - 'scripts/scholark-cinematic-visual.spec.mjs'
       - 'scripts/playwright.config.mjs'
       - 'scripts/scholark-production-audit.sh'
       - '.github/workflows/scholark-production-ai-audit.yml'
@@ -30,6 +34,7 @@ jobs:
     timeout-minutes: 35
     env:
       SCHOLARK_PRODUCTION_URL: https://sribyju.github.io/
+      SCHOLARK_AUDIT_OUT: /tmp/scholark-production-audit
     steps:
       - name: Checkout deployed commit
         uses: actions/checkout@v7
@@ -51,7 +56,7 @@ jobs:
           npm install --no-save --package-lock=false @playwright/test@1.63.0
           npx playwright install --with-deps chromium firefox webkit
 
-      - name: Run AI E2E against live production
+      - name: Run AI and cinematic E2E against live production
         working-directory: scripts
         env:
           SCHOLARK_BASE_URL: https://sribyju.github.io/
