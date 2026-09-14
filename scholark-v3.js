@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const VERSION='3.3.3';
-  const BUILD='5150';
+  const BUILD='5151';
   const MOBILE=matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
