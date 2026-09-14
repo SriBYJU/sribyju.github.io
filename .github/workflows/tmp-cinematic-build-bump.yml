@@ -30,9 +30,6 @@ jobs:
               'scholark-v3.js': [
                   ("const BUILD='5151';", "const BUILD='5152';"),
               ],
-              '.github/workflows/scholark-regression-audit.yml': [
-                  ('scholark-v3.js?build=5151', 'scholark-v3.js?build=5152'),
-              ],
           }
 
           for name, pairs in replacements.items():
@@ -51,7 +48,7 @@ jobs:
           PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html scholark-v3.js .github/workflows/scholark-regression-audit.yml
+          git add index.html scholark-v3.js
           if git diff --cached --quiet; then
             echo 'Build is already 5152.'
             exit 0
