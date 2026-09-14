@@ -22,10 +22,12 @@
   }
 
   function removeRejectedOrbitUI(root = document) {
+    if (!touch.matches) return;
     qa(ORBIT_SELECTOR, root).forEach(el => el.remove());
   }
 
   function installOrbitCleanup() {
+    if (!touch.matches) return;
     removeRejectedOrbitUI();
     const home = q('#page-home') || document.body;
     if (!home || home.dataset.sk510OrbitClean) return;
