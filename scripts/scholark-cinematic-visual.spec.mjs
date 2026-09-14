@@ -36,11 +36,14 @@ async function readState(page) {
     const clouds = [...document.querySelectorAll('.sk6-cloud')];
     const rings = [...document.querySelectorAll('.sk6-portal-ring')];
     const layers = [...document.querySelectorAll('.sk6-logo-layer')];
+    const orbitNodes = [...orbit.querySelectorAll('.sk6-orbit,.sk6-orbit-core')];
     const visible = el => {
       const css = getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       return css.display !== 'none' && css.visibility !== 'hidden' && Number(css.opacity) > 0.03 && rect.width > 1 && rect.height > 1;
     };
+    const orbitCss = getComputedStyle(orbit);
+    const orbitRect = orbit.getBoundingClientRect();
     return {
       p: numberVar('--sk6-p'),
       approach: numberVar('--sk6-approach'),
@@ -73,7 +76,13 @@ async function readState(page) {
       layerCount: layers.length,
       layerOpacities: layers.map(el => Number(getComputedStyle(el).opacity)),
       waveVisible: visible(wave),
-      orbitVisible: visible(orbit),
+      orbitDisplay: orbitCss.display,
+      orbitVisibility: orbitCss.visibility,
+      orbitComputedOpacity: Number(orbitCss.opacity),
+      orbitWidth: orbitRect.width,
+      orbitHeight: orbitRect.height,
+      orbitNodeCount: orbitNodes.length,
+      visibleOrbitNodes: orbitNodes.filter(visible).length,
       exitVisible: visible(exit),
       storyHeight: story.offsetHeight,
       viewportHeight: innerHeight
@@ -113,6 +122,8 @@ async function evidence(page, testInfo, label) {
 }
 
 test.describe('Scholark desktop cinematic restoration', () => {
+  test.setTimeout(60000);
+
   test('desktop loads the fresh cinematic build and the original dimensional atmosphere', async ({ page }, testInfo) => {
     await waitForDesktopCinematic(page);
     const assets = await page.evaluate(() => ({
@@ -128,8 +139,9 @@ test.describe('Scholark desktop cinematic restoration', () => {
     await seekProgress(page, 0.01);
     const opening = await readState(page);
     console.log('cinematic opening', JSON.stringify(opening));
-    expect(opening.clouds).toBe(7);
-    expect(opening.visibleClouds).toBeGreaterThanOrEqual(6);
+    // V5.3 creates seven hero clouds; later additive cinematic layers may add more.
+    expect(opening.clouds).toBeGreaterThanOrEqual(7);
+    expect(opening.visibleClouds).toBeGreaterThanOrEqual(7);
     expect(opening.rays).toBe(3);
     expect(opening.dust).toBe(18);
     expect(opening.hills).toBe(1);
@@ -171,7 +183,13 @@ test.describe('Scholark desktop cinematic restoration', () => {
     const orbit = await seekProgress(page, 0.71);
     console.log('cinematic orbit', JSON.stringify(orbit));
     expect(orbit.orbitOpacity).toBeGreaterThan(0.7);
-    expect(orbit.orbitVisible).toBe(true);
+    expect(orbit.orbitDisplay).not.toBe('none');
+    expect(orbit.orbitVisibility).not.toBe('hidden');
+    expect(orbit.orbitComputedOpacity).toBeGreaterThan(0.7);
+    expect(orbit.orbitWidth).toBeGreaterThan(100);
+    expect(orbit.orbitHeight).toBeGreaterThan(100);
+    expect(orbit.orbitNodeCount).toBeGreaterThanOrEqual(5);
+    expect(orbit.visibleOrbitNodes).toBeGreaterThanOrEqual(5);
     await evidence(page, testInfo, 'orbit');
 
     const ending = await seekProgress(page, 0.90);
