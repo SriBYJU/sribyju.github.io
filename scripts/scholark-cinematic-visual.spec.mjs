@@ -72,6 +72,7 @@ test.describe('Scholark desktop S cinematic visual regression', () => {
     }));
 
     expect(assetState.build).toBe(CINEMATIC_BUILD);
+    expect(assetState.scriptSrcs.some(src => src.includes(`scholark-v3.js?build=${CINEMATIC_BUILD}`))).toBe(true);
     expect(assetState.styleHrefs.some(href => href.includes(`scholark-v512.css?build=${CINEMATIC_BUILD}`))).toBe(true);
     expect(assetState.scriptSrcs.some(src => src.includes(`scholark-v53.js?build=${CINEMATIC_BUILD}`))).toBe(true);
   });

@@ -79,7 +79,7 @@ done
 
 curl --fail --location --silent --show-error "${SITE}?sha=${SHA}" > "$OUT/live-index.html"
 grep -q 'scholark-feature-loader.js' "$OUT/live-index.html"
-grep -q 'scholark-v3.js' "$OUT/live-index.html"
+grep -Fq 'scholark-v3.js?build=5151' "$OUT/live-index.html"
 grep -q 'scholark-ai-practice.js' "$OUT/loader.js"
 grep -q 'scholark-ai-health.js' "$OUT/loader.js"
 grep -q 'scholark-ai-reliability.js' "$OUT/loader.js"
