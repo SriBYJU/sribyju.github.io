@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const BASE = process.env.SCHOLARK_BASE_URL || 'http://127.0.0.1:4173';
+const CINEMATIC_BUILD = '5151';
 
 async function waitForDesktopCinematic(page) {
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -61,6 +62,20 @@ async function seekPortalZoomPhase(page) {
 }
 
 test.describe('Scholark desktop S cinematic visual regression', () => {
+  test('desktop cinematic assets use the current cache-busting build', async ({ page }) => {
+    await waitForDesktopCinematic(page);
+
+    const assetState = await page.evaluate(() => ({
+      build: window.ScholarkV3?.build,
+      styleHrefs: [...document.querySelectorAll('link[rel="stylesheet"]')].map(link => link.href),
+      scriptSrcs: [...document.scripts].map(script => script.src).filter(Boolean)
+    }));
+
+    expect(assetState.build).toBe(CINEMATIC_BUILD);
+    expect(assetState.styleHrefs.some(href => href.includes(`scholark-v512.css?build=${CINEMATIC_BUILD}`))).toBe(true);
+    expect(assetState.scriptSrcs.some(src => src.includes(`scholark-v53.js?build=${CINEMATIC_BUILD}`))).toBe(true);
+  });
+
   test('the S stays cohesive when the tile falls away and the portal zoom begins', async ({ page }) => {
     await waitForDesktopCinematic(page);
 
