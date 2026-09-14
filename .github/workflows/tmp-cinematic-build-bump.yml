@@ -1,0 +1,60 @@
+name: Temporary cinematic build bump
+
+on:
+  push:
+    branches:
+      - scholark-live-rollout-gate-fix
+    paths:
+      - '.github/workflows/tmp-cinematic-build-bump.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: scholark-live-rollout-gate-fix
+          fetch-depth: 0
+      - name: Force fresh desktop cinematic build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              'index.html': [
+                  ('scholark-v3.js?build=5151', 'scholark-v3.js?build=5152'),
+              ],
+              'scholark-v3.js': [
+                  ("const BUILD='5151';", "const BUILD='5152';"),
+              ],
+              '.github/workflows/scholark-regression-audit.yml': [
+                  ('scholark-v3.js?build=5151', 'scholark-v3.js?build=5152'),
+              ],
+          }
+
+          for name, pairs in replacements.items():
+              path = Path(name)
+              text = path.read_text(encoding='utf-8')
+              original = text
+              for old, new in pairs:
+                  if old not in text and new not in text:
+                      raise SystemExit(f'Expected cinematic build marker missing from {name}: {old}')
+                  text = text.replace(old, new)
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  print(f'updated {name}')
+              else:
+                  print(f'already current {name}')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html scholark-v3.js .github/workflows/scholark-regression-audit.yml
+          if git diff --cached --quiet; then
+            echo 'Build is already 5152.'
+            exit 0
+          fi
+          git commit -m 'Force fresh restored cinematic build 5152'
+          git push origin HEAD:scholark-live-rollout-gate-fix
