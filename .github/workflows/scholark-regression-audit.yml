@@ -81,6 +81,7 @@ jobs:
           node --check scripts/scholark-ai-browser.spec.mjs
           node --check scripts/scholark-ai-mobile-smoke.spec.mjs
           node --check scripts/scholark-ai-hardening.spec.mjs
+          node --check scripts/scholark-cinematic-visual.spec.mjs
           node --check scripts/playwright.config.mjs
           node --check scripts/send-weekly-email.js
           node --check ap-v2-app.js
@@ -172,9 +173,9 @@ jobs:
           )
           required_e2e=(
             'scripts/scholark-ai-browser.spec.mjs','scripts/scholark-ai-mobile-smoke.spec.mjs',
-            'scripts/scholark-ai-hardening.spec.mjs','scripts/playwright.config.mjs',
-            'scripts/scholark-production-audit.sh','.github/workflows/scholark-production-ai-audit.yml',
-            '.github/workflows/scholark-ai-reliability-gate.yml'
+            'scripts/scholark-ai-hardening.spec.mjs','scripts/scholark-cinematic-visual.spec.mjs',
+            'scripts/playwright.config.mjs','scripts/scholark-production-audit.sh',
+            '.github/workflows/scholark-production-ai-audit.yml','.github/workflows/scholark-ai-reliability-gate.yml'
           )
           paid_hosts=(
             'api.openai.com','api.anthropic.com','generativelanguage.googleapis.com',
@@ -183,7 +184,7 @@ jobs:
 
           checks={
             'v3_css_once': html.count('href="scholark-v3.css"')==1,
-            'v3_js_once': html.count('src="scholark-v3.js?build=5151"')==1 and 'src="scholark-v3.js"' not in html,
+            'v3_js_once': html.count('src="scholark-v3.js?build=5152"')==1 and 'src="scholark-v3.js"' not in html,
             'canonical_present': ('rel="canonical"' in html.lower() or "rel='canonical'" in html.lower()),
             'robots_allows_public_site': 'User-agent: *' in robots and 'Allow: /' in robots,
             'robots_references_sitemap': 'Sitemap: https://sribyju.github.io/sitemap.xml' in robots,
