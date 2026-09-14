@@ -1,102 +1,183 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { test, expect } from '@playwright/test';
 
 const BASE = process.env.SCHOLARK_BASE_URL || 'http://127.0.0.1:4173';
-const CINEMATIC_BUILD = '5151';
+const CINEMATIC_BUILD = '5152';
+const EVIDENCE_DIR = process.env.SCHOLARK_AUDIT_OUT || '/tmp/scholark-production-audit';
 
 async function waitForDesktopCinematic(page) {
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!window.ScholarkV3?.cinematicReady, null, { timeout: 15000 });
   await page.evaluate(() => window.ScholarkV3.cinematicReady);
-  await page.waitForSelector('.sk6-portal-object .sk6-logo-face', { state: 'attached' });
+  await page.waitForSelector('.sk6-experience .sk6-portal-object .sk6-logo-face', { state: 'attached' });
+  await page.waitForSelector('.sk6-cloud', { state: 'attached' });
 }
 
-async function readPortalState(page, fraction = null) {
-  return page.evaluate((requestedFraction) => {
+async function settle(page) {
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.waitForTimeout(180);
+}
+
+async function readState(page) {
+  return page.evaluate(() => {
     const sticky = document.querySelector('.sk6-sticky');
+    const story = document.querySelector('.sk6-story');
+    const portal = document.querySelector('.sk6-portal-object');
     const face = document.querySelector('.sk6-logo-face');
     const depth = document.querySelector('.sk6-logo-depth');
-    const portal = document.querySelector('.sk6-portal-object');
-    const stage = document.querySelector('.sk6-portal-stage');
-    if (!sticky || !face || !depth || !portal || !stage) throw new Error('desktop-portal-state-missing');
-    const faceRect = face.getBoundingClientRect();
-    const portalRect = portal.getBoundingClientRect();
-    return {
-      requestedFraction,
-      scrollY,
-      approach: Number.parseFloat(sticky.style.getPropertyValue('--sk6-approach') || '0'),
-      dive: Number.parseFloat(sticky.style.getPropertyValue('--sk6-dive') || '0'),
-      through: Number.parseFloat(sticky.style.getPropertyValue('--sk6-through') || '0'),
-      faceOpacity: Number(getComputedStyle(face).opacity),
-      depthOpacity: Number(getComputedStyle(depth).opacity),
-      rings: [...document.querySelectorAll('.sk6-portal-ring')].map(el => getComputedStyle(el).display),
-      stageOpacity: Number(getComputedStyle(stage).opacity),
-      faceCenterDelta: Math.hypot(
-        (faceRect.left + faceRect.width / 2) - (portalRect.left + portalRect.width / 2),
-        (faceRect.top + faceRect.height / 2) - (portalRect.top + portalRect.height / 2)
-      )
+    const wave = document.querySelector('.sk6-wave-scene');
+    const orbit = document.querySelector('.sk6-orbit-scene');
+    const exit = document.querySelector('.sk6-exit-copy');
+    if (!sticky || !story || !portal || !face || !depth || !wave || !orbit || !exit) {
+      throw new Error('desktop-cinematic-state-missing');
+    }
+    const numberVar = name => Number.parseFloat(sticky.style.getPropertyValue(name) || '0');
+    const clouds = [...document.querySelectorAll('.sk6-cloud')];
+    const rings = [...document.querySelectorAll('.sk6-portal-ring')];
+    const layers = [...document.querySelectorAll('.sk6-logo-layer')];
+    const visible = el => {
+      const css = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return css.display !== 'none' && css.visibility !== 'hidden' && Number(css.opacity) > 0.03 && rect.width > 1 && rect.height > 1;
     };
-  }, fraction);
+    return {
+      p: numberVar('--sk6-p'),
+      approach: numberVar('--sk6-approach'),
+      dive: numberVar('--sk6-dive'),
+      through: numberVar('--sk6-through'),
+      waveOpacity: numberVar('--sk6-wave-opacity'),
+      orbitOpacity: numberVar('--sk6-orbit-opacity'),
+      exitOpacity: numberVar('--sk6-exit-opacity'),
+      portalScale: numberVar('--sk6-portal-scale'),
+      portalOpacity: Number(getComputedStyle(document.querySelector('.sk6-portal-stage')).opacity),
+      depthOpacity: Number(getComputedStyle(depth).opacity),
+      faceOpacity: Number(getComputedStyle(face).opacity),
+      clouds: clouds.length,
+      visibleClouds: clouds.filter(visible).length,
+      cloudMotion: clouds.map(el => ({
+        sx: Number.parseFloat(el.style.getPropertyValue('--sx') || '0'),
+        sy: Number.parseFloat(el.style.getPropertyValue('--sy') || '0'),
+        zoom: Number.parseFloat(el.style.getPropertyValue('--zoom') || '1')
+      })),
+      rays: document.querySelectorAll('.sk6-ray').length,
+      dust: document.querySelectorAll('.sk6-dust').length,
+      hills: document.querySelectorAll('.sk6-hills').length,
+      campus: document.querySelectorAll('.sk6-campus-wrap').length,
+      books: document.querySelectorAll('.sk6-book-stack').length,
+      leaves: document.querySelectorAll('.sk6-leaf').length,
+      floatCards: document.querySelectorAll('.sk6-float-card').length,
+      ringCount: rings.length,
+      ringDisplays: rings.map(el => getComputedStyle(el).display),
+      ringOpacities: rings.map(el => Number(getComputedStyle(el).opacity)),
+      layerCount: layers.length,
+      layerOpacities: layers.map(el => Number(getComputedStyle(el).opacity)),
+      waveVisible: visible(wave),
+      orbitVisible: visible(orbit),
+      exitVisible: visible(exit),
+      storyHeight: story.offsetHeight,
+      viewportHeight: innerHeight
+    };
+  });
 }
 
-async function seekPortalZoomPhase(page) {
-  // Browser engines do not map the same story-scroll fraction to the exact same
-  // sticky/cinematic progress. Seek using the animation's own state instead of
-  // assuming a hard-coded scroll percentage is equivalent everywhere.
-  const fractions = [0.18, 0.22, 0.26, 0.30, 0.34, 0.38, 0.42, 0.46, 0.50, 0.56, 0.62];
-  let state = await readPortalState(page, 0);
-
-  for (const fraction of fractions) {
-    await page.evaluate((f) => {
+async function seekProgress(page, target) {
+  let low = 0;
+  let high = 1;
+  let state = await readState(page);
+  for (let i = 0; i < 11; i += 1) {
+    const fraction = (low + high) / 2;
+    await page.evaluate(f => {
       const story = document.querySelector('.sk6-story');
       if (!story) throw new Error('desktop-story-missing');
       const runway = Math.max(1, story.offsetHeight - innerHeight);
       window.scrollTo({ top: story.offsetTop + runway * f, behavior: 'instant' });
     }, fraction);
-    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-    await page.waitForTimeout(220);
-    state = await readPortalState(page, fraction);
-    if (state.approach >= 0.55 && state.dive >= 0.05 && state.through < 0.65) return state;
+    await settle(page);
+    state = await readState(page);
+    if (Math.abs(state.p - target) <= 0.018) return state;
+    if (state.p < target) low = fraction;
+    else high = fraction;
   }
-
   return state;
 }
 
-test.describe('Scholark desktop S cinematic visual regression', () => {
-  test('desktop cinematic assets use the current cache-busting build', async ({ page }) => {
-    await waitForDesktopCinematic(page);
+async function evidence(page, testInfo, label) {
+  fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+  const safeProject = testInfo.project.name.replace(/[^a-z0-9_-]+/gi, '-');
+  await page.screenshot({
+    path: path.join(EVIDENCE_DIR, `cinematic-${safeProject}-${label}.png`),
+    fullPage: false,
+    animations: 'allow'
+  });
+}
 
-    const assetState = await page.evaluate(() => ({
+test.describe('Scholark desktop cinematic restoration', () => {
+  test('desktop loads the fresh cinematic build and the original dimensional atmosphere', async ({ page }, testInfo) => {
+    await waitForDesktopCinematic(page);
+    const assets = await page.evaluate(() => ({
       build: window.ScholarkV3?.build,
       styleHrefs: [...document.querySelectorAll('link[rel="stylesheet"]')].map(link => link.href),
       scriptSrcs: [...document.scripts].map(script => script.src).filter(Boolean)
     }));
+    expect(assets.build).toBe(CINEMATIC_BUILD);
+    expect(assets.scriptSrcs.some(src => src.includes(`scholark-v3.js?build=${CINEMATIC_BUILD}`))).toBe(true);
+    expect(assets.styleHrefs.some(href => href.includes(`scholark-v512.css?build=${CINEMATIC_BUILD}`))).toBe(true);
+    expect(assets.scriptSrcs.some(src => src.includes(`scholark-v53.js?build=${CINEMATIC_BUILD}`))).toBe(true);
 
-    expect(assetState.build).toBe(CINEMATIC_BUILD);
-    expect(assetState.scriptSrcs.some(src => src.includes(`scholark-v3.js?build=${CINEMATIC_BUILD}`))).toBe(true);
-    expect(assetState.styleHrefs.some(href => href.includes(`scholark-v512.css?build=${CINEMATIC_BUILD}`))).toBe(true);
-    expect(assetState.scriptSrcs.some(src => src.includes(`scholark-v53.js?build=${CINEMATIC_BUILD}`))).toBe(true);
+    await seekProgress(page, 0.01);
+    const opening = await readState(page);
+    console.log('cinematic opening', JSON.stringify(opening));
+    expect(opening.clouds).toBe(7);
+    expect(opening.visibleClouds).toBeGreaterThanOrEqual(6);
+    expect(opening.rays).toBe(3);
+    expect(opening.dust).toBe(18);
+    expect(opening.hills).toBe(1);
+    expect(opening.campus).toBe(1);
+    expect(opening.books).toBeGreaterThanOrEqual(2);
+    expect(opening.leaves).toBeGreaterThanOrEqual(2);
+    expect(opening.floatCards).toBeGreaterThanOrEqual(4);
+    expect(opening.ringCount).toBe(4);
+    expect(opening.ringDisplays.every(value => value !== 'none')).toBe(true);
+    expect(opening.layerCount).toBe(10);
+    expect(opening.layerOpacities.every(value => value > 0.85)).toBe(true);
+    expect(opening.depthOpacity).toBeGreaterThan(0.85);
+    expect(opening.faceOpacity).toBeGreaterThan(0.9);
+    await evidence(page, testInfo, 'opening');
   });
 
-  test('the S stays cohesive when the tile falls away and the portal zoom begins', async ({ page }) => {
+  test('the S, clouds and cinematic scenes animate through the original scroll sequence', async ({ page }, testInfo) => {
     await waitForDesktopCinematic(page);
 
-    const opening = await readPortalState(page, 0);
-    expect(opening.rings.length).toBe(4);
-    expect(opening.rings.every(value => value === 'none')).toBe(true);
-    expect(opening.faceOpacity).toBeGreaterThan(0.9);
-    expect(opening.depthOpacity).toBeGreaterThan(0.45);
+    const portal = await seekProgress(page, 0.25);
+    console.log('cinematic portal', JSON.stringify(portal));
+    expect(portal.approach).toBeGreaterThan(0.75);
+    expect(portal.dive).toBeGreaterThan(0.05);
+    expect(portal.portalScale).toBeGreaterThan(2);
+    expect(portal.ringDisplays.every(value => value !== 'none')).toBe(true);
+    expect(Math.max(...portal.ringOpacities)).toBeGreaterThan(0.55);
+    expect(portal.depthOpacity).toBeGreaterThan(0.85);
+    expect(portal.layerOpacities.every(value => value > 0.85)).toBe(true);
+    expect(portal.cloudMotion.some(c => Math.abs(c.sx) > 8 || Math.abs(c.sy) > 8 || c.zoom > 1.04)).toBe(true);
+    await evidence(page, testInfo, 'portal');
 
-    const mid = await seekPortalZoomPhase(page);
-    console.log('desktop S portal mid-state', JSON.stringify(mid));
+    const wave = await seekProgress(page, 0.50);
+    console.log('cinematic wave', JSON.stringify(wave));
+    expect(wave.through).toBeGreaterThan(0.9);
+    expect(wave.waveOpacity).toBeGreaterThan(0.7);
+    expect(wave.waveVisible).toBe(true);
+    await evidence(page, testInfo, 'wave');
 
-    // First prove we actually reached the affected scroll phase. The geometry
-    // assertions below are only meaningful once approach + dive are underway.
-    expect(mid.approach, `portal phase not reached: ${JSON.stringify(mid)}`).toBeGreaterThanOrEqual(0.55);
-    expect(mid.dive, `portal phase not reached: ${JSON.stringify(mid)}`).toBeGreaterThanOrEqual(0.05);
-    expect(mid.rings.every(value => value === 'none'), `rings detached at mid-scroll: ${JSON.stringify(mid)}`).toBe(true);
-    expect(mid.depthOpacity, `deep extrusion remained visible: ${JSON.stringify(mid)}`).toBeLessThan(0.12);
-    expect(mid.faceOpacity, `S face faded unexpectedly: ${JSON.stringify(mid)}`).toBeGreaterThan(0.9);
-    expect(mid.stageOpacity, `portal stage disappeared too early: ${JSON.stringify(mid)}`).toBeGreaterThan(0.5);
-    expect(mid.faceCenterDelta, `S face drifted away from portal center: ${JSON.stringify(mid)}`).toBeLessThan(8);
+    const orbit = await seekProgress(page, 0.71);
+    console.log('cinematic orbit', JSON.stringify(orbit));
+    expect(orbit.orbitOpacity).toBeGreaterThan(0.7);
+    expect(orbit.orbitVisible).toBe(true);
+    await evidence(page, testInfo, 'orbit');
+
+    const ending = await seekProgress(page, 0.90);
+    console.log('cinematic ending', JSON.stringify(ending));
+    expect(ending.exitOpacity).toBeGreaterThan(0.75);
+    expect(ending.exitVisible).toBe(true);
+    await evidence(page, testInfo, 'ending');
   });
 });
