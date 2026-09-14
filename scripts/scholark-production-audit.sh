@@ -8,8 +8,9 @@ mkdir -p "$OUT"
 
 wait_for_release() {
   for attempt in $(seq 1 90); do
-    local loader health_code reliability_code polish_code robots_code sitemap_code
+    local loader v3 health_code reliability_code polish_code robots_code sitemap_code
     loader="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SITE}scholark-feature-loader.js?sha=${SHA}" 2>/dev/null || true)"
+    v3="$(curl --fail --location --silent --show-error --connect-timeout 15 --max-time 30 "${SITE}scholark-v3.js?sha=${SHA}" 2>/dev/null || true)"
     health_code="$(curl --location --silent --output "$OUT/health.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-health.js?sha=${SHA}" || true)"
     reliability_code="$(curl --location --silent --output "$OUT/reliability.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-reliability.js?sha=${SHA}" || true)"
     polish_code="$(curl --location --silent --output "$OUT/ui-polish.js" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}scholark-ai-ui-polish.js?sha=${SHA}" || true)"
@@ -21,6 +22,7 @@ wait_for_release() {
       && grep -q 'afterCinematicReady' <<<"$loader" \
       && grep -q 'bounded-timeout' <<<"$loader" \
       && grep -q 'aiBootScheduledAt' <<<"$loader" \
+      && grep -Fq "const BUILD='5151';" <<<"$v3" \
       && [ "$health_code" = '200' ] \
       && [ "$reliability_code" = '200' ] \
       && [ "$polish_code" = '200' ] \
@@ -29,12 +31,13 @@ wait_for_release() {
       && cmp -s robots.txt "$OUT/robots-wait.txt" \
       && cmp -s sitemap.xml "$OUT/sitemap-wait.xml"; then
       printf '%s\n' "$loader" > "$OUT/loader.js"
-      echo "Production AI/SEO/reliability release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
+      printf '%s\n' "$v3" > "$OUT/v3-wait.js"
+      echo "Production AI/SEO/reliability/cinematic release detected on attempt ${attempt}." | tee "$OUT/deployment.txt"
       return 0
     fi
     sleep 10
   done
-  echo 'GitHub Pages did not expose the expected AI/SEO/reliability release within the audit window.' >&2
+  echo 'GitHub Pages did not expose the expected AI/SEO/reliability/cinematic release within the audit window.' >&2
   return 1
 }
 
@@ -51,6 +54,8 @@ wait_for_release
 
 for asset in \
   index.html \
+  scholark-v3.js \
+  scholark-v512.css \
   scholark-feature-loader.js \
   scholark-ai-algorithms.js \
   scholark-ai-core.js \
@@ -82,6 +87,8 @@ grep -q 'scholark-ai-ui-polish.js' "$OUT/loader.js"
 grep -q 'afterCinematicReady' "$OUT/loader.js"
 grep -q 'bounded-timeout' "$OUT/loader.js"
 grep -q 'aiBootScheduledAt' "$OUT/loader.js"
+grep -Fq "const BUILD='5151';" "$OUT/scholark-v3.js"
+grep -q 'Desktop S-portal cohesion repair' "$OUT/scholark-v512.css"
 
 grep -Fq 'Sitemap: https://sribyju.github.io/sitemap.xml' "$OUT/robots.txt"
 grep -Fq '<loc>https://sribyju.github.io/</loc>' "$OUT/sitemap.xml"
@@ -111,4 +118,4 @@ grep -q 'setTextIfChanged' "$OUT/scholark-ai-ui-polish.js"
 grep -q 'schedulePolish' "$OUT/scholark-ai-ui-polish.js"
 
 echo 'Production AI runtime contains no configured paid inference endpoint.' | tee -a "$OUT/http-report.txt"
-echo 'Production HTTP/network/SEO/reliability audit passed.' | tee -a "$OUT/http-report.txt"
+echo 'Production HTTP/network/SEO/reliability/cinematic audit passed.' | tee -a "$OUT/http-report.txt"
