@@ -1,7 +1,7 @@
 (() => {
   'use strict';
-  const VERSION='3.3.3';
-  const BUILD='5152';
+  const VERSION='3.3.4';
+  const BUILD='5153';
   const MOBILE=matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
@@ -9,6 +9,57 @@
   const isSafeStorage=(()=>{try{const k=STORE_PREFIX+'probe';localStorage.setItem(k,'1');localStorage.removeItem(k);return true}catch{return false}})();
   const safeGet=k=>{if(!isSafeStorage)return null;try{return localStorage.getItem(STORE_PREFIX+k)}catch{return null}};
   const safeSet=(k,v)=>{if(!isSafeStorage)return;try{return localStorage.setItem(STORE_PREFIX+k,v)}catch{}};
+  const systemMotion=matchMedia('(prefers-reduced-motion: reduce)');
+  const motionModes=new Set(['system','full','reduce']);
+  const motionListeners=new Set();
+  const storedMotionMode=safeGet('motion-mode');
+  let motionMode=motionModes.has(storedMotionMode)?storedMotionMode:'system';
+  try{
+    const url=new URL(location.href),requested=url.searchParams.get('motion');
+    if(motionModes.has(requested)){
+      motionMode=requested;
+      safeSet('motion-mode',motionMode);
+      url.searchParams.delete('motion');
+      history.replaceState(history.state,'',url.href);
+    }
+  }catch{}
+  const motionIsReduced=()=>motionMode==='reduce'||(motionMode==='system'&&systemMotion.matches);
+  const syncMotionClass=()=>{
+    const reduced=motionIsReduced();
+    document.documentElement.classList.toggle('sk6-reduce-motion',reduced);
+    document.documentElement.classList.toggle('sk6-force-motion',motionMode==='full');
+    document.documentElement.dataset.scholarkMotion=motionMode;
+    return reduced;
+  };
+  const motionPreference={
+    media:'(prefers-reduced-motion: reduce)',
+    get matches(){return motionIsReduced();},
+    addEventListener(type,listener){if(type==='change'&&typeof listener==='function')motionListeners.add(listener);},
+    removeEventListener(type,listener){if(type==='change')motionListeners.delete(listener);},
+    addListener(listener){if(typeof listener==='function')motionListeners.add(listener);},
+    removeListener(listener){motionListeners.delete(listener);}
+  };
+  const notifyMotion=()=>{
+    const event={matches:motionPreference.matches,media:motionPreference.media};
+    motionListeners.forEach(listener=>{try{listener.call(motionPreference,event);}catch(error){console.warn('Scholark motion listener:',error);}});
+    dispatchEvent(new CustomEvent('scholark:motionchange',{detail:{mode:motionMode,reduced:event.matches}}));
+  };
+  const setMotionMode=mode=>{
+    if(!motionModes.has(mode))return false;
+    motionMode=mode;
+    safeSet('motion-mode',mode);
+    syncMotionClass();
+    notifyMotion();
+    return true;
+  };
+  window.ScholarkMotion={
+    preference:motionPreference,
+    get mode(){return motionMode;},
+    get reduced(){return motionPreference.matches;},
+    setMode:setMotionMode
+  };
+  systemMotion.addEventListener?.('change',()=>{if(motionMode==='system'){syncMotionClass();notifyMotion();}});
+  syncMotionClass();
   const pageName=el=>(el?.id||'').replace(/^page-/,'');
   const activePage=()=>pageName(document.querySelector('.page.active'))||'home';
   const visible=el=>!!el&&!el.hidden&&getComputedStyle(el).display!=='none'&&getComputedStyle(el).visibility!=='hidden';
@@ -80,7 +131,7 @@
   function saveLastPage(name){if(name&&name!=='home'&&!EXCLUDED_PAGES.has(name))safeSet('last-page',name);}
   function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=document.querySelector('#page-home>.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
 
-  function scrollFeatures(){const target=document.querySelector('.skm-tools,.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return true}return false;}
+  function scrollFeatures(){const target=document.querySelector('.skm-tools,.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:motionPreference.matches?'auto':'smooth',block:'start'});return true}return false;}
   function waitForDynamic(name,original,args){
     const started=performance.now();
     ensureV4().catch(()=>{});
@@ -104,6 +155,6 @@
   function installMutationRepair(){let queued=false;const observer=new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;hardenButtons();hardenModals();restoreFields();});});observer.observe(document.body,{subtree:true,childList:true});}
   function patchKnownEdgeCases(){if(typeof window.calcGoalProjection==='function'&&!window.calcGoalProjection.__sk3){const original=window.calcGoalProjection;const wrapped=function(...args){try{return original.apply(this,args)}catch(err){console.error('Goal projection failed:',err);toast('Projection could not be calculated from those values.','error');return false}};wrapped.__sk3=true;window.calcGoalProjection=wrapped;}if(typeof window.deleteSavedItem==='function'&&!window.deleteSavedItem.__sk3){const original=window.deleteSavedItem;const wrapped=function(id,...args){if(!id){toast('That saved result could not be identified.','error');return false}return original.call(this,id,...args)};wrapped.__sk3=true;window.deleteSavedItem=wrapped;}}
   function installRuntimeGuard(){window.addEventListener('unhandledrejection',e=>console.error('Unhandled Scholark promise rejection:',e.reason));window.addEventListener('error',e=>{if(e.error)console.error('Scholark runtime error:',e.error);});}
-  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,mobile:MOBILE,restoreFields,activePage,ensureV4,cinematicReady};}
+  function boot(){markReady();hardenButtons();hardenModals();installPersistence();installNavigationGuards();patchKnownEdgeCases();installKeyboard();installResume();installRuntimeGuard();installMutationRepair();requestAnimationFrame(restoreRoute);window.ScholarkV3={version:VERSION,build:BUILD,mobile:MOBILE,motion:window.ScholarkMotion,restoreFields,activePage,ensureV4,cinematicReady};}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

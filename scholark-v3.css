@@ -94,4 +94,4 @@ body.scholark-v3 footer{margin-top:20px}
   body.scholark-v3 .sk3-resume-btn{width:100%}
   body.scholark-v3 .dark-toggle{width:42px;height:42px;bottom:14px;right:14px}
 }
-@media(prefers-reduced-motion:reduce){body.scholark-v3 *,body.scholark-v3 *:before,body.scholark-v3 *:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+html.sk6-reduce-motion body.scholark-v3 *,html.sk6-reduce-motion body.scholark-v3 *:before,html.sk6-reduce-motion body.scholark-v3 *:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}

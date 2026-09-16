@@ -89,10 +89,8 @@ html.sk8-shared-transition{overflow:hidden}html.sk8-shared-transition .sk6-route
 }
 @media(max-width:390px){.sk8-hero-network{display:none}.sk8-campus-depth{display:none}.sk8-campus-lights i:nth-child(n+9){display:none}.sk8-card-signal{display:none}}
 
-@media(prefers-reduced-motion:reduce){
-  .sk8-network-lines path,.sk8-network-nodes circle,.sk8-campus-lights i,.sk8-beacon-halo,.sk8-beacon-star,.sk8-final-ring,.sk8-shared-line{animation:none!important}
-  .sk8-hero-network{opacity:.14}.sk8-campus-depth{opacity:.10;transform:none}.sk8-campus-lights{opacity:.35}.sk8-journey-beacon{display:none}.sk8-final-mark{opacity:.08;transform:translate(-50%,-50%)}
-  .sk6-tool-card:hover,.sk6-path-card:hover,.sk6-fit-stack:hover{scale:1}.sk8-shared-ghost{display:none!important}
-}
+html.sk6-reduce-motion :is(.sk8-network-lines path,.sk8-network-nodes circle,.sk8-campus-lights i,.sk8-beacon-halo,.sk8-beacon-star,.sk8-final-ring,.sk8-shared-line){animation:none!important}
+html.sk6-reduce-motion .sk8-hero-network{opacity:.14}html.sk6-reduce-motion .sk8-campus-depth{opacity:.10;transform:none}html.sk6-reduce-motion .sk8-campus-lights{opacity:.35}html.sk6-reduce-motion .sk8-journey-beacon{display:none}html.sk6-reduce-motion .sk8-final-mark{opacity:.08;transform:translate(-50%,-50%)}
+html.sk6-reduce-motion :is(.sk6-tool-card:hover,.sk6-path-card:hover,.sk6-fit-stack:hover){scale:1}html.sk6-reduce-motion .sk8-shared-ghost{display:none!important}
 html.sk6-paused .sk8-network-lines path,html.sk6-paused .sk8-network-nodes circle,html.sk6-paused .sk8-campus-lights i,html.sk6-paused .sk8-beacon-halo,html.sk6-paused .sk8-beacon-star,html.sk6-paused .sk8-final-ring{animation-play-state:paused!important}
 @media(forced-colors:active){.sk8-stage-btn{border:1px solid ButtonText}.sk8-stage-btn.active{outline:2px solid Highlight}.sk8-shared-ghost{border:1px solid CanvasText}.sk8-hero-network,.sk8-campus-depth,.sk8-campus-lights,.sk8-final-mark{display:none}}

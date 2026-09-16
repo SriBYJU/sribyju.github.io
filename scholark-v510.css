@@ -93,4 +93,4 @@ body.scholark-v58 .sk11-next-move-linear .sk11-bridge-inner{min-height:0!importa
 
 @media(max-width:390px){.sk10-closing-stage{padding-inline:11px!important}.sk10-brand-lockup strong{font-size:28px!important}.sk13-flight-copy h4{font-size:42px!important}.sk11-next-move-linear .sk11-bridge-inner{padding-inline:11px!important}}
 
-@media(prefers-reduced-motion:reduce){.sk6-story{height:auto!important;min-height:100svh!important}.sk6-sticky{position:relative!important}}
+html.sk6-reduce-motion .sk6-story{height:auto!important;min-height:100svh!important}html.sk6-reduce-motion .sk6-sticky{position:relative!important}

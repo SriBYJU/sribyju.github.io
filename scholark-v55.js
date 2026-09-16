@@ -4,7 +4,7 @@
   window.__scholarkV55Installed = true;
 
   const VERSION = '5.5.0';
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
   const coarsePointer = matchMedia('(pointer: coarse)');
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];

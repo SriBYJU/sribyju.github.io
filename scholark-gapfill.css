@@ -62,4 +62,4 @@ body.scholark-v58 .sk11-next-move-linear .sk11-bridge-inner{min-height:0!importa
   .sk6-world,.sk6-portal-stage,.sk6-campus-wrap,.sk6-book-stack,.sk6-float-card,.sk9-stage-world,.sk9-panel-wrap{will-change:auto!important}
 }
 @media(max-width:420px){.sk13-flight-copy h4{font-size:clamp(40px,12.5vw,56px)}.sk11-route-node{min-height:98px;padding:12px}.sk11-route-node>strong{font-size:9px}}
-@media(prefers-reduced-motion:reduce){.sk13-cloud,.sk13-route:after{animation:none!important}.sk11-route-node,.sk13-map{transition:none!important}}
+html.sk6-reduce-motion :is(.sk13-cloud,.sk13-route:after){animation:none!important}html.sk6-reduce-motion :is(.sk11-route-node,.sk13-map){transition:none!important}
