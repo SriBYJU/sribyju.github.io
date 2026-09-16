@@ -161,7 +161,5 @@
   body.scholark-v5 .sk6-final-halo{display:block!important;}
 }
 
-@media (prefers-reduced-motion:reduce){
-  body.scholark-v5 .sk6-story{height:auto!important;min-height:100svh!important;}
-  body.scholark-v5 .sk6-sticky{position:relative!important;top:auto!important;height:auto!important;min-height:calc(100svh - 60px)!important;}
-}
+html.sk6-reduce-motion body.scholark-v5 .sk6-story{height:auto!important;min-height:100svh!important;}
+html.sk6-reduce-motion body.scholark-v5 .sk6-sticky{position:relative!important;top:auto!important;height:auto!important;min-height:calc(100svh - 60px)!important;}

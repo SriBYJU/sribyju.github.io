@@ -44,7 +44,7 @@ jobs:
       - name: Verify V5.9 loader and motion fallbacks
         run: |
           grep -q 'scholark-v59.js' scholark-v4-data.js
-          grep -q 'prefers-reduced-motion' scholark-v59.css
+          grep -q 'sk6-reduce-motion' scholark-v59.css
           grep -q 'sk12-continuity' scholark-v59.css
           grep -q 'sk12-project-status' scholark-v59.css
 

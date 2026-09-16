@@ -3,7 +3,7 @@ import path from 'node:path';
 import { test, expect } from '@playwright/test';
 
 const BASE = process.env.SCHOLARK_BASE_URL || 'http://127.0.0.1:4173';
-const CINEMATIC_BUILD = '5152';
+const CINEMATIC_BUILD = '5153';
 const EVIDENCE_DIR = process.env.SCHOLARK_AUDIT_OUT || '/tmp/scholark-production-audit';
 
 async function waitForDesktopCinematic(page) {
@@ -200,5 +200,63 @@ test.describe('Scholark desktop cinematic restoration', () => {
     expect(ending.exitOpacity).toBeGreaterThan(0.75);
     expect(ending.exitVisible).toBe(true);
     await evidence(page, testInfo, 'ending');
+  });
+
+  test('a desktop can explicitly restore the full cinematic when the system requests reduced motion', async ({ page }, testInfo) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(`${BASE}?motion=system`, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => !!window.ScholarkV3?.cinematicReady, null, { timeout: 15000 });
+    await page.evaluate(() => window.ScholarkV3.cinematicReady);
+
+    const reduced = await page.evaluate(() => ({
+      systemReduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      effectiveReduced: window.ScholarkMotion?.reduced,
+      mode: window.ScholarkMotion?.mode,
+      classReduced: document.documentElement.classList.contains('sk6-reduce-motion'),
+      storyHeight: document.querySelector('.sk6-story')?.offsetHeight,
+      viewportHeight: innerHeight,
+      stored: localStorage.getItem('scholark:v3:motion-mode')
+    }));
+    expect(reduced.systemReduced).toBe(true);
+    expect(reduced.effectiveReduced).toBe(true);
+    expect(reduced.mode).toBe('system');
+    expect(reduced.classReduced).toBe(true);
+    expect(reduced.storyHeight).toBeLessThanOrEqual(reduced.viewportHeight * 1.2);
+    expect(reduced.stored).toBe('system');
+    await expect(page.locator('[data-motion-toggle]')).toContainText('Play full cinematic');
+    await evidence(page, testInfo, 'reduced-with-restore-control');
+
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+      page.locator('[data-motion-toggle]').click()
+    ]);
+    await page.waitForFunction(() => !!window.ScholarkV3?.cinematicReady, null, { timeout: 15000 });
+    await page.evaluate(() => window.ScholarkV3.cinematicReady);
+    await page.waitForSelector('.sk6-experience .sk6-portal-object .sk6-logo-face', { state: 'attached' });
+
+    const restored = await page.evaluate(() => ({
+      systemReduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      effectiveReduced: window.ScholarkMotion?.reduced,
+      mode: window.ScholarkMotion?.mode,
+      classReduced: document.documentElement.classList.contains('sk6-reduce-motion'),
+      classForced: document.documentElement.classList.contains('sk6-force-motion'),
+      storyHeight: document.querySelector('.sk6-story')?.offsetHeight,
+      viewportHeight: innerHeight,
+      stored: localStorage.getItem('scholark:v3:motion-mode')
+    }));
+    expect(restored.systemReduced).toBe(true);
+    expect(restored.effectiveReduced).toBe(false);
+    expect(restored.mode).toBe('full');
+    expect(restored.classReduced).toBe(false);
+    expect(restored.classForced).toBe(true);
+    expect(restored.storyHeight).toBeGreaterThan(restored.viewportHeight * 5);
+    expect(restored.stored).toBe('full');
+    await expect(page.locator('[data-motion-toggle]')).toContainText('Reduce motion');
+
+    const orbit = await seekProgress(page, 0.71);
+    expect(orbit.orbitOpacity).toBeGreaterThan(0.7);
+    expect(orbit.orbitDisplay).not.toBe('none');
+    expect(orbit.visibleOrbitNodes).toBeGreaterThanOrEqual(5);
+    await evidence(page, testInfo, 'restored-full-motion');
   });
 });

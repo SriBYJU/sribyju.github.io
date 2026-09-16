@@ -4,7 +4,7 @@
   window.__scholarkV53Installed = true;
 
   const VERSION = '5.3.0';
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
   const coarsePointer = matchMedia('(pointer: coarse)');
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -118,7 +118,7 @@
     if(!home || q('.sk6-experience',home)) return false;
     home.classList.add('sk5-home','sk6-home');
     const root=document.createElement('div'); root.className='sk6-experience';
-    root.innerHTML=`<div class="sk6-grain" aria-hidden="true"></div><div class="sk6-route-wipe" aria-hidden="true"></div>
+    root.innerHTML=`<div class="sk6-grain" aria-hidden="true"></div><div class="sk6-route-wipe" aria-hidden="true"></div><button type="button" class="sk6-motion-toggle" data-motion-toggle><span aria-hidden="true">◉</span><b>Motion</b></button>
       <section class="sk6-story" aria-label="Scholark interactive introduction"><div class="sk6-sticky">
         <div class="sk6-world" aria-hidden="true"><div class="sk6-sky-layer sk6-z-far"><span class="sk6-sun"></span><span class="sk6-ray r1"></span><span class="sk6-ray r2"></span><span class="sk6-ray r3"></span>${cloud(1,12,19,1.35,-480,-28)}${cloud(2,78,18,.9,-430,22)}${cloud(3,63,57,1.7,-330,-18)}${cloud(4,23,69,.82,-260,20)}${cloud(5,91,72,.72,-210,-26)}${cloud(6,48,9,.62,-520,18)}${cloud(7,42,82,1.1,-170,-16)}<div class="sk6-dust-field">${dust}</div></div><div class="sk6-hills sk6-z-mid"><i></i><b></b></div><div class="sk6-campus-wrap sk6-z-mid">${campusSvg}</div><div class="sk6-book-stack sk6-books-left sk6-z-near"><i></i><i></i><i></i><i></i></div><div class="sk6-book-stack sk6-books-right sk6-z-near"><i></i><i></i><i></i></div><div class="sk6-leaf sk6-leaf-a sk6-z-near"></div><div class="sk6-leaf sk6-leaf-b sk6-z-near"></div></div>
         <div class="sk6-float-field">${floatingCard('chart','sk6-fc-a','GPA','Calculate')}${floatingCard('school','sk6-fc-b','Admissions','Compare')}${floatingCard('pen','sk6-fc-c','Essays','Refine')}${floatingCard('test','sk6-fc-d','Test prep','Practice')}${floatingCard('career','sk6-fc-e','Careers','Explore')}</div>
@@ -195,6 +195,27 @@
     qa('[data-magnetic]').forEach(btn=>{btn.addEventListener('pointermove',e=>{const r=btn.getBoundingClientRect();btn.style.setProperty('--mx',((e.clientX-r.left-r.width/2)*.16).toFixed(1)+'px');btn.style.setProperty('--my',((e.clientY-r.top-r.height/2)*.16).toFixed(1)+'px');});btn.addEventListener('pointerleave',()=>{btn.style.setProperty('--mx','0px');btn.style.setProperty('--my','0px');});});
   }
 
+  function installMotionControl(){
+    const control=q('[data-motion-toggle]');
+    const motion=window.ScholarkMotion;
+    if(!control||!motion){control?.remove();return;}
+    const sync=()=>{
+      const reduced=motion.reduced;
+      control.classList.toggle('is-reduced',reduced);
+      control.dataset.mode=reduced?'reduced':'full';
+      control.innerHTML=`<span aria-hidden="true">${reduced?'▶':'◉'}</span><b>${reduced?'Play full cinematic':'Reduce motion'}</b>`;
+      control.setAttribute('aria-label',reduced?'Play the full Scholark cinematic':'Use the reduced-motion Scholark experience');
+      control.title=reduced?'Restore clouds, the dimensional S, portal, wave, orbit, and scroll transitions':'Reduce animation and scroll effects';
+    };
+    control.addEventListener('click',()=>{
+      motion.setMode(motion.reduced?'full':'reduce');
+      control.disabled=true;
+      location.reload();
+    });
+    addEventListener('scholark:motionchange',sync);
+    sync();
+  }
+
   function installVisibilityPause(){ const sync=()=>document.documentElement.classList.toggle('sk6-paused',document.hidden); document.addEventListener('visibilitychange',sync); sync(); }
   function installReducedMotionSync(){const sync=()=>{document.documentElement.classList.toggle('sk6-reduce-motion',reduceMotion.matches);requestMotion();};reduceMotion.addEventListener?.('change',sync);sync();}
   function syncPageState(){const home=q('#page-home');document.body.classList.toggle('sk5-home-active',!!home?.classList.contains('active'));requestMotion();}
@@ -204,7 +225,7 @@
     ensureStyles();
     if(!buildHome()) return setTimeout(boot,30);
     story=q('.sk6-story');sticky=q('.sk6-sticky');fit=q('.sk6-fit-scene');path=q('.sk6-wave-main',sticky);clouds=qa('.sk6-cloud',sticky);orbits=qa('.sk6-orbit',sticky);throughs=qa('.sk6-through-copy',sticky);
-    installReveal();installPointer();installVisibilityPause();installReducedMotionSync();hookNavigation();syncPageState();
+    installReveal();installPointer();installMotionControl();installVisibilityPause();installReducedMotionSync();hookNavigation();syncPageState();
     addEventListener('scroll',requestMotion,{passive:true});addEventListener('resize',requestMotion,{passive:true});addEventListener('orientationchange',()=>setTimeout(requestMotion,120),{passive:true});
     updateMotion(); window.ScholarkV5={version:VERSION,refresh:updateMotion,go};
   }
