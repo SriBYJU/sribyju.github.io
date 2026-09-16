@@ -1,0 +1,39 @@
+name: One-time Scholark user import
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-scholark-users.yml'
+
+concurrency:
+  group: scholark-one-time-user-import
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  import-users:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install existing server dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Validate importer
+        working-directory: scripts
+        run: node --check import-scholark-users.js
+
+      - name: Import staged Firebase Authentication users
+        working-directory: scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node import-scholark-users.js
