@@ -29,7 +29,7 @@
   body.scholark-mobile-cinematic nav .nav-links.mobile-open .profile-dropdown{grid-column:1/-1}
 
   #page-home.skm-home{position:relative;overflow:visible!important;background:var(--bg,#faf9f6)}
-  #page-home.skm-home > :not(.skm-experience):not(footer){display:none!important}
+  #page-home.skm-home > :not(.skm-experience):not(.sk-press-feature):not(footer){display:none!important}
 
   .skm-experience{position:relative;width:100%;max-width:100vw;overflow:visible;color:var(--ink,#1a1714);background:var(--bg,#faf9f6)}
   .skm-story{position:relative;height:225svh;background:var(--bg,#faf9f6)}
