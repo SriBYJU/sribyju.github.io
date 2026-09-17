@@ -211,6 +211,9 @@
         <div class="sk6-final-inner"><small class="sk6-reveal">Scholark</small><h2 class="sk6-reveal">Same curiosity.<br><em>Brighter opportunities.</em></h2><p class="sk6-reveal" data-delay="1">Independent educational project · Not a company or employer · Built by Shriyan Avadhanula, Founder.</p><div class="sk6-actions sk6-reveal" data-delay="2"><button type="button" class="sk6-btn primary" data-start>Start with GPA ${icon('arrow')}</button><button type="button" class="sk6-btn glass" data-features>View all features</button></div></div>
       </section>`;
 
+    const press = q(':scope > .sk-press-feature', home);
+    const journey = q('.sk6-journey-section', root);
+    if (press && journey) journey.before(press);
     home.prepend(root);
     qa('[data-tool]', root).forEach(card => card.addEventListener('click', () => tools[+card.dataset.tool]?.action()));
     qa('[data-route]', root).forEach(card => card.addEventListener('click', () => go(card.dataset.route, card.dataset.tab || undefined)));

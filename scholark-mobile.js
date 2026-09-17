@@ -97,6 +97,9 @@
       </div></section>
       <section class="skm-section skm-tools"><div class="skm-head"><small>Real tools · real progress</small><h2>Everything moves <em>with you.</em></h2><p>Open a tool, do the work, and return to the same ScholarK system.</p></div><div class="skm-grid">${tools.map(t=>`<button class="skm-card" type="button" data-skm-go="${t[3]}"${t[4]?` data-skm-tab="${t[4]}"`:''}><b>${t[0]} / 12</b><h3>${t[1]}</h3><p>${t[2]}</p></button>`).join('')}</div></section>
       <section class="skm-final"><small>ScholarK</small><h2>Same curiosity.<br><em>Brighter opportunities.</em></h2><p>Independent, student-built, non-commercial educational project · not an incorporated company, business, or employer · not revenue-generating.</p><div class="skm-actions"><button class="skm-btn primary" type="button" data-skm-go="tools" data-skm-tab="gpa">Start with GPA ↗</button><button class="skm-btn secondary" type="button" data-skm-go="features">View all features</button></div></section>`;
+    const press=q(':scope > .sk-press-feature',home);
+    const journey=q('.skm-journey',root);
+    if(press&&journey)journey.before(press);
     home.prepend(root);
     root.querySelectorAll('[data-skm-go]').forEach(btn=>btn.addEventListener('click',()=>go(btn.dataset.skmGo,btn.dataset.skmTab||'')));
     document.documentElement.classList.remove('scholark-cinematic-loading');
