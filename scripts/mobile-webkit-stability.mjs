@@ -30,7 +30,9 @@ async function auditDevice(deviceName){
         viewportH:innerHeight,
         heroOpacity:+getComputedStyle(hero).opacity,
         heavyCount:document.querySelectorAll('.sk6-experience,.sk6-orbit-scene,.sk11-orbit-shell,.sk9-observatory,.sk6-cloud,.sk6-logo-depth').length,
-        mobileNodes:document.querySelectorAll('.skm-experience *').length,
+        // Count the animated scene graph only. The static press credibility block lives between
+        // the proof strip and journey, but it does not participate in the cinematic runtime.
+        mobileNodes:[...document.querySelectorAll('.skm-experience *')].filter(el=>!el.closest('.sk-press-feature')).length,
         overflow:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)-innerWidth
       };
     });
