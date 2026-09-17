@@ -1,17 +1,17 @@
 # ScholarK V4 End-to-End Audit
 
-Generated automatically from commit `577803d14be5e8257a19d22d4f00a79dd2171a00`.
+Generated automatically from commit `df7a50d3b54a6e123bfa6382c315d6ebd5851b48`.
 
 | Check | Result |
 |---|---|
 | Dependencies | success |
 | V4 static release audit | success |
-| Existing full test suite | success |
-| SAT/ACT market-quality audit | success |
-| AP market-quality audit | success |
+| Existing full test suite | failure |
+| SAT/ACT market-quality audit | skipped |
+| AP market-quality audit | skipped |
 
 ## Release gate
-**PASS** — all required checks succeeded.
+**FAIL** — at least one required check failed; inspect the Actions run before release.
 
 ## V4 scope under test
 - ScholarK V4 JavaScript syntax and loader wiring
