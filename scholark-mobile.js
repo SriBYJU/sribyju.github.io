@@ -5,7 +5,7 @@
 
   const mobile=matchMedia('(max-width:760px), (pointer:coarse)');
   if(!mobile.matches) return;
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  const reduce=window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
   const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
   const q=(s,r=document)=>r.querySelector(s);
   const dynamicPages=new Set(['intelligence','careers','methodology']);
