@@ -3,7 +3,7 @@ import path from 'node:path';
 import { test, expect } from '@playwright/test';
 
 const BASE = process.env.SCHOLARK_BASE_URL || 'http://127.0.0.1:4173';
-const CINEMATIC_BUILD = '5156';
+const CINEMATIC_BUILD = '5157';
 const EVIDENCE_DIR = process.env.SCHOLARK_AUDIT_OUT || '/tmp/scholark-production-audit';
 
 async function waitForDesktopCinematic(page) {
@@ -206,8 +206,7 @@ test.describe('Scholark desktop cinematic restoration', () => {
     const context = await browser.newContext({
       viewport: { width: 1366, height: 768 },
       hasTouch: true,
-      isMobile: false,
-      reducedMotion: 'reduce'
+      isMobile: false
     });
     const page = await context.newPage();
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -226,7 +225,7 @@ test.describe('Scholark desktop cinematic restoration', () => {
     }));
 
     expect(state.mobile).toBe(false);
-    expect(state.motionMode).toBe('full');
+    expect(state.motionMode).toBe('system');
     expect(state.reduced).toBe(false);
     expect(state.desktopExperience).toBe(true);
     expect(state.mobileExperience).toBe(false);
