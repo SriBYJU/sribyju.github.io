@@ -8,7 +8,10 @@ const prepApp = readFileSync(resolve('..', 'prep-v2-app.js'), 'utf8');
 
 test('all inline scripts parse after the prep-engine replacement', () => {
   const scripts = [...html.matchAll(/<script((?![^>]*\bsrc=)[^>]*)>([\s\S]*?)<\/script>/gi)]
-    .filter(match => !/\btype=["']module["']/i.test(match[1]))
+    .filter(match => {
+      const type = match[1].match(/\btype=["']([^"']+)["']/i)?.[1]?.toLowerCase();
+      return !type || type === 'text/javascript' || type === 'application/javascript';
+    })
     .map(match => match[2]);
   assert.ok(scripts.length > 0);
   scripts.forEach((source, index) => assert.doesNotThrow(() => new Function(source), `inline script ${index + 1} has invalid syntax`));
