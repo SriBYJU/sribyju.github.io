@@ -5,7 +5,7 @@
 
   const VERSION = '5.3.0';
   const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
-  const coarsePointer = matchMedia('(pointer: coarse)');
+  const finePointer = matchMedia('(any-hover:hover) and (any-pointer:fine)');
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
   const lerp = (a, b, t) => a + (b - a) * t;
   const smoothstep = t => { t = clamp(t); return t * t * (3 - 2 * t); };
@@ -176,7 +176,7 @@
     const dt=Math.min(.05,Math.max(.001,(ts-lastTs)/1000)); lastTs=ts;
     const rect=story.getBoundingClientRect(), max=Math.max(1,story.offsetHeight-innerHeight);
     scrollTarget=clamp(-rect.top/max);
-    const alpha=reduceMotion.matches?1:1-Math.exp(-dt*(coarsePointer.matches?22:18));
+    const alpha=reduceMotion.matches?1:1-Math.exp(-dt*(finePointer.matches?18:22));
     scrollSmooth += (scrollTarget-scrollSmooth)*alpha;
     if(Math.abs(scrollTarget-scrollSmooth)<.00015) scrollSmooth=scrollTarget;
     applyStory(scrollSmooth);
@@ -192,7 +192,7 @@
   }
 
   function installPointer(){
-    if(reduceMotion.matches||coarsePointer.matches) return;
+    if(reduceMotion.matches||!finePointer.matches) return;
     addEventListener('pointermove',e=>{pointerX=e.clientX/innerWidth;pointerY=e.clientY/innerHeight;const card=e.target.closest?.('.sk6-tool-card,.sk6-path-card');if(card){const r=card.getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,1)-.5,y=clamp((e.clientY-r.top)/r.height,0,1)-.5;card.style.setProperty('--tilt-x',(-y*5).toFixed(2)+'deg');card.style.setProperty('--tilt-y',(x*6.5).toFixed(2)+'deg');card.style.setProperty('--spot-x',((x+.5)*100).toFixed(1)+'%');card.style.setProperty('--spot-y',((y+.5)*100).toFixed(1)+'%');}requestMotion();},{passive:true});
     document.addEventListener('pointerout',e=>{const card=e.target.closest?.('.sk6-tool-card,.sk6-path-card');if(card){card.style.setProperty('--tilt-x','0deg');card.style.setProperty('--tilt-y','0deg');}},{passive:true});
     qa('[data-magnetic]').forEach(btn=>{btn.addEventListener('pointermove',e=>{const r=btn.getBoundingClientRect();btn.style.setProperty('--mx',((e.clientX-r.left-r.width/2)*.16).toFixed(1)+'px');btn.style.setProperty('--my',((e.clientY-r.top-r.height/2)*.16).toFixed(1)+'px');});btn.addEventListener('pointerleave',()=>{btn.style.setProperty('--mx','0px');btn.style.setProperty('--my','0px');});});
