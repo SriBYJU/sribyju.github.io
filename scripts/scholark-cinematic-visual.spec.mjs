@@ -202,6 +202,38 @@ test.describe('Scholark desktop cinematic restoration', () => {
     await evidence(page, testInfo, 'ending');
   });
 
+  test('a wide touch-capable computer still gets the full desktop cinematic by default', async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1366, height: 768 },
+      hasTouch: true,
+      isMobile: false,
+      reducedMotion: 'reduce'
+    });
+    const page = await context.newPage();
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => !!window.ScholarkV3?.cinematicReady, null, { timeout: 15000 });
+    await page.evaluate(() => window.ScholarkV3.cinematicReady);
+    await page.waitForSelector('.sk6-experience .sk6-portal-object', { state: 'attached' });
+
+    const state = await page.evaluate(() => ({
+      mobile: window.ScholarkV3?.mobile,
+      motionMode: window.ScholarkMotion?.mode,
+      reduced: window.ScholarkMotion?.reduced,
+      desktopExperience: !!document.querySelector('.sk6-experience'),
+      mobileExperience: !!document.querySelector('.skm-experience'),
+      storyHeight: document.querySelector('.sk6-story')?.offsetHeight || 0,
+      viewportHeight: innerHeight
+    }));
+
+    expect(state.mobile).toBe(false);
+    expect(state.motionMode).toBe('full');
+    expect(state.reduced).toBe(false);
+    expect(state.desktopExperience).toBe(true);
+    expect(state.mobileExperience).toBe(false);
+    expect(state.storyHeight).toBeGreaterThan(state.viewportHeight * 5);
+    await context.close();
+  });
+
   test('a desktop can explicitly restore the full cinematic when the system requests reduced motion', async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${BASE}?motion=system`, { waitUntil: 'domcontentloaded' });
