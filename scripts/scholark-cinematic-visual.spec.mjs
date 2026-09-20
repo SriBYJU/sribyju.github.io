@@ -3,7 +3,7 @@ import path from 'node:path';
 import { test, expect } from '@playwright/test';
 
 const BASE = process.env.SCHOLARK_BASE_URL || 'http://127.0.0.1:4173';
-const CINEMATIC_BUILD = '5153';
+const CINEMATIC_BUILD = '5155';
 const EVIDENCE_DIR = process.env.SCHOLARK_AUDIT_OUT || '/tmp/scholark-production-audit';
 
 async function waitForDesktopCinematic(page) {
