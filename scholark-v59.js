@@ -8,7 +8,7 @@
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
   const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
-  const coarsePointer = matchMedia('(pointer: coarse)');
+  const finePointer = matchMedia('(any-hover:hover) and (any-pointer:fine)');
 
   function ensureStyles() {
     if (q('link[href*="scholark-v59.css"]')) return;
@@ -159,7 +159,7 @@
   function requestMotion(){if(!raf)raf=requestAnimationFrame(applyMotion)}
 
   function installPointerDepth() {
-    if (reduceMotion.matches || coarsePointer.matches) return;
+    if (reduceMotion.matches || !finePointer.matches) return;
     qa('.sk12-continuity').forEach(section => {
       section.addEventListener('pointermove',event=>{
         const r=section.getBoundingClientRect();
