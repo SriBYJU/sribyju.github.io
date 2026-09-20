@@ -5,7 +5,7 @@
 
   const VERSION = '5.4.0';
   const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
-  const coarsePointer = matchMedia('(pointer: coarse)');
+  const finePointer = matchMedia('(any-hover:hover) and (any-pointer:fine)');
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
@@ -154,7 +154,7 @@
   function request() { if (!raf) raf = requestAnimationFrame(apply); }
 
   function installPointer() {
-    if (reduceMotion.matches || coarsePointer.matches) return;
+    if (reduceMotion.matches || !finePointer.matches) return;
     addEventListener('pointermove', e => {
       px = e.clientX / innerWidth;
       py = e.clientY / innerHeight;
@@ -165,7 +165,7 @@
   }
 
   function installCardDepth() {
-    if (reduceMotion.matches || coarsePointer.matches) return;
+    if (reduceMotion.matches || !finePointer.matches) return;
     qa('.sk6-tool-card,.sk6-path-card').forEach(card => {
       card.addEventListener('pointerenter', () => card.classList.add('sk7-live'));
       card.addEventListener('pointerleave', () => card.classList.remove('sk7-live'));
