@@ -5,7 +5,7 @@
 
   const VERSION = '5.5.0';
   const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
-  const coarsePointer = matchMedia('(pointer: coarse)');
+  const finePointer = matchMedia('(any-hover:hover) and (any-pointer:fine)');
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
@@ -137,7 +137,7 @@
   }
 
   function sharedTransition(card, route) {
-    if (reduceMotion.matches || coarsePointer.matches || !route || !window.ScholarkV5?.go) {
+    if (reduceMotion.matches || !finePointer.matches || !route || !window.ScholarkV5?.go) {
       window.ScholarkV5?.go?.(route?.page, route?.tab);
       return;
     }
