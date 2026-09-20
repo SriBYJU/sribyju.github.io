@@ -4,7 +4,7 @@ set -euo pipefail
 SITE="${SCHOLARK_PRODUCTION_URL:-https://sribyju.github.io/}"
 SHA="${GITHUB_SHA:-manual-audit}"
 OUT="${SCHOLARK_AUDIT_OUT:-/tmp/scholark-production-audit}"
-BUILD='5155'
+BUILD='5156'
 mkdir -p "$OUT"
 
 wait_for_release() {
