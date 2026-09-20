@@ -8,7 +8,7 @@
   const qa = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n));
   const reduceMotion = window.ScholarkMotion?.preference || matchMedia('(prefers-reduced-motion: reduce)');
-  const coarsePointer = matchMedia('(pointer: coarse)');
+  const finePointer = matchMedia('(any-hover:hover) and (any-pointer:fine)');
 
   function ensureStyles() {
     if (q('link[href*="scholark-v57.css"]')) return;
@@ -152,7 +152,7 @@
     addEventListener('resize', request, {passive:true});
     apply();
 
-    if (!reduceMotion.matches && !coarsePointer.matches) {
+    if (!reduceMotion.matches && !!finePointer.matches) {
       stage.addEventListener('pointermove', e => {
         const r = stage.getBoundingClientRect();
         const x = clamp((e.clientX - r.left) / Math.max(1, r.width));
