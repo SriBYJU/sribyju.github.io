@@ -184,7 +184,7 @@ jobs:
 
           checks={
             'v3_css_once': html.count('href="scholark-v3.css"')==1,
-            'v3_js_once': html.count('src="scholark-v3.js?build=5155"')==1 and 'src="scholark-v3.js"' not in html,
+            'v3_js_once': html.count('src="scholark-v3.js?build=5156"')==1 and 'src="scholark-v3.js"' not in html,
             'canonical_present': ('rel="canonical"' in html.lower() or "rel='canonical'" in html.lower()),
             'robots_allows_public_site': 'User-agent: *' in robots and 'Allow: /' in robots,
             'robots_references_sitemap': 'Sitemap: https://sribyju.github.io/sitemap.xml' in robots,
