@@ -1,8 +1,8 @@
 (() => {
   'use strict';
   const VERSION='3.3.4';
-  const BUILD='5155';
-  const MOBILE=matchMedia('(max-width:760px), (pointer:coarse)').matches;
+  const BUILD='5156';
+  const MOBILE=matchMedia('(max-width:760px)').matches;
   const STORE_PREFIX='scholark:v3:';
   const EXCLUDED_PAGES=new Set(['ap','prep','sat']);
   const DYNAMIC_PAGES=new Set(['intelligence','careers','methodology']);
@@ -13,7 +13,7 @@
   const motionModes=new Set(['system','full','reduce']);
   const motionListeners=new Set();
   const storedMotionMode=safeGet('motion-mode');
-  let motionMode=motionModes.has(storedMotionMode)?storedMotionMode:'system';
+  let motionMode=motionModes.has(storedMotionMode)?storedMotionMode:(MOBILE?'system':'full');
   try{
     const url=new URL(location.href),requested=url.searchParams.get('motion');
     if(motionModes.has(requested)){
