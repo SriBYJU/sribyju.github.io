@@ -3,20 +3,21 @@
  *
  * Runs via GitHub Actions every Monday at 13:15 UTC.
  * Combines Firebase Authentication users with Firestore preferences, then
- * sends branded email via Gmail SMTP.
+ * sends branded email through a bulk mail provider.
  *
  * Required environment variables:
  *   FIREBASE_SERVICE_ACCOUNT — JSON string of Firebase service account key
- *   EMAIL_USER              — Gmail address to send from
- *   EMAIL_PASS              — Gmail App Password (not your regular password)
+ *   RESEND_API_KEY          — API key for a verified sending domain
+ *   EMAIL_FROM              — sender on that domain, e.g. Scholark <tips@example.com>
+ *   EMAIL_UNSUBSCRIBE_ADDRESS — monitored address that processes opt-outs
  */
 
 import { initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
-import { createTransport } from "nodemailer";
 import { createHash, randomUUID } from "node:crypto";
 import { pathToFileURL } from "node:url";
+import { deliveryId, isRecentPending, mondayUtcKey, ResendEmailClient } from "./weekly-email-delivery.js";
 
 // ── Firebase setup ──────────────────────────────────────────
 let db;
@@ -31,7 +32,7 @@ function initializeFirebaseAdmin() {
   db = getFirestore();
   auth = getAuth();
 }
-const RUN_LOCK_TTL_MS = 2 * 60 * 60 * 1000;
+const RUN_LOCK_TTL_MS = 4 * 60 * 60 * 1000;
 
 // ── 52 unique weekly tips — one for each week of the year ───
 const WEEKLY_TIPS = [
@@ -1243,23 +1244,57 @@ async function acquireRunLock() {
   };
 }
 
-async function getNextWeekNumber() {
+async function getCampaign(weekKey) {
+  const campaignRef = db.collection("email_meta").doc(`weekly_campaign_${weekKey}`);
   const counterRef = db.collection("email_meta").doc("week_counter");
   return db.runTransaction(async (transaction) => {
+    const campaign = await transaction.get(campaignRef);
+    if (campaign.exists) return campaign.data().weekNum;
     const snapshot = await transaction.get(counterRef);
     let weekNum = (snapshot.data()?.current || 0) + 1;
     if (weekNum > WEEKLY_TIPS.length) weekNum = 1;
     transaction.set(counterRef, { current: weekNum, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    transaction.create(campaignRef, { weekNum, createdAt: FieldValue.serverTimestamp() });
     return weekNum;
   });
+}
+
+async function reserveDelivery(weekKey, email) {
+  const ref = db.collection("email_deliveries").doc(deliveryId(weekKey, email));
+  const snapshot = await ref.get();
+  if (snapshot.exists) {
+    const record = snapshot.data();
+    if (record.status === "accepted") return { status: "accepted", ref };
+    if (record.status === "rejected") {
+      await ref.update({ status: "pending", reservedAtMs: Date.now() });
+      return { status: "retry", ref };
+    }
+    if (!isRecentPending(record)) return { status: "uncertain", ref };
+    return { status: "retry", ref };
+  }
+  try {
+    await ref.create({
+      weekKey,
+      status: "pending",
+      reservedAtMs: Date.now(),
+    });
+    return { status: "new", ref };
+  } catch (error) {
+    // A concurrent or previous run may have created the record after our read.
+    if (error.code === 6 || error.code === "already-exists") return { status: "uncertain", ref };
+    throw error;
+  }
 }
 
 // ── Main ────────────────────────────────────────────────────
 async function main() {
   initializeFirebaseAdmin();
-  const emailUser = normalizeEmail(process.env.EMAIL_USER);
-  const emailPass = process.env.EMAIL_PASS;
-  if (!emailUser || !emailPass) throw new Error("Missing EMAIL_USER or EMAIL_PASS environment variables.");
+  const from = process.env.EMAIL_FROM;
+  const apiKey = process.env.RESEND_API_KEY;
+  const unsubscribeEmail = normalizeEmail(process.env.EMAIL_UNSUBSCRIBE_ADDRESS);
+  if (!from || !apiKey || !isEmail(unsubscribeEmail)) {
+    throw new Error("Missing RESEND_API_KEY, EMAIL_FROM, or valid EMAIL_UNSUBSCRIBE_ADDRESS.");
+  }
 
   let releaseLock;
   try {
@@ -1273,47 +1308,71 @@ async function main() {
       throw error;
     }
 
-    const weekNum = await getNextWeekNumber();
+    const weekKey = mondayUtcKey();
+    const weekNum = await getCampaign(weekKey);
     const tip = WEEKLY_TIPS[weekNum - 1];
     const recipients = await getEligibleRecipients();
-    const results = { eligible: recipients.length, attempted: 0, sent: 0, failed: 0 };
+    const results = { eligible: recipients.length, attempted: 0, sent: 0, failed: 0, skipped: 0, uncertain: 0 };
 
     console.log(`Week ${weekNum} of ${WEEKLY_TIPS.length} — sending: "${tip.subject}"`);
     console.log(`Total eligible: ${results.eligible}`);
     if (!recipients.length) {
       console.log("No eligible recipients; skipping sends.");
     } else {
-      const transporter = createTransport({
-        service: "gmail",
-        auth: { user: emailUser, pass: emailPass },
-      });
-      const emailHTML = getEmailHTML(tip, weekNum, WEEKLY_TIPS.length, emailUser);
-      const unsubscribeHeader = `<mailto:${emailUser}?subject=${encodeURIComponent("Unsubscribe from Scholark weekly tips")}>`;
+      const client = new ResendEmailClient({ apiKey, from });
+      const emailHTML = getEmailHTML(tip, weekNum, WEEKLY_TIPS.length, unsubscribeEmail);
+      const unsubscribeHeader = `<mailto:${unsubscribeEmail}?subject=${encodeURIComponent("Unsubscribe from Scholark weekly tips")}>`;
 
       for (const email of recipients) {
         const fingerprint = recipientFingerprint(email);
+        const delivery = await reserveDelivery(weekKey, email);
+        if (delivery.status === "accepted") {
+          results.skipped++;
+          continue;
+        }
+        if (delivery.status === "uncertain") {
+          results.uncertain++;
+          continue;
+        }
         results.attempted++;
         try {
-          await transporter.sendMail({
-            from: `"Scholark" <${emailUser}>`,
+          const providerId = await client.send({
             to: email,
             subject: `\u{1F4DA} ${tip.subject} — Scholark Weekly Tips`,
             html: emailHTML,
-            headers: { "List-Unsubscribe": unsubscribeHeader },
+            unsubscribeHeader,
+            idempotencyKey: deliveryId(weekKey, email),
+          });
+          await delivery.ref.update({
+            status: "accepted",
+            providerId,
+            acceptedAt: FieldValue.serverTimestamp(),
           });
           results.sent++;
           console.log(`Sent to recipient ${fingerprint}.`);
         } catch (error) {
           results.failed++;
           console.error(`Failed recipient ${fingerprint}: ${redactEmailAddresses(error.message)}`);
+          // A definite 4xx rejection did not create a message. Keep it
+          // retryable after account or recipient data is corrected.
+          if ([400, 401, 403, 404, 422, 429].includes(error.status)) {
+            try { await delivery.ref.update({ status: "rejected" }); }
+            catch (writeError) {
+              console.warn(`Could not mark recipient ${fingerprint} rejected: ${redactEmailAddresses(writeError.message)}`);
+            }
+          }
+          // Stop at the first error rather than flooding the provider. A
+          // timeout can occur after acceptance, so keep that reservation.
+          break;
         }
       }
     }
 
-    console.log(`Totals — eligible: ${results.eligible}, attempted: ${results.attempted}, sent: ${results.sent}, failed: ${results.failed}.`);
+    console.log(`Totals — eligible: ${results.eligible}, attempted: ${results.attempted}, sent: ${results.sent}, failed: ${results.failed}, skipped: ${results.skipped}, uncertain: ${results.uncertain}.`);
     try {
       await db.collection("email_logs").add({
         sentAt: FieldValue.serverTimestamp(),
+        weekKey,
         weekNum,
         tipSubject: tip.subject,
         ...results,
@@ -1321,7 +1380,7 @@ async function main() {
     } catch (error) {
       console.warn("Could not write aggregate email log:", redactEmailAddresses(error.message));
     }
-    if (results.failed > 0) process.exitCode = 1;
+    if (results.failed > 0 || results.uncertain > 0 || results.sent + results.skipped < results.eligible) process.exitCode = 1;
   } finally {
     if (releaseLock) {
       try { await releaseLock(); }
