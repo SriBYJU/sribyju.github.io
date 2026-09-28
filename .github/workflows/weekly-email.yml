@@ -15,7 +15,9 @@ permissions:
 
 jobs:
   send-emails:
+    if: vars.WEEKLY_EMAIL_ENABLED == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +41,7 @@ jobs:
         working-directory: scripts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_UNSUBSCRIBE_ADDRESS: ${{ vars.EMAIL_UNSUBSCRIBE_ADDRESS }}
         run: node send-weekly-email.js
