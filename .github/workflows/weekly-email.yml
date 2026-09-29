@@ -42,4 +42,5 @@ jobs:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64: ${{ secrets.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64 }}
+          WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2: ${{ secrets.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2 }}
         run: node send-weekly-email.js
