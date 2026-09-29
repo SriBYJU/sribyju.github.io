@@ -17,6 +17,7 @@ import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
 import { createTransport } from "nodemailer";
 import { createHash, randomUUID } from "node:crypto";
 import { pathToFileURL } from "node:url";
+import { isPlaceholderAddress, loadWeeklyEmailExclusions } from "./weekly-email-exclusions.js";
 
 // ── Firebase setup ──────────────────────────────────────────
 let db;
@@ -1204,7 +1205,8 @@ async function getSubscriberPreferences(dbClient = db) {
   return preferences;
 }
 
-export async function getEligibleRecipients(authClient = auth, dbClient = db) {
+export async function getEligibleRecipients(authClient = auth, dbClient = db, excludedEmails) {
+  if (!(excludedEmails instanceof Set)) throw new Error("Weekly email exclusion set is required.");
   const [authEmails, subscriberPreferences] = await Promise.all([
     getAllAuthEmails(authClient),
     getSubscriberPreferences(dbClient),
@@ -1215,6 +1217,7 @@ export async function getEligibleRecipients(authClient = auth, dbClient = db) {
   }
   return [...candidates]
     .filter((email) => !subscriberPreferences.get(email)?.suppressed)
+    .filter((email) => !excludedEmails.has(email) && !isPlaceholderAddress(email))
     .sort();
 }
 
@@ -1256,6 +1259,10 @@ async function getNextWeekNumber() {
 
 // ── Main ────────────────────────────────────────────────────
 async function main() {
+  const excludedEmails = loadWeeklyEmailExclusions([
+    process.env.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64,
+    process.env.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2,
+  ]);
   initializeFirebaseAdmin();
   const emailUser = normalizeEmail(process.env.EMAIL_USER);
   const emailPass = process.env.EMAIL_PASS;
@@ -1275,7 +1282,7 @@ async function main() {
 
     const weekNum = await getNextWeekNumber();
     const tip = WEEKLY_TIPS[weekNum - 1];
-    const recipients = await getEligibleRecipients();
+    const recipients = await getEligibleRecipients(auth, db, excludedEmails);
     const results = { eligible: recipients.length, attempted: 0, sent: 0, failed: 0 };
 
     console.log(`Week ${weekNum} of ${WEEKLY_TIPS.length} — sending: "${tip.subject}"`);
