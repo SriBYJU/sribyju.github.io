@@ -48,16 +48,18 @@ test("combines auth and subscribers, deduplicates case, and preserves opt-outs",
   const auth = {
     async listUsers() {
       return { users: [
-        { email: "Keep@Example.com" },
-        { email: "OptOut@example.com" },
-        { email: "keep@example.com" },
+        { email: "Keep@Scholark.org" },
+        { email: "OptOut@Scholark.org" },
+        { email: "keep@scholark.org" },
+        { email: "blocked@gmail.com" },
+        { email: "other@sample.net" },
       ] };
     },
   };
   const docs = [
-    { id: "extra@example.com", data: () => ({ email: "Extra@Example.com", active: true }) },
-    { id: "optout@example.com", data: () => ({ email: "OPTOUT@example.com", active: true }) },
-    { id: "legacy-optout", data: () => ({ email: "optout@example.com", active: false }) },
+    { id: "extra@scholark.org", data: () => ({ email: "Extra@Scholark.org", active: true }) },
+    { id: "optout@scholark.org", data: () => ({ email: "OPTOUT@scholark.org", active: true }) },
+    { id: "legacy-optout", data: () => ({ email: "optout@scholark.org", active: false }) },
   ];
   const firestore = {
     collection(name) {
@@ -65,8 +67,8 @@ test("combines auth and subscribers, deduplicates case, and preserves opt-outs",
       return { get: async () => ({ docs }) };
     },
   };
-  assert.deepEqual(await getEligibleRecipients(auth, firestore), [
-    "extra@example.com",
-    "keep@example.com",
+  assert.deepEqual(await getEligibleRecipients(auth, firestore, new Set(["blocked@gmail.com"])), [
+    "extra@scholark.org",
+    "keep@scholark.org",
   ]);
 });
