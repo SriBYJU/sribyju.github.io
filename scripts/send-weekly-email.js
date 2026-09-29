@@ -1259,7 +1259,10 @@ async function getNextWeekNumber() {
 
 // ── Main ────────────────────────────────────────────────────
 async function main() {
-  const excludedEmails = loadWeeklyEmailExclusions(process.env.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64);
+  const excludedEmails = loadWeeklyEmailExclusions([
+    process.env.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64,
+    process.env.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2,
+  ]);
   initializeFirebaseAdmin();
   const emailUser = normalizeEmail(process.env.EMAIL_USER);
   const emailPass = process.env.EMAIL_PASS;
