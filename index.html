@@ -1065,7 +1065,9 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <h2 id="sk-press-title">As featured on:</h2>
         <p>Scholark is part of a growing portfolio of student-built technology platforms recognized by international media.</p>
       </header>
-      <div class="sk-press-grid">
+      <div class="sk-press-carousel" aria-label="Scholark media coverage">
+      <button class="sk-press-nav sk-press-prev" type="button" aria-label="Previous publications">‹</button>
+      <div class="sk-press-grid" tabindex="0" aria-label="Publication cards">
         <a class="sk-press-card" href="https://ghananews.org/shriyan-avadhanula-16-year-old-technology-innovator/" target="_blank" rel="noopener noreferrer" aria-label="Read the Ghana News article about Shriyan Avadhanula">
           <span class="sk-press-logo"><img src="assets/press/ghana-news.jpeg" width="2048" height="2048" alt="Ghana News" loading="lazy" decoding="async"></span>
           <span class="sk-press-meta"><strong>Ghana News</strong><span>Read the article <b aria-hidden="true">↗</b></span></span>
@@ -1075,6 +1077,9 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           <span class="sk-press-meta"><strong>Ghana Media</strong><span>Read the article <b aria-hidden="true">↗</b></span></span>
         </a>
       </div>
+      <button class="sk-press-nav sk-press-next" type="button" aria-label="Next publications">›</button>
+      </div>
+      <div class="sk-press-controls"><button class="sk-press-toggle" type="button" aria-label="Pause carousel" aria-pressed="false">Pause rotation</button><span class="sk-press-position" aria-live="off"></span></div>
     </div>
   </section>
   <footer>
@@ -4829,6 +4834,7 @@ window.onload = function() {
 };
 </script>
 <script src="scholark-feature-loader.js" defer></script>
+<script src="scholark-press.js" defer></script>
 <script src="scholark-v3.js?build=5157" defer></script>
 <script src="scholark-legal.js" defer></script>
 </body>
