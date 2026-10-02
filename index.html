@@ -2747,7 +2747,6 @@ const DB = {
     const prior = snap.exists() ? snap.data() : null;
     const createdMonth = prior?.createdMonth || review.createdMonth;
     await setDoc(ref, {
-      uid: review.uid,
       displayName: review.displayName,
       rating: review.rating,
       body: review.body || '',
