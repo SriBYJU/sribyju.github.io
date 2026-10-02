@@ -47,8 +47,8 @@ test('reviews are public to read but account-gated to submit', () => {
   assert.match(html, /exact review dates are not displayed/);
 });
 
-test('review preview fixtures are sanitized and month-only', () => {
-  assert.equal(reviewFixtures.previewOnly, true);
+test('historical review dataset is sanitized and month-only', () => {
+  assert.equal(reviewFixtures.verifiedHistoricalReviews, true);
   assert.ok(Array.isArray(reviewFixtures.reviews));
   assert.ok(reviewFixtures.reviews.length > 0);
   for (const review of reviewFixtures.reviews) {
