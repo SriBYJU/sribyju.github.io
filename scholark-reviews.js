@@ -135,7 +135,7 @@
     const composer = $('review-composer');
     if (!composer) return;
     updateAccountChip();
-    const existing = reviews.find(r => r.uid && r.uid === user.uid);
+    const existing = reviews.find(r => r.source !== 'preview' && r.id === user.uid);
     selectedRating = existing ? Number(existing.rating) || 0 : 0;
     const body = $('review-body');
     if (body) body.value = existing?.body || '';
