@@ -8,6 +8,7 @@
   let selectedRating = 0;
   let initialized = false;
   let observer = null;
+  let previewFixtures = [];
 
   const $ = (id) => document.getElementById(id);
   const esc = (value) => String(value ?? '')
@@ -51,8 +52,8 @@
   }
 
   function normalizedFixtures() {
-    if (!previewMode() || !Array.isArray(window.SCHOLARK_REVIEW_FIXTURES)) return [];
-    return window.SCHOLARK_REVIEW_FIXTURES.map((r, index) => ({
+    if (!previewMode() || !Array.isArray(previewFixtures)) return [];
+    return previewFixtures.map((r, index) => ({
       id: 'fixture-' + index,
       uid: null,
       displayName: r.displayName || r.name || 'Scholark user',
@@ -61,6 +62,20 @@
       createdMonth: r.createdMonth || r.month || '',
       source: 'preview'
     }));
+  }
+
+  async function loadPreviewFixtures() {
+    if (!previewMode() || previewFixtures.length) return;
+    try {
+      const response = await fetch('scholark-review-fixtures.json?build=20261001-reviews1', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data?.previewOnly === true && Array.isArray(data.reviews)) {
+        previewFixtures = data.reviews;
+      }
+    } catch (error) {
+      console.warn('Review preview fixtures could not load:', error);
+    }
   }
 
   function reviewMonthNow() {
@@ -308,6 +323,7 @@
   }
 
   async function loadReviews() {
+    await loadPreviewFixtures();
     const grid = $('reviews-grid');
     if (grid) {
       grid.innerHTML = '<div class="reviews-load-state"><div class="review-skeleton"></div><div class="review-skeleton"></div><div class="review-skeleton"></div></div>';
