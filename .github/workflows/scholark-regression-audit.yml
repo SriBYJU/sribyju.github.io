@@ -65,6 +65,7 @@ jobs:
       - name: JavaScript and shell syntax checks
         run: |
           node --check scholark-feature-loader.js
+          node --check scholark-reviews.js
           node --check scholark-v3.js
           node --check scholark-ai-algorithms.js
           node --check scholark-ai-core.js
