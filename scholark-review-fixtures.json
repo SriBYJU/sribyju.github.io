@@ -1,0 +1,1452 @@
+{
+  "previewOnly": true,
+  "sourceNote": "Sanitized from scholark_test_reviews.csv. Emails, source IDs, exact dates, product field, and is_test field are intentionally omitted.",
+  "reviews": [
+    {
+      "displayName": "Emily Ramirez",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the flashcard decks is my favorite part. lol",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "William Ramirez",
+      "rating": 5,
+      "body": "The progress charts are so motivating. Seeing my score go up each week made me want to keep going.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Raymond James",
+      "rating": 5,
+      "body": "my guidance counselor recommended this and she was right. dropped my screen-time on other apps too lol 📚",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Pamela Flores",
+      "rating": 5,
+      "body": "great for last min cramming before AP Lit lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Ruth Cook",
+      "rating": 5,
+      "body": "clean, fast, no ads. thats all i ask. plus the sat stuff is legit 🔥",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Maria Anderson",
+      "rating": 5,
+      "body": "Used it for 5 weeks before my exam. Math section went up like 130 points. Not kidding.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Patricia Parker",
+      "rating": 5,
+      "body": "Got a 5 on APUSH after using the score tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Ryan Allen",
+      "rating": 5,
+      "body": "went from a 1370 to 1470 on the SAT in about 7 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Tyler Johnson",
+      "rating": 5,
+      "body": "didn't think a free site could help this much but here we are. 1520 on my second sat attempt!!",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Debra Martin",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the study planner alone is worth it. 🙌",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Carolyn Jackson",
+      "rating": 5,
+      "body": "ACT 21 -> 27. mostly from the essay feedback tool honestly",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Kathleen James",
+      "rating": 5,
+      "body": "went from a 1210 to 1510 on the SAT in about 8 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Daniel Reed",
+      "rating": 5,
+      "body": "this helped me get my 1070 to a 1320 on the sat",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Kenneth Wood",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the essay feedback tool alone is worth it.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Emma Nelson",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP Lit unit reviews are perfect.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Patricia Harris",
+      "rating": 5,
+      "body": "my friends and i all use it now. we quiz each other w/ teh flashcard decks lol",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Daniel Rodriguez",
+      "rating": 5,
+      "body": "Got a 5 on AP Human Geo after using the sat practice section for a month. wish i found it sooner",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Jeffrey Moore",
+      "rating": 5,
+      "body": "this helped me get my 1100 to a 1350 on the sat",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Scott Miller",
+      "rating": 5,
+      "body": "the daily quiz thing kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Emma Walker",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. APUSH unit reviews are perfect.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Justin Ramirez",
+      "rating": 5,
+      "body": "honestly the best study tool i've tried and i've tried a lot (quizlet, khan, etc). scholark just feels more focused. 🙌",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Stephanie Collins",
+      "rating": 5,
+      "body": "the daily quiz thing is rlly useful i got a 5 on AP Chem ngl",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Dennis Kelly",
+      "rating": 4,
+      "body": "Helpful! the daily quiz thing is great but the notifications can be a bit much sometimes.",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "William Collins",
+      "rating": 5,
+      "body": "went from a 1240 to 1420 on the SAT in about 8 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Daniel Hernandez",
+      "rating": 5,
+      "body": "been using this since last semester and my grades went up fr. highly recommend",
+      "createdMonth": "2026-01"
+    },
+    {
+      "displayName": "Jacob Martinez",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1590).",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Raymond Ward",
+      "rating": 5,
+      "body": "ok so i was skeptical but the essay feedback tool actually works. my teacher even asked what i was using 🙌",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Emily Chavez",
+      "rating": 5,
+      "body": "this helped me get my 1340 to a 1490 on the sat",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Pamela Kelly",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the daily quiz thing alone is worth it.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Ryan Diaz",
+      "rating": 5,
+      "body": "didn't think a free site could help this much but here we are. 1500 on my second sat attempt!!",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Lisa Miller",
+      "rating": 5,
+      "body": "been using this since sophomore year and my grades went up fr. highly recommend",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Gary Thomas",
+      "rating": 4,
+      "body": "really solid overall. would love more mobile features but it helped me a lot. ngl",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Katherine Martinez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the study planner actually works. my teacher even asked what i was using :)",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Shirley Miller",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the flashcard decks alone is worth it.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Eric Gutierrez",
+      "rating": 5,
+      "body": "didn't think a free site could help this much but here we are. 1390 on my second sat attempt!!",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Mary Miller",
+      "rating": 5,
+      "body": "i was stressing about ap micro and the score tracker made it way less scary. ended up with a 5!",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Nancy Taylor",
+      "rating": 5,
+      "body": "been using this since last semester and my grades went up fr. highly recommend 🔥",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Lisa Torres",
+      "rating": 5,
+      "body": "Used it for 5 weeks before my exam. Math section went up like 140 points. Not kidding.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Nicole Perez",
+      "rating": 4,
+      "body": "Really solid overall. Would love more essay examples but it helped me a lot.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Timothy Nguyen",
+      "rating": 5,
+      "body": "Got a 4 on AP Micro after using the vocab builder for a month. wish i found it sooner",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Mark Phillips",
+      "rating": 4,
+      "body": "4 stars bc i want a calendar sync feature. everything else is awesome tho 🔥",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Jessica Thomas",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the deadline tracker is my favorite part.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Anthony Gonzalez",
+      "rating": 4,
+      "body": "Good tool. A couple of questions had typos but support fixed it fast when I reported it.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Ronald Ortiz",
+      "rating": 4,
+      "body": "good for sat prep, got my score up 120 pts. only complaint is it lags a little on my old laptop",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Nicole Kelly",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the vocab builder alone is worth it.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Brian Gonzalez",
+      "rating": 5,
+      "body": "as a junior juggling 4 APs this keeps me sane. the deadline tracker is a lifesaver",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Jack Reyes",
+      "rating": 5,
+      "body": "didn't think a free site could help this much but here we are. 1450 on my second sat attempt!!",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "George Kim",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the practice tests alone is worth it.",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "Janet Mitchell",
+      "rating": 5,
+      "body": "the score tracker is rlly useful i got a 5 on AP CSP",
+      "createdMonth": "2026-02"
+    },
+    {
+      "displayName": "David Cooper",
+      "rating": 5,
+      "body": "Got a 5 on AP Euro after using the vocab builder for a month. wish i found it sooner",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Paul Young",
+      "rating": 5,
+      "body": "great for last min cramming before ap csp lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Paul Gonzalez",
+      "rating": 5,
+      "body": "Got a 4 on AP Stats after using the deadline tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Gregory Parker",
+      "rating": 5,
+      "body": "as a junior juggling 3 APs this keeps me sane. the daily quiz thing is a lifesaver lol",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Jonathan Robinson",
+      "rating": 5,
+      "body": "the score tracker is rlly useful i got a 5 on AP Calc AB",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Nancy Harris",
+      "rating": 5,
+      "body": "my guidance counselor recommended this and she was right. Dropped my screen-time on other apps too lol 🙌",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Debra Hughes",
+      "rating": 5,
+      "body": "Used it for 5 weeks before my exam. Math section went up like 120 points. Not kidding.",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Stephanie Hall",
+      "rating": 5,
+      "body": "Got a 5 on AP Psych after using the ap study hub for a month. wish i found it sooner 🔥",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Anna Miller",
+      "rating": 5,
+      "body": "ACT 22 -> 25. mostly from the flashcard decks honestly",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Angela Brown",
+      "rating": 5,
+      "body": "the study planner kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Sharon Edwards",
+      "rating": 4,
+      "body": "good for sat prep, got my score up 60 pts. only complaint is it lags a little on my old laptop",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Brenda Robinson",
+      "rating": 5,
+      "body": "great for last min cramming before AP Human Geo lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Tyler Young",
+      "rating": 5,
+      "body": "I was stressing about AP Euro and the deadline tracker made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "John Garcia",
+      "rating": 5,
+      "body": "act 29 -> 32. mostly from the deadline tracker honestly",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Charles Evans",
+      "rating": 5,
+      "body": "i was stressing about ap human geo and the deadline tracker made it way less scary. ended up with a 5! 📚",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Katherine Ward",
+      "rating": 4,
+      "body": "good for sat prep, got my score up 90 pts. only complaint is it lags a little on my old laptop",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "William Gonzalez",
+      "rating": 5,
+      "body": "Used it for 2 weeks before my exam. Math section went up like 80 points. Not kidding.",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Sandra Cox",
+      "rating": 5,
+      "body": "this helped me get my 1220 to a 1430 on the sat",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Kathleen Bennett",
+      "rating": 5,
+      "body": "ACT 27 -> 33. mostly from the flashcard decks honestly",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Emily Morris",
+      "rating": 4,
+      "body": "Helpful! the practice tests is great but the notifications can be a bit much sometimes.",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Tyler Roberts",
+      "rating": 5,
+      "body": "Got a 5 on AP Psych after using the sat practice section for a month. wish i found it sooner",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Michelle Perez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the score tracker actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Mary Campbell",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the practice tests is my favorite part",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Matthew Roberts",
+      "rating": 5,
+      "body": "Got a 4 on AP Stats after using the ap study hub for a month. wish i found it sooner",
+      "createdMonth": "2026-03"
+    },
+    {
+      "displayName": "Scott Bennett",
+      "rating": 5,
+      "body": "thank you scholark! got into my top choice and the sat bump definitely helped (1330).",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Larry Richardson",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on the bus every morning. Passed AP Stats with a 5 :)",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "David Campbell",
+      "rating": 5,
+      "body": "act 25 -> 28. mostly from the practice tests honestly",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Jacob Jones",
+      "rating": 5,
+      "body": "Used it for 4 weeks before my exam. Math section went up like 100 points. Not kidding.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Jerry Hughes",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on teh bus every morning. Passed AP Physics 1 with a 5.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Justin Martinez",
+      "rating": 5,
+      "body": "went from a 1280 to 1520 on the SAT in about 6 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Kathleen Robinson",
+      "rating": 4,
+      "body": "good for sat prep, got my score up 70 pts. only complaint is it lags a little on my old laptop",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Cynthia Harris",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on the bus every morning. Passed AP Chem with a 4.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Christine Gray",
+      "rating": 5,
+      "body": "idk how else to say it, it just works",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Samuel Ruiz",
+      "rating": 5,
+      "body": "I was stressing about AP CSP and the deadline tracker made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Jennifer Adams",
+      "rating": 5,
+      "body": "my daughter uses scholark every night before bed and her act practice scores keep climbing. worth every minute.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "David Davis",
+      "rating": 4,
+      "body": "Easy to use and my scores improved. Free tier is generous but I'd like more AP subjects covered.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Debra Garcia",
+      "rating": 5,
+      "body": "the score tracker is rlly useful i got a 5 on ap lit",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Alexander Harris",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the practice tests is my favorite part.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Gary Morris",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the sat practice section is my favorite part. ngl",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Sharon Robinson",
+      "rating": 4,
+      "body": "really solid overall. would love more essay examples but it helped me a lot.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Linda Cox",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just teh stuff I need to study. the score tracker is my favorite part.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Nancy Thomas",
+      "rating": 4,
+      "body": "works great, just took me a bit to figure out the planner at first. fine now lol",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "David Thompson",
+      "rating": 5,
+      "body": "Got a 5 on AP CSP after using the score tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Cynthia Turner",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just teh stuff I need to study. the score tracker is my favorite part. :)",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Sharon Collins",
+      "rating": 4,
+      "body": "4 stars bc i want a calendar sync feature. everything else is awesome tho",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "David Lewis",
+      "rating": 5,
+      "body": "ok so i was skeptical but the practice tests actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Betty Ruiz",
+      "rating": 5,
+      "body": "Got a 5 on AP Lit after using the score tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Michael Gutierrez",
+      "rating": 5,
+      "body": "great for last min cramming before AP Euro lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "David Phillips",
+      "rating": 5,
+      "body": "the daily quiz thing is rlly useful i got a 5 on AP Lang",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Edward Williams",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP Bio unit reviews are perfect.",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Nancy Clark",
+      "rating": 5,
+      "body": "I was stressing about AP Gov and the flashcard decks made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Rebecca Young",
+      "rating": 5,
+      "body": "my guidance counselor recommended this and she was right. dropped my screen-time on other apps too lol",
+      "createdMonth": "2026-04"
+    },
+    {
+      "displayName": "Amy Williams",
+      "rating": 5,
+      "body": "the practice tests kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Susan Young",
+      "rating": 5,
+      "body": "been using this since teh summer and my grades went up fr. highly recommend",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Barbara Sanchez",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the score tracker is my favorite part.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Jerry Stewart",
+      "rating": 5,
+      "body": "as a junior juggling 4 aps this keeps me sane. the ap study hub is a lifesaver lol",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Amy Bailey",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP Human Geo unit reviews are perfect. :)",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Carolyn Murphy",
+      "rating": 5,
+      "body": "this helped me get my 1220 to a 1470 on the sat",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Joseph Reed",
+      "rating": 5,
+      "body": "great for last min cramming before AP Micro lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Chris Martin",
+      "rating": 5,
+      "body": "ok so i was skeptical but the deadline tracker actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Ronald Murphy",
+      "rating": 5,
+      "body": "as a junior juggling 4 APs this keeps me sane. the daily quiz thing is a lifesaver",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Daniel Green",
+      "rating": 5,
+      "body": "Used it for 3 weeks before my exam. Math section went up like 150 points. Not kidding. 📚",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Dennis Perez",
+      "rating": 5,
+      "body": "Used it for 2 weeks before my exam. Math section went up like 150 points. Not kidding.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Stephen Smith",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the deadline tracker alone is worth it.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Anthony Martinez",
+      "rating": 5,
+      "body": "Raised my AP Stats grade from a B to an A over the semester. The study planner kept me consistent.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Stephanie Davis",
+      "rating": 5,
+      "body": "idk how else to say it, it just works 📚",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Anthony Garcia",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and teh SAT bump definitely helped (1540).",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Ryan Moore",
+      "rating": 5,
+      "body": "my friends and i all use it now. we quiz each other w/ the flashcard decks lol",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "David Kelly",
+      "rating": 5,
+      "body": "Used it for 2 weeks before my exam. Math section went up like 120 points. Not kidding.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Steven Wood",
+      "rating": 5,
+      "body": "got a 5 on ap euro after using the study planner for a month. wish i found it sooner",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Katherine Wilson",
+      "rating": 5,
+      "body": "act 23 -> 26. mostly from the daily quiz thing honestly",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Nicholas Gutierrez",
+      "rating": 4,
+      "body": "Helpful! the essay feedback tool is great but the notifications can be a bit much sometimes.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Jerry Brooks",
+      "rating": 5,
+      "body": "My daughter uses Scholark every night before bed and her PSAT practice scores keep climbing. Worth every minute.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Ruth Watson",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on the bus every morning. Passed AP Human Geo with a 5. lol",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Robert Bailey",
+      "rating": 5,
+      "body": "the flashcard decks is rlly useful i got a 5 on AP Physics 1",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "David Wright",
+      "rating": 5,
+      "body": "love how clean everything is. no clutter, just teh stuff i need to study. the daily quiz thing is my favorite part.",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Paul Lopez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the study planner actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-05"
+    },
+    {
+      "displayName": "Ruth Green",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the vocab builder is my favorite part",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Dennis Martinez",
+      "rating": 5,
+      "body": "the practice tests is rlly useful i got a 5 on AP Chem",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Brandon Morris",
+      "rating": 5,
+      "body": "ok so i was skeptical but the vocab builder actually works. my teacher even asked what i was using 🔥",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Amy Moore",
+      "rating": 5,
+      "body": "ACT 26 -> 29. mostly from the study planner honestly",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Ruth Williams",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on the bus every morning. Passed AP Lang with a 4. lol",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Daniel Rodriguez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the ap study hub actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Tyler Thompson",
+      "rating": 5,
+      "body": "teh explanations after each practice question are actually good, not just 'the answer is C'",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Elizabeth Morales",
+      "rating": 5,
+      "body": "Raised my AP Lit grade from a B to an A over the semester. The study planner kept me consistent.",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Matthew Miller",
+      "rating": 5,
+      "body": "10/10 would recommend to anyone prepping for the ACT",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Scott Ruiz",
+      "rating": 5,
+      "body": "went from a 1360 to 1580 on the SAT in about 14 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Melissa Brown",
+      "rating": 5,
+      "body": "went from a 1160 to 1300 on the SAT in about 6 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Margaret Jackson",
+      "rating": 5,
+      "body": "i was stressing about apush and the score tracker made it way less scary. ended up with a 5! ngl",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Maria Cox",
+      "rating": 5,
+      "body": "this helped me get my 1230 to a 1450 on the sat",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Jason Ortiz",
+      "rating": 5,
+      "body": "Raised my AP Euro grade from a B to an A over the semester. The study planner kept me consistent.",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Debra Ramirez",
+      "rating": 5,
+      "body": "been using this since august and my grades went up fr. highly recommend 🔥",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Sharon Taylor",
+      "rating": 5,
+      "body": "Raised my AP Psych grade from a B to an A over the semester. The study planner kept me consistent",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Brian Wright",
+      "rating": 5,
+      "body": "I was stressing about AP Stats and the sat practice section made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Kimberly Rivera",
+      "rating": 5,
+      "body": "as a junior juggling 4 APs this keeps me sane. the sat practice section is a lifesaver",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Jennifer Walker",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1250).",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Elizabeth Ruiz",
+      "rating": 5,
+      "body": "Raised my AP Human Geo grade from a B to an A over the semester. The study planner kept me consistent.",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Laura Reed",
+      "rating": 5,
+      "body": "went from a 1190 to 1390 on the SAT in about 14 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Karen Morales",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1350).",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Emily Phillips",
+      "rating": 5,
+      "body": "I was stressing about AP Euro and teh score tracker made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-06"
+    },
+    {
+      "displayName": "Ryan Phillips",
+      "rating": 5,
+      "body": "Got a 4 on AP Physics 1 after using the flashcard decks for a month. wish i found it sooner",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Margaret Rivera",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1230).",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Christine Lee",
+      "rating": 5,
+      "body": "great for last min cramming before ap euro lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Richard Ramirez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the vocab builder actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Emma Mendoza",
+      "rating": 5,
+      "body": "the essay feedback tool is rlly useful i got a 5 on ap physics 1 🙌",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Kevin Wilson",
+      "rating": 5,
+      "body": "the deadline tracker kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Sharon Ramirez",
+      "rating": 5,
+      "body": "Honestly the best study tool I've tried and I've tried a lot (Quizlet, Khan, etc). Scholark just feels more focused.",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Mary Taylor",
+      "rating": 5,
+      "body": "10/10 would recommend to anyone prepping for the SAT",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Ryan Hill",
+      "rating": 5,
+      "body": "went from a 1100 to 1390 on the SAT in about 7 weeks using Scholark. the practice tests are close to the real thing lol",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Rachel Adams",
+      "rating": 5,
+      "body": "as a junior juggling 3 APs this keeps me sane. the study planner is a lifesaver",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Betty Kim",
+      "rating": 5,
+      "body": "my guidance counselor recommended this and she was right. Dropped my screen-time on other apps too lol :)",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Debra Campbell",
+      "rating": 5,
+      "body": "My daughter uses Scholark every night before bed and her SAT practice scores keep climbing. Worth every minute.",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Kimberly Stewart",
+      "rating": 5,
+      "body": "been using this since sophomore year and my grades went up fr. highly recommend 🙌",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Mary Gray",
+      "rating": 5,
+      "body": "The progress charts are so motivating. Seeing my score go up each week made me want to keep going. 🙌",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Nicholas Ramos",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1290).",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Jerry White",
+      "rating": 5,
+      "body": "Honestly the best study tool I've tried and I've tried a lot (Quizlet, Khan, etc). Scholark just feels more focused",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Samuel Martinez",
+      "rating": 5,
+      "body": "ok so i was skeptical but the daily quiz thing actually works. my teacher even asked what i was using",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Laura Wright",
+      "rating": 5,
+      "body": "the vocab builder kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Karen Reed",
+      "rating": 5,
+      "body": "Super easy to use on my phone, did flashcards on the bus every morning. Passed APUSH with a 5",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Angela Cook",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP Micro unit reviews are perfect.",
+      "createdMonth": "2026-07"
+    },
+    {
+      "displayName": "Larry Lopez",
+      "rating": 5,
+      "body": "Got a 5 on AP Human Geo after using the deadline tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Jeffrey Cruz",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. teh sat practice section alone is worth it.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Matthew Wright",
+      "rating": 5,
+      "body": "went from a 1300 to 1490 on the SAT in about 10 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Benjamin Gomez",
+      "rating": 5,
+      "body": "my friends and i all use it now. we quiz each other w/ the practice sets lol",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Larry Collins",
+      "rating": 4,
+      "body": "pretty good, wish there were more AP Physics 1 practice sets. otherwise love it",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Raymond Mendoza",
+      "rating": 5,
+      "body": "the ap study hub is rlly useful i got a 5 on AP Lang ngl",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Mark Hernandez",
+      "rating": 5,
+      "body": "this helped me get my 1280 to a 1550 on the sat",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Carolyn Martin",
+      "rating": 4,
+      "body": "Really solid overall. Would love more practice questions for AP Lit but it helped me a lot.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Sharon Martinez",
+      "rating": 5,
+      "body": "Got a 5 on AP Euro after using the deadline tracker for a month. wish i found it sooner",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Melissa Gomez",
+      "rating": 5,
+      "body": "clean, fast, no ads. thats all i ask. plus the sat stuff is legit",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Helen Walker",
+      "rating": 5,
+      "body": "I was stressing about AP Bio and the flashcard decks made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Michelle Hall",
+      "rating": 5,
+      "body": "ACT 22 -> 27. mostly from the essay feedback tool honestly",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Linda Carter",
+      "rating": 4,
+      "body": "Really solid overall. Would love more dark mode but it helped me a lot",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Patricia Cooper",
+      "rating": 5,
+      "body": "my friends and i all use it now. we quiz each other w/ the daily quizzes lol",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Sharon King",
+      "rating": 5,
+      "body": "My daughter uses Scholark every night before bed and her ACT practice scores keep climbing. Worth every minute.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Mary Wilson",
+      "rating": 5,
+      "body": "been using this since january and my grades went up fr. highly recommend",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Carol Cox",
+      "rating": 4,
+      "body": "works great, just took me a bit to figure out the planner at first. fine now",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Sharon Nelson",
+      "rating": 5,
+      "body": "great for last min cramming before AP Chem lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Michael Mendoza",
+      "rating": 5,
+      "body": "10/10 would recommend to anyone prepping for the sat",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Amy Nelson",
+      "rating": 5,
+      "body": "this helped me get my 1170 to a 1430 on the sat",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Daniel Rivera",
+      "rating": 5,
+      "body": "Got a 5 on AP Psych after using the daily quiz thing for a month. wish i found it sooner",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Linda Lee",
+      "rating": 5,
+      "body": "great for last min cramming before AP Chem lol. got a 4 and was expecting a 3 🔥",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Jack Jones",
+      "rating": 5,
+      "body": "the progress charts are so motivating. seeing my score go up each week made me want to keep going.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Richard Nguyen",
+      "rating": 5,
+      "body": "Used it for 2 weeks before my exam. Math section went up like 110 points. Not kidding.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Scott Williams",
+      "rating": 5,
+      "body": "My daughter uses Scholark every night before bed and her SAT practice scores keep climbing. Worth every minute",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Kimberly Jackson",
+      "rating": 5,
+      "body": "as a junior juggling 5 aps this keeps me sane. the deadline tracker is a lifesaver",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Richard Bailey",
+      "rating": 5,
+      "body": "10/10 would recommend to anyone prepping for the AP exams",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Steven Bailey",
+      "rating": 5,
+      "body": "as a junior juggling 4 aps this keeps me sane. the score tracker is a lifesaver",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Alexander Taylor",
+      "rating": 5,
+      "body": "love how clean everything is. no clutter, just the stuff i need to study. the practice tests is my favorite part.",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Thomas Diaz",
+      "rating": 5,
+      "body": "as a junior juggling 5 APs this keeps me sane. teh flashcard decks is a lifesaver",
+      "createdMonth": "2026-08"
+    },
+    {
+      "displayName": "Michelle Nguyen",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and teh SAT bump definitely helped (1470).",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Jack Miller",
+      "rating": 5,
+      "body": "Got a 5 on AP CSP after using the daily quiz thing for a month. wish i found it sooner",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Sarah Davis",
+      "rating": 5,
+      "body": "this helped me get my 1020 to a 1130 on the sat",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Richard Hughes",
+      "rating": 5,
+      "body": "my guidance counselor recommended this and she was right. Dropped my screen-time on other apps too lol",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Tyler Williams",
+      "rating": 5,
+      "body": "the essay feedback tool kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Thomas Campbell",
+      "rating": 5,
+      "body": "been using this since august and my grades went up fr. highly recommend",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Tyler Cook",
+      "rating": 5,
+      "body": "great for last min cramming before AP Calc AB lol. got a 4 and was expecting a 3",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Elizabeth Turner",
+      "rating": 5,
+      "body": "as a junior juggling 3 APs this keeps me sane. the practice tests is a lifesaver",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Brian Ward",
+      "rating": 5,
+      "body": "the score tracker kept me on track when i was procrastinating like crazy. thank u whoever built this 🔥",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Robert Mendoza",
+      "rating": 4,
+      "body": "Helpful! the study planner is great but the notifications can be a bit much sometimes.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Scott Morris",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the essay feedback tool is my favorite part.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "John Lewis",
+      "rating": 5,
+      "body": "idk how else to say it, it just works ngl",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Sandra Lee",
+      "rating": 5,
+      "body": "Used it for 2 weeks before my exam. Math section went up like 140 points. Not kidding.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Brian Anderson",
+      "rating": 5,
+      "body": "Got a 5 on AP Chem after using the flashcard decks for a month. wish i found it sooner",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Michael Collins",
+      "rating": 5,
+      "body": "Raised my AP Bio grade from a B to an A over the semester. The study planner kept me consistent. lol",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Jeffrey Rodriguez",
+      "rating": 5,
+      "body": "didn't think a free site could help this much but here we are. 1480 on my second sat attempt!!",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Sandra Morgan",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1510). ngl",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Amanda Johnson",
+      "rating": 5,
+      "body": "Used it for 4 weeks before my exam. Math section went up like 70 points. Not kidding.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Cynthia Ortiz",
+      "rating": 5,
+      "body": "this helped me get my 1330 to a 1510 on teh sat",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Karen Nelson",
+      "rating": 5,
+      "body": "the explanations after each practice question are actually good, not just 'the answer is C'",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Amanda Stewart",
+      "rating": 5,
+      "body": "went from a 1170 to 1410 on the sat in about 11 weeks using scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Jessica Evans",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1490).",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Margaret Cox",
+      "rating": 4,
+      "body": "Helpful! the deadline tracker is great but the notifications can be a bit much sometimes",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Anthony Lopez",
+      "rating": 5,
+      "body": "Thank you Scholark! Got into my top choice and the SAT bump definitely helped (1440).",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Jack Turner",
+      "rating": 5,
+      "body": "realy appreciate that it breaks big topics into small bites. AP Gov unit reviews are perfect.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Carolyn Rivera",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the sat practice section alone is worth it.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Linda Miller",
+      "rating": 5,
+      "body": "Love how clean everything is. no clutter, just the stuff I need to study. the study planner is my favorite part.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Tyler Gonzalez",
+      "rating": 4,
+      "body": "Helpful! the daily quiz thing is great but the notifications can be a bit much sometimes",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Pamela Thompson",
+      "rating": 5,
+      "body": "I was stressing about AP Calc AB and the daily quiz thing made it way less scary. Ended up with a 5!",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Donna Phillips",
+      "rating": 5,
+      "body": "went from a 1040 to 1150 on the SAT in about 13 weeks using Scholark. the practice tests are close to the real thing",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Gary Chavez",
+      "rating": 5,
+      "body": "Found it through a friend and now I'm telling everyone. the study planner alone is worth it.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Rebecca Torres",
+      "rating": 5,
+      "body": "the explanations after each practice question are actually good, not just 'the answer is c'",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Susan Cruz",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP CSP unit reviews are perfect.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Patricia Harris",
+      "rating": 4,
+      "body": "4 stars bc i want a calendar sync feature. everything else is awesome tho lol",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Amanda Ortiz",
+      "rating": 5,
+      "body": "ACT 29 -> 34. mostly from the deadline tracker honestly :)",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Robert Mitchell",
+      "rating": 4,
+      "body": "easy to use and my scores improved. free tier is generous but i'd like more ap subjects covered.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Kevin Williams",
+      "rating": 5,
+      "body": "went from a 1060 to 1240 on the SAT in about 12 weeks using Scholark. the practice tests are close to the real thing 🙌",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Emma Nelson",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. apes unit reviews are perfect.",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Edward Reed",
+      "rating": 5,
+      "body": "as a junior juggling 6 APs this keeps me sane. the deadline tracker is a lifesaver",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Barbara Collins",
+      "rating": 5,
+      "body": "the sat practice section kept me on track when i was procrastinating like crazy. thank u whoever built this",
+      "createdMonth": "2026-09"
+    },
+    {
+      "displayName": "Stephanie Brooks",
+      "rating": 5,
+      "body": "ok so i was skeptical but teh daily quiz thing actually works. my teacher even asked what i was using 🙌",
+      "createdMonth": "2026-10"
+    },
+    {
+      "displayName": "Joseph Jackson",
+      "rating": 5,
+      "body": "really appreciate that it breaks big topics into small bites. AP Calc AB unit reviews are perfect.",
+      "createdMonth": "2026-10"
+    }
+  ]
+}
