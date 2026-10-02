@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 const html = readFileSync(resolve('..', 'index.html'), 'utf8');
 const prepApp = readFileSync(resolve('..', 'prep-v2-app.js'), 'utf8');
 const reviewFixtures = JSON.parse(readFileSync(resolve('..', 'scholark-review-fixtures.json'), 'utf8'));
+const reviewApp = readFileSync(resolve('..', 'scholark-reviews.js'), 'utf8');
 
 test('all inline scripts parse after the prep-engine replacement', () => {
   const scripts = [...html.matchAll(/<script((?![^>]*\bsrc=)[^>]*)>([\s\S]*?)<\/script>/gi)]
@@ -41,7 +42,7 @@ test('prep state recovery does not hide empty catch blocks', () => {
 test('reviews are public to read but account-gated to submit', () => {
   assert.match(html, /id="page-reviews"/);
   assert.match(html, /data-open-review-composer/);
-  assert.match(html, /Sign in to leave a Scholark review/);
+  assert.match(reviewApp, /Sign in to leave a Scholark review/);
   assert.doesNotMatch(html, /id="review-name"/);
   assert.match(html, /exact review dates are not displayed/);
 });
