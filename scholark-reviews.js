@@ -2,13 +2,12 @@
   'use strict';
 
   const ADMIN_EMAIL = 'admin@gradescope.app';
-  const PREVIEW_PARAM = 'reviewPreview';
   let reviews = [];
   let activeFilter = 'all';
   let selectedRating = 0;
   let initialized = false;
   let observer = null;
-  let previewFixtures = [];
+  let importedReviews = [];
 
   const $ = (id) => document.getElementById(id);
   const esc = (value) => String(value ?? '')
@@ -46,35 +45,29 @@
       Array.from({length:5}, (_,i) => i < n ? '★' : '☆').join('') + '</span>';
   }
 
-  function previewMode() {
-    try { return new URLSearchParams(location.search).get(PREVIEW_PARAM) === '1'; }
-    catch { return false; }
-  }
-
-  function normalizedFixtures() {
-    if (!previewMode() || !Array.isArray(previewFixtures)) return [];
-    return previewFixtures.map((r, index) => ({
-      id: 'fixture-' + index,
-      uid: null,
+  function normalizedImportedReviews() {
+    if (!Array.isArray(importedReviews)) return [];
+    return importedReviews.map((r, index) => ({
+      id: 'imported-' + index,
       displayName: r.displayName || r.name || 'Scholark user',
       rating: Number(r.rating) || 5,
       body: r.body || r.review || '',
       createdMonth: r.createdMonth || r.month || '',
-      source: 'preview'
+      source: 'imported'
     }));
   }
 
-  async function loadPreviewFixtures() {
-    if (!previewMode() || previewFixtures.length) return;
+  async function loadImportedReviews() {
+    if (importedReviews.length) return;
     try {
-      const response = await fetch('scholark-review-fixtures.json?build=20261001-reviews1', { cache: 'no-store' });
+      const response = await fetch('scholark-review-fixtures.json?build=20261001-reviews2', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
-      if (data?.previewOnly === true && Array.isArray(data.reviews)) {
-        previewFixtures = data.reviews;
+      if (data?.verifiedHistoricalReviews === true && Array.isArray(data.reviews)) {
+        importedReviews = data.reviews;
       }
     } catch (error) {
-      console.warn('Review preview fixtures could not load:', error);
+      console.warn('Historical reviews could not load:', error);
     }
   }
 
@@ -135,7 +128,7 @@
     const composer = $('review-composer');
     if (!composer) return;
     updateAccountChip();
-    const existing = reviews.find(r => r.source !== 'preview' && r.id === user.uid);
+    const existing = reviews.find(r => r.source !== 'imported' && r.id === user.uid);
     selectedRating = existing ? Number(existing.rating) || 0 : 0;
     const body = $('review-body');
     if (body) body.value = existing?.body || '';
@@ -205,8 +198,8 @@
   async function removeReview(reviewId) {
     if (!isAdmin()) return;
     const target = reviews.find(r => r.id === reviewId);
-    if (!target || target.source === 'preview') {
-      if (typeof window.showToast === 'function') window.showToast('Preview reviews are fixture data, not live Firestore reviews.', 'error');
+    if (!target || target.source === 'imported') {
+      if (typeof window.showToast === 'function') window.showToast('Imported historical reviews are managed from the site dataset, not Firestore.', 'error');
       return;
     }
     if (!confirm('Remove this review from Scholark?')) return;
@@ -251,7 +244,7 @@
     if (toolbar) toolbar.textContent = count ? count + (count === 1 ? ' review' : ' reviews') : 'No reviews yet';
 
     const previewBadge = $('reviews-preview-badge');
-    if (previewBadge) previewBadge.style.display = previewMode() && normalizedFixtures().length ? 'inline-flex' : 'none';
+    if (previewBadge) previewBadge.style.display = normalizedImportedReviews().length ? 'inline-flex' : 'none';
   }
 
   function renderFilters() {
@@ -264,7 +257,7 @@
     const body = String(review.body || '').trim();
     const month = monthKeyToLabel(review.createdMonth);
     const name = String(review.displayName || 'Scholark user').trim();
-    const adminControl = isAdmin() && review.source !== 'preview'
+    const adminControl = isAdmin() && review.source !== 'imported'
       ? '<button class="review-card-admin-remove" type="button" data-remove-review="' + esc(review.id) + '">Remove</button>'
       : '';
 
@@ -323,7 +316,7 @@
   }
 
   async function loadReviews() {
-    await loadPreviewFixtures();
+    await loadImportedReviews();
     const grid = $('reviews-grid');
     if (grid) {
       grid.innerHTML = '<div class="reviews-load-state"><div class="review-skeleton"></div><div class="review-skeleton"></div><div class="review-skeleton"></div></div>';
@@ -335,8 +328,8 @@
       catch (error) { console.error('Review load failed:', error); }
     }
 
-    const fixtures = normalizedFixtures();
-    reviews = [...live, ...fixtures].sort((a,b) => {
+    const historical = normalizedImportedReviews();
+    reviews = [...live, ...historical].sort((a,b) => {
       const monthSort = String(b.createdMonth || '').localeCompare(String(a.createdMonth || ''));
       if (monthSort) return monthSort;
       return String(b.id || '').localeCompare(String(a.id || ''));
