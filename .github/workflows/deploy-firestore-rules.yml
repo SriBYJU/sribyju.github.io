@@ -6,6 +6,7 @@ on:
     paths:
       - 'firestore.rules'
       - 'firebase.json'
+      - 'scripts/deploy-firestore-rules-direct.mjs'
       - '.github/workflows/deploy-firestore-rules.yml'
   workflow_dispatch:
 
@@ -25,21 +26,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: Install Firebase CLI
-        run: npm install --global firebase-tools
-
-      - name: Configure Firebase service account
-        shell: bash
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          test -n "$FIREBASE_SERVICE_ACCOUNT"
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
-          chmod 600 "$RUNNER_TEMP/firebase-service-account.json"
+      - name: Validate direct deploy script
+        run: node --check scripts/deploy-firestore-rules-direct.mjs
 
       - name: Deploy Firestore security rules
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
-        run: firebase deploy --only firestore:rules --project gradescope-539dd --non-interactive
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: gradescope-539dd
+        run: node scripts/deploy-firestore-rules-direct.mjs
