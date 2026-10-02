@@ -2729,6 +2729,36 @@ const DB = {
       items,
       updatedAt: serverTimestamp()
     }, { merge: true });
+  },
+
+  // ── Public reviews ─────────────────────────────────────────
+  // Public review docs contain no email address and store only YYYY-MM
+  // month keys, so the UI never needs an exact review date.
+  getReviews: async () => {
+    const q = query(collection(db, 'reviews'), orderBy('createdMonth', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  saveReview: async (review) => {
+    if (!auth.currentUser || auth.currentUser.uid !== review.uid) throw new Error('auth-required');
+    const ref = doc(db, 'reviews', review.uid);
+    const snap = await getDoc(ref);
+    const prior = snap.exists() ? snap.data() : null;
+    const createdMonth = prior?.createdMonth || review.createdMonth;
+    await setDoc(ref, {
+      uid: review.uid,
+      displayName: review.displayName,
+      rating: review.rating,
+      body: review.body || '',
+      createdMonth,
+      updatedMonth: review.createdMonth
+    });
+    return review.uid;
+  },
+
+  deleteReview: async (reviewId) => {
+    await deleteDoc(doc(db, 'reviews', reviewId));
   }
 };
 
@@ -2750,6 +2780,10 @@ onAuthStateChanged(auth, async (user) => {
   window._dbDeleteEssay = (uid, id) => DB.deleteEssay(uid, id);
   window._dbGetSyncState = (uid, key) => DB.getSyncState(uid, key);
   window._dbSaveSyncState = (uid, key, items) => DB.saveSyncState(uid, key, items);
+  window._dbGetReviews = () => DB.getReviews();
+  window._dbSaveReview = (review) => DB.saveReview(review);
+  window._dbDeleteReview = (reviewId) => DB.deleteReview(reviewId);
+  window.ScholarkReviews?.authChanged?.();
 
   // Update UI immediately so nav/dashboard/profile respond without
   // waiting on Firestore (which may be slow or offline).
@@ -4947,6 +4981,7 @@ window.onload = function() {
   initDarkMode();
   initEmailCapture();
   initAdReservations();
+  window.ScholarkReviews?.init?.();
   // Show sign-in button if not logged in
   if(!window.currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
