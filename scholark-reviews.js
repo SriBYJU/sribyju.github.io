@@ -60,7 +60,7 @@
   async function loadImportedReviews() {
     if (importedReviews.length) return;
     try {
-      const response = await fetch('scholark-review-fixtures.json?build=20261001-reviews2', { cache: 'no-store' });
+      const response = await fetch('scholark-review-fixtures.json?build=20261001-reviews3', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
       if (data?.verifiedHistoricalReviews === true && Array.isArray(data.reviews)) {
