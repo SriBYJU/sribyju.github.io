@@ -27,9 +27,8 @@ service cloud.firestore {
       }
       function validReviewShape() {
         return request.resource.data.keys().hasOnly([
-            'uid', 'displayName', 'rating', 'body', 'createdMonth', 'updatedMonth'
+            'displayName', 'rating', 'body', 'createdMonth', 'updatedMonth'
           ])
-          && request.resource.data.uid == request.auth.uid
           && request.resource.data.displayName is string
           && request.resource.data.displayName.size() >= 1
           && request.resource.data.displayName.size() <= 80
@@ -51,7 +50,6 @@ service cloud.firestore {
         && request.resource.data.createdMonth == request.resource.data.updatedMonth;
       allow update: if signedIn()
         && reviewId == request.auth.uid
-        && resource.data.uid == request.auth.uid
         && validReviewShape()
         && request.resource.data.createdMonth == resource.data.createdMonth;
       allow delete: if (signedIn() && reviewId == request.auth.uid) || isAdmin();
