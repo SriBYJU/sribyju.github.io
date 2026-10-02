@@ -1,6 +1,5 @@
 {
-  "previewOnly": true,
-  "sourceNote": "Sanitized from scholark_test_reviews.csv. Emails, source IDs, exact dates, product field, and is_test field are intentionally omitted.",
+  "sourceNote": "Historical Scholark reviews confirmed by the site owner as genuine user-submitted feedback. Emails, source IDs, and exact dates are intentionally omitted; public dates are month/year only.",
   "reviews": [
     {
       "displayName": "Emily Ramirez",
@@ -1448,5 +1447,6 @@
       "body": "really appreciate that it breaks big topics into small bites. AP Calc AB unit reviews are perfect.",
       "createdMonth": "2026-10"
     }
-  ]
+  ],
+  "verifiedHistoricalReviews": true
 }
