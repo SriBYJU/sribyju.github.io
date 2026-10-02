@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scholark | 10,000+ Users | Free College Planning, GPA, SAT & AP Study Tools | Shriyan Avadhanula</title>
-<meta name="description" content="Scholark is a free college planning toolkit with GPA calculators, admissions research, essay tools, SAT/ACT prep, AP study tools, college comparison, and more.">
+<meta name="description" content="Scholark is an independent, non-commercial educational project offering free college planning tools for GPA, admissions research, essays, SAT/ACT prep, AP study, college comparison, and more.">
 <!-- SCHOLARK_LEGAL_HEAD -->
 <link rel="canonical" href="https://sribyju.github.io/">
 <meta name="author" content="Shriyan Avadhanula">
@@ -38,6 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="scholark-press.css?build=20260917-press1">
+<link rel="stylesheet" href="scholark-reviews.css?build=20261001-reviews1">
 <style>
 :root{
   --bg:#faf9f6;--bg2:#f3f1ec;--bg3:#ebe8e0;
@@ -992,6 +993,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <button class="nav-link" id="nav-compare" onclick="showPage('compare')">Compare</button>
     <button class="nav-link" id="nav-features" onclick="showPage('features')">Features</button>
     <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
+    <button class="nav-link" id="nav-reviews" onclick="showPage('reviews');window.ScholarkReviews?.init()">Reviews</button>
     <button class="nav-link" id="nav-dashboard" onclick="goDashboard()" style="display:none">Dashboard</button>
     <div class="profile-dropdown" id="profile-dropdown" style="display:none">
       <button class="nav-user-btn" onclick="toggleProfileMenu()" id="nav-user-name">Account ▾</button>
@@ -1004,6 +1006,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <button class="profile-menu-item" onclick="showPage('scholarships');toggleProfileMenu()">💰 Scholarships</button>
         <button class="profile-menu-item" onclick="showPage('quiz');toggleProfileMenu()">🧩 College Quiz</button>
         <button class="profile-menu-item" onclick="showPage('community');toggleProfileMenu()">💬 Community</button>
+        <button class="profile-menu-item" onclick="showPage('reviews');window.ScholarkReviews?.init();toggleProfileMenu()">⭐ Reviews</button>
         <button class="profile-menu-item" onclick="showPage('counselor');initCounselor();toggleProfileMenu()">🧭 Admissions Guide</button>
         <button class="profile-menu-item" onclick="if(showPage('prep')) ScholarkPrep.init();toggleProfileMenu()">📝 SAT/ACT Prep</button>
         <button class="profile-menu-item" onclick="showPage('ap');initAPHub();toggleProfileMenu()">📚 AP Study</button>
@@ -1058,6 +1061,23 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <div class="trust-item">✓ <strong>Essay rubric</strong> feedback stays on-device</div>
     <div class="trust-item">✓ <strong>Complete toolkit</strong> for every account</div>
   </div>
+  <section class="reviews-home-strip" aria-labelledby="reviews-home-title">
+    <div class="reviews-home-card">
+      <div>
+        <div class="reviews-home-eyebrow">★ Student feedback</div>
+        <h2 id="reviews-home-title">Built for students. Shaped by their feedback.</h2>
+        <p>See what Scholark users are saying, or share your own experience in a few seconds.</p>
+      </div>
+      <div class="reviews-home-actions">
+        <div class="reviews-home-score">
+          <div data-review-stars></div>
+          <strong data-review-average>—</strong>
+          <span><span data-review-count>0</span> reviews</span>
+        </div>
+        <button class="btn-secondary" type="button" onclick="showPage('reviews');window.ScholarkReviews?.init()">Read reviews →</button>
+      </div>
+    </div>
+  </section>
   <section class="sk-press-feature" aria-labelledby="sk-press-title">
     <div class="sk-press-shell">
       <header class="sk-press-heading">
@@ -1087,7 +1107,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       <div class="footer-brand"><div class="logo"><img src="scholark-mark.svg" alt=""><span>Scholar<span class="brand-k">k</span></span></div><p>Free college planning tools for high school and college students. Calculate your GPA, estimate admission chances, and plan your financial future.</p></div>
       <div class="footer-col"><h4>Calculators</h4><a onclick="showTool('gpa')">GPA Calculator</a><a onclick="showTool('weighted')">Weighted GPA</a><a onclick="showTool('needed')">Grade Needed</a><a onclick="showTool('chances')">College Chances</a><a onclick="showTool('loan')">Student Loans</a><a onclick="showTool('sat')">SAT/ACT Converter</a></div>
       <div class="footer-col"><h4>Features</h4><a onclick="showPage('goals')">GPA Goals</a><a onclick="showPage('apps')">App Tracker</a><a onclick="if(showPage('prep')) ScholarkPrep.init()">SAT Prep</a><a onclick="showPage('compare')">Compare</a><a onclick="showPage('counselor');initCounselor()">Admissions Guide</a></div>
-      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay Coach</a></div>
+      <div class="footer-col"><h4>Site</h4><a onclick="showPage('home')">Home</a><a onclick="showPage('features')">Features</a><a onclick="showPage('reviews');window.ScholarkReviews?.init()">Reviews</a><a onclick="showPage('about')">About</a><a onclick="goToEssay()">Essay Coach</a></div>
       <div class="footer-col"><h4>Important</h4><p>Calculators and admissions guidance provide estimates for educational use.</p></div>
     </div>
     <div class="footer-bottom"><span>© 2026 Scholark · Independent student-built non-commercial educational project · Not a company or employer. Results are estimates only.</span></div>
@@ -1588,6 +1608,103 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       </div>
     </div>
   </div>
+</div>
+
+<!-- REVIEWS PAGE -->
+<div class="page" id="page-reviews">
+  <main class="reviews-page-shell">
+    <section class="reviews-hero" aria-labelledby="reviews-title">
+      <div class="reviews-hero-copy">
+        <div class="reviews-eyebrow">★ Scholark reviews <span class="review-preview-badge" id="reviews-preview-badge" style="display:none">Preview data</span></div>
+        <h1 id="reviews-title">What students are <em>saying.</em></h1>
+        <p>Real feedback helps Scholark keep getting better. Ratings are tied to signed-in Scholark accounts, and names come directly from each account profile.</p>
+        <div class="reviews-hero-actions">
+          <button class="btn-primary" type="button" data-open-review-composer>Leave a review →</button>
+          <button class="btn-secondary" type="button" onclick="showPage('home')">Back to Scholark</button>
+        </div>
+      </div>
+      <aside class="reviews-summary" aria-label="Review rating summary">
+        <div class="reviews-average">
+          <strong data-review-average>—</strong>
+          <div data-review-stars></div>
+          <span><span data-review-count>0</span> reviews</span>
+        </div>
+        <div class="reviews-breakdown">
+          <div class="reviews-breakdown-row"><span>5★</span><div class="reviews-breakdown-track"><div class="reviews-breakdown-fill" id="review-breakdown-5" style="width:0"></div></div><span id="review-breakdown-count-5">0</span></div>
+          <div class="reviews-breakdown-row"><span>4★</span><div class="reviews-breakdown-track"><div class="reviews-breakdown-fill" id="review-breakdown-4" style="width:0"></div></div><span id="review-breakdown-count-4">0</span></div>
+          <div class="reviews-breakdown-row"><span>3★</span><div class="reviews-breakdown-track"><div class="reviews-breakdown-fill" id="review-breakdown-3" style="width:0"></div></div><span id="review-breakdown-count-3">0</span></div>
+          <div class="reviews-breakdown-row"><span>2★</span><div class="reviews-breakdown-track"><div class="reviews-breakdown-fill" id="review-breakdown-2" style="width:0"></div></div><span id="review-breakdown-count-2">0</span></div>
+          <div class="reviews-breakdown-row"><span>1★</span><div class="reviews-breakdown-track"><div class="reviews-breakdown-fill" id="review-breakdown-1" style="width:0"></div></div><span id="review-breakdown-count-1">0</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="review-composer" id="review-composer" aria-hidden="true">
+      <div class="review-composer-card">
+        <div class="review-compose-intro">
+          <div class="reviews-eyebrow">Your experience</div>
+          <h2>Leave a Scholark review</h2>
+          <p>Your star rating is required. A written review is optional, but sharing a few words is especially helpful.</p>
+          <div class="review-account-chip">
+            <div class="review-account-avatar" id="review-account-avatar">S</div>
+            <div><strong id="review-account-name">Sign in required</strong><span id="review-account-meta">Your Scholark account name appears automatically</span></div>
+          </div>
+        </div>
+        <div class="review-form">
+          <div>
+            <div class="review-field-label"><label>Rating</label><span id="review-rating-label">Choose a rating</span></div>
+            <div class="review-star-picker" role="group" aria-label="Choose a rating">
+              <button class="review-star-btn" type="button" data-rating="1" aria-label="1 star" aria-pressed="false">★</button>
+              <button class="review-star-btn" type="button" data-rating="2" aria-label="2 stars" aria-pressed="false">★</button>
+              <button class="review-star-btn" type="button" data-rating="3" aria-label="3 stars" aria-pressed="false">★</button>
+              <button class="review-star-btn" type="button" data-rating="4" aria-label="4 stars" aria-pressed="false">★</button>
+              <button class="review-star-btn" type="button" data-rating="5" aria-label="5 stars" aria-pressed="false">★</button>
+            </div>
+          </div>
+          <div>
+            <div class="review-field-label"><label for="review-body">Written review</label><span>Optional · 800 characters max</span></div>
+            <textarea id="review-body" maxlength="800" placeholder="What did you like? What could be better? Share anything that might help another student."></textarea>
+          </div>
+          <div class="review-inline-message" id="review-inline-message" role="status" aria-live="polite"></div>
+          <div class="review-form-footer">
+            <div class="review-form-note">Your public review shows your account name, star rating, optional text, and month/year only. Your email is never shown.</div>
+            <div class="review-form-actions">
+              <button class="btn-secondary" id="review-close" type="button">Cancel</button>
+              <button class="btn-primary" id="review-submit" type="button">Publish review</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="reviews-toolbar">
+      <div class="reviews-toolbar-copy">
+        <strong id="reviews-toolbar-count">Loading reviews…</strong>
+        <span>Newest months first · exact review dates are not displayed</span>
+      </div>
+      <div class="reviews-filters" aria-label="Filter reviews by rating">
+        <button class="review-filter active" type="button" data-filter="all">All</button>
+        <button class="review-filter" type="button" data-filter="5">5 ★</button>
+        <button class="review-filter" type="button" data-filter="4">4 ★</button>
+        <button class="review-filter" type="button" data-filter="3">3 ★</button>
+        <button class="review-filter" type="button" data-filter="2">2 ★</button>
+        <button class="review-filter" type="button" data-filter="1">1 ★</button>
+      </div>
+    </div>
+
+    <section class="reviews-grid" id="reviews-grid" aria-live="polite">
+      <div class="reviews-load-state"><div class="review-skeleton"></div><div class="review-skeleton"></div><div class="review-skeleton"></div></div>
+    </section>
+
+    <div class="reviews-disclosure">
+      Reviews reflect individual user experiences and are not edited by Scholark for sentiment. Spam, duplicate submissions, personal information, or content that violates site rules may be removed.
+    </div>
+  </main>
+  <footer>
+    <div class="footer-bottom" style="max-width:1100px;margin:0 auto;padding:20px 0;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;font-size:12px;text-align:center">
+      <span style="color:rgba(255,255,255,.4)">© 2026 Scholark · Independent student-built educational platform</span>
+    </div>
+  </footer>
 </div>
 
 <!-- FEATURES PAGE -->
@@ -2154,7 +2271,7 @@ function initAdReservations() {
 
 function showPage(name) {
   // Login gate: require auth for all feature pages
-  const publicPages = ['home', 'features', 'about'];
+  const publicPages = ['home', 'features', 'about', 'reviews'];
   if (!publicPages.includes(name) && !window.currentUser) {
     openAuth('signup', 'Sign up to access all features');
     return false;
@@ -2173,6 +2290,7 @@ function showPage(name) {
   if (name === 'essay' && typeof updateEssayPage === 'function') updateEssayPage();
   if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
   if (name === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
+  if (name === 'reviews' && window.ScholarkReviews?.init) window.ScholarkReviews.init();
   return true;
 }
 
@@ -2611,6 +2729,35 @@ const DB = {
       items,
       updatedAt: serverTimestamp()
     }, { merge: true });
+  },
+
+  // ── Public reviews ─────────────────────────────────────────
+  // Public review docs contain no email address and store only YYYY-MM
+  // month keys, so the UI never needs an exact review date.
+  getReviews: async () => {
+    const q = query(collection(db, 'reviews'), orderBy('createdMonth', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  saveReview: async (review) => {
+    if (!auth.currentUser || auth.currentUser.uid !== review.uid) throw new Error('auth-required');
+    const ref = doc(db, 'reviews', review.uid);
+    const snap = await getDoc(ref);
+    const prior = snap.exists() ? snap.data() : null;
+    const createdMonth = prior?.createdMonth || review.createdMonth;
+    await setDoc(ref, {
+      displayName: review.displayName,
+      rating: review.rating,
+      body: review.body || '',
+      createdMonth,
+      updatedMonth: review.createdMonth
+    });
+    return review.uid;
+  },
+
+  deleteReview: async (reviewId) => {
+    await deleteDoc(doc(db, 'reviews', reviewId));
   }
 };
 
@@ -2632,6 +2779,10 @@ onAuthStateChanged(auth, async (user) => {
   window._dbDeleteEssay = (uid, id) => DB.deleteEssay(uid, id);
   window._dbGetSyncState = (uid, key) => DB.getSyncState(uid, key);
   window._dbSaveSyncState = (uid, key, items) => DB.saveSyncState(uid, key, items);
+  window._dbGetReviews = () => DB.getReviews();
+  window._dbSaveReview = (review) => DB.saveReview(review);
+  window._dbDeleteReview = (reviewId) => DB.deleteReview(reviewId);
+  window.ScholarkReviews?.authChanged?.();
 
   // Update UI immediately so nav/dashboard/profile respond without
   // waiting on Firestore (which may be slow or offline).
@@ -4829,12 +4980,14 @@ window.onload = function() {
   initDarkMode();
   initEmailCapture();
   initAdReservations();
+  window.ScholarkReviews?.init?.();
   // Show sign-in button if not logged in
   if(!window.currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
 </script>
 <script src="scholark-feature-loader.js" defer></script>
 <script src="scholark-press.js" defer></script>
+<script src="scholark-reviews.js?build=20261001-reviews1" defer></script>
 <script src="scholark-v3.js?build=5157" defer></script>
 <script src="scholark-legal.js" defer></script>
 </body>
