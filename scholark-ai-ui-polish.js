@@ -4,7 +4,7 @@
   window.__scholarkAIUIPolishInstalled = true;
 
   const VERSION = '1.0.1';
-  const WELCOME_COPY = 'Requests are routed to a specialist. Scholark starts with the strongest practical on-device model, automatically retries across local models when needed, and uses guided local tools only as a last resort.';
+  const WELCOME_COPY = 'Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model.';
   let scheduled = false;
 
   function setTextIfChanged(node, value) {
@@ -21,9 +21,7 @@
     }
 
     document.querySelectorAll('#sk-ai-transcript .sk-ai-message small').forEach(meta => {
-      if (/^guided fallback/i.test(meta.textContent || '')) {
-        setTextIfChanged(meta, 'Last-resort guided mode · no cloud AI');
-      }
+      // Keep the runtime failure detail visible so guided help is never mistaken for a model reply.
     });
   }
 

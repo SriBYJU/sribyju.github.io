@@ -21,6 +21,13 @@
   function go(page, tab) {
     if (!page) return false;
     const pageEl = q('#page-' + page);
+    if (!pageEl && ['intelligence','careers','methodology'].includes(page)) {
+      window.ScholarkV3?.ensureV4?.().then(() => go(page, tab)).catch(error => {
+        console.error('[Scholark V5.7] section load failed:', error);
+        window.showToast?.('That section could not load. Please check your connection and try again.','error');
+      });
+      return true;
+    }
     if (!pageEl || typeof window.showPage !== 'function') {
       console.warn('[Scholark V5.7] route unavailable:', page);
       return false;

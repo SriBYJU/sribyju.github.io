@@ -14,6 +14,7 @@
   let legacyEssayFeedback = null;
   let autosaveTimer = null;
   let lastEssayEvaluation = null;
+  let activeRequest = null;
 
   function ensureStyles() {
     if (q('link[href*="scholark-ai.css"]')) return;
@@ -26,7 +27,7 @@
   function capabilityLabel() {
     const cap = AI.state.capability || AI.detectDevice();
     if (cap.generative) return `Private on-device AI · ${cap.tier} mode`;
-    if (cap.wasm) return 'Compatibility mode · guided local tools';
+    if (cap.wasm) return 'Private on-device AI · CPU mode';
     return 'Guided local tools';
   }
 
@@ -63,7 +64,7 @@
         <button type="button" data-sk-action="college"><b>College</b><span>Research from data</span></button>
       </div>
       <div class="sk-ai-transcript" id="sk-ai-transcript" aria-live="polite">
-        <div class="sk-ai-welcome"><strong>What do you need help with?</strong><span>Requests are routed to a specialist. A local model is loaded only when useful; otherwise Scholark falls back to guided tools.</span></div>
+        <div class="sk-ai-welcome"><strong>What do you need help with?</strong><span>Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model.</span></div>
       </div>
       <div class="sk-ai-progress" id="sk-ai-progress" hidden><span></span><div><b>Preparing your specialist</b><small id="sk-ai-progress-text">Checking this device…</small></div></div>
       <form class="sk-ai-composer" id="sk-ai-form">
@@ -92,7 +93,13 @@
     q('.sk-ai-close', overlay).addEventListener('click', closeDialog);
     overlay.addEventListener('pointerdown', event => { if (event.target === overlay) closeDialog(); });
     q('#sk-ai-form', overlay).addEventListener('submit', event => { event.preventDefault(); submitAsk(); });
-    q('.sk-ai-stop', overlay).addEventListener('click', () => AI.cancelGeneration());
+    q('.sk-ai-stop', overlay).addEventListener('click', () => {
+      if (!activeRequest) return;
+      activeRequest.cancelled = true;
+      AI.cancelGeneration();
+      setBusy(false);
+      addMessage('assistant', 'Stopped. You can ask again whenever you’re ready.', 'Local AI');
+    });
     q('.sk-ai-new', overlay).addEventListener('click', () => {
       AI.sessions.clearAll();
       q('#sk-ai-transcript', overlay).innerHTML = '<div class="sk-ai-welcome"><strong>Fresh conversation</strong><span>Previous local AI conversation context was cleared.</span></div>';
@@ -155,24 +162,41 @@
   }
 
   async function submitAsk() {
+    if (activeRequest && !activeRequest.cancelled) return;
     const input = q('#sk-ai-input');
     const text = input?.value.trim();
     if (!text) return;
     input.value = '';
     addMessage('user', text);
     setBusy(true, 'Routing to the right specialist…');
+    const request = { cancelled: false };
+    activeRequest = request;
+    const stopProgress = AI.on('model-progress', event => {
+      if (request.cancelled) return;
+      const percentage = Number.isFinite(event.progress) ? ` ${Math.round(event.progress * 100)}%` : '';
+      setBusy(true, `${event.text || 'Preparing local AI…'}${percentage}`);
+    });
     try {
       const context = collectLightContext(text);
       const result = await Agents.ask(text, context);
+      if (request.cancelled) return;
       const answer = result.answer || result.value?.text || result.evaluation?.verdict || summarizeStructuredResult(result);
-      const mode = result.mode === 'local-generative' ? `On-device ${result.route?.agent || 'AI'} · ${result.tier || 'local'}` : 'Guided fallback · no cloud AI';
+      const mode = result.mode === 'local-generative'
+        ? `On-device ${result.route?.agent || 'AI'} · ${result.tier || 'local'} model`
+        : result.mode === 'grounded-local' ? 'Stored Scholark facts'
+          : `Guided help · local AI unavailable${result.failures?.length ? ` (${result.failures.at(-1).message || 'model error'})` : ''}`;
       addMessage('assistant', answer || 'Scholark completed the request using the available local tools.', mode);
     } catch (error) {
+      if (request.cancelled) return;
       console.error('[Scholark AI UI] request failed', error);
-      addMessage('assistant', 'That request could not be completed in the command view. Your existing Scholark tools and saved work are still available.', 'Recovery mode');
+      addMessage('assistant', 'The local AI could not finish this request. Check your connection and available device storage, then send it again.', 'Local AI error');
     } finally {
-      setBusy(false);
-      input?.focus();
+      stopProgress();
+      if (activeRequest === request) {
+        activeRequest = null;
+        setBusy(false);
+        input?.focus();
+      }
     }
   }
 
@@ -305,7 +329,7 @@
     if (!section) return;
     const status = q('#sk-ai-essay-status', section);
     status.className = 'sk-ai-essay-status loading';
-    status.textContent = AI.state.capability?.generative ? 'Preparing the private on-device admissions reader. First use may download and cache a local model…' : 'Running the expanded compatibility rubric…';
+    status.textContent = AI.state.capability?.generative || AI.state.capability?.cpuGenerative ? 'Preparing the private on-device admissions reader. First use may download and cache a local model…' : 'Running the expanded compatibility rubric…';
     section.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
 
     const stopListening = AI.on('model-progress', event => {

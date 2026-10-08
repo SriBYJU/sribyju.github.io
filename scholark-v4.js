@@ -72,7 +72,7 @@
   }
 
   function collegeDataset(){
-    try{return typeof COLLEGE_DATA!=='undefined'&&Array.isArray(COLLEGE_DATA)?COLLEGE_DATA:[]}catch{return []}
+    return Array.isArray(window.SCHOLARK_COLLEGE_DATA) ? window.SCHOLARK_COLLEGE_DATA : [];
   }
   let collegeFilter='All',selectedSchools=[];
   function collegeMetrics(c,set){

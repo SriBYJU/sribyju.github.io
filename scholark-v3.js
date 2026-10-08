@@ -131,7 +131,15 @@
   function saveLastPage(name){if(name&&name!=='home'&&!EXCLUDED_PAGES.has(name))safeSet('last-page',name);}
   function installResume(){const name=safeGet('last-page');const home=document.getElementById('page-home');if(!name||!home||!document.getElementById('page-'+name)||home.querySelector('.sk3-resume'))return;const wrap=document.createElement('div');wrap.className='sk3-resume';wrap.innerHTML=`<div class="sk3-resume-inner"><div class="sk3-resume-copy"><div class="sk3-resume-kicker">Pick up where you left off</div><div class="sk3-resume-title">${friendlyPageName(name)}</div></div><button class="sk3-resume-btn" type="button">Continue →</button></div>`;wrap.querySelector('button').addEventListener('click',()=>window.showPage?.(name));const hero=document.querySelector('#page-home>.hero');if(hero)hero.insertAdjacentElement('afterend',wrap);else home.prepend(wrap);}
 
-  function scrollFeatures(){const target=document.querySelector('.skm-tools,.sk6-tools-section,.features-grid,#page-home [data-section="features"]');if(target){target.scrollIntoView({behavior:motionPreference.matches?'auto':'smooth',block:'start'});return true}return false;}
+  function scrollFeatures(){
+    const target=document.querySelector('.skm-tools,.sk6-tools-section,.features-grid,#page-home [data-section="features"]');
+    if(!target)return false;
+    if(!document.getElementById('page-home')?.classList.contains('active')){
+      if(window.showPage?.('home')===false)return false;
+      requestAnimationFrame(()=>target.scrollIntoView({behavior:motionPreference.matches?'auto':'smooth',block:'start'}));
+    }else target.scrollIntoView({behavior:motionPreference.matches?'auto':'smooth',block:'start'});
+    return true;
+  }
   function waitForDynamic(name,original,args){
     const started=performance.now();
     ensureV4().catch(()=>{});

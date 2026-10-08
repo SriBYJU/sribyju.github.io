@@ -11,7 +11,7 @@
 
   const VERSION = '1.0.1';
   const WEBLLM_VERSION = '0.2.82';
-  const WEBLLM_IMPORT = `https://esm.sh/@mlc-ai/web-llm@${WEBLLM_VERSION}?bundle`;
+  const WEBLLM_IMPORT = `https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@${WEBLLM_VERSION}/+esm`;
   const STORAGE_PREFIX = 'scholark_ai_v1_';
 
   const MODEL_MANIFEST = Object.freeze({
@@ -26,7 +26,7 @@
       fallback: 'standard'
     },
     standard: {
-      id: 'Qwen3-0.6B-q4f16_1-MLC',
+      id: 'Qwen3-0.6B-q4f32_1-MLC',
       family: 'Qwen3',
       purpose: 'Balanced local academic generation',
       runtime: `WebLLM ${WEBLLM_VERSION}`,
@@ -196,10 +196,20 @@
     const record = MODEL_MANIFEST[tier];
     if (!record) throw new Error(`unknown-model-tier:${tier}`);
     if (state.engine && state.modelId === record.id) return state.engine;
-    if (state.loading) return state.loading;
+    if (state.loading) {
+      await state.loading;
+      if (state.engine && state.modelId === record.id) return state.engine;
+      return loadModel(tier, options);
+    }
 
     state.loading = (async () => {
       const webllm = await importWebLLM();
+      const available = webllm.prebuiltAppConfig?.model_list?.find(item => item.model_id === record.id);
+      if (!available) throw new Error(`model-not-in-runtime:${record.id}`);
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) throw new Error('webgpu-adapter-unavailable');
+      const missing = (available.required_features || []).filter(feature => !adapter.features.has(feature));
+      if (missing.length) throw new Error(`webgpu-feature-unavailable:${missing.join(',')}`);
       const progress = report => {
         const normalized = {
           text: report?.text || 'Preparing local model',
@@ -266,6 +276,7 @@
         top_p: options.topP ?? 0.9,
         max_tokens: options.maxTokens ?? 500,
         seed: Number.isFinite(options.seed) ? options.seed : 41721,
+        extra_body: { enable_thinking: options.enableThinking === true },
         stream: false
       };
       const result = await Promise.race([
@@ -426,6 +437,7 @@
     algorithms: A,
     detectDevice,
     on,
+    emit,
     generate,
     generateStructured,
     loadModel,

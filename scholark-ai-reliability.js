@@ -25,6 +25,10 @@
     contextWindow: 3072,
     purpose: 'Independent local rescue model when the primary Qwen path is unavailable or produces a weak answer'
   });
+  const CPU_RUNTIME = 'https://esm.sh/@huggingface/transformers@3.8.1?bundle';
+  const CPU_MODELS = Object.freeze({
+    compact: 'onnx-community/SmolLM2-135M-Instruct-ONNX'
+  });
 
   const PRODUCT_FACTS = Object.freeze({
     name: 'Scholark',
@@ -47,6 +51,14 @@
   let rescueEngine = null;
   let rescueLoading = null;
   let rescueLastUsedAt = 0;
+  const cpuPipelines = new Map();
+  const cpuLoading = new Map();
+  let cpuStop = null;
+  let cancelEpoch = 0;
+
+  function assertActive(epoch) {
+    if (epoch !== cancelEpoch) throw new Error('generation-cancelled');
+  }
 
   function improvedCapability(signals = {}) {
     const deviceMemory = Number(signals.deviceMemory || 0);
@@ -58,7 +70,7 @@
 
     if (webgpu) {
       if (!mobile && !saveData && deviceMemory >= 8 && cores >= 8) {
-        return { tier: 'high', generative: true, modelTier: 'high', reason: 'strong-webgpu' };
+        return { tier: 'standard', generative: true, modelTier: 'standard', reason: 'strong-webgpu' };
       }
       // Do not penalize a capable phone merely for having a coarse pointer. Modern mobile
       // Safari/Chrome devices can run the balanced model well enough to deserve it as the default.
@@ -68,7 +80,7 @@
       }
       return { tier: 'low', generative: true, modelTier: 'low', reason: 'constrained-webgpu' };
     }
-    if (wasm) return { tier: 'compatibility', generative: false, modelTier: null, reason: 'wasm-task-specific' };
+    if (wasm) return { tier: 'cpu', generative: false, cpuGenerative: true, modelTier: null, reason: 'wasm-local-model' };
     return { tier: 'compatibility', generative: false, modelTier: null, reason: 'deterministic-only' };
   }
 
@@ -146,9 +158,29 @@
 
   function isWeakAnswer(text, messages) {
     const value = String(text || '').trim();
-    if (value.length < 24) return true;
+    if (value.length < 8) return true;
+    if (/<\/?think\b/i.test(value)) return true;
     if (/break the task into three pieces|use the relevant scholark practice or course resource|compatibility-mode guidance is rule-based/i.test(value)) return true;
     const question = lastUserText(messages).toLowerCase();
+    if (/\bSAT\s*\([^)]{3,100}\)/i.test(value) || (/\bsat\b/.test(question) && /SAT fractions (?:are|is) a special type/i.test(value))) return true;
+    // Small CPU models can produce fluent explanations with invalid worked arithmetic.
+    // Verify every simple fraction equation they include before showing it to a student.
+    const incorrectFractionResult = (a, b, operator, c, d, e, f = '1') => {
+      const denominatorsValid = Number(b) !== 0 && Number(d) !== 0 && Number(f) !== 0;
+      const numerator = Number(a) * Number(d) + (operator === '+' ? 1 : -1) * Number(c) * Number(b);
+      return !denominatorsValid || numerator * Number(f) !== Number(e) * Number(b) * Number(d);
+    };
+    const fractionEquation = /(-?\d+)\s*\/\s*(-?\d+)\s*([+\-])\s*(-?\d+)\s*\/\s*(-?\d+)\s*=\s*(-?\d+)(?:\s*\/\s*(-?\d+))?/g;
+    for (const match of value.matchAll(fractionEquation)) {
+      const [, a, b, operator, c, d, e, f = '1'] = match;
+      if (incorrectFractionResult(a, b, operator, c, d, e, f)) return true;
+    }
+    const proseSum = /(-?\d+)\s*\/\s*(-?\d+).{0,50}?\b(?:add|plus)\b.{0,35}?(-?\d+)\s*\/\s*(-?\d+).{0,35}?\b(?:get|equals|makes|is)\s+(-?\d+)\s*\/\s*(-?\d+)/gi;
+    for (const match of value.matchAll(proseSum)) {
+      const [, a, b, c, d, e, f] = match;
+      if (incorrectFractionResult(a, b, '+', c, d, e, f)) return true;
+    }
+    if (/fraction/.test(question) && (/add (the )?denominators|denominators are different.{0,60}add the numerators|1\/2\s*\+\s*1\/4\s*=\s*2\/4/i.test(value))) return true;
     if (/^\s*who\b/.test(question) && /guided help|practice resource|solve one example/i.test(value)) return true;
     return false;
   }
@@ -157,8 +189,84 @@
     const tier = requestedTier || capability?.modelTier || 'standard';
     if (tier === 'high') return ['high', 'standard', 'rescue', 'low'];
     if (tier === 'standard') return ['standard', 'rescue', 'low'];
-    if (tier === 'low') return capability?.saveData ? ['low', 'standard'] : ['standard', 'low', 'rescue'];
+    if (tier === 'low') return ['low'];
     return [];
+  }
+
+  async function loadCPU(modelId, options = {}) {
+    if (cpuPipelines.has(modelId)) return cpuPipelines.get(modelId);
+    if (cpuLoading.has(modelId)) return cpuLoading.get(modelId);
+    const loading = (async () => {
+      AI.state.runtime = 'loading-cpu-model';
+      AI.state.modelTier = 'cpu';
+      AI.state.modelId = modelId;
+      AI.emit('runtime', { status: AI.state.runtime, tier: 'cpu', modelId });
+      const initial = { text: 'Loading a local CPU model…', tier: 'cpu', modelId };
+      AI.emit('model-progress', initial);
+      options.onProgress?.(initial);
+      const runtime = await import(CPU_RUNTIME);
+      if (typeof runtime.pipeline !== 'function') throw new Error('cpu-runtime-invalid');
+      const generator = await runtime.pipeline('text-generation', modelId, {
+        device: 'wasm', dtype: 'q4',
+        progress_callback: progress => {
+          const report = {
+            text: progress?.file ? `Downloading local model: ${progress.file}` : 'Preparing local CPU model…',
+            progress: Number.isFinite(progress?.progress) ? progress.progress / 100 : null,
+            tier: 'cpu', modelId
+          };
+          AI.state.modelProgress = report;
+          AI.emit('model-progress', report);
+          options.onProgress?.(report);
+        }
+      });
+      const cpuPipeline = { generator, runtime };
+      cpuPipelines.set(modelId, cpuPipeline);
+      AI.state.runtime = 'ready';
+      AI.emit('runtime', { status: 'ready', tier: 'cpu', modelId });
+      return cpuPipeline;
+    })().catch(error => {
+      AI.state.lastFailure = normalizeError(error);
+      AI.state.runtime = 'failed';
+      AI.emit('runtime-error', { error: AI.state.lastFailure, tier: 'cpu', modelId });
+      throw error;
+    }).finally(() => { cpuLoading.delete(modelId); });
+    cpuLoading.set(modelId, loading);
+    return loading;
+  }
+
+  async function runCPU(modelId, messages, options = {}) {
+    const epoch = cancelEpoch;
+    const { generator, runtime } = await loadCPU(modelId, options);
+    assertActive(epoch);
+    const stop = new runtime.InterruptableStoppingCriteria();
+    cpuStop = stop;
+    AI.state.generating = true;
+    const compact = options.agent === 'tutor'
+      ? [
+          { role: 'system', content: 'You are a concise academic tutor. Answer the newest question directly and accurately. If unsure, say so. For adding fractions, find a common denominator, convert each fraction, add the numerators, and keep the denominator. Never add denominators.' },
+          ...messages.filter(item => item.role !== 'system').slice(-3).map(item => ({ role: item.role, content: item.content.slice(-1800) }))
+        ]
+      : messages.slice(-5).map(item => ({
+          role: item.role,
+          content: item.content.slice(-((item.role === 'system') ? 1400 : 2400))
+        }));
+    try {
+      AI.emit('model-progress', { text: 'Writing an on-device reply…', tier: 'cpu', modelId });
+      const output = await generator(compact, {
+        max_new_tokens: Math.min(options.maxTokens || 110, 110),
+        do_sample: false,
+        stopping_criteria: stop
+      });
+      if (cpuStop !== stop) throw new Error('generation-cancelled');
+      const generated = output?.[0]?.generated_text;
+      const text = (Array.isArray(generated) ? generated.at(-1)?.content : generated) || '';
+      if (!String(text).trim()) throw new Error('empty-local-model-response');
+      AI.state.generationCount = Number(AI.state.generationCount || 0) + 1;
+      return String(text).trim();
+    } finally {
+      if (cpuStop === stop) cpuStop = null;
+      AI.state.generating = false;
+    }
   }
 
   function withTimeout(promise, ms, label) {
@@ -179,14 +287,14 @@
         max_tokens: options.maxTokens ?? 500,
         seed: Number.isFinite(options.seed) ? options.seed : 41721,
         stream: false,
-        enable_thinking: options.enableThinking === true
+        extra_body: { enable_thinking: options.enableThinking === true }
       };
       const result = await withTimeout(
         engine.chat.completions.create(request),
         options.timeoutMs || 90000,
         'generation-timeout'
       );
-      const text = result?.choices?.[0]?.message?.content;
+      const text = result?.choices?.[0]?.message?.content?.replace(/^<think>[\s\S]*?<\/think>\s*/i, '');
       if (!text || typeof text !== 'string') throw new Error('empty-local-model-response');
       AI.state.generationCount = Number(AI.state.generationCount || 0) + 1;
       return text.trim();
@@ -247,13 +355,16 @@
   }
 
   async function runTier(tier, messages, options = {}) {
+    const epoch = cancelEpoch;
     if (tier === 'rescue') {
       const engine = await loadRescue(options);
+      assertActive(epoch);
       rescueLastUsedAt = Date.now();
       return complete(engine, messages, { ...options, maxTokens: Math.min(options.maxTokens || 500, 500) });
     }
     await unloadRescue();
     const engine = await AI.loadModel(tier, options);
+    assertActive(epoch);
     const maxTokens = tier === 'low' ? Math.min(options.maxTokens || 500, 350) : options.maxTokens;
     return complete(engine, messages, { ...options, maxTokens });
   }
@@ -274,6 +385,7 @@
   }
 
   async function reliableGenerate(messages, options = {}) {
+    const epoch = cancelEpoch;
     const capability = AI.detectDevice();
     const safeMessages = normalizeMessages(messages);
     const failures = [];
@@ -305,6 +417,7 @@
               reliabilityStage: index === 0 && attempt === 0 ? 'primary' : (tier === 'rescue' ? 'alternate-model' : 'recovery')
             };
           } catch (error) {
+            assertActive(epoch);
             const normalized = normalizeError(error);
             failures.push({ tier, attempt, ...normalized });
             AI.state.lastFailure = normalized;
@@ -318,6 +431,25 @@
       }
     }
 
+    if (capability.wasm && !options.skipCPU) {
+      const cpuModels = [CPU_MODELS.compact];
+      for (const modelId of cpuModels) {
+        try {
+          const text = await runCPU(modelId, safeMessages, options);
+          if (!isWeakAnswer(text, safeMessages)) {
+            AI.telemetry.record('generation-success', { agent: options.agent || 'unknown', tier: 'cpu', modelId });
+            return { mode: 'local-generative', tier: 'cpu', modelId, text, failures, reliabilityStage: 'cpu' };
+          }
+          failures.push({ tier: 'cpu', modelId, message: 'quality-gate-rejected-weak-response', at: Date.now() });
+        } catch (error) {
+          assertActive(epoch);
+          const normalized = normalizeError(error);
+          failures.push({ tier: 'cpu', modelId, ...normalized });
+          AI.state.lastFailure = normalized;
+        }
+      }
+    }
+
     if (options.suppressFinalFallback) {
       return { mode: 'generation-unavailable', tier: null, modelId: null, failures, reason: capability.reason };
     }
@@ -326,7 +458,9 @@
 
   async function reliableGenerateStructured(messages, options = {}) {
     const fallback = options.fallback;
-    const first = await reliableGenerate(messages, { ...options, fallback: null, suppressFinalFallback: true });
+    const capability = AI.detectDevice();
+    if (!capability.generative) return finalFallback(options, [], capability, 'structured-model-unavailable');
+    const first = await reliableGenerate(messages, { ...options, fallback: null, suppressFinalFallback: true, skipCPU: true });
     if (first.mode === 'local-generative') {
       const parsed = AI.extractJSONObject(first.text);
       const validation = typeof options.validate === 'function' ? options.validate(parsed) : { valid: !!parsed };
@@ -341,7 +475,8 @@
         temperature: 0,
         maxTokens: Math.min(options.maxTokens || 500, 600),
         fallback: null,
-        suppressFinalFallback: true
+        suppressFinalFallback: true,
+        skipCPU: true
       });
       if (repaired.mode === 'local-generative') {
         const value = AI.extractJSONObject(repaired.text);
@@ -349,9 +484,9 @@
         if (value && repairedValidation?.valid !== false) return { ...repaired, value, parsed: true, repaired: true };
       }
       const failures = [...(first.failures || []), ...(repaired.failures || []), { message: 'invalid-structured-output' }];
-      return finalFallback({ ...options, fallback }, failures, AI.state.capability, 'invalid-structured-output');
+      return finalFallback({ ...options, fallback }, failures, capability, 'invalid-structured-output');
     }
-    return finalFallback({ ...options, fallback }, first.failures || [], AI.state.capability, first.reason || 'generation-unavailable');
+    return finalFallback({ ...options, fallback }, first.failures || [], capability, first.reason || 'generation-unavailable');
   }
 
   async function reliableAsk(input, context = {}) {
@@ -360,7 +495,7 @@
       const answer = productAnswer(input);
       return {
         route,
-        mode: 'local-generative',
+        mode: 'grounded-local',
         tier: 'grounded',
         modelId: null,
         generationKind: 'grounded-product-knowledge',
@@ -379,6 +514,9 @@
   Agents.ask = reliableAsk;
 
   AI.cancelGeneration = function cancelReliableGeneration() {
+    cancelEpoch += 1;
+    cpuStop?.interrupt();
+    cpuStop = null;
     try { rescueEngine?.interruptGenerate?.(); } catch (_) {}
     return baseCancel();
   };
@@ -394,6 +532,7 @@
   window.ScholarkAIReliability = {
     version: VERSION,
     rescueModel: RESCUE_MODEL,
+    cpuModels: CPU_MODELS,
     productFacts: PRODUCT_FACTS,
     sequenceFor,
     productAnswer,

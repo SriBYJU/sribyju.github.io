@@ -211,25 +211,36 @@ hr{border:none;border-top:1px solid var(--border2);margin:20px 0}
 .loan-row .key{color:var(--ink2)}.loan-row .value{font-family:var(--font-mono);color:var(--ink);font-weight:500}
 
 /* ABOUT */
-.about-hero{background:linear-gradient(135deg,#1a1714 0%,#2d2420 50%,#1a1714 100%);padding:80px 40px 60px;text-align:center;position:relative;overflow:hidden}
-.about-hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(200,98,42,.04) 40px,rgba(200,98,42,.04) 80px)}
-.about-hero-content{position:relative;z-index:1;max-width:700px;margin:0 auto}
-.about-avatar{width:100px;height:100px;border-radius:50%;overflow:hidden;margin:0 auto 20px;border:3px solid rgba(255,255,255,.15)}
-.about-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.about-hero h1{font-family:var(--font-display);font-size:42px;color:white;margin-bottom:12px}
-.about-hero .subtitle{font-size:16px;color:rgba(255,255,255,.65);line-height:1.6}
-.about-content{max-width:800px;margin:0 auto;padding:60px 40px}
-.about-section{margin-bottom:48px}
-.about-section h2{font-family:var(--font-display);font-size:28px;color:var(--ink);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--bg3)}
-.about-section p{font-size:15px;color:var(--ink2);line-height:1.8;margin-bottom:14px}
-.badge-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.badge{padding:8px 16px;border-radius:100px;background:var(--bg2);border:1px solid var(--border);font-size:13px;font-weight:500;color:var(--ink2)}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
-.contact-card{background:var(--bg2);border-radius:var(--radius-lg);padding:20px;border:1px solid var(--border);text-align:center}
-.contact-card .icon{font-size:28px;margin-bottom:8px}
-.contact-card h3{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
-.contact-card p{font-size:13px;color:var(--ink3)}
-.contact-card a{color:var(--accent);text-decoration:none;font-weight:500}
+.about-hero{background:radial-gradient(circle at 80% 18%,rgba(207,103,45,.2),transparent 36%),linear-gradient(135deg,#1b1816,#30231d 72%,#211b18);padding:72px 40px;position:relative;overflow:hidden}
+.about-hero::before{content:'';position:absolute;inset:0;opacity:.26;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:88px 88px;mask-image:linear-gradient(90deg,transparent,#000)}
+.about-hero-content{position:relative;z-index:1;max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,390px);align-items:center;gap:clamp(36px,7vw,100px)}
+.about-eyebrow{display:block;color:#e7a878;font-size:11px;font-weight:700;letter-spacing:.23em;text-transform:uppercase;margin-bottom:22px}
+.about-hero h1{font-family:var(--font-display);font-size:clamp(48px,5.7vw,82px);font-weight:500;line-height:1.04;letter-spacing:-.045em;color:white;margin:0 0 26px}
+.about-hero h1 em{color:#e8a474;font-weight:400}
+.about-hero .subtitle{max-width:620px;font-size:16px;color:rgba(255,255,255,.74);line-height:1.75;margin:0}
+.about-hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.about-hero-actions button,.about-hero-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid rgba(255,255,255,.3);border-radius:8px;background:transparent;color:#fff;text-decoration:none;font:600 13px var(--font-body);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.about-hero-actions button{background:#d26b32;border-color:#d26b32;color:#211813}
+.about-hero-actions button:hover,.about-hero-actions a:hover{transform:translateY(-2px);background:#f2bc92;border-color:#f2bc92;color:#211813}
+.about-avatar{position:relative;width:100%;height:470px;max-height:65vh;overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:#3d3028;box-shadow:24px 24px 0 rgba(200,98,42,.15),0 30px 80px rgba(0,0,0,.28)}
+.about-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 38%;display:block}
+.about-avatar figcaption{position:absolute;bottom:0;left:0;right:0;padding:32px 20px 17px;background:linear-gradient(transparent,rgba(0,0,0,.68));font:600 12px var(--font-body);letter-spacing:.04em;color:white}
+.about-content{max-width:1120px;margin:0 auto;padding:72px 40px 90px}
+.about-section{display:grid;grid-template-columns:minmax(180px,.36fr) minmax(0,1fr);gap:40px;padding:34px 0;border-top:1px solid var(--border);margin:0}
+.about-section h2{font-family:var(--font-display);font-size:clamp(27px,3vw,36px);font-weight:500;color:var(--ink);line-height:1.12;margin:0}
+.about-section p{font-size:15px;color:var(--ink2);line-height:1.8;margin:0 0 15px}
+.about-section p:last-child{margin-bottom:0}
+.about-section-body{min-width:0}
+.about-section-kicker{display:block;color:var(--accent);font:700 11px var(--font-body);letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.badge-grid{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.badge{padding:9px 13px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--ink2)}
+.contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.contact-card{background:var(--bg2);border-radius:10px;padding:22px;border:1px solid var(--border);text-align:left;min-width:0}
+.contact-card .icon{font-size:23px;margin-bottom:16px}
+.contact-card h3{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.contact-card p{font-size:13px;color:var(--ink3);margin-bottom:5px;overflow-wrap:anywhere}
+.contact-card a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:600}
+@media(max-width:720px){.about-hero{padding:52px 24px 62px}.about-hero-content{grid-template-columns:1fr;gap:36px}.about-avatar{width:min(100%,420px);height:420px;max-height:none}.about-content{padding:48px 24px 70px}.about-section{grid-template-columns:1fr;gap:18px;padding:30px 0}.contact-grid{grid-template-columns:1fr}}
 
 /* FEATURES OVERVIEW */
 .features-hero{background:var(--bg2);padding:60px 40px;text-align:center;border-bottom:1px solid var(--border)}
@@ -2192,19 +2203,29 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 <div class="page" id="page-about">
 <div class="about-hero">
     <div class="about-hero-content">
-      <div class="about-avatar"><img src="IMG_7529.png" alt="Profile Picture"></div>
-      <h1>Built by a Student,<br>for Students</h1>
-      <p class="subtitle">Scholark was created by Shriyan Avadhanula as an independent, student-built, non-commercial educational project. It is not an incorporated company, business, or employer, and it is not revenue-generating. The platform exists to provide free college-planning and academic-support tools for students.</p>
+      <div class="about-hero-copy">
+        <span class="about-eyebrow">The person behind Scholark</span>
+        <h1>Built by a student.<br><em>For every student.</em></h1>
+        <p class="subtitle">I’m Shriyan Avadhanula. I built Scholark to make college planning and academic support easier to use and free to access. It’s an independent, non-commercial educational project shaped by the questions students actually ask.</p>
+        <div class="about-hero-actions">
+          <button type="button" onclick="showPage('features')">Explore Scholark <span aria-hidden="true">&nbsp;↗</span></button>
+          <a href="mailto:avadhanula.shriyan@gmail.com">Get in touch <span aria-hidden="true">&nbsp;↗</span></a>
+        </div>
+      </div>
+      <figure class="about-avatar"><img src="IMG_7529.png" alt="Shriyan Avadhanula, creator of Scholark" loading="lazy"><figcaption>Shriyan Avadhanula · Founder &amp; builder</figcaption></figure>
     </div>
   </div>
   <div class="about-content">
     <div class="about-section">
-      <h2>The Story</h2>
-      <p>Every college prep tool online was either buried behind a signup form, littered with irrelevant ads, or just plain ugly. The ones that were good cost money. So I built Scholark — a clean, fast, actually useful set of calculators that every student deserves for free.</p>
-      <p>What started as a personal GPA tracker for my own IB coursework grew into a platform used by more than 10,000 students each month.</p>
+      <div><span class="about-section-kicker">01 / Why it exists</span><h2>The Story</h2></div>
+      <div class="about-section-body">
+        <p>Every college prep tool online seemed to be buried behind a signup form, cluttered with ads, or expensive. I wanted a cleaner place to work through the decisions students face, so I started with a GPA tracker for my own IB coursework.</p>
+        <p>That small project became Scholark: a free set of planning, preparation, research, and writing tools now used by more than 10,000 students each month.</p>
+      </div>
     </div>
     <div class="about-section">
-      <h2>About the Creator</h2>
+      <div><span class="about-section-kicker">02 / The builder</span><h2>About the Creator</h2></div>
+      <div class="about-section-body">
       <p>I'm Shriyan Avadhanula, an 11th-grade student in Henrico High School's full IB Diploma Programme, with a 3.95 unweighted GPA and a 4.5+ weighted GPA. I build at the intersection of technology, finance, cybersecurity, and entrepreneurship—usually by turning a complicated system into something people can actually use.</p>
       <p>Beyond Scholark, I founded the patent-pending DataShadow platform, co-founded the ATHENA athlete-intelligence research platform, created the privacy-first DinkSense coaching app, and publish an annual Cyber Risk Intelligence Report. ATHENA's models have been validated across 27,548 athletes and 155,109 real-world race records.</p>
       <p>I've completed 22 certifications and career credentials, including finance job simulations from JPMorgan Chase and Goldman Sachs and technology credentials from IBM, Microsoft, OpenAI, and Salesforce. I also study live-style M&amp;A analysis through Partner-level mentorship and compete as a sponsored junior pickleball athlete.</p>
@@ -2218,10 +2239,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="badge">📈 Partner-Level M&amp;A Mentorship</div>
         <div class="badge">🏓 Sponsored Competitive Athlete</div>
       </div>
+      </div>
     </div>
     <div class="about-section">
-      <h2>Get In Touch</h2>
-      <div class="contact-grid">
+      <div><span class="about-section-kicker">03 / Start a conversation</span><h2>Get In Touch</h2></div>
+      <div class="about-section-body contact-grid">
         <div class="contact-card"><div class="icon">✉️</div><h3>Email</h3><p><a href="mailto:avadhanula.shriyan@gmail.com">avadhanula.shriyan@gmail.com</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Questions & feedback</p></div>
         <div class="contact-card"><div class="icon">💼</div><h3>Partnerships</h3><p><a href="mailto:partnerships@scholark.app">partnerships@scholark.app</a></p><p style="font-size:12px;color:var(--ink3);margin-top:4px">Sponsorships & collabs</p></div>
       </div>
@@ -4774,6 +4796,7 @@ const COLLEGE_DATA = [
   {name:'Brown University',loc:'Providence, RI',accept:5.0,tuition:65146,size:7160,ranking:11,sat:'1470-1560',salary:80000,ratio:'6:1',type:'Private'},
   {name:'Cornell University',loc:'Ithaca, NY',accept:7.3,tuition:65204,size:15503,ranking:12,sat:'1450-1540',salary:84000,ratio:'9:1',type:'Private'},
 ];
+window.SCHOLARK_COLLEGE_DATA = COLLEGE_DATA;
 
 let compareSlots = [null, null, null];
 let compareActiveSlot = -1;

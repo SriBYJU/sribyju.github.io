@@ -81,7 +81,7 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(preflight.runtimeImport, JSON.stringify(preflight.error || {})).toBe('ok');
     expect(preflight.modelManifest.map(row => row.id)).toEqual([
       'Qwen3-1.7B-q4f16_1-MLC',
-      'Qwen3-0.6B-q4f16_1-MLC',
+      'Qwen3-0.6B-q4f32_1-MLC',
       'SmolLM2-360M-Instruct-q4f32_1-MLC'
     ]);
 
@@ -105,7 +105,25 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(result.answer).not.toMatch(/break the task into three pieces|practice or course resource/i);
   });
 
-  test('all specialists return useful compatibility-mode results with WebGPU unavailable', async ({ page }) => {
+  test('local answer quality rejects incorrect worked fraction examples', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const checks = await page.evaluate(() => {
+      const question = [{ role: 'user', content: 'Can you explain SAT fractions?' }];
+      const weak = window.ScholarkAIReliability.isWeakAnswer;
+      return {
+        incorrect: weak('For example, 2/3 + 1/3 = 2/9.', question),
+        incorrectWhole: weak('For example, 1/2 + 1/2 = 2.', question),
+        incorrectProse: weak('If you have a fraction 2/3, you can add it to 1/3 to get 2/9.', question),
+        inventedAcronym: weak('SAT (Solving and Analyzing Test) fractions use common denominators.', question),
+        correct: weak('For example, 2/3 + 1/3 = 1.', question)
+      };
+    });
+    expect(checks).toEqual({ incorrect: true, incorrectWhole: true, incorrectProse: true, inventedAcronym: true, correct: false });
+  });
+
+  test('all specialists retain useful guided results when local inference is unavailable', async ({ page }) => {
+    await page.addInitScript(() => { Object.defineProperty(window, 'WebAssembly', { configurable: true, value: undefined }); });
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     await waitForAI(page);
 

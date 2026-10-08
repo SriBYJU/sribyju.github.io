@@ -82,7 +82,7 @@ test('AI UI polish settles after mutations instead of creating a mutation storm'
   });
 
   expect(result.polishVersion).toBe('1.0.1');
-  expect(result.welcome).toContain('strongest practical on-device model');
+  expect(result.welcome).toContain('model downloads to this device');
   expect(result.mutationRecords).toBeLessThan(20);
 });
 

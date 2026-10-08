@@ -83,6 +83,15 @@
 
   function go(page, tab){
     if (page==='features') return scrollToTools();
+    if (['intelligence','careers','methodology'].includes(page) && !document.getElementById('page-'+page)) {
+      window.ScholarkV3?.ensureV4?.().then(() => {
+        if (!openRoute(page, tab)) window.showToast?.('That section could not open. Please try again.','error');
+      }).catch(error => {
+        console.error('Scholark section load failed:', error);
+        window.showToast?.('That section could not load. Please check your connection and try again.','error');
+      });
+      return;
+    }
     const started=performance.now();
     const attempt=()=>{
       if (openRoute(page,tab)) return;

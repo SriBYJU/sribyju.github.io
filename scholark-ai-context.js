@@ -252,8 +252,15 @@
 
   async function ask(input, context = {}) {
     const route = A.routeIntent(input);
-    if (route.agent === 'sat') return { route, ...(await diagnoseExisting('sat', satEvidence(), context)) };
-    if (route.agent === 'ap') return { route, ...(await diagnoseExisting('ap', apEvidence(), context)) };
+    const diagnostic = /\b(my|mine|diagnos|weakness|performance|progress|history|results?|score|what should i (study|practice|work on))\b/i.test(input);
+    if (route.agent === 'sat') {
+      if (!diagnostic) return { route: { ...route, agent: 'tutor' }, ...(await Agents.tutor.run(input, { ...context, subject: 'SAT' })) };
+      return { route, ...(await diagnoseExisting('sat', satEvidence(), context)) };
+    }
+    if (route.agent === 'ap') {
+      if (!diagnostic) return { route: { ...route, agent: 'tutor' }, ...(await Agents.tutor.run(input, { ...context, subject: 'AP' })) };
+      return { route, ...(await diagnoseExisting('ap', apEvidence(), context)) };
+    }
     return originalAsk(input, enrichedContext(input, context));
   }
 
