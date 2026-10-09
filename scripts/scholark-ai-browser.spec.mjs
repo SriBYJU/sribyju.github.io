@@ -103,7 +103,7 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(result.answer).toContain('Shriyan Avadhanula');
     expect(result.answer).toContain('student-built');
     expect(result.answer).not.toMatch(/break the task into three pieces|practice or course resource/i);
-    for (const input of ['who made u', 'Who created you?', 'scholark']) {
+    for (const input of ['who made u', 'Who created you?', 'who are you', 'scholark']) {
       const followUp = await page.evaluate(question => window.ScholarkAIAgents.ask(question), input);
       expect(followUp.route.agent, input).toBe('knowledge');
       expect(followUp.answer, input).toContain('Shriyan Avadhanula');
@@ -128,15 +128,36 @@ test.describe('Scholark AI local-first browser regression', () => {
       window.__capturedTutorMessages = [];
       window.ScholarkAI.generate = async messages => {
         window.__capturedTutorMessages.push(messages);
-        return { mode: 'local-generative', tier: 'standard', text: 'Hey! What would you like to work on?' };
+        return { mode: 'local-generative', tier: 'standard', text: 'Plants use sunlight to turn water and carbon dioxide into sugars.' };
       };
     });
     await page.evaluate(() => window.ScholarkAIUI.open());
     await page.locator('#sk-ai-input').fill('hey');
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Hey!');
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Scholark’s study assistant');
+    expect(await page.evaluate(() => window.__capturedTutorMessages.length)).toBe(0);
+    await page.locator('#sk-ai-input').fill('How does photosynthesis work?');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
     const messages = await page.evaluate(() => window.__capturedTutorMessages[0]);
     expect(JSON.stringify(messages)).not.toMatch(/Creative Development|AP course|mastery_anon|"mastery":/i);
+    await page.locator('#sk-ai-input').fill('Help me understand my AP Computer Science Principles code');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    const apMessages = await page.evaluate(() => window.__capturedTutorMessages[1]);
+    expect(JSON.stringify(apMessages)).toContain('Help me understand my AP Computer Science Principles code');
+    expect(JSON.stringify(apMessages)).not.toContain('Creative Development');
+    await page.locator('#sk-ai-input').fill('explain that');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    const followUp = await page.evaluate(() => window.__capturedTutorMessages[2]);
+    expect(followUp.at(-3).content).toBe('Help me understand my AP Computer Science Principles code');
+    expect(followUp.at(-1).content).toBe('explain that');
+    await page.locator('#sk-ai-dialog .sk-ai-new').click();
+    await page.locator('#sk-ai-input').fill('explain that');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    expect(await page.evaluate(() => window.__capturedTutorMessages[3])).toHaveLength(2);
   });
 
   test('assistant replies render lists and emphasis without exposing HTML', async ({ page }) => {

@@ -87,6 +87,7 @@
   function isKnowledgeQuestion(input = '') {
     const q = String(input).toLowerCase().replace(/scholar\s*k/g, 'scholark').trim();
     if (/^scholark[?.!]*$/.test(q)) return true;
+    if (/^(who|what)\s+are\s+(you|u)[?.!]*$/.test(q)) return true;
     if (/\bwho\s+(made|built|created|founded|started)\s+(you|u|this\s+(app|site|website|tool|assistant))\b/.test(q)) return true;
     return /\bscholark\b/.test(q) && (
       /\bwho\s+(made|built|created|founded|owns|runs|started)\b/.test(q) ||
@@ -99,6 +100,12 @@
   }
 
   function improvedRouteIntent(input = '') {
+    if (/^(?:hey|hi|hello|hiya|good\s+(?:morning|afternoon|evening))[!.?\s]*$/i.test(String(input).trim())) {
+      return {
+        agent: 'greeting', confidence: 10,
+        scores: { tutor: 0, essay: 0, planner: 0, sat: 0, ap: 0, college: 0, scholarship: 0, knowledge: 0, greeting: 10 }
+      };
+    }
     if (isKnowledgeQuestion(input)) {
       return {
         agent: 'knowledge',
@@ -493,6 +500,10 @@
 
   async function reliableAsk(input, context = {}) {
     const route = A.routeIntent(input);
+    if (route.agent === 'greeting') {
+      const answer = 'Hey! I’m Scholark’s study assistant. What would you like help with?';
+      return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'greeting', answer, text: answer, failures: [] };
+    }
     if (route.agent === 'knowledge') {
       const answer = productAnswer(input);
       return {

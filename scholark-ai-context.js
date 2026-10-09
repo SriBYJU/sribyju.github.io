@@ -251,7 +251,7 @@
 
   async function ask(input, context = {}) {
     const route = A.routeIntent(input);
-    const diagnostic = /\b(my|mine|diagnos|weakness|performance|progress|history|results?|score|what should i (study|practice|work on))\b/i.test(input);
+    const diagnostic = /\b(diagnos\w*|weakness(?:es)?|performance|progress|history|results?|scores?|stats?|what should i (?:study|practice|work on)|how am i doing)\b/i.test(input);
     if (route.agent === 'sat') {
       if (!diagnostic) return { route: { ...route, agent: 'tutor' }, ...(await Agents.tutor.run(input, { ...context, subject: 'SAT' })) };
       return { route, ...(await diagnoseExisting('sat', satEvidence(), context)) };

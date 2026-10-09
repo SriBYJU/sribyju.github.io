@@ -15,6 +15,7 @@
   let autosaveTimer = null;
   let lastEssayEvaluation = null;
   let activeRequest = null;
+  let lastChatExchange = null;
 
   function ensureStyles() {
     if (q('link[href*="scholark-ai.css"]')) return;
@@ -102,6 +103,7 @@
     });
     q('.sk-ai-new', overlay).addEventListener('click', () => {
       AI.sessions.clearAll();
+      lastChatExchange = null;
       q('#sk-ai-transcript', overlay).innerHTML = '<div class="sk-ai-welcome"><strong>Fresh conversation</strong><span>Previous local AI conversation context was cleared.</span></div>';
       q('#sk-ai-input', overlay).value = '';
       q('#sk-ai-input', overlay).focus();
@@ -231,9 +233,10 @@
       const result = await Agents.ask(text, context);
       if (request.cancelled) return;
       const answer = result.answer || result.value?.text || result.evaluation?.verdict || summarizeStructuredResult(result);
+      if (answer) lastChatExchange = { question: text, answer: String(answer).slice(0, 1800) };
       const mode = result.mode === 'local-generative'
         ? `On-device ${result.route?.agent || 'AI'} · ${result.tier || 'local'} model`
-        : result.mode === 'grounded-local' ? 'Stored Scholark facts'
+        : result.mode === 'grounded-local' ? (result.generationKind === 'greeting' ? 'Scholark assistant' : 'Stored Scholark facts')
           : `Guided help · local AI unavailable${result.failures?.length ? ` (${result.failures.at(-1).message || 'model error'})` : ''}`;
       addMessage('assistant', answer || 'Scholark completed the request using the available local tools.', mode);
     } catch (error) {
@@ -259,9 +262,10 @@
       const current = Agents.planner.current();
       return current?.input || { tasks: [], dailyMinutes: 60 };
     }
-    // An open page is not evidence that a chat question is about that course.
-    // Keep the general tutor free of unrelated progress and page context.
-    return {};
+    // Only an explicit conversational follow-up carries the immediately preceding exchange.
+    // The active page and unrelated progress never enter general tutor chat.
+    const followUp = /^(?:and|also|what about|why|how about|what do you mean|explain (?:that|this|it)|can you explain (?:that|this|it)|tell me more|go deeper)\b/i.test(text);
+    return followUp && lastChatExchange ? { previousExchange: lastChatExchange } : {};
   }
 
   function summarizeStructuredResult(result) {
