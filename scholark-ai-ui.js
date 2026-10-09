@@ -142,7 +142,8 @@
   }
 
   function appendInlineFormatting(parent, value) {
-    const source = String(value ?? '');
+    const readableMath = math => math.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2').replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\sqrt\{([^{}]+)\}/g, '√($1)').replace(/\\text\{([^{}]+)\}/g, '$1').replace(/\\quad/g, ' ');
+    const source = readableMath(String(value ?? '').replace(/\$([^$\n]{1,120})\$/g, (_, math) => math).replace(/\\\(([^\n]+?)\\\)/g, (_, math) => math));
     const pattern = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|`([^`\n]+)`|\*([^*\n]+)\*/g;
     let cursor = 0;
     for (const match of source.matchAll(pattern)) {
@@ -159,6 +160,7 @@
     let paragraph = null;
     let list = null;
     for (const line of String(content ?? '').split(/\r?\n/)) {
+      if (/^\s*(?:\$\$|\\\[|\\\])\s*$/.test(line)) { paragraph = null; list = null; continue; }
       if (!line.trim()) { paragraph = null; list = null; continue; }
       const numbered = line.match(/^\s*\d+[.)]\s+(.+)$/);
       const bulleted = line.match(/^\s*[-*•]\s+(.+)$/);
@@ -236,7 +238,7 @@
       if (answer) lastChatExchange = { question: text, answer: String(answer).slice(0, 1800) };
       const mode = result.mode === 'local-generative'
         ? `On-device ${result.route?.agent || 'AI'} · ${result.tier || 'local'} model`
-        : result.mode === 'grounded-local' ? (result.generationKind === 'greeting' ? 'Scholark assistant' : 'Stored Scholark facts')
+        : result.mode === 'grounded-local' ? (result.generationKind === 'grounded-product-knowledge' ? 'Stored Scholark facts' : 'Scholark assistant')
           : `Guided help · local AI unavailable${result.failures?.length ? ` (${result.failures.at(-1).message || 'model error'})` : ''}`;
       addMessage('assistant', answer || 'Scholark completed the request using the available local tools.', mode);
     } catch (error) {
@@ -285,7 +287,7 @@
   function essayDetailHTML() {
     return `<section class="sk-ai-essay-detail" id="sk-ai-essay-detail" aria-live="polite">
       <div class="sk-ai-essay-title-row">
-        <div><span class="sk-ai-kicker">AI Admissions Reader Simulation</span><h3>Demanding rubric review</h3><p>This is an AI simulation of an admissions-style reading, not an evaluation from any specific university.</p></div>
+        <div><span class="sk-ai-kicker">Admissions Reader Simulation</span><h3>Demanding rubric review</h3><p>Scores are rubric estimates. On-device AI adds draft-specific reader notes when available; this is not a university evaluation or admissions prediction.</p></div>
         <div class="sk-ai-overall" id="sk-ai-overall"><b>—</b><span>/ 10</span></div>
       </div>
       <div class="sk-ai-essay-status" id="sk-ai-essay-status">Run Rubric Feedback to generate the expanded review.</div>
@@ -405,7 +407,7 @@
     const section = q('#sk-ai-essay-detail');
     if (!e || !section) return;
     q('#sk-ai-overall b', section).textContent = Number(e.overall).toFixed(1);
-    const mode = result.mode === 'local-generative' ? `On-device AI · ${result.tier} model` : 'Compatibility rubric · deterministic fallback';
+    const mode = result.mode === 'local-generative' ? `Rubric scores + on-device AI reader notes · ${result.tier} model` : result.reason === 'ungrounded-essay-feedback' ? 'Local rubric review · AI notes did not pass evidence checks' : 'Local rubric review · AI model unavailable';
     const status = q('#sk-ai-essay-status', section);
     status.className = 'sk-ai-essay-status ready';
     status.textContent = `${mode}. Draft stayed in the browser for this evaluation path.`;

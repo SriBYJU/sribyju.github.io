@@ -99,7 +99,21 @@
     );
   }
 
+  function isOutOfScope(input = '') {
+    const q = String(input).toLowerCase().trim();
+    if (/\b(class|homework|assignment|essay|course|study|learn|research|analy[sz]e|school|college|university|sat|act|ap exam|career)\b/.test(q)) return false;
+    if (/\bwhat should i (?:watch|cook|eat|buy|play)\b/.test(q)) return true;
+    return /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|recipes?|sports scores?|weather forecast)\b/.test(q)
+      && /\b(recommend\w*|favorite|best|watch|stream|play|review|rank|suggest\w*|good)\b/.test(q);
+  }
+
   function improvedRouteIntent(input = '') {
+    if (isOutOfScope(input)) {
+      return {
+        agent: 'out-of-scope', confidence: 10,
+        scores: { tutor: 0, essay: 0, planner: 0, sat: 0, ap: 0, college: 0, scholarship: 0, knowledge: 0, 'out-of-scope': 10 }
+      };
+    }
     if (/^(?:hey|hi|hello|hiya|good\s+(?:morning|afternoon|evening))[!.?\s]*$/i.test(String(input).trim())) {
       return {
         agent: 'greeting', confidence: 10,
@@ -129,6 +143,29 @@
     }
     if (/privacy/.test(q)) return PRODUCT_FACTS.privacy;
     return `Scholark is ${PRODUCT_FACTS.description}, built by ${PRODUCT_FACTS.creator}. ${PRODUCT_FACTS.pricing}`;
+  }
+
+  function verifiedLearningAnswer(input = '', context = {}) {
+    const q = String(input).toLowerCase().trim();
+    if (/^(?:what is photosynthesis|how does photosynthesis work|explain photosynthesis)[?.!]*$/.test(q)) {
+      return 'Photosynthesis is how plants use light energy to make sugar from carbon dioxide and water. A useful overall equation is 6 CO₂ + 6 H₂O + light → C₆H₁₂O₆ + 6 O₂. In plants, this happens in chloroplasts; the sugar stores energy and oxygen is released.';
+    }
+    if (/^(?:what is dna|what does dna do|explain dna)[?.!]*$/.test(q)) {
+      return 'DNA stores hereditary instructions. Cells copy parts of those instructions into RNA, which can leave the nucleus and help direct protein production. The DNA itself generally remains in the nucleus of a eukaryotic cell.';
+    }
+    if (/\b(?:difference between|compare)\b.*\bmetaphor\b.*\bsimile\b/.test(q)) {
+      return 'Both compare unlike things. A simile states the comparison using “like” or “as”: “The classroom was like a beehive.” A metaphor states it directly: “The classroom was a beehive.”';
+    }
+    if (/^(?:how do i write|what is) a thesis statement[?.!]*$/.test(q)) {
+      return 'A thesis statement gives the main claim your essay will support. Make it specific and arguable. For example: “High schools should start later because more sleep can improve students’ attention and health.” Then use evidence in the essay to support each reason.';
+    }
+    if (/\bsubject[- ]verb agreement\b/.test(q) && /\bsat\b/.test(q)) {
+      return 'For SAT subject–verb agreement, find the main subject and make the verb match it in number: “The student writes,” but “The students write.” Ignore interrupting phrases when checking agreement: “The box of books is heavy” because “box” is singular.';
+    }
+    if (!context.essay && /\b(?:improve|strengthen|better) my college essay\b/.test(q)) {
+      return 'For a college personal statement, focus on one specific moment or choice, show what you did, and explain how your thinking changed. Keep your own voice; avoid résumé summaries and broad claims. Share a draft and prompt for a concrete admissions-style review.';
+    }
+    return null;
   }
 
   function normalizeMessages(messages) {
@@ -500,6 +537,10 @@
 
   async function reliableAsk(input, context = {}) {
     const route = A.routeIntent(input);
+    if (route.agent === 'out-of-scope') {
+      const answer = 'That’s outside Scholark’s study and college-planning scope. I can help with classes, test prep, applications, essays, scholarships, or careers.';
+      return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'scope-redirect', answer, text: answer, failures: [] };
+    }
     if (route.agent === 'greeting') {
       const answer = 'Hey! I’m Scholark’s study assistant. What would you like help with?';
       return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'greeting', answer, text: answer, failures: [] };
@@ -516,6 +557,11 @@
         text: answer,
         failures: []
       };
+    }
+    const verified = verifiedLearningAnswer(input, context);
+    if (verified) {
+      return { route, mode: 'grounded-local', tier: 'grounded', modelId: null,
+        generationKind: 'verified-learning', answer: verified, text: verified, failures: [] };
     }
     return baseAsk(input, context);
   }

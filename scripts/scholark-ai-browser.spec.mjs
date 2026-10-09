@@ -118,6 +118,220 @@ test.describe('Scholark AI local-first browser regression', () => {
     }
   });
 
+  test('non-education requests redirect while academic questions remain available', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const result = await page.evaluate(async () => {
+      const Agents = window.ScholarkAIAgents;
+      const rejected = await Promise.all([
+        Agents.ask('What is your favorite Netflix show?'),
+        Agents.ask('Recommend a good Netflix show'),
+        Agents.ask('What should I watch tonight?')
+      ]);
+      return {
+        rejected: rejected.map(item => ({ route: item.route.agent, answer: item.answer })),
+        academic: [
+          window.ScholarkAIAlgorithms.routeIntent('Explain a movie scene for my English class').agent,
+          window.ScholarkAIAlgorithms.routeIntent('Help with AP Computer Science Principles').agent,
+          window.ScholarkAIAlgorithms.routeIntent('What is 6 + 7?').agent
+        ]
+      };
+    });
+    for (const item of result.rejected) {
+      expect(item.route).toBe('out-of-scope');
+      expect(item.answer).toContain('outside Scholark');
+      expect(item.answer).not.toMatch(/Netflix|show recommendation/i);
+    }
+    expect(result.academic).toEqual(['tutor', 'ap', 'tutor']);
+    await page.evaluate(() => window.ScholarkAIUI.open());
+    await page.locator('#sk-ai-input').fill('Recommend a good Netflix show');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    const reply = page.locator('#sk-ai-transcript .sk-ai-message.assistant').last();
+    await expect(reply).toContainText('outside Scholark');
+    await expect(reply.locator('small')).toHaveText('Scholark assistant');
+  });
+
+  test('twenty-three distinct student scenarios reach the intended scope and specialist', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const cases = [
+      ['hey', 'greeting'], ['hello', 'greeting'],
+      ['who made u', 'knowledge'], ['who created you', 'knowledge'],
+      ['who are you', 'knowledge'], ['scholark', 'knowledge'],
+      ['what is scholark?', 'knowledge'],
+      ['Recommend a good Netflix show', 'out-of-scope'],
+      ['What is your favorite Netflix show?', 'out-of-scope'],
+      ['What should I watch tonight?', 'out-of-scope'],
+      ['What should I cook?', 'out-of-scope'],
+      ['Recommend a video game', 'out-of-scope'],
+      ['How does photosynthesis work?', 'tutor'],
+      ['What is 6 + 7?', 'tutor'], ['Explain fractions', 'tutor'],
+      ['Help with AP Biology', 'ap'], ['How is my AP progress?', 'ap'],
+      ['How is my SAT progress?', 'sat'], ['Make a study plan', 'planner'],
+      ['Help with my essay', 'essay'], ['Compare colleges', 'college'],
+      ['Find scholarships', 'scholarship'],
+      ['Analyze a movie scene for my English class', 'tutor']
+    ];
+    const actual = await page.evaluate(inputs => inputs.map(input => window.ScholarkAIAlgorithms.routeIntent(input).agent), cases.map(item => item[0]));
+    expect(actual).toEqual(cases.map(item => item[1]));
+  });
+
+  test('foundational answers avoid observed science, writing, and SAT hallucinations', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const answers = await page.evaluate(async () => {
+      const ask = window.ScholarkAIAgents.ask;
+      return Promise.all([
+        'How does photosynthesis work?', 'What does DNA do?',
+        'What is the difference between a metaphor and a simile?',
+        'How do I write a thesis statement?',
+        'Explain subject-verb agreement for the SAT.',
+        'How can I improve my college essay?'
+      ].map(async input => ({ input, ...(await ask(input)) })));
+    });
+    expect(answers).toHaveLength(6);
+    expect(answers.every(item => item.generationKind === 'verified-learning')).toBe(true);
+    expect(answers[0].answer).toContain('6 CO₂ + 6 H₂O');
+    expect(answers[1].answer).toContain('RNA');
+    expect(answers[2].answer).toContain('classroom was a beehive');
+    expect(answers[2].answer).toContain('classroom was like a beehive');
+    expect(answers[3].answer).not.toMatch(/study conducted in 2023|according to a study/i);
+    expect(answers[4].answer).toContain('The students write');
+    expect(answers[5].answer).toContain('college personal statement');
+  });
+
+  test('one AP answer never becomes a false mastery diagnosis', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const result = await page.evaluate(async () => {
+      const originalState = window.ScholarkAP?.getState;
+      const originalGenerate = window.ScholarkAI.generate;
+      window.ScholarkAP = window.ScholarkAP || {};
+      window.ScholarkAP.getState = () => ({ subjects: {
+        'ap-computer-science-principles': { responses: [{ unitIndex: 0, correct: true, confidence: 2 }] }
+      } });
+      window.ScholarkAI.generate = () => { throw new Error('A single response must not trigger model inference'); };
+      try { return await window.ScholarkAIAgents.ask('How is my AP progress?'); }
+      finally {
+        window.ScholarkAP.getState = originalState;
+        window.ScholarkAI.generate = originalGenerate;
+      }
+    });
+    expect(result.mode).toBe('grounded-local');
+    expect(result.answer).toContain('too little evidence to judge mastery');
+    expect(result.answer).not.toMatch(/high level of mastery|mastered the concept/i);
+  });
+
+  test('specialists reject off-target model prose and use verified source data', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const answers = await page.evaluate(async () => {
+      const AI = window.ScholarkAI;
+      const Agents = window.ScholarkAIAgents;
+      const original = AI.generate;
+      AI.generate = async (_messages, options) => ({
+        mode: 'local-generative', tier: 'standard', text: {
+          sat: 'Concept gap. Do prerequisite_review.',
+          ap: 'concept_gap and prerequisite_review.',
+          planner: 'Math review is first. Math review is second because dailyMinutes is 45.',
+          college: "Scholark's current dataset does not include it.",
+          scholarship: 'Scholarship One needs a transcript and recommendation.'
+        }[options.agent] || 'generic answer'
+      });
+      try {
+        const practice = [
+          { skill: 'Linear equations', correct: false, errorType: 'concept_gap' },
+          { skill: 'Linear equations', correct: false, errorType: 'concept_gap' },
+          { skill: 'Linear equations', correct: true }
+        ];
+        const sat = await Agents.sat.run(practice, {});
+        const ap = await Agents.ap.run(practice.map(row => ({ ...row, skill: 'AP Biology: Cell communication' })), {});
+        const planner = await Agents.planner.run({ dailyMinutes: 45, days: 2, tasks: [
+          { id: 'math', title: 'Math review', deadline: new Date(Date.now() + 86400000).toISOString(), minutes: 30 }
+        ] });
+        const college = await Agents.college.run('Compare Alpha University and Beta College', { colleges: [
+          { name: 'Alpha University', state: 'VA', programs: ['Data Science'] },
+          { name: 'Beta College', state: 'NC', programs: ['Economics'] }
+        ] });
+        const scholarship = await Agents.scholarship.run('Which has the earlier deadline?', { scholarships: [
+          { name: 'Scholarship One', deadline: '2026-09-15' },
+          { name: 'Scholarship Two', deadline: '2026-10-01' }
+        ] });
+        return { sat, ap, planner, college, scholarship };
+      } finally { AI.generate = original; }
+    });
+    expect(answers.sat.answer).toContain('Linear equations');
+    expect(answers.ap.answer).toContain('AP Biology: Cell communication');
+    expect(answers.sat.answer + answers.ap.answer).not.toMatch(/concept_gap|prerequisite_review/);
+    expect(answers.planner.answer.match(/Math review/g)).toHaveLength(1);
+    expect(answers.college.answer).toContain('Alpha University');
+    expect(answers.college.answer).toContain('Beta College');
+    expect(answers.scholarship.answer).toContain('Scholarship One has the earlier stored deadline');
+    expect(answers.scholarship.answer).not.toContain('transcript');
+    const clarification = await page.evaluate(() => window.ScholarkAIAgents.ask('Compare colleges'));
+    expect(clarification.answer).toContain('Name two colleges');
+  });
+
+  test('essay evaluation uses a demanding admissions reader prompt with local rubric scores', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const review = await page.evaluate(async () => {
+      const AI = window.ScholarkAI;
+      const original = AI.generateStructured;
+      let prompt = '';
+      AI.generateStructured = async messages => {
+        prompt = messages[0].content;
+        return {
+          mode: 'local-generative', tier: 'standard',
+          value: {
+            strongest_element: 'The robotics cart stopping before the line is a concrete opening.',
+            biggest_weakness: 'The ending summarizes the lesson without showing a later choice.',
+            reader_thought: 'The cable repair is memorable; the reflection needs a more specific consequence.',
+            improvements: ['Show a later test.', 'Replace the general closing claim.', 'Connect the revision to the prompt.']
+          }
+        };
+      };
+      try {
+        const essay = 'The robotics cart stopped three inches before the line. I had assumed the sensor was broken, but the loose cable was my mistake. I rewired it, tested it again, and wrote down what changed. That small failure taught me to separate what I expected from what the data actually showed. Now, when a project goes wrong, I start by checking the evidence instead of defending my first guess. I still like building quickly, but I have learned that careful revision is part of building well.';
+        const result = await window.ScholarkAIAgents.essay.evaluate(essay, 'Describe an experience that changed how you think.', { saveVersion: false });
+        return { prompt, result };
+      } finally { AI.generateStructured = original; }
+    });
+    expect(review.prompt).toMatch(/demanding college admissions essay reader simulation/i);
+    expect(review.prompt).toMatch(/specific scenes|reflection|prompt fit|clichés/i);
+    expect(review.prompt).toContain('name a specific action, object, or phrase actually present');
+    expect(review.result.mode).toBe('local-generative');
+    expect(review.result.evaluation.overall).toBeGreaterThanOrEqual(1);
+    expect(Object.keys(review.result.evaluation.scores)).toHaveLength(13);
+    expect(review.result.evaluation.biggest_weakness).toBe('The ending summarizes the lesson without showing a later choice.');
+  });
+
+  test('essay reader rejects generic or invented model notes and keeps evidence-based rubric review', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const review = await page.evaluate(async () => {
+      const AI = window.ScholarkAI;
+      const original = AI.generateStructured;
+      AI.generateStructured = async () => ({
+        mode: 'local-generative', tier: 'standard',
+        value: {
+          strongest_element: 'reflection and growth', biggest_weakness: 'clichés',
+          reader_thought: 'The phrase "I was born to lead" is memorable.',
+          improvements: ['Add detail.', 'Improve the voice.', 'Make it clearer.']
+        }
+      });
+      try {
+        const essay = 'The robotics cart stopped three inches before the line. I had assumed the sensor was broken, but the loose cable was my mistake. I rewired it, tested it again, and wrote down what changed. That small failure taught me to separate what I expected from what the data actually showed. Now, when a project goes wrong, I start by checking the evidence instead of defending my first guess. I still like building quickly, but I have learned that careful revision is part of building well.';
+        const result = await window.ScholarkAIAgents.essay.evaluate(essay, '', { saveVersion: false });
+        return { mode: result.mode, reason: result.reason, notes: result.evaluation };
+      } finally { AI.generateStructured = original; }
+    });
+    expect(review.mode).toBe('deterministic-fallback');
+    expect(review.reason).toBe('ungrounded-essay-feedback');
+    expect(review.notes.strongest_element).toContain('robotics cart');
+    expect(review.notes.reader_thought).not.toContain('I was born to lead');
+  });
+
   test('casual chat does not include unrelated AP mastery or active page in tutor prompt', async ({ page }) => {
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     await waitForAI(page);
@@ -128,7 +342,7 @@ test.describe('Scholark AI local-first browser regression', () => {
       window.__capturedTutorMessages = [];
       window.ScholarkAI.generate = async messages => {
         window.__capturedTutorMessages.push(messages);
-        return { mode: 'local-generative', tier: 'standard', text: 'Plants use sunlight to turn water and carbon dioxide into sugars.' };
+        return { mode: 'local-generative', tier: 'standard', text: 'Volcanoes form when magma rises to the surface.' };
       };
     });
     await page.evaluate(() => window.ScholarkAIUI.open());
@@ -136,27 +350,27 @@ test.describe('Scholark AI local-first browser regression', () => {
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
     await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Scholark’s study assistant');
     expect(await page.evaluate(() => window.__capturedTutorMessages.length)).toBe(0);
-    await page.locator('#sk-ai-input').fill('How does photosynthesis work?');
+    await page.locator('#sk-ai-input').fill('How do volcanoes form?');
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Volcanoes form');
     const messages = await page.evaluate(() => window.__capturedTutorMessages[0]);
     expect(JSON.stringify(messages)).not.toMatch(/Creative Development|AP course|mastery_anon|"mastery":/i);
     await page.locator('#sk-ai-input').fill('Help me understand my AP Computer Science Principles code');
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Volcanoes form');
     const apMessages = await page.evaluate(() => window.__capturedTutorMessages[1]);
     expect(JSON.stringify(apMessages)).toContain('Help me understand my AP Computer Science Principles code');
     expect(JSON.stringify(apMessages)).not.toContain('Creative Development');
     await page.locator('#sk-ai-input').fill('explain that');
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Volcanoes form');
     const followUp = await page.evaluate(() => window.__capturedTutorMessages[2]);
     expect(followUp.at(-3).content).toBe('Help me understand my AP Computer Science Principles code');
     expect(followUp.at(-1).content).toBe('explain that');
     await page.locator('#sk-ai-dialog .sk-ai-new').click();
     await page.locator('#sk-ai-input').fill('explain that');
     await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
-    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Plants use sunlight');
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Volcanoes form');
     expect(await page.evaluate(() => window.__capturedTutorMessages[3])).toHaveLength(2);
   });
 
@@ -167,7 +381,7 @@ test.describe('Scholark AI local-first browser regression', () => {
       window.__formatExecuted = false;
       window.ScholarkAIAgents.ask = async () => ({
         mode: 'local-generative', tier: 'standard', route: { agent: 'tutor' },
-        answer: 'To solve 6 + 7:\n\n1. **Add the numbers**: 6 + 7 = 13.\n2. **Result**: 13.\n\nSo, the answer is 13.\n\n<img src=x onerror="window.__formatExecuted=true">'
+        answer: 'To solve 6 + 7:\n\n1. **Add the numbers**: 6 + 7 = 13.\n2. **Result**: 13.\n\nSo, the answer is 13.\n\n$ \\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4} $. A scholarship award is $20.\n\n$$\n\\frac{2}{4} + \\frac{1}{4} = \\frac{3}{4}\n$$\n\n<img src=x onerror="window.__formatExecuted=true">'
       });
     });
     await page.evaluate(() => window.ScholarkAIUI.open());
@@ -178,6 +392,10 @@ test.describe('Scholark AI local-first browser regression', () => {
     await expect(reply.locator('strong').first()).toHaveText('Add the numbers');
     await expect(reply).toContainText('So, the answer is 13.');
     await expect(reply).not.toContainText('**');
+    await expect(reply).toContainText('1/2 + 1/4 = 3/4');
+    await expect(reply).toContainText('$20');
+    await expect(reply).not.toContainText('\\frac');
+    await expect(reply).not.toContainText('$$');
     await expect(reply.locator('img')).toHaveCount(0);
     expect(await page.evaluate(() => window.__formatExecuted)).toBe(false);
   });

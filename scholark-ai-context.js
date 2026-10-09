@@ -129,7 +129,7 @@
   ]);
 
   function scholarshipRows() {
-    return VERIFIED_SCHOLARSHIPS.map(row => ({ ...row }));
+    return VERIFIED_SCHOLARSHIPS.filter(row => Date.parse(row.deadline) > Date.now()).map(row => ({ ...row }));
   }
 
   function satRawResponses() {
@@ -207,6 +207,7 @@
     if (!analysis.length) return `Complete some ${kind === 'sat' ? 'SAT' : 'AP'} practice first. Scholark will use your actual recorded results rather than inventing a diagnosis.`;
     const weak = analysis[0];
     const pct = Math.round(weak.accuracy * 100);
+    if (weak.attempts < 3) return `You have ${weak.attempts} recorded ${weak.attempts === 1 ? 'attempt' : 'attempts'} for ${weak.skill} (${pct}% correct). That is too little evidence to judge mastery or diagnose a reliable weakness. Try a few more questions in this skill first.`;
     const error = weak.dominantError ? ` Your most common recorded error type there is ${weak.dominantError.replaceAll('_',' ')}.` : '';
     const next = recommendation ? ` Next: ${recommendation.count} ${recommendation.difficulty} questions using ${recommendation.action.replaceAll('_',' ')}.` : '';
     return `Your current bottleneck is ${weak.skill}: ${pct}% correct across ${weak.attempts} recorded attempts.${error}${next}`;
@@ -223,6 +224,12 @@
     }) : null;
     const prompt = kind === 'ap' ? Agents.prompts.ap : Agents.prompts.sat;
     const fallbackText = fallbackDiagnostic(kind, analysis, recommendation);
+    if (!weak || weak.attempts < 3) {
+      return {
+        mode: 'grounded-local', generationKind: 'limited-practice-evidence',
+        analysis, weakest: weak, recommendation, answer: fallbackText, text: fallbackText
+      };
+    }
     const result = await AI.generate([
       { role: 'system', content: prompt },
       { role: 'user', content: `This history is already stored in Scholark and has already contributed to mastery. Diagnose it without pretending there are additional attempts.\n\nCONTEXT:\n${JSON.stringify(context).slice(0,2800)}\n\nRECORDED ANALYSIS:\n${JSON.stringify(analysis).slice(0,6500)}\n\nDETERMINISTIC NEXT STEP:\n${JSON.stringify(recommendation).slice(0,1400)}` }
@@ -232,12 +239,17 @@
       maxTokens: 430,
       fallback: () => ({ text: fallbackText })
     });
+    const generated = String(result.text || '');
+    const useful = result.mode === 'local-generative' && generated.toLowerCase().includes(weak.skill.toLowerCase())
+      && !/concept_gap|prerequisite_review|\bmaster(?:ed|y)\b/i.test(generated);
     return {
       ...result,
+      mode: useful ? result.mode : 'grounded-local',
+      generationKind: useful ? 'specialist-ai' : 'validated-specialist',
       analysis,
       weakest: weak,
       recommendation,
-      answer: result.mode === 'local-generative' ? result.text : result.value?.text || fallbackText
+      answer: useful ? generated : fallbackText
     };
   }
 
