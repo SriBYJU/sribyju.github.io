@@ -4,7 +4,7 @@
   window.__scholarkAIUIPolishInstalled = true;
 
   const VERSION = '1.0.1';
-  const WELCOME_COPY = 'Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model.';
+  const WELCOME_COPY = 'Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model. Guided help is a last resort when local AI cannot provide a usable answer.';
   let scheduled = false;
 
   function setTextIfChanged(node, value) {

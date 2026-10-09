@@ -64,7 +64,7 @@
         <button type="button" data-sk-action="college"><b>College</b><span>Research from data</span></button>
       </div>
       <div class="sk-ai-transcript" id="sk-ai-transcript" aria-live="polite">
-        <div class="sk-ai-welcome"><strong>What do you need help with?</strong><span>Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model.</span></div>
+        <div class="sk-ai-welcome"><strong>What do you need help with?</strong><span>Your first AI reply may take a few minutes while a model downloads to this device. Later replies use the cached model. Guided help is a last resort when local AI cannot provide a usable answer.</span></div>
       </div>
       <div class="sk-ai-progress" id="sk-ai-progress" hidden><span></span><div><b>Preparing your specialist</b><small id="sk-ai-progress-text">Checking this device…</small></div></div>
       <form class="sk-ai-composer" id="sk-ai-form">
