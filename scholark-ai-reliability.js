@@ -11,7 +11,7 @@
     return;
   }
 
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const baseDetectCapability = A.detectCapability.bind(A);
   const baseRouteIntent = A.routeIntent.bind(A);
   const baseGenerate = AI.generate.bind(AI);
@@ -45,7 +45,13 @@
       'study planning',
       'scholarship guidance',
       'adaptive practice'
-    ]
+    ],
+    specialists: ['general study tutor', 'SAT/ACT and AP coaches', 'admissions essay reader simulation', 'study planner', 'college research assistant', 'scholarship assistant'],
+    architecture: 'The chat uses small language models that run in the browser when the device supports them. Its specialists are task-specific instructions and data checks around those models, not separate all-knowing AIs. Rule-based tools provide practice, rubric scores, and a fallback when a model cannot run.',
+    models: 'Depending on the device and availability, Scholark can use Qwen3 or SmolLM2 through WebLLM, a Llama 3.2 rescue model, or a small CPU model. A reply labeled on-device tutor comes from a local model; a reply labeled Stored Scholark facts or Scholark assistant comes from verified app rules.',
+    vision: 'This chat does not analyze camera feeds or images and does not have a computer-vision specialist.',
+    backend: 'AI chat and essay feedback run in the browser. Signed-in account data can sync through Firebase; that is separate from running the local AI model.',
+    essay: 'The admissions reader simulation uses a local rubric and, when available, an on-device language model for draft-specific feedback. It assesses voice, concrete evidence, reflection, clarity, and prompt fit; it does not know a college’s private admissions decisions or write the student’s essay.'
   });
 
   let rescueEngine = null;
@@ -85,26 +91,34 @@
   }
 
   function isKnowledgeQuestion(input = '') {
-    const q = String(input).toLowerCase().replace(/scholar\s*k/g, 'scholark').trim();
+    const q = String(input).toLowerCase().replace(/scholar[\s-]*k/g, 'scholark').trim();
     if (/^scholark[?.!]*$/.test(q)) return true;
     if (/^(who|what)\s+are\s+(you|u)[?.!]*$/.test(q)) return true;
     if (/\bwho\s+(made|built|created|founded|started)\s+(you|u|this\s+(app|site|website|tool|assistant))\b/.test(q)) return true;
+    if (/\b(?:explain|solve|teach|help me with)\b/.test(q) && /\b(?:math|biology|chemistry|physics|history|english|fractions?|photosynthesis|world war|sat|act|ap|essay|college|scholarship)\b/.test(q) && !/\b(?:scholark|this app)\b.{0,25}\b(?:work|built|made|run)\b/.test(q)) return false;
+    const productSubject = /\b(scholark|you|your|admissions reader|essay reader|local ai|ai tools?|this (?:app|site|website|chat|assistant|bot|platform|tool))\b/.test(q);
+    const productTopic = /\b(ai|ais|bots?|models?|agents?|assistants?|specialists?|features?|capabilities|technology|tech|system|architecture|backend|front.?end|camera|vision|images?|photos?|data|privacy|firebase|essay grader|essay reader|machine learning|deep learning)\b/.test(q);
+    const productIntent = /\b(what|which|who|how|does|do|is|are|can|tell|list|explain|describe)\b/.test(q);
+    if (productSubject && productTopic && productIntent) return true;
     return /\bscholark\b/.test(q) && (
       /\bwho\s+(made|built|created|founded|owns|runs|started)\b/.test(q) ||
       /\bwho\s+is\s+(behind|the\s+(creator|founder|maker)\s+of)\b/.test(q) ||
       /\bwhat\s+is\s+scholark\b/.test(q) ||
       /\b(is|does)\s+scholark\s+(free|cost|charge)\b/.test(q) ||
       /\bwhat\s+(can|does)\s+scholark\b/.test(q) ||
-      /\bscholark\s+(creator|founder|features|privacy|about)\b/.test(q)
+      /\bscholark\s+(creator|founder|features|privacy|about)\b/.test(q) ||
+      /\bhow\s+does\s+scholark\s+work\b/.test(q)
     );
   }
 
   function isOutOfScope(input = '') {
     const q = String(input).toLowerCase().trim();
-    if (/\b(class|homework|assignment|essay|course|study|learn|research|analy[sz]e|school|college|university|sat|act|ap exam|career)\b/.test(q)) return false;
+    if (/\b(class|homework|assignment|essay|course|school|college|university|sat|act|ap exam|career|math|economics|history|science)\b/.test(q)) return false;
+    if (/\b(?:study|learn|research|analy[sz]e)\b/.test(q) && /\b(?:marketing|literature|economics|math|history|science|school|class|assignment|essay|course|college)\b/.test(q)) return false;
     if (/\bwhat should i (?:watch|cook|eat|buy|play)\b/.test(q)) return true;
-    return /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|recipes?|sports scores?|weather forecast)\b/.test(q)
-      && /\b(recommend\w*|favorite|best|watch|stream|play|review|rank|suggest\w*|good)\b/.test(q);
+    const offTopic = /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|fast food|mcdonald'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|recipes?|meals?|dinners?|drinks?|sports scores?|weather|forecast|vacations?|travel destinations?|shopping)\b/.test(q);
+    const request = /\b(what|which|who|how|where|when|why|is|are|can|do|does|recommend\w*|favorite|best|watch|stream|play|review|rank|suggest\w*|good|popular|order|buy|eat|cook|research|learn|study)\b/.test(q);
+    return offTopic && request;
   }
 
   function improvedRouteIntent(input = '') {
@@ -122,16 +136,22 @@
     }
     if (isKnowledgeQuestion(input)) {
       return {
-        agent: 'knowledge',
-        confidence: 10,
+        agent: 'knowledge', confidence: 10,
         scores: { tutor: 0, essay: 0, planner: 0, sat: 0, ap: 0, college: 0, scholarship: 0, knowledge: 10 }
+      };
+    }
+    if (/\b(?:write|draft|generate|compose|create)\b.{0,45}\b(?:my|a|the)\b.{0,25}\b(?:college|admissions|application|personal statement|essay)\b/i.test(String(input))) {
+      return {
+        agent: 'authorship-boundary',
+        confidence: 10,
+        scores: { tutor: 0, essay: 0, planner: 0, sat: 0, ap: 0, college: 0, scholarship: 0, 'authorship-boundary': 10 }
       };
     }
     return baseRouteIntent(input);
   }
 
   function productAnswer(input = '') {
-    const q = String(input).toLowerCase().replace(/scholar\s*k/g, 'scholark');
+    const q = String(input).toLowerCase().replace(/scholar[\s-]*k/g, 'scholark');
     if (/who\s+(made|built|created|founded|started)|who\s+is\s+(behind|the\s+(creator|founder|maker))|scholark\s+(creator|founder)/.test(q)) {
       return `Scholark was built by ${PRODUCT_FACTS.creator}. It is ${PRODUCT_FACTS.description}.`;
     }
@@ -141,12 +161,25 @@
     if (/what\s+(can|does)\s+scholark|scholark\s+features/.test(q)) {
       return `Scholark brings together ${PRODUCT_FACTS.capabilities.slice(0, -1).join(', ')}, and ${PRODUCT_FACTS.capabilities.at(-1)} in one student-built platform.`;
     }
+    if (/\b(camera|computer vision|image recognition|photos?|images?|see|visual)\b/.test(q)) return PRODUCT_FACTS.vision;
+    if (/\b(essay grader|essay reader|essay ai|grades? essays?|admissions officer)\b/.test(q)) return PRODUCT_FACTS.essay;
+    if (/\b(backend|front.?end|firebase|server|where.{0,20}(?:data|run)|cloud)\b/.test(q)) return PRODUCT_FACTS.backend;
+    if (/\b(which|what|how).{0,30}\b(models?|qwen|llama|smollm|under the hood|powered)\b|\b(deep learning|machine learning)\b/.test(q)) return PRODUCT_FACTS.models;
+    if (/\b(ai|ais|bots?|agents?|assistants?|specialists?|chatbots?|types?|kinds?)\b/.test(q)) {
+      return `Scholark has ${PRODUCT_FACTS.specialists.join(', ')}. ${PRODUCT_FACTS.architecture} ${PRODUCT_FACTS.vision}`;
+    }
     if (/privacy/.test(q)) return PRODUCT_FACTS.privacy;
     return `Scholark is ${PRODUCT_FACTS.description}, built by ${PRODUCT_FACTS.creator}. ${PRODUCT_FACTS.pricing}`;
   }
 
   function verifiedLearningAnswer(input = '', context = {}) {
     const q = String(input).toLowerCase().trim();
+    if (/\b(?:why (?:did|was)|what (?:caused|started)|explain (?:the causes of)?)\b.{0,28}\b(?:world war (?:i|1|one)|first world war|wwi)\b/.test(q)) {
+      return 'World War I began after the assassination of Archduke Franz Ferdinand in Sarajevo in June 1914. Austria-Hungary declared war on Serbia in July; alliances, mobilization plans, nationalism, and rivalry among European powers turned that crisis into a wider war. Germany fought with Austria-Hungary, while France, Russia, and Britain became opposing powers. Source: Imperial War Museums, “4 August 1914” factsheet.';
+    }
+    if (/\b(?:why|how|explain)\b.{0,35}\b1\s*\/\s*2\s*\+\s*1\s*\/\s*4\b/.test(q)) {
+      return 'Use a common denominator. Rewrite 1/2 as 2/4; then 2/4 + 1/4 = 3/4. The pieces must be the same size before you add their counts.';
+    }
     if (/^(?:what is photosynthesis|how does photosynthesis work|explain photosynthesis)[?.!]*$/.test(q)) {
       return 'Photosynthesis is how plants use light energy to make sugar from carbon dioxide and water. A useful overall equation is 6 CO₂ + 6 H₂O + light → C₆H₁₂O₆ + 6 O₂. In plants, this happens in chloroplasts; the sugar stores energy and oxygen is released.';
     }
@@ -229,6 +262,19 @@
     if (/fraction/.test(question) && (/add (the )?denominators|denominators are different.{0,60}add the numerators|1\/2\s*\+\s*1\/4\s*=\s*2\/4/i.test(value))) return true;
     if (/^\s*who\b/.test(question) && /guided help|practice resource|solve one example/i.test(value)) return true;
     return false;
+  }
+
+  function readableMath(text, agent) {
+    if (agent !== 'tutor') return text;
+    return String(text)
+      .replace(/\\frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}/g, '$1/$2')
+      .replace(/\\text\s*\{([^{}]+)\}/g, '$1')
+      .replace(/\\quad\b/g, ' ')
+      .replace(/\\cdot\b/g, ' × ')
+      .replace(/\\times\b/g, ' × ')
+      .replace(/\$\$?/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   }
 
   function sequenceFor(capability, requestedTier) {
@@ -443,11 +489,12 @@
         const attempts = index === 0 ? 2 : 1;
         for (let attempt = 0; attempt < attempts; attempt += 1) {
           try {
-            const text = await runTier(tier, safeMessages, {
+            const rawText = await runTier(tier, safeMessages, {
               ...options,
               temperature: attempt ? Math.min(options.temperature ?? 0.18, 0.12) : options.temperature,
               maxTokens: attempt ? Math.min(options.maxTokens || 500, 420) : options.maxTokens
             });
+            const text = readableMath(rawText, options.agent);
             if (isWeakAnswer(text, safeMessages)) {
               failures.push({ tier, attempt, message: 'quality-gate-rejected-weak-response', at: Date.now() });
               AI.telemetry.record('quality-retry', { agent: options.agent || 'unknown', tier, reason: 'weak-response' });
@@ -481,7 +528,7 @@
       const cpuModels = [CPU_MODELS.compact];
       for (const modelId of cpuModels) {
         try {
-          const text = await runCPU(modelId, safeMessages, options);
+          const text = readableMath(await runCPU(modelId, safeMessages, options), options.agent);
           if (!isWeakAnswer(text, safeMessages)) {
             AI.telemetry.record('generation-success', { agent: options.agent || 'unknown', tier: 'cpu', modelId });
             return { mode: 'local-generative', tier: 'cpu', modelId, text, failures, reliabilityStage: 'cpu' };
@@ -537,6 +584,10 @@
 
   async function reliableAsk(input, context = {}) {
     const route = A.routeIntent(input);
+    if (route.agent === 'authorship-boundary') {
+      const answer = 'I can review your draft, identify its strongest evidence and biggest weakness, and suggest revisions in your own voice. I cannot write an admissions essay for you. Share your draft and the application prompt for feedback.';
+      return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'authorship-guidance', answer, text: answer, failures: [] };
+    }
     if (route.agent === 'out-of-scope') {
       const answer = 'That’s outside Scholark’s study and college-planning scope. I can help with classes, test prep, applications, essays, scholarships, or careers.';
       return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'scope-redirect', answer, text: answer, failures: [] };

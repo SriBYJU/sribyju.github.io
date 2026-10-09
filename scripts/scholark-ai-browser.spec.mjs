@@ -176,6 +176,95 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(actual).toEqual(cases.map(item => item[1]));
   });
 
+  test('forty-plus varied product, scope, and academic phrasings route without invented product claims', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const cases = [
+      ['what are the different types of AIs in this Scholark?', 'knowledge'],
+      ['What AI agents does ScholarK have?', 'knowledge'],
+      ['List the AI tools in this app', 'knowledge'],
+      ['Which assistants are in this chat?', 'knowledge'],
+      ['How does Scholar K AI work?', 'knowledge'],
+      ['What models power your chat?', 'knowledge'],
+      ['Are you machine learning or deep learning?', 'knowledge'],
+      ['Does Scholark use computer vision?', 'knowledge'],
+      ['Can this chat see photos?', 'knowledge'],
+      ['Does your AI have a camera?', 'knowledge'],
+      ['Where does Scholark AI run?', 'knowledge'],
+      ['Is Scholark AI on a server?', 'knowledge'],
+      ['What does the backend do in Scholark?', 'knowledge'],
+      ['How does your essay grader work?', 'knowledge'],
+      ['What is the admissions reader AI?', 'knowledge'],
+      ['Who made this app?', 'knowledge'],
+      ['What can Scholark do?', 'knowledge'],
+      ["What's McDonald's most popular order?", 'out-of-scope'],
+      ['What is in a Big Mac?', 'out-of-scope'],
+      ['Recommend a Starbucks drink', 'out-of-scope'],
+      ['Where should I get pizza tonight?', 'out-of-scope'],
+      ['Which restaurant is best?', 'out-of-scope'],
+      ['What is the best burger?', 'out-of-scope'],
+      ['What should I eat for dinner?', 'out-of-scope'],
+      ['Suggest a recipe for tonight', 'out-of-scope'],
+      ['What is the weather tomorrow?', 'out-of-scope'],
+      ['Where should I travel for vacation?', 'out-of-scope'],
+      ['Which movie should I watch?', 'out-of-scope'],
+      ['What is your favorite song?', 'out-of-scope'],
+      ['What was the sports score?', 'out-of-scope'],
+      ["Research McDonald's most popular order", 'out-of-scope'],
+      ['Analyze McDonald\'s marketing for my economics class', 'tutor'],
+      ['Use a burger price in a math word problem', 'tutor'],
+      ['Analyze a movie for history class', 'tutor'],
+      ['Can your AI explain photosynthesis?', 'tutor'],
+      ['Can Scholark AI help me with SAT math?', 'sat'],
+      ['Explain photosynthesis', 'tutor'],
+      ['What is 6 + 7?', 'tutor'],
+      ['Help with AP biology', 'ap'],
+      ['Help me prepare for the SAT', 'sat'],
+      ['Compare colleges', 'college'],
+      ['Find scholarships', 'scholarship'],
+      ['Write my college admissions essay for me', 'authorship-boundary']
+    ];
+    const actual = await page.evaluate(inputs => inputs.map(input => window.ScholarkAIAlgorithms.routeIntent(input).agent), cases.map(item => item[0]));
+    expect(actual).toEqual(cases.map(item => item[1]));
+
+    const groundedCases = cases.filter(([, agent]) => agent === 'knowledge' || agent === 'out-of-scope');
+    const groundedAnswers = await page.evaluate(async inputs => Promise.all(inputs.map(input => window.ScholarkAIAgents.ask(input))), groundedCases.map(([input]) => input));
+    expect(groundedAnswers).toHaveLength(31);
+    groundedAnswers.forEach((answer, index) => {
+      expect(answer.route.agent, groundedCases[index][0]).toBe(groundedCases[index][1]);
+      expect(answer.answer.trim(), groundedCases[index][0]).not.toBe('');
+      expect(answer.mode, groundedCases[index][0]).toBe('grounded-local');
+      if (answer.route.agent === 'out-of-scope') expect(answer.answer).toContain('outside Scholark');
+    });
+
+    const answers = await page.evaluate(async () => {
+      const ask = window.ScholarkAIAgents.ask;
+      return Promise.all([
+        'what are the different types of AIs in this Scholark?',
+        'Does Scholark use computer vision?',
+        "What's McDonald's most popular order?",
+        'Write my college admissions essay for me'
+      ].map(async input => ({ input, ...(await ask(input)) })));
+    });
+    expect(answers[0].answer).toMatch(/tutor|admissions essay reader/i);
+    expect(answers[0].answer).toMatch(/task-specific instructions|small language models/i);
+    expect(answers[0].answer).not.toMatch(/image recognition specialist|camera vision specialist/i);
+    expect(answers[1].answer).toMatch(/does not analyze camera/i);
+    expect(answers[2].answer).toMatch(/outside Scholark/i);
+    expect(answers[2].answer).not.toMatch(/Big Mac/i);
+    expect(answers[3].answer).toMatch(/cannot write an admissions essay/i);
+
+    await page.evaluate(() => window.ScholarkAIUI.open());
+    for (const [input, expected] of [
+      ['what are the different types of AIs in this Scholark?', /study tutor|admissions essay reader/i],
+      ["What's McDonald's most popular order?", /outside Scholark/i]
+    ]) {
+      await page.locator('#sk-ai-input').fill(input);
+      await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+      await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText(expected);
+    }
+  });
+
   test('foundational answers avoid observed science, writing, and SAT hallucinations', async ({ page }) => {
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     await waitForAI(page);
@@ -186,13 +275,17 @@ test.describe('Scholark AI local-first browser regression', () => {
         'What is the difference between a metaphor and a simile?',
         'How do I write a thesis statement?',
         'Explain subject-verb agreement for the SAT.',
-        'How can I improve my college essay?'
+        'How can I improve my college essay?',
+        'Why did World War I start?',
+        'Why is 1/2 + 1/4 equal to 3/4?'
       ].map(async input => ({ input, ...(await ask(input)) })));
     });
-    expect(answers).toHaveLength(6);
+    expect(answers).toHaveLength(8);
     expect(answers.every(item => item.generationKind === 'verified-learning')).toBe(true);
     expect(answers[0].answer).toContain('6 CO₂ + 6 H₂O');
     expect(answers[1].answer).toContain('RNA');
+    expect(answers[6].answer).toContain('Germany fought with Austria-Hungary');
+    expect(answers[7].answer).toContain('2/4 + 1/4 = 3/4');
     expect(answers[2].answer).toContain('classroom was a beehive');
     expect(answers[2].answer).toContain('classroom was like a beehive');
     expect(answers[3].answer).not.toMatch(/study conducted in 2023|according to a study/i);
@@ -284,7 +377,7 @@ test.describe('Scholark AI local-first browser regression', () => {
         return {
           mode: 'local-generative', tier: 'standard',
           value: {
-            strongest_element: 'The robotics cart stopping before the line is a concrete opening.',
+            strongest_element: '“The robotics cart stopped” is a concrete opening.',
             biggest_weakness: 'The ending summarizes the lesson without showing a later choice.',
             reader_thought: 'The cable repair is memorable; the reflection needs a more specific consequence.',
             improvements: ['Show a later test.', 'Replace the general closing claim.', 'Connect the revision to the prompt.']
@@ -299,7 +392,7 @@ test.describe('Scholark AI local-first browser regression', () => {
     });
     expect(review.prompt).toMatch(/demanding college admissions essay reader simulation/i);
     expect(review.prompt).toMatch(/specific scenes|reflection|prompt fit|clichés/i);
-    expect(review.prompt).toContain('name a specific action, object, or phrase actually present');
+    expect(review.prompt).toContain('quote 3-7 consecutive words actually in the draft');
     expect(review.result.mode).toBe('local-generative');
     expect(review.result.evaluation.overall).toBeGreaterThanOrEqual(1);
     expect(Object.keys(review.result.evaluation.scores)).toHaveLength(13);
@@ -323,13 +416,32 @@ test.describe('Scholark AI local-first browser regression', () => {
       try {
         const essay = 'The robotics cart stopped three inches before the line. I had assumed the sensor was broken, but the loose cable was my mistake. I rewired it, tested it again, and wrote down what changed. That small failure taught me to separate what I expected from what the data actually showed. Now, when a project goes wrong, I start by checking the evidence instead of defending my first guess. I still like building quickly, but I have learned that careful revision is part of building well.';
         const result = await window.ScholarkAIAgents.essay.evaluate(essay, '', { saveVersion: false });
-        return { mode: result.mode, reason: result.reason, notes: result.evaluation };
+        AI.generateStructured = async () => ({
+          mode: 'local-generative', tier: 'standard',
+          value: {
+            strongest_element: '“The robotics cart stopped” makes an opening.',
+            biggest_weakness: 'I need to improve my ability to reflect on my mistakes.',
+            reader_thought: 'This shows growth.',
+            improvements: ['I should be more reflective.', 'I can include examples.', 'I need to improve my writing.']
+          }
+        });
+        const applicantVoice = await window.ScholarkAIAgents.essay.evaluate(essay, '', { saveVersion: false });
+        return { mode: result.mode, reason: result.reason, notes: result.evaluation, applicantVoice: applicantVoice.mode };
       } finally { AI.generateStructured = original; }
     });
     expect(review.mode).toBe('deterministic-fallback');
     expect(review.reason).toBe('ungrounded-essay-feedback');
     expect(review.notes.strongest_element).toContain('robotics cart');
     expect(review.notes.reader_thought).not.toContain('I was born to lead');
+    expect(review.applicantVoice).toBe('deterministic-fallback');
+  });
+
+  test('essay follow-up keeps student authorship', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    const review = await page.evaluate(() => window.ScholarkAIAgents.essay.followUp('Rewrite my opening paragraph for me'));
+    expect(review.generationKind).toBe('authorship-guidance');
+    expect(review.answer).toMatch(/cannot write application prose/i);
   });
 
   test('casual chat does not include unrelated AP mastery or active page in tutor prompt', async ({ page }) => {

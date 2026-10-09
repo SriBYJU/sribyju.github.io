@@ -287,7 +287,7 @@
   function essayDetailHTML() {
     return `<section class="sk-ai-essay-detail" id="sk-ai-essay-detail" aria-live="polite">
       <div class="sk-ai-essay-title-row">
-        <div><span class="sk-ai-kicker">Admissions Reader Simulation</span><h3>Demanding rubric review</h3><p>Scores are rubric estimates. On-device AI adds draft-specific reader notes when available; this is not a university evaluation or admissions prediction.</p></div>
+        <div><span class="sk-ai-kicker">Admissions Reader Simulation</span><h3>Evidence-based essay feedback</h3><p>Scores are local rubric estimates, not a university grade or admissions prediction. The on-device reader adds notes tied to your draft when available. It coaches your revisions and does not write your essay. The review draws on published <a href="https://admissions.yale.edu/essays" target="_blank" rel="noopener noreferrer">Yale</a> and <a href="https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-first-year/personal-insight-questions.html" target="_blank" rel="noopener noreferrer">UC</a> essay guidance.</p></div>
         <div class="sk-ai-overall" id="sk-ai-overall"><b>—</b><span>/ 10</span></div>
       </div>
       <div class="sk-ai-essay-status" id="sk-ai-essay-status">Run Rubric Feedback to generate the expanded review.</div>
