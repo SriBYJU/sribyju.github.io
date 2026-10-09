@@ -103,6 +103,62 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(result.answer).toContain('Shriyan Avadhanula');
     expect(result.answer).toContain('student-built');
     expect(result.answer).not.toMatch(/break the task into three pieces|practice or course resource/i);
+    for (const input of ['who made u', 'Who created you?', 'scholark']) {
+      const followUp = await page.evaluate(question => window.ScholarkAIAgents.ask(question), input);
+      expect(followUp.route.agent, input).toBe('knowledge');
+      expect(followUp.answer, input).toContain('Shriyan Avadhanula');
+    }
+    await page.evaluate(() => window.ScholarkAIUI.open());
+    for (const input of ['who made u', 'scholark']) {
+      await page.locator('#sk-ai-input').fill(input);
+      await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+      const reply = page.locator('#sk-ai-transcript .sk-ai-message.assistant').last();
+      await expect(reply).toContainText('Shriyan Avadhanula');
+      await expect(reply).not.toContainText('AP Computer Science');
+    }
+  });
+
+  test('casual chat does not include unrelated AP mastery or active page in tutor prompt', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    await page.evaluate(() => {
+      window.ScholarkAIAgents.mastery.update('AP Computer Science Principles: Unit 1 - Creative Development', { correct: true });
+      document.querySelector('.page.active')?.classList.remove('active');
+      document.querySelector('#page-ap')?.classList.add('active');
+      window.__capturedTutorMessages = [];
+      window.ScholarkAI.generate = async messages => {
+        window.__capturedTutorMessages.push(messages);
+        return { mode: 'local-generative', tier: 'standard', text: 'Hey! What would you like to work on?' };
+      };
+    });
+    await page.evaluate(() => window.ScholarkAIUI.open());
+    await page.locator('#sk-ai-input').fill('hey');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    await expect(page.locator('#sk-ai-transcript .sk-ai-message.assistant').last()).toContainText('Hey!');
+    const messages = await page.evaluate(() => window.__capturedTutorMessages[0]);
+    expect(JSON.stringify(messages)).not.toMatch(/Creative Development|AP course|mastery_anon|"mastery":/i);
+  });
+
+  test('assistant replies render lists and emphasis without exposing HTML', async ({ page }) => {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await waitForAI(page);
+    await page.evaluate(() => {
+      window.__formatExecuted = false;
+      window.ScholarkAIAgents.ask = async () => ({
+        mode: 'local-generative', tier: 'standard', route: { agent: 'tutor' },
+        answer: 'To solve 6 + 7:\n\n1. **Add the numbers**: 6 + 7 = 13.\n2. **Result**: 13.\n\nSo, the answer is 13.\n\n<img src=x onerror="window.__formatExecuted=true">'
+      });
+    });
+    await page.evaluate(() => window.ScholarkAIUI.open());
+    await page.locator('#sk-ai-input').fill('What is 6 + 7?');
+    await page.locator('#sk-ai-form').evaluate(form => form.requestSubmit());
+    const reply = page.locator('#sk-ai-transcript .sk-ai-message.assistant > div').last();
+    await expect(reply.locator('ol li')).toHaveCount(2);
+    await expect(reply.locator('strong').first()).toHaveText('Add the numbers');
+    await expect(reply).toContainText('So, the answer is 13.');
+    await expect(reply).not.toContainText('**');
+    await expect(reply.locator('img')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__formatExecuted)).toBe(false);
   });
 
   test('local answer quality rejects incorrect worked fraction examples', async ({ page }) => {

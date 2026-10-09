@@ -139,12 +139,62 @@
     q('#sk-ai-launch')?.focus();
   }
 
+  function appendInlineFormatting(parent, value) {
+    const source = String(value ?? '');
+    const pattern = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|`([^`\n]+)`|\*([^*\n]+)\*/g;
+    let cursor = 0;
+    for (const match of source.matchAll(pattern)) {
+      parent.append(document.createTextNode(source.slice(cursor, match.index)));
+      const element = document.createElement(match[3] ? 'code' : match[4] ? 'em' : 'strong');
+      element.textContent = match[1] || match[2] || match[3] || match[4];
+      parent.append(element);
+      cursor = match.index + match[0].length;
+    }
+    parent.append(document.createTextNode(source.slice(cursor)));
+  }
+
+  function renderAssistantMessage(container, content) {
+    let paragraph = null;
+    let list = null;
+    for (const line of String(content ?? '').split(/\r?\n/)) {
+      if (!line.trim()) { paragraph = null; list = null; continue; }
+      const numbered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+      const bulleted = line.match(/^\s*[-*•]\s+(.+)$/);
+      if (numbered || bulleted) {
+        const tag = numbered ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) {
+          list = document.createElement(tag);
+          container.append(list);
+        }
+        const item = document.createElement('li');
+        appendInlineFormatting(item, (numbered || bulleted)[1]);
+        list.append(item);
+        paragraph = null;
+        continue;
+      }
+      list = null;
+      if (!paragraph) {
+        paragraph = document.createElement('p');
+        container.append(paragraph);
+      } else paragraph.append(document.createElement('br'));
+      appendInlineFormatting(paragraph, line);
+    }
+  }
+
   function addMessage(role, content, meta = '') {
     const list = q('#sk-ai-transcript');
     if (!list) return;
     const item = document.createElement('div');
     item.className = `sk-ai-message ${role}`;
-    item.innerHTML = `<div>${esc(content).replace(/\n/g, '<br>')}</div>${meta ? `<small>${esc(meta)}</small>` : ''}`;
+    const bubble = document.createElement('div');
+    if (role === 'assistant') renderAssistantMessage(bubble, content);
+    else bubble.textContent = String(content ?? '');
+    item.append(bubble);
+    if (meta) {
+      const label = document.createElement('small');
+      label.textContent = meta;
+      item.append(label);
+    }
     list.appendChild(item);
     list.scrollTop = list.scrollHeight;
   }
@@ -209,18 +259,9 @@
       const current = Agents.planner.current();
       return current?.input || { tasks: [], dailyMinutes: 60 };
     }
-    return {
-      subject: inferSubjectFromPage(),
-      mastery: Agents.mastery.all(),
-      currentPage: qa('.page.active')[0]?.id || ''
-    };
-  }
-
-  function inferSubjectFromPage() {
-    const page = qa('.page.active')[0]?.id || '';
-    if (page.includes('ap')) return 'AP course';
-    if (page.includes('prep')) return 'SAT';
-    return '';
+    // An open page is not evidence that a chat question is about that course.
+    // Keep the general tutor free of unrelated progress and page context.
+    return {};
   }
 
   function summarizeStructuredResult(result) {

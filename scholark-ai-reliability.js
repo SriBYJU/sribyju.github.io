@@ -85,7 +85,9 @@
   }
 
   function isKnowledgeQuestion(input = '') {
-    const q = String(input).toLowerCase().replace(/scholar\s*k/g, 'scholark');
+    const q = String(input).toLowerCase().replace(/scholar\s*k/g, 'scholark').trim();
+    if (/^scholark[?.!]*$/.test(q)) return true;
+    if (/\bwho\s+(made|built|created|founded|started)\s+(you|u|this\s+(app|site|website|tool|assistant))\b/.test(q)) return true;
     return /\bscholark\b/.test(q) && (
       /\bwho\s+(made|built|created|founded|owns|runs|started)\b/.test(q) ||
       /\bwho\s+is\s+(behind|the\s+(creator|founder|maker)\s+of)\b/.test(q) ||

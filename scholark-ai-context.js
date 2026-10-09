@@ -246,7 +246,6 @@
     if (route === 'planner') return { ...context, ...plannerInput(), planner: plannerInput() };
     if (route === 'college') return { ...context, colleges: universityRows(), applications: applications() };
     if (route === 'scholarship') return { ...context, scholarships: scholarshipRows() };
-    if (route === 'tutor') return { ...context, mastery: Agents.mastery.all() };
     return context;
   }
 
