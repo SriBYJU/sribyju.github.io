@@ -42,7 +42,9 @@ jobs:
         run: |
           set -euo pipefail
           node --check scholark-feature-loader.js
+          node --check scholark-ai-learning.js
           node --check scholark-ai-reliability.js
+          node --test scripts/scholark-ai-learning.test.js
           node --check scholark-ai-ui-polish.js
           node --check scripts/scholark-ai-browser.spec.mjs
           node --check scripts/scholark-ai-mobile-smoke.spec.mjs
@@ -70,7 +72,8 @@ jobs:
               'api.together.xyz','api.fireworks.ai','api.groq.com','api.replicate.com'
           )
           checks = {
-              'final_loader_build': "const BUILD='ai-107'" in loader,
+              'final_loader_build': "const BUILD='ai-108'" in loader,
+              'learning_loaded': 'scholark-ai-learning.js' in loader and 'ScholarkAILearning' in loader,
               'reliability_loaded': 'scholark-ai-reliability.js' in loader and 'ScholarkAIReliability' in loader,
               'ui_polish_loaded': 'scholark-ai-ui-polish.js' in loader and 'ScholarkAIUIPolish' in loader,
               'cinematic_first_boot': 'afterCinematicReady' in loader and 'cinematicReadyAt' in loader and 'aiBootStartedAt' in loader,
@@ -94,7 +97,7 @@ jobs:
               'hardening_ai_only_clear': 'remainingAISessions' in hardening and 'gs_ai_clear_sentinel' in hardening,
               'hardening_reduced_motion': 'reduced-motion preference' in hardening and "pulseAnimation" in hardening,
               'hardening_is_executed': 'scholark-ai-hardening.spec.mjs' in config,
-              'production_requires_ai107': 'ai-107' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
+              'production_requires_ai108': 'ai-108' in prod and 'scholark-ai-reliability.js' in prod and 'scholark-ai-ui-polish.js' in prod,
               'production_checks_boot_safeguards': 'bounded-timeout' in prod and 'setTextIfChanged' in prod,
               'production_runs_all_ai_specs': "scripts/scholark-ai-*.spec.mjs" in prod_workflow and 'npx playwright test --config=playwright.config.mjs' in prod_workflow,
               'no_paid_provider_endpoint': not any(host in reliability.lower() for host in paid_hosts),

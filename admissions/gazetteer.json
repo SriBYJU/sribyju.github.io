@@ -1,0 +1,83 @@
+[
+  {
+    "names": [
+      "Regeneron International Science and Engineering Fair"
+    ],
+    "aliases": [
+      "ISEF",
+      "Regeneron ISEF"
+    ],
+    "category": "research",
+    "tier": "1",
+    "kind": "competition",
+    "notes": "Finalist and award levels differ; naming the fair alone does not establish either.",
+    "source": "https://www.societyforscience.org/blog/regeneron-isef-2026-grand-awards/",
+    "verified": true
+  },
+  {
+    "names": [
+      "USA Mathematical Olympiad"
+    ],
+    "aliases": [
+      "USAMO"
+    ],
+    "category": "mathematics",
+    "tier": "1",
+    "kind": "competition",
+    "notes": "Invitational competition. Require the stated qualifying result.",
+    "source": "https://maa.org/maa-invitational-competitions/",
+    "verified": true
+  },
+  {
+    "names": [
+      "American Invitational Mathematics Examination"
+    ],
+    "aliases": [
+      "AIME"
+    ],
+    "category": "mathematics",
+    "tier": "2",
+    "kind": "competition",
+    "notes": "Invitational stage; it is not the same distinction as USAMO.",
+    "source": "https://maa.org/maa-invitational-competitions/",
+    "verified": true
+  },
+  {
+    "names": [
+      "Research Science Institute"
+    ],
+    "aliases": [
+      "RSI"
+    ],
+    "category": "research",
+    "tier": "1",
+    "kind": "program",
+    "notes": "Selective research program. Require participation and actual contribution; not simply an application.",
+    "source": "https://www.cee.org/research-science-institute",
+    "verified": true
+  },
+  {
+    "names": [
+      "Anthropic"
+    ],
+    "aliases": [],
+    "category": "research",
+    "tier": "1",
+    "kind": "research-employer",
+    "notes": "Research employer verified; no acceptance rate or admission outcome inferred. A claimed internship remains self-reported.",
+    "source": "https://www.anthropic.com/careers",
+    "verified": true
+  },
+  {
+    "names": [
+      "OpenAI"
+    ],
+    "aliases": [],
+    "category": "research",
+    "tier": "1",
+    "kind": "research-employer",
+    "notes": "Research employer; program, role, contribution, and eligibility must be confirmed independently.",
+    "source": "https://openai.com/careers/",
+    "verified": true
+  }
+]

@@ -22,7 +22,7 @@ wait_for_release() {
     robots_code="$(curl --location --silent --output "$OUT/robots-wait.txt" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}robots.txt?sha=${SHA}" || true)"
     sitemap_code="$(curl --location --silent --output "$OUT/sitemap-wait.xml" --write-out '%{http_code}' --connect-timeout 15 --max-time 30 "${SITE}sitemap.xml?sha=${SHA}" || true)"
     if grep -Fq "scholark-v3.js?build=${BUILD}" <<<"$index_html" \
-      && grep -q 'ai-107' <<<"$loader" \
+      && grep -q 'ai-108' <<<"$loader" \
       && grep -q 'scholark-ai-reliability.js' <<<"$loader" \
       && grep -q 'scholark-ai-ui-polish.js' <<<"$loader" \
       && grep -q 'afterCinematicReady' <<<"$loader" \
@@ -75,6 +75,7 @@ for asset in \
   scholark-v512.css \
   scholark-feature-loader.js \
   scholark-ai-algorithms.js \
+  scholark-ai-learning.js \
   scholark-ai-core.js \
   scholark-ai-agents.js \
   scholark-ai-context.js \

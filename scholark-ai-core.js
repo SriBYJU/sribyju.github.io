@@ -16,9 +16,9 @@
 
   const MODEL_MANIFEST = Object.freeze({
     high: {
-      id: 'Qwen3-1.7B-q4f16_1-MLC',
-      family: 'Qwen3',
-      purpose: 'High-capability local academic generation on stronger desktop devices',
+      id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+      family: 'Qwen2.5',
+      purpose: 'Structured draft feedback on capable WebGPU devices',
       runtime: `WebLLM ${WEBLLM_VERSION}`,
       approximateFootprint: '~1.7 GB class',
       license: 'Apache-2.0 model family; verify bundled model card before future replacement',
@@ -276,7 +276,8 @@
         top_p: options.topP ?? 0.9,
         max_tokens: options.maxTokens ?? 500,
         seed: Number.isFinite(options.seed) ? options.seed : 41721,
-        extra_body: { enable_thinking: options.enableThinking === true },
+        ...(options.schema ? { response_format: { type: 'json_object', schema: JSON.stringify(options.schema) } } : {}),
+        ...(state.modelId?.startsWith('Qwen3') ? { extra_body: { enable_thinking: options.enableThinking === true } } : {}),
         stream: false
       };
       const result = await Promise.race([
@@ -369,8 +370,9 @@
 
     try {
       const repairMessages = [
-        { role: 'system', content: 'Return valid JSON only. Do not add markdown, commentary, or code fences.' },
-        { role: 'user', content: `Repair this into valid JSON while preserving its meaning:\n${String(result.text).slice(0, 8000)}` }
+        ...messages,
+        { role: 'assistant', content: String(result.text).slice(0, 2000) },
+        { role: 'user', content: 'That response did not pass validation. Re-read the original source and requirements above. Return complete valid JSON only, using evidence from the original source. Correct unsupported claims and do not invent quotes.' }
       ];
       const repaired = await generate(repairMessages, { ...options, temperature: 0, maxTokens: Math.min(options.maxTokens || 500, 600), fallback: null });
       if (repaired.mode === 'local-generative') {

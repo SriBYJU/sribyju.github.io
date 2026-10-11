@@ -998,6 +998,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <button class="nav-link active" id="nav-home" onclick="showPage('home')">Home</button>
     <button class="nav-link" id="nav-tools" onclick="goToTools()">Calculators</button>
     <button class="nav-link" id="nav-essay" onclick="goToEssay()">Essay Coach ✦</button>
+    <button class="nav-link" id="nav-activities" aria-label="Activities Lab" onclick="ScholarkAdmissions.open('activities')"><span class="sk-lab-nav-full">Activities Lab</span><span class="sk-lab-nav-short" style="display:none">Lab</span></button>
     <button class="nav-link" id="nav-goals" onclick="showPage('goals')">Goals</button>
     <button class="nav-link" id="nav-prep" onclick="if(showPage('prep')) ScholarkPrep.init()">SAT Prep</button>
     <button class="nav-link" id="nav-ap" onclick="showPage('ap');initAPHub()">AP Study</button>
@@ -1112,6 +1113,12 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
       </div>
       <div class="sk-press-controls"><button class="sk-press-toggle" type="button" aria-label="Pause carousel" aria-pressed="false">Pause rotation</button><span class="sk-press-position" aria-live="off"></span></div>
     </div>
+  </section>
+  <section id="sk-profile-hero" class="card sk-hero-profile" style="max-width:1120px;margin:32px auto;padding:24px" aria-label="Admissions profile">
+    <h2>Build a profile with evidence</h2>
+    <p>Connect your activities, essay feedback, and college planning.</p>
+    <button class="btn-secondary" onclick="ScholarkAdmissions.open('activities')">Open Activities Lab →</button>
+    <button class="btn-secondary" onclick="ScholarkAdmissions.open('chances')">College Chances →</button>
   </section>
   <footer>
     <div class="footer-grid">
@@ -1282,12 +1289,11 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
               </select>
             </div>
             <div class="field-group"><label class="field-label">Extracurriculars</label>
-              <select id="c-ecs">
-                <option value="exc">Exceptional (national awards)</option>
-                <option value="str" selected>Strong (leadership + depth)</option>
-                <option value="avg">Average (some clubs)</option>
-                <option value="min">Minimal</option>
-              </select>
+              <input id="c-ecs" type="number" min="0" max="100" step="1" placeholder="Activities score, 0–100" aria-label="Activities score from zero to one hundred" oninput="this.dataset.manual='true'">
+              <p id="sk-ec-linked" class="sk-lab-muted">Use your Activities Lab score, or enter a manual estimate.</p>
+              <button type="button" class="btn-secondary" onclick="ScholarkAdmissions.open('activities')">Grade my activities →</button>
+              <label class="field-label" for="sk-ecs-quick">No activities entered yet? Quick estimate</label>
+              <select id="sk-ecs-quick"><option value="">Unknown / neutral</option><option value="exc">Exceptional</option><option value="str">Strong</option><option value="avg">Some participation</option><option value="min">Limited participation</option></select>
             </div>
           </div>
           <div class="two-col">
@@ -1300,13 +1306,19 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
               </select>
             </div>
             <div class="field-group"><label class="field-label">Application Essays</label>
-              <select id="c-essays">
-                <option value="str" selected>Strong & distinctive</option>
-                <option value="avg">Average</option>
-                <option value="wk">Weak</option>
-              </select>
+              <input id="c-essays" type="number" min="0" max="100" step="1" placeholder="Scholark essay score, 0–100" aria-label="Essay score from zero to one hundred" oninput="this.dataset.manual='true'">
+              <p id="sk-essay-linked" class="sk-lab-muted">No score yet? Leave blank: the essay is neutral and the planning range widens.</p>
+              <button type="button" class="btn-secondary" onclick="ScholarkAdmissions.open('essay')">Get your Scholark Essay Coach score →</button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('c-essays').value='';document.getElementById('c-essays').dataset.manual='true'">Clear score</button>
             </div>
           </div>
+          <details><summary>Optional profile context</summary>
+            <label class="field-label" for="sk-c-rigor">Number of AP / IB / honors courses</label><input id="sk-c-rigor" type="number" min="0" max="40">
+            <label class="field-label" for="sk-c-residency">Residency</label><select id="sk-c-residency"><option value="unknown">Unknown</option><option value="in-state">In-state</option><option value="out-of-state">Out-of-state</option></select>
+            <label class="field-label" for="sk-c-major">Intended major</label><input id="sk-c-major" maxlength="100" placeholder="Optional">
+          </details>
+          <p id="sk-chances-error" role="alert"></p>
+          <p class="sk-lab-muted">Planning estimates only. Admissions are holistic and unpredictable; activities and essay scores do not prove admission odds. Use alongside counselor advice.</p>
           <button class="btn-calc" onclick="calcChancesAndSave()">Estimate My Chances</button>
         </div>
       </div>
@@ -1488,7 +1500,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           <div class="card-subtitle">Write or paste your essay below. The rubric review runs locally in your browser and does not upload the draft.</div>
         </div>
         <div class="essay-toolbar">
-          <select class="essay-prompt-select" id="essay-prompt" onchange="updatePromptHint()">
+          <select class="essay-prompt-select" aria-label="Essay application prompt" id="essay-prompt" onchange="updatePromptHint()">
             <option value="">— Select a prompt (optional) —</option>
             <option value="ca1">Common App #1: Background & Identity</option>
             <option value="ca2">Common App #2: Lessons from Obstacles</option>
@@ -1503,7 +1515,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
           </select>
           <div style="display:flex;align-items:center;gap:12px">
             <span class="essay-word-count" id="essay-word-count">0 words / 650 max</span>
-            <button class="essay-get-feedback" onclick="getEssayFeedback()" id="feedback-btn">✦ Get Rubric Feedback</button>
+            <button class="essay-get-feedback" onclick="ScholarkAdmissions.feedback()" id="feedback-btn">✦ Get Rubric Feedback</button>
           </div>
         </div>
         <div id="prompt-hint" style="display:none;background:var(--blue-light);border:1px solid rgba(30,79,163,.15);border-radius:8px;padding:10px 14px;font-size:13px;color:#1a3c7a;margin-bottom:12px;line-height:1.6"></div>
@@ -2293,7 +2305,7 @@ function initAdReservations() {
 
 function showPage(name) {
   // Login gate: require auth for all feature pages
-  const publicPages = ['home', 'features', 'about', 'reviews'];
+  const publicPages = ['home', 'features', 'about', 'reviews', 'activities', 'essay'];
   if (!publicPages.includes(name) && !window.currentUser) {
     openAuth('signup', 'Sign up to access all features');
     return false;
@@ -2309,7 +2321,7 @@ function showPage(name) {
   const emailBanner = document.getElementById('email-capture-banner');
   if (emailBanner && name !== 'home') emailBanner.style.display = 'none';
   window.scrollTo(0, 0);
-  if (name === 'essay' && typeof updateEssayPage === 'function') updateEssayPage();
+  if (name === 'essay' && typeof updateEssayPage === 'function') { updateEssayPage(); window.ScholarkAdmissions?.initEssay(); }
   if (name === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
   if (name === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
   if (name === 'reviews' && window.ScholarkReviews?.init) window.ScholarkReviews.init();
@@ -3352,115 +3364,18 @@ function calcNeeded() {
    COLLEGE CHANCES + UNIVERSITY COMPARISON
 ============================================================ */
 function calcChances() {
-  const gpa=parseFloat(document.getElementById('c-gpa').value);
-  const wgpa=parseFloat(document.getElementById('c-wgpa').value);
-  const sat=parseFloat(document.getElementById('c-sat').value)||0;
-  const act=parseFloat(document.getElementById('c-act').value)||0;
-  if(!Number.isFinite(gpa)||gpa<0||gpa>4||!Number.isFinite(wgpa)||wgpa<0||wgpa>5||
-     (sat!==0&&(sat<400||sat>1600))||(act!==0&&(act<1||act>36))) {
-    showToast('Enter GPA values in range and, if provided, SAT 400–1600 or ACT 1–36.', 'error');
+  if (!window.ScholarkAdmissionsUI) {
+    window.ScholarkAdmissions.ensure().then(() => calcChancesAndSave()).catch(error => showToast(error.message, 'error'));
     return null;
   }
-  const school=document.getElementById('c-school').value;
-  const rank=document.getElementById('c-rank').value;
-  const ecs=document.getElementById('c-ecs').value;
-  const legacy=document.getElementById('c-legacy').value;
-  const essays=document.getElementById('c-essays').value;
-  let score=0, notes=[];
-
-  // GPA
-  if(gpa>=3.9){score+=28;notes.push('✅ Excellent GPA — very competitive')}
-  else if(gpa>=3.7){score+=24;notes.push('✅ Strong GPA')}
-  else if(gpa>=3.5){score+=19;notes.push('📊 Good GPA — solid foundation')}
-  else if(gpa>=3.0){score+=13;notes.push('⚠️ Average GPA — strong test scores help')}
-  else{score+=5;notes.push('⚠️ GPA may be a challenge for selective schools')}
-
-  // SAT/ACT (use best)
-  let testScore=0;
-  if(sat>=1550){testScore=24;notes.push('✅ Outstanding SAT — 99th percentile')}
-  else if(sat>=1450){testScore=20;notes.push('✅ Strong SAT — top 5%')}
-  else if(sat>=1300){testScore=15;notes.push('📊 Good SAT score')}
-  else if(sat>=1100){testScore=9}
-  else if(sat>=400){testScore=4}
-  if(act>=34){testScore=Math.max(testScore,24);notes.push('✅ Outstanding ACT score')}
-  else if(act>=30){testScore=Math.max(testScore,20)}
-  else if(act>=25){testScore=Math.max(testScore,15)}
-  score+=testScore;
-
-  // Class rank
-  const rankScore={5:18,10:14,25:10,50:5,bot:1};
-  score+=rankScore[rank]||10;
-  if(rank==='5'||rank==='10') notes.push('✅ Top class rank significantly boosts your profile');
-
-  // Extracurriculars
-  const ecScore={exc:22,str:16,avg:9,min:3};
-  score+=ecScore[ecs]||9;
-  if(ecs==='exc') notes.push('✅ Exceptional ECs — national recognition is a major differentiator');
-  else if(ecs==='str') notes.push('✅ Strong extracurriculars — depth matters more than breadth');
-
-  // Essays
-  const esScore={str:7,avg:4,wk:1};
-  score+=esScore[essays]||4;
-  if(essays==='str') notes.push('✅ Strong essays can tip borderline applications');
-  else notes.push('⚠️ Essay quality significantly impacts borderline decisions');
-
-  // Legacy / ED
-  const legBonus={no:0,ed:0.3,leg:0.2,both:0.45};
-  const legMult=1+(legBonus[legacy]||0);
-  if(legacy==='ed') notes.push('📌 Early Decision can increase chances by ~25-35%');
-  else if(legacy==='leg') notes.push('📌 Legacy status provides a modest boost');
-
-  // School tier
-  const tiers={ivy:0.20,high:0.42,select:0.68,mod:0.88,open:1.0};
-  const mult=(tiers[school]||0.68)*legMult;
-  let chance=Math.min(Math.max((score/100)*mult*100,2),97);
-
-  const box=document.getElementById('chances-result');
-  box.classList.remove('result-hidden');
-  document.getElementById('chances-val').textContent=Math.round(chance)+'%';
-  const bar=document.getElementById('chances-bar');
-  bar.style.width=chance+'%';
-  bar.style.background=chance>60?'#2a6e45':chance>30?'#b8860b':'#c0312b';
-  const badge=document.getElementById('chances-badge');
-  if(chance>70){badge.textContent='Safety School';badge.style.cssText='background:#2a6e45;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
-  else if(chance>40){badge.textContent='Match School';badge.style.cssText='background:#b8860b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
-  else if(chance>18){badge.textContent='Reach School';badge.style.cssText='background:#b5571f;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
-  else{badge.textContent='Far Reach';badge.style.cssText='background:#c0312b;color:white;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700'}
-
-  // University comparison
-  const compSection = document.getElementById('comparison-section');
-  if(selectedUni) {
-    compSection.style.display = 'block';
-    document.getElementById('comp-uni-name').textContent = selectedUni.name + ' (dataset)';
-    document.getElementById('comp-official-rate').textContent = selectedUni.rate + '%';
-    document.getElementById('comp-official-bar').style.width = Math.min(selectedUni.rate, 100) + '%';
-    document.getElementById('comp-user-rate').textContent = Math.round(chance) + '%';
-    document.getElementById('comp-user-bar').style.width = Math.min(chance, 100) + '%';
-    const verdict = document.getElementById('comp-verdict');
-    if(chance >= selectedUni.rate * 1.2) {
-      verdict.style.background = '#e8f5ee'; verdict.style.color = '#1a4d2e';
-      verdict.innerHTML = '✅ <strong>Potential match.</strong> Your planning estimate (' + Math.round(chance) + '%) is above the stored acceptance-rate benchmark (' + selectedUni.rate + '%). Treat this as one input when building a balanced list.';
-    } else if(chance >= selectedUni.rate * 0.7) {
-      verdict.style.background = '#fef8e1'; verdict.style.color = '#7a5800';
-      verdict.innerHTML = '📊 <strong>Competitive range.</strong> Your planning estimate (' + Math.round(chance) + '%) is close to the stored rate (' + selectedUni.rate + '%). Verify current admissions data and keep a balanced list.';
-    } else {
-      verdict.style.background = '#fce8e8'; verdict.style.color = '#7a1a1a';
-      verdict.innerHTML = '⚠️ <strong>Reach range.</strong> Your planning estimate (' + Math.round(chance) + '%) is below the stored rate (' + selectedUni.rate + '%). Consider additional target and likely schools.';
-    }
-  } else {
-    compSection.style.display = 'none';
-  }
-
-  document.getElementById('chances-notes').innerHTML = notes.join('<br>') +
-    '<br><br><em style="font-size:12px;color:var(--ink3)">⚠️ Estimates based on aggregate data. Individual results depend on essays, recommendations, demographics, and institutional priorities.</em>';
-  return {chance: Math.round(chance), school: selectedUni?.name || school};
+  return window.ScholarkAdmissionsUI.renderChances(selectedUni);
 }
 
 function calcChancesAndSave() {
   const result = calcChances();
   if(result && window.currentUser) {
     saveResult('College Chances', 'College Chances — ' + (selectedUni?.name || result.school), {
-      'Estimated Chance': result.chance + '%',
+      'Planning Range': result.range.join('–') + '%',
       'University': selectedUni?.name || 'Custom tier',
       'Dataset Rate': selectedUni ? selectedUni.rate + '%' : 'N/A'
     });
@@ -3750,7 +3665,8 @@ async function saveEssay() {
     prompt: prompt || 'custom',
     text,
     words,
-    savedAt: new Date().toLocaleString()
+    savedAt: new Date().toLocaleString(),
+    ...(window.ScholarkAdmissionsUI ? {scoreStamp: window.ScholarkAdmissionsUI.getStamp(), scoreHistory: window.ScholarkAdmissionsUI.getHistory()} : {})
   };
   const essays = _getLocalEssays(uid);
   essays.unshift(essay);
@@ -3800,6 +3716,7 @@ function loadEssay(id) {
   if(!essay) { showToast('Essay not found.', 'error'); return; }
   document.getElementById('essay-textarea').value = essay.text;
   document.getElementById('essay-prompt').value = essay.prompt || '';
+  window.ScholarkAdmissions?.initEssay();
   onEssayInput(); updatePromptHint();
   showToast('Essay loaded!');
 }
@@ -3853,8 +3770,10 @@ function updateEssayPage() {
   const gate = document.getElementById('essay-gate');
   const editor = document.getElementById('essay-editor');
   if(!window.currentUser) {
-    if(gate) gate.style.display = 'block';
-    if(editor) editor.style.display = 'none';
+    if(gate) gate.style.display = 'none';
+    if(editor) editor.style.display = 'block';
+    const note = document.getElementById('essay-access-note');
+    if(note) note.textContent = 'Free on-device feedback · sign in to save essays across devices';
     return;
   }
   if(gate) gate.style.display = 'none';
@@ -5008,7 +4927,15 @@ window.onload = function() {
   if(!window.currentUser) document.getElementById('nav-signin-btn').style.display = 'block';
 };
 </script>
-<script src="scholark-feature-loader.js" defer></script>
+<div id="page-activities" class="page">
+  <main class="sk-lab-shell">
+    <header class="sk-lab-header"><div><p class="sk-lab-eyebrow">Your work, clearly told</p><h1>Activities Lab</h1><p>Describe what you did. Understand the evidence. Make every character count.</p></div><button class="btn-secondary" onclick="ScholarkAdmissions.open('chances')">College Chances →</button></header>
+    <p id="sk-lab-status" role="status" aria-live="polite">Free · on-device grading · truthful refinement</p>
+    <div id="sk-lab-workspace"></div>
+  </main>
+</div>
+<script src="admissions/boot.js?v=2.0.0" defer></script>
+<script src="scholark-feature-loader.js?build=ai-108" defer></script>
 <script src="scholark-press.js" defer></script>
 <script src="scholark-reviews.js?build=20261001-reviews3" defer></script>
 <script src="scholark-v3.js?build=5157" defer></script>

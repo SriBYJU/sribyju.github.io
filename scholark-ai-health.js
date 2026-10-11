@@ -58,6 +58,7 @@
   function moduleChecks() {
     return [
       ['algorithms', () => !!window.ScholarkAIAlgorithms],
+      ['learning', () => !!window.ScholarkAILearning],
       ['core', () => !!window.ScholarkAI],
       ['agents', () => !!window.ScholarkAIAgents],
       ['dashboard', () => !!window.ScholarkAIDashboard],

@@ -1,0 +1,36 @@
+import {createRequire} from 'node:module';
+const require=createRequire(process.env.SCHOLARK_TEST_DEPS || import.meta.url);
+const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
+const {doc,setDoc,getDoc,getDocs,collection,deleteDoc,serverTimestamp,writeBatch}=require('firebase/firestore');import fs from'node:fs';
+const env=await initializeTestEnvironment({projectId:'demo-scholark-tests',firestore:{host:'127.0.0.1',port:8088,rules:fs.readFileSync(new URL('../firestore.rules',import.meta.url),'utf8')}});let passed=0;const check=async(name,fn)=>{await fn();passed++;console.log('PASS',name);};const a=env.authenticatedContext('alice').firestore(),b=env.authenticatedContext('bob').firestore(),anon=env.unauthenticatedContext().firestore();const path='users/alice/activities/test';const item={id:'test',category:'Academic',position:'Tutor',organization:'School',description:'Taught 12 students',notes:'',grades:['10'],hours:3,weeks:30,current:true,context:[],versions:[],lastGrade:{score:47,rubricVersion:'activities-1.0',gradedAt:1},updatedAt:1};
+try{
+await check('owner creates bounded activity',()=>assertSucceeds(setDoc(doc(a,path),item)));
+await check('other user cannot read',()=>assertFails(getDoc(doc(b,path))));
+await check('anonymous cannot read',()=>assertFails(getDoc(doc(anon,path))));
+await check('other user cannot overwrite',()=>assertFails(setDoc(doc(b,path),item)));
+await check('description limit cannot be bypassed by wildcard',()=>assertFails(setDoc(doc(a,path),{...item,description:'x'.repeat(151)})));
+await check('nested version size bounded',()=>assertFails(setDoc(doc(a,path),{...item,versions:[{description:'x'.repeat(151),position:'',organization:'',savedAt:''}]})));
+await check('valid history accepted',()=>assertSucceeds(setDoc(doc(a,path),{...item,versions:Array.from({length:5},()=>({description:'Prior wording',position:'Tutor',organization:'School',savedAt:'2026-10-10'}))})));
+await check('unknown context rejected',()=>assertFails(setDoc(doc(a,path),{...item,context:['free-form private content']})));
+await check('ten full activity histories fit a single save batch',async()=>{const batch=writeBatch(a);for(let i=0;i<10;i++)batch.set(doc(a,'users/alice/activities/batch'+i),{...item,id:'batch'+i,versions:Array.from({length:5},()=>({description:'Prior wording',position:'Tutor',organization:'School',savedAt:'2026-10-10'}))});await assertSucceeds(batch.commit());});
+await check('invalid saved grade rejected',()=>assertFails(setDoc(doc(a,path),{...item,lastGrade:{score:101,rubricVersion:'v1',gradedAt:1}})));
+const portfolio={score:68,shape:'Emerging',updatedAt:1,libraryVersion:1,ids:['test'],shareToken:'0123456789abcdef0123456789abcdef'};
+await check('private mentor token syncs for owner',()=>assertSucceeds(setDoc(doc(a,'users/alice/profile/portfolio'),portfolio)));
+await check('other user cannot discover mentor token',()=>assertFails(getDoc(doc(b,'users/alice/profile/portfolio'))));
+await check('malformed mentor token rejected',()=>assertFails(setDoc(doc(a,'users/alice/profile/portfolio'),{...portfolio,shareToken:'guessable'})));
+const stamp={score:78,subScores:{Structure:75,Voice:80,Clarity:85,Impact:73},rubricVersion:'essay-rules-1.0',essayHash:'abc',promptType:'ca1',gradedAt:new Date().toISOString()};
+await check('owner score stamp',()=>assertSucceeds(setDoc(doc(a,'users/alice/profile/essayScore'),stamp)));
+await check('out-of-range score rejected',()=>assertFails(setDoc(doc(a,'users/alice/profile/essayScore'),{...stamp,score:101})));
+await check('essay text cannot be included in score stamp',()=>assertFails(setDoc(doc(a,'users/alice/profile/essayScore'),{...stamp,text:'private essay'})));
+await check('feedback create succeeds',()=>assertSucceeds(setDoc(doc(a,'users/alice/profile/gradingFeedback'),{fair:false,note:'Needs more detail',rubricVersion:'v1',updatedAt:serverTimestamp()})));
+await check('feedback immediate update throttled',()=>assertFails(setDoc(doc(a,'users/alice/profile/gradingFeedback'),{fair:true,note:'Again',rubricVersion:'v1',updatedAt:serverTimestamp()})));
+const share='admissionsShares/0123456789abcdef0123456789abcdef',data={owner:'alice',enabled:true,score:67,shape:'Emerging',items:'[]',updatedAt:1};
+await check('owner creates capability link',()=>assertSucceeds(setDoc(doc(a,share),data)));
+await check('anonymous reads exact link',()=>assertSucceeds(getDoc(doc(anon,share))));
+await check('anonymous cannot list shares',()=>assertFails(getDocs(collection(anon,'admissionsShares'))));
+await check('other user cannot take ownership',()=>assertFails(setDoc(doc(b,share),{...data,owner:'bob'})));
+await check('owner revokes link',()=>assertSucceeds(deleteDoc(doc(a,share))));
+await check('revoked link is inaccessible',()=>assertFails(getDoc(doc(anon,share))));
+await check('existing saved calculations remain owner writable',()=>assertSucceeds(setDoc(doc(a,'users/alice/saved/example'),{label:'GPA',value:3.8})));
+console.log(`${passed} rules checks passed`);
+}finally{await env.cleanup();}

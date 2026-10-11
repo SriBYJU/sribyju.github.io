@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('ai-107 boot is bounded, cinematic-first, and remains event-loop responsive', async ({ page }) => {
+test('ai-108 boot is bounded, cinematic-first, and remains event-loop responsive', async ({ page }) => {
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   await waitForAI(page);
 
@@ -44,7 +44,7 @@ test('ai-107 boot is bounded, cinematic-first, and remains event-loop responsive
     };
   });
 
-  expect(state.build).toBe('ai-107');
+  expect(state.build).toBe('ai-108');
   expect(state.cinematicReadyAt).toBeGreaterThan(0);
   expect(['cinematic-promise', 'ready-class']).toContain(state.cinematicReadyReason);
   expect(state.aiBootScheduledAt).toBeGreaterThanOrEqual(state.cinematicReadyAt);

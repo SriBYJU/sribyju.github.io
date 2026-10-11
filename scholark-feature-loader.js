@@ -3,20 +3,24 @@
   if (window.__scholarkFeatureLoaderInstalled) return;
   window.__scholarkFeatureLoaderInstalled = true;
 
-  const BUILD='ai-107';
+  const BUILD='ai-108';
   const pending=new Map();
+  const scriptLoads=new Map();
   const loaderState={cinematicReadyAt:0,cinematicReadyReason:'pending',aiBootScheduledAt:0,aiBootStartedAt:0,aiReadyAt:0,aiBootError:null};
   const loaded=src=>[...document.scripts].some(s=>s.src&&s.src.includes(src));
   const load=src=>{
+    if(scriptLoads.has(src)) return scriptLoads.get(src);
     if(loaded(src)) return Promise.resolve();
-    return new Promise((resolve,reject)=>{
+    const promise=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
       s.src=`${src}?build=${BUILD}`;
       s.defer=true;
       s.addEventListener('load',resolve,{once:true});
-      s.addEventListener('error',()=>reject(new Error(`Could not load ${src}`)),{once:true});
+      s.addEventListener('error',()=>{s.remove();scriptLoads.delete(src);reject(new Error(`Could not load ${src}`));},{once:true});
       document.head.appendChild(s);
     });
+    scriptLoads.set(src,promise);
+    return promise;
   };
 
   const notify=name=>{
@@ -24,15 +28,16 @@
   };
 
   const suites={
+    'ai-data':{files:['ap-v2-data.js'],ready:()=>!!window.ScholarkAPData,init:()=>{}},
     prep:{files:['prep-v2-data.js','prep-v2-app.js'],ready:()=>!!window.ScholarkPrep,init:()=>{window.ScholarkPrep?.init?.();notify('prep');}},
     ap:{files:['ap-v2-data.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>{window.initAPHub?.();notify('ap');}},
     ai:{
       files:[
-        'scholark-ai-algorithms.js','scholark-ai-core.js','scholark-ai-agents.js',
+        'scholark-ai-algorithms.js','scholark-ai-learning.js','scholark-ai-core.js','scholark-ai-agents.js',
         'scholark-ai-dashboard.js','scholark-ai-bridge.js','scholark-ai-context.js','scholark-ai-reliability.js','scholark-ai-ui.js','scholark-ai-ui-polish.js',
         'scholark-ai-practice.js','scholark-ai-practice-ui.js','scholark-ai-health.js'
       ],
-      ready:()=>!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIReliability&&!!window.ScholarkAIUI&&!!window.ScholarkAIUIPolish&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
+      ready:()=>!!window.ScholarkAILearning&&!!window.ScholarkAIAgents&&!!window.ScholarkAIDashboard&&!!window.ScholarkAIBridge&&!!window.ScholarkAIContext&&!!window.ScholarkAIReliability&&!!window.ScholarkAIUI&&!!window.ScholarkAIUIPolish&&!!window.ScholarkAIPractice&&!!window.ScholarkAIPracticeUI&&!!window.ScholarkAIHealth,
       init:()=>{window.ScholarkAIUI?.enhanceEssay?.();window.ScholarkAIUIPolish?.refresh?.();loaderState.aiReadyAt=performance.now();notify('ai');}
     }
   };

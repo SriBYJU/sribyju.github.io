@@ -30,7 +30,10 @@ test('retired prep engine is absent and authenticated launchers are guarded', ()
   for (const retired of ['PREP_QUESTIONS','SAT_EXAM_QUESTIONS','ACT_EXAM_QUESTIONS','function startExam(']) {
     assert.ok(!html.includes(retired), `${retired} should have been removed`);
   }
-  assert.match(html, /const publicPages = \['home', 'features', 'about', 'reviews'\]/);
+  const publicPages = html.match(/const publicPages = \[([^\]]+)\]/)?.[1] || '';
+  assert.ok(!/['\"](?:prep|ap)['\"]/.test(publicPages));
+  assert.match(publicPages, /'activities'/);
+  assert.match(publicPages, /'essay'/);
   assert.ok(!html.includes("showPage('prep');ScholarkPrep.init()"), 'prep launchers must not initialize behind a rejected sign-in gate');
 });
 

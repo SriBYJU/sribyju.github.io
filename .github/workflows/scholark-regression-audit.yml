@@ -196,7 +196,7 @@ jobs:
             'no_accidental_paywall_copy': 'Upgrade to Pro to access' not in html,
             'ai_is_additive_loader_suite': all(x in loader for x in required_ai_files),
             'ai_does_not_replace_index_boot': 'scholark-feature-loader.js' in html and 'scholark-v3.js' in html,
-            'ai107_boot_safeguards': "const BUILD='ai-107'" in loader and 'bounded-timeout' in loader and 'aiBootScheduledAt' in loader,
+            'ai108_boot_safeguards': "const BUILD='ai-108'" in loader and 'bounded-timeout' in loader and 'aiBootScheduledAt' in loader,
             'no_paid_ai_runtime_dependency': not any(x in ai_js for x in paid_hosts),
             'deterministic_fallback_present': 'deterministic-fallback' in core and 'fallbackTutor' in agents,
             'multi_model_recovery_present': 'Llama-3.2-1B-Instruct-q4f16_1-MLC' in reliability and "['standard', 'rescue', 'low']" in reliability,
@@ -229,7 +229,7 @@ jobs:
           set -euo pipefail
           npm view @mlc-ai/web-llm@0.2.82 version | grep -qx '0.2.82'
           for url in \
-            'https://huggingface.co/mlc-ai/Qwen3-1.7B-q4f16_1-MLC' \
+            'https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC' \
             'https://huggingface.co/mlc-ai/Qwen3-0.6B-q4f16_1-MLC' \
             'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC' \
             'https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC'; do

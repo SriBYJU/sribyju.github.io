@@ -1,0 +1,46 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+// Editorial composites. No student records, admission outcomes, or inferred admit rates.
+const domains={
+research:['quantum technology','molecular biology','machine learning','economics','neuroscience','materials science','climate science','public health'],
+mathematics:['number theory','geometry','combinatorics','algebra','statistics','mathematical modeling','proof writing','applied mathematics'],
+software:['accessibility tools','education apps','open source','data visualization','cybersecurity','language technology','community websites','assistive technology'],
+entrepreneurship:['repair services','local commerce','education services','sustainable products','creative business','food ventures','software ventures','community logistics'],
+athletics:['soccer','basketball','swimming','track','tennis','rowing','wrestling','volleyball'],
+visualarts:['painting','photography','sculpture','graphic design','illustration','ceramics','animation','film'],
+music:['piano','violin','voice','percussion','jazz','composition','chamber music','band'],
+performance:['theater','ballet','contemporary dance','cultural dance','stage design','improvisation','spoken word','technical theater'],
+writing:['poetry','fiction','literary magazine','school journalism','investigative reporting','science communication','translation','podcasting'],
+service:['food access','literacy','elder support','housing support','disability access','youth mentoring','community health','disaster relief'],
+advocacy:['civic access','disability rights','education equity','public transit','community safety','youth representation','language access','voter education'],
+government:['student council','school policy','youth advisory board','budget transparency','student representation','civic research','public meetings','community organizing'],
+work:['retail','food service','farm work','construction','childcare','tutoring','family business','administrative support'],
+caregiving:['sibling care','elder care','disability support','family translation','household budgeting','medical coordination','meal planning','transport coordination'],
+culture:['heritage language','oral history','cultural festivals','community archives','intercultural dialogue','traditional crafts','cultural education','community translation'],
+religion:['youth service','community meals','religious education','music ministry','interfaith dialogue','community outreach','event coordination','heritage preservation'],
+environment:['watershed monitoring','habitat restoration','waste reduction','urban gardens','energy conservation','biodiversity surveys','air quality','climate communication'],
+health:['health education','first aid training','public health data','community wellness','patient support','disability resources','nutrition education','medical translation'],
+robotics:['control systems','robot design','mechanical design','electronics','autonomous navigation','team strategy','robotics outreach','prototyping'],
+debate:['policy debate','public forum','Lincoln Douglas debate','speech','mock trial','Model UN','extemporaneous speaking','Congressional debate'],
+science:['astronomy','physics','chemistry','biology','geoscience','environmental science','engineering design','science communication'],
+languages:['Spanish','Mandarin','Arabic','French','American Sign Language','heritage language','language tutoring','community interpreting'],
+academic:['history','philosophy','literature','economics','psychology','geography','linguistics','academic mentoring'],
+community:['LGBT youth support','school spirit','peer mentoring','student orientation','rural outreach','exchange programs','school publications','accessibility advocacy'],
+independent:['maker projects','local history','citizen science','self-directed study','digital archives','educational resources','community mapping','creative coding']};
+const general=[['Participation and introductory practice',20],['Sustained contribution with a defined task',32],['Leadership with a documented local result',50],['Substantial independent work with measured reach',68],['Selective external recognition and a significant result',79],['Exceptional externally validated distinction or scale',91]];
+const responsibility=[['Occasional support with a limited task',20],['Regular dependable support',32],['Sustained responsibility for recurring needs',50],['Major ongoing responsibility with concrete outcomes',68],['Complex sustained coordination under significant constraints',79],['Exceptional sustained responsibility with independently described impact',91]];
+const creative=[['Introductory practice or group participation',20],['Sustained practice and completed work',32],['Leadership or a substantial public presentation',50],['Recognized work beyond the school community',68],['Selective juried recognition and substantial body of work',79],['National or international distinction for original work',91]];
+const rows=[];for(const[category,topics]of Object.entries(domains))for(const domain of topics){const ladder=['work','caregiving'].includes(category)?responsibility:['visualarts','music','performance','writing'].includes(category)?creative:general;for(let i=0;i<ladder.length;i++){const[description,baseScore]=ladder[i];rows.push({id:`${category}-${domain.replace(/[^a-z0-9]+/g,'-')}-r${i+1}`,category,domain,ladder:category,rung:i+1,title:`${domain}: ${description}`,aliases:[`${domain} activity`,`${domain} project`],keywords:[...domain.split(' '),category,...description.toLowerCase().split(' ')],tier:['4c','4a','3b','2c','2a','1b'][i],baseScore,signals:{requires:[domain],boosts:description.toLowerCase().split(' '),caps:{noEvidence:55}},typicalDescriptionPattern:'[Your action] + [specific responsibility] + [documented result]',upgradePath:i<5?'Describe the next level of responsibility or reach with a concrete result and evidence; a prestigious name alone is not enough.':'Describe the depth and authenticity of the contribution; accumulating titles is not the goal.',sourceNotes:'Editorial composite based on public admissions guidance about contribution, initiative, and context. Not an individual student, admitted profile, or statistical benchmark.',composite:true});}}
+const gazetteer=[
+{names:['Regeneron International Science and Engineering Fair'],aliases:['ISEF','Regeneron ISEF'],category:'research',tier:'1',kind:'competition',notes:'Finalist and award levels differ; naming the fair alone does not establish either.',source:'https://www.societyforscience.org/blog/regeneron-isef-2026-grand-awards/',verified:true},
+{names:['USA Mathematical Olympiad'],aliases:['USAMO'],category:'mathematics',tier:'1',kind:'competition',notes:'Invitational competition. Require the stated qualifying result.',source:'https://maa.org/maa-invitational-competitions/',verified:true},
+{names:['American Invitational Mathematics Examination'],aliases:['AIME'],category:'mathematics',tier:'2',kind:'competition',notes:'Invitational stage; it is not the same distinction as USAMO.',source:'https://maa.org/maa-invitational-competitions/',verified:true},
+{names:['Research Science Institute'],aliases:['RSI'],category:'research',tier:'1',kind:'program',notes:'Selective research program. Require participation and actual contribution; not simply an application.',source:'https://www.cee.org/research-science-institute',verified:true},
+{names:['Anthropic'],aliases:[],category:'research',tier:'1',kind:'research-employer',notes:'Research employer verified; no acceptance rate or admission outcome inferred. A claimed internship remains self-reported.',source:'https://www.anthropic.com/careers',verified:true},
+{names:['OpenAI'],aliases:[],category:'research',tier:'1',kind:'research-employer',notes:'Research employer; program, role, contribution, and eligibility must be confirmed independently.',source:'https://openai.com/careers/',verified:true}];
+for(const e of gazetteer.filter(e=>e.kind==='competition'||e.kind==='program'))rows.push({id:`named-${e.aliases[0].toLowerCase()}`,category:e.category,domain:e.names[0],ladder:`named-${e.aliases[0].toLowerCase()}`,rung:e.tier==='1'?6:4,title:`${e.names[0]}: documented qualification or participation`,aliases:e.aliases,keywords:[e.category,'qualified','selected','participant'],tier:e.tier==='1'?'1c':'2b',baseScore:e.tier==='1'?85:70,signals:{requires:['qualified'],boosts:['award'],caps:{noEvidence:55}},typicalDescriptionPattern:'[Named stage/result] + [personal contribution]',upgradePath:'Explain your actual work and exact result; participation and winning are distinct.',sourceNotes:e.notes,source:e.source,verified:true,composite:true});
+fs.writeFileSync(path.join(root,'admissions/library_v1.json'),JSON.stringify({version:1,updated:'2026-10-10',compositeNotice:'Reference profiles are editorial composites, not admitted-student records. Similarity is not evidence of admission odds.',entries:rows}));
+fs.writeFileSync(path.join(root,'admissions/gazetteer.json'),JSON.stringify(gazetteer,null,2)+'\n');
+console.log(`Wrote ${rows.length} reference profiles.`);

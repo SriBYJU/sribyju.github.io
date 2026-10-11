@@ -2,7 +2,7 @@
 .sk-ai-launch{position:relative}
 .sk-ai-launch::after{content:'LOCAL';font:700 7px/1 var(--font-body,system-ui);letter-spacing:.08em;margin-left:5px;padding:2px 4px;border-radius:4px;background:var(--green-light,#e8f5ee);color:var(--green,#2a6e45);vertical-align:middle}
 body.sk-ai-open{overflow:hidden}
-.sk-ai-dialog[hidden]{display:none!important}
+.sk-ai-dialog[hidden],.sk-ai-dialog [hidden]{display:none!important}
 .sk-ai-dialog{position:fixed;inset:0;z-index:5000;background:rgba(18,15,13,.52);backdrop-filter:blur(10px);display:grid;place-items:center;padding:20px}
 .sk-ai-shell{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));display:grid;grid-template-rows:auto auto minmax(180px,1fr) auto auto;background:var(--bg,#faf9f6);color:var(--ink,#1a1714);border:1px solid var(--border,rgba(0,0,0,.1));border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.28);overflow:hidden}
 .sk-ai-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:24px 26px 16px;border-bottom:1px solid var(--border2,rgba(0,0,0,.06))}
@@ -29,3 +29,10 @@ body.sk-ai-open{overflow:hidden}
 @media(max-width:760px){.sk-ai-dialog{padding:0;place-items:end stretch}.sk-ai-shell{width:100%;max-height:92dvh;border-radius:22px 22px 0 0}.sk-ai-head{padding:18px 18px 13px}.sk-ai-head h2{font-size:25px}.sk-ai-quick{grid-template-columns:repeat(3,1fr);padding:10px 12px}.sk-ai-quick button:nth-child(n+4){display:none}.sk-ai-transcript{padding:15px 14px}.sk-ai-message{max-width:94%}.sk-ai-composer{padding:10px 12px calc(12px + env(safe-area-inset-bottom))}.sk-ai-score-matrix{grid-template-columns:1fr}.sk-ai-essay-insights{grid-template-columns:1fr}.sk-ai-insight.wide{grid-column:auto}.sk-ai-essay-detail{padding:18px 14px}.sk-ai-essay-title-row{gap:10px}.sk-ai-overall{min-width:78px;padding:10px}.sk-ai-score-row{grid-template-columns:132px 1fr 32px}}
 @media(max-width:420px){.sk-ai-essay-title-row{display:block}.sk-ai-overall{display:inline-block;margin-top:10px}.sk-ai-score-row{grid-template-columns:116px 1fr 30px}.sk-ai-quick{grid-template-columns:1fr 1fr}.sk-ai-quick button:nth-child(3){display:none}}
 @media(prefers-reduced-motion:reduce){.sk-ai-progress>span{animation:none}.sk-ai-quick button{transition:none}}
+/* The evidence stays close to the answer without crowding the conversation. */
+.sk-ai-sources { margin-top: .65rem; font-size: .8rem; line-height: 1.5; }
+.sk-ai-sources summary { cursor: pointer; font-weight: 600; }
+.sk-ai-sources p { margin: .5rem 0; }
+.sk-ai-sources a { color: inherit; text-decoration: underline; }
+
+.sk-ai-essay-title-row p,.sk-ai-essay-status,.sk-ai-essay-detail .sk-ai-kicker{color:var(--ink2)}

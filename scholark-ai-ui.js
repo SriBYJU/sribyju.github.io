@@ -97,11 +97,18 @@
     q('.sk-ai-stop', overlay).addEventListener('click', () => {
       if (!activeRequest) return;
       activeRequest.cancelled = true;
+      activeRequest.controller.abort();
       AI.cancelGeneration();
       setBusy(false);
       addMessage('assistant', 'Stopped. You can ask again whenever you’re ready.', 'Local AI');
     });
     q('.sk-ai-new', overlay).addEventListener('click', () => {
+      if (activeRequest && !activeRequest.cancelled) {
+        activeRequest.cancelled = true;
+        activeRequest.controller.abort();
+        AI.cancelGeneration();
+      }
+      setBusy(false);
       AI.sessions.clearAll();
       lastChatExchange = null;
       q('#sk-ai-transcript', overlay).innerHTML = '<div class="sk-ai-welcome"><strong>Fresh conversation</strong><span>Previous local AI conversation context was cleared.</span></div>';
@@ -142,8 +149,7 @@
   }
 
   function appendInlineFormatting(parent, value) {
-    const readableMath = math => math.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2').replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\sqrt\{([^{}]+)\}/g, '√($1)').replace(/\\text\{([^{}]+)\}/g, '$1').replace(/\\quad/g, ' ');
-    const source = readableMath(String(value ?? '').replace(/\$([^$\n]{1,120})\$/g, (_, math) => math).replace(/\\\(([^\n]+?)\\\)/g, (_, math) => math));
+    const source = window.ScholarkAILearning.readableMath(value);
     const pattern = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|`([^`\n]+)`|\*([^*\n]+)\*/g;
     let cursor = 0;
     for (const match of source.matchAll(pattern)) {
@@ -185,7 +191,7 @@
     }
   }
 
-  function addMessage(role, content, meta = '') {
+  function addMessage(role, content, meta = '', sources = []) {
     const list = q('#sk-ai-transcript');
     if (!list) return;
     const item = document.createElement('div');
@@ -194,6 +200,27 @@
     if (role === 'assistant') renderAssistantMessage(bubble, content);
     else bubble.textContent = String(content ?? '');
     item.append(bubble);
+    if (role === 'assistant' && sources.length) {
+      const details = document.createElement('details');
+      details.className = 'sk-ai-sources';
+      const summary = document.createElement('summary');
+      summary.textContent = 'Learning notes used';
+      details.append(summary);
+      for (const source of sources.slice(0, 3)) {
+        const note = document.createElement('p');
+        note.textContent = `${source.name} · ${source.subject}: ${source.text}`;
+        details.append(note);
+        try {
+          const url = new URL(source.url);
+          if (url.protocol === 'https:' && ['apstudents.collegeboard.org', 'openstax.org'].includes(url.hostname)) {
+            const link = document.createElement('a');
+            link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+            link.textContent = source.sourceLabel || 'Source'; details.append(link);
+          }
+        } catch (_) {}
+      }
+      item.append(details);
+    }
     if (meta) {
       const label = document.createElement('small');
       label.textContent = meta;
@@ -223,7 +250,7 @@
     input.value = '';
     addMessage('user', text);
     setBusy(true, 'Routing to the right specialist…');
-    const request = { cancelled: false };
+    const request = { cancelled: false, controller: new AbortController() };
     activeRequest = request;
     const stopProgress = AI.on('model-progress', event => {
       if (request.cancelled) return;
@@ -232,15 +259,17 @@
     });
     try {
       const context = collectLightContext(text);
+      context.signal = request.controller.signal;
       const result = await Agents.ask(text, context);
       if (request.cancelled) return;
       const answer = result.answer || result.value?.text || result.evaluation?.verdict || summarizeStructuredResult(result);
       if (answer) lastChatExchange = { question: text, answer: String(answer).slice(0, 1800) };
       const mode = result.mode === 'local-generative'
         ? `On-device ${result.route?.agent || 'AI'} · ${result.tier || 'local'} model`
-        : result.mode === 'grounded-local' ? (result.generationKind === 'grounded-product-knowledge' ? 'Stored Scholark facts' : 'Scholark assistant')
-          : `Guided help · local AI unavailable${result.failures?.length ? ` (${result.failures.at(-1).message || 'model error'})` : ''}`;
-      addMessage('assistant', answer || 'Scholark completed the request using the available local tools.', mode);
+        : result.mode === 'grounded-local' ? (result.generationKind === 'grounded-product-knowledge' ? 'Stored Scholark facts' : result.generationKind === 'verified-course-notes' ? 'Verified learning notes' : 'Scholark assistant')
+          : result.value?.kind === 'course-notes' ? 'Saved learning notes · model response unavailable'
+            : 'Guided help · model response unavailable';
+      addMessage('assistant', answer || 'Scholark completed the request using the available local tools.', mode, result.sources || []);
     } catch (error) {
       if (request.cancelled) return;
       console.error('[Scholark AI UI] request failed', error);
@@ -407,7 +436,7 @@
     const section = q('#sk-ai-essay-detail');
     if (!e || !section) return;
     q('#sk-ai-overall b', section).textContent = Number(e.overall).toFixed(1);
-    const mode = result.mode === 'local-generative' ? `Rubric scores + on-device AI reader notes · ${result.tier} model` : result.reason === 'ungrounded-essay-feedback' ? 'Local rubric review · AI notes did not pass evidence checks' : 'Local rubric review · AI model unavailable';
+    const mode = result.mode === 'local-generative' ? `Rubric scores + on-device AI reader notes · ${result.tier} model` : ['ungrounded-essay-feedback', 'invalid-structured-output'].includes(result.reason) ? 'Local rubric review · AI notes did not pass review checks' : 'Local rubric review · AI model unavailable';
     const status = q('#sk-ai-essay-status', section);
     status.className = 'sk-ai-essay-status ready';
     status.textContent = `${mode}. Draft stayed in the browser for this evaluation path.`;
