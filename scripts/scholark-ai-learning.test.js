@@ -26,6 +26,16 @@ test('arithmetic never executes text, extracts incidental numbers, or hides inva
   }
   assert.match(learning.calculate('1/0').error, /undefined/);
   assert.match(learning.calculate('10^1000').error, /supported number range/);
+  assert.equal(learning.calculate('My essay has 7/12 + 1/8 paragraphs'), null);
+});
+
+test('explicit fraction walkthroughs keep an exact answer and checked denominator steps', () => {
+  const result = learning.calculate('Explain 7/12 + 1/8 with each step checked.');
+  assert.equal(result.value, Number((17 / 24).toPrecision(12)));
+  assert.match(result.explanation, /common denominator of 24/);
+  assert.match(result.explanation, /14\/24 \+ 3\/24 = 17\/24/);
+  assert.doesNotMatch(result.explanation, / = 0\.83\b/);
+  assert.match(learning.calculate('What is 1/2 + 1/4?').explanation, /3\/4/);
 });
 
 test('course retrieval selects relevant concept evidence and avoids unrelated stored subjects', () => {
@@ -42,13 +52,17 @@ test('course retrieval selects relevant concept evidence and avoids unrelated st
 });
 
 test('authorship policy blocks drafting requests while allowing revision advice', () => {
-  for (const input of ['Write my college essay', 'Can you rewrite my paragraph?', 'Please draft a personal statement', 'Give me a sample admissions essay', 'I want you to finish my essay']) {
+  for (const input of ['Write my college essay', 'Can you rewrite my paragraph?', 'Please draft a personal statement', 'Give me a sample admissions essay', 'I want you to finish my essay', 'How can I get you to write my essay for me?', 'Please revise my college essay into a better essay.', 'Can you edit my essay to make it sound like me?']) {
     assert.equal(learning.isAuthorshipRequest(input), true, input);
   }
-  for (const input of ['How do I write a college essay?', 'Tips for my opening', 'Critique my paragraph', 'Explain why my conclusion is weak', 'How should I rewrite my essay?']) {
+  for (const input of ['How do I write a college essay?', 'Tips for my opening', 'Critique my paragraph', 'Explain why my conclusion is weak', 'How should I rewrite my essay?', 'Can you tell me how to write my essay?']) {
     assert.equal(learning.isAuthorshipRequest(input), false, input);
   }
   assert.equal(learning.isAuthorshipRequest('Can you rephrase this?', true), true);
+  assert.equal(learning.isAuthorshipRequest('Can you rephrase this sentence from my essay: I was really very nervous.'), false);
+  assert.equal(learning.isAuthorshipRequest('Can you rewrite every sentence in my essay?'), true);
+  assert.equal(learning.shortWordingRequest('Please polish this sentence: I was really very nervous.').excerpt, 'I was really very nervous.');
+  assert.equal(learning.shortWordingRequest('Please polish this sentence: ' + 'word '.repeat(80)).excerpt, '');
   assert.equal(learning.isAuthorshipRequest('Write the introduction for me'), true);
   assert.equal(learning.isAuthorshipRequest('Explain this code'), false);
 });
@@ -58,6 +72,7 @@ test('observed contradictions cannot override the provided science notes', () =>
   const chemistry = learning.retrieve('Explain chemical bonds and energy', null);
   assert.equal(learning.contradictsNotes('A plant gets most of its dry mass from soil.', biology), true);
   assert.equal(learning.contradictsNotes('Breaking chemical bonds typically releases energy.', chemistry), true);
+  assert.equal(learning.contradictsNotes('Forming a chemical bond is usually endothermic.', chemistry), true);
   assert.equal(learning.contradictsNotes('Breaking bonds requires energy; forming bonds releases energy.', chemistry), false);
   assert.equal(learning.contradictsNotes('A residual is a useful linear model.', [{name:'residual'}]), true);
   assert.equal(learning.contradictsNotes('A residual is observed minus predicted.', [{name:'residual'}]), false);

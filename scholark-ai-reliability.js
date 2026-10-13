@@ -105,6 +105,11 @@
     if (/\b(?:what|how|does|is|explain)\b/.test(q)&&/\b(?:activities lab|essay coach|college chances)\b/.test(q)) return true;
     if (/^(who|what)\s+are\s+(you|u)[?.!]*$/.test(q)) return true;
     if (/\bwho\s+(made|built|created|founded|started)\s+(you|u|this\s+(app|site|website|tool|assistant))\b/.test(q)) return true;
+    if (/\bscholark\b/.test(q)
+      && /\b(?:what|how|does|can)\b/.test(q)
+      && /\b(?:score|grade|assess|evaluate|refine|save|prepare)\b/.test(q)
+      && /\b(?:activities|extracurriculars|essays?|college chances|sat|act)\b/.test(q)
+      && !/\b(?:explain|solve|teach|help me with)\b/.test(q)) return true;
     if (/\b(?:explain|solve|teach|help me with)\b/.test(q) && /\b(?:math|biology|chemistry|physics|history|english|fractions?|photosynthesis|world war|sat|act|ap|essay|college|scholarship)\b/.test(q) && !/\b(?:scholark|this app)\b.{0,25}\b(?:work|built|made|run)\b/.test(q)) return false;
     const productSubject = /\b(scholark|you|your|admissions reader|essay reader|local ai|ai tools?|this (?:app|site|website|chat|assistant|bot|platform|tool))\b/.test(q);
     const productTopic = /\b(ai|ais|bots?|models?|agents?|assistants?|specialists?|features?|capabilities|technology|tech|system|architecture|backend|front.?end|camera|vision|images?|photos?|data|privacy|firebase|essay grader|essay reader|machine learning|deep learning)\b/.test(q);
@@ -122,13 +127,20 @@
   }
 
   function isOutOfScope(input = '') {
-    const q = String(input).toLowerCase().trim();
-    if (/\b(class|homework|assignment|essay|course|school|college|university|sat|act|ap exam|career|math|economics|history|science)\b/.test(q)) return false;
-    if (/\b(?:study|learn|research|analy[sz]e)\b/.test(q) && /\b(?:marketing|literature|economics|math|history|science|school|class|assignment|essay|course|college)\b/.test(q)) return false;
+    const q = String(input).normalize('NFKC').toLowerCase().replace(/[’‘]/g, "'").replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
     if (/\bwhat should i (?:watch|cook|eat|buy|play)\b/.test(q)) return true;
-    const offTopic = /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|fast food|mcdonald'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|recipes?|meals?|dinners?|drinks?|sports scores?|weather|forecast|vacations?|travel destinations?|shopping)\b/.test(q);
-    const request = /\b(what|which|who|how|where|when|why|is|are|can|do|does|recommend\w*|favorite|best|watch|stream|play|review|rank|suggest\w*|good|popular|order|buy|eat|cook|research|learn|study)\b/.test(q);
-    return offTopic && request;
+    const offTopic = /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|fast food|mc\s*donald'?s|mickey d'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|recipes?|meals?|dinners?|drinks?|sports scores?|weather|forecast|vacations?|travel destinations?|shopping|horoscopes?|astrology|dating advice)\b/.test(q);
+    if (!offTopic) return false;
+    // Location, ordering and entertainment requests stay outside scope even
+    // when padded with words such as "college", "research" or "analyze".
+    const consumerRequest = /\b(?:nearest|closest|directions? to|near me|near my|opening hours|open now|where (?:is|are|can i find|should i get)|what (?:to|should i) (?:order|watch|eat|buy)|most popular order|recommend\w*|favorites?)\b/.test(q);
+    if (consumerRequest) return true;
+    const academicAnalysis = /\b(?:analy[sz]e|interpret|critique|compare|explain|calculate|discuss|evaluate|revise|review|improve|feedback)\b/.test(q)
+      && /\b(?:marketing|literature|economics|math|history|science|media studies|rhetoric|symbolism|themes?|school|class|assignment|essay|course|college|application|activities|extracurriculars)\b/.test(q);
+    const applicationExperience = /\b(?:job|work|worked|working|employment|shift|volunteer)\b/.test(q)
+      && /\b(?:applications?|essays?|activit(?:y|ies)|extracurriculars?|common app|college)\b/.test(q);
+    const academicExercise = /\b(?:use|create|solve|write|work through)\b/.test(q) && /\b(?:math word problem|probability problem|algebra exercise|economics case study)\b/.test(q);
+    return !(academicAnalysis || applicationExperience || academicExercise);
   }
 
   function improvedRouteIntent(input = '') {
@@ -172,11 +184,12 @@
     if (/what\s+(can|does)\s+scholark|scholark\s+features/.test(q)) {
       return `Scholark brings together ${PRODUCT_FACTS.capabilities.slice(0, -1).join(', ')}, and ${PRODUCT_FACTS.capabilities.at(-1)} in one student-built platform.`;
     }
-    if (/\bactivities lab\b/.test(q)) return 'Activities Lab grades self-reported activities against an explained rubric and composite reference profiles. It offers a 150-character offline refiner and optional on-device AI refinement. Its portfolio score can be linked to College Chances; it is not an admissions prediction.';
+    if (/\b(?:activities lab|activities|extracurriculars)\b/.test(q)) return 'Activities Lab grades self-reported activities against an explained rubric and composite reference profiles. It offers a 150-character offline refiner and optional on-device AI refinement. Its portfolio score can be linked to College Chances; it is not an admissions prediction.';
     if (/\bcollege chances\b/.test(q)) return 'College Chances shows a heuristic planning range anchored to the stored school acceptance rate, with bounded academic, activity, and essay adjustments. The model is not calibrated on individual admission outcomes and cannot promise an admission result.';
     if (/\bessay coach\b/.test(q)) return PRODUCT_FACTS.essay;
     if (/\b(camera|computer vision|image recognition|photos?|images?|see|visual)\b/.test(q)) return PRODUCT_FACTS.vision;
     if (/\b(essay grader|essay reader|essay ai|grades? essays?|admissions officer)\b/.test(q)) return PRODUCT_FACTS.essay;
+    if (/\b(?:sat|act)\b/.test(q)) return 'Scholark offers SAT/ACT preparation, practice, and diagnostics. Its practice data are not official exam scores. Check College Board for current SAT information and ACT for current ACT information.';
     if (/\b(backend|front.?end|firebase|server|where.{0,20}(?:data|run)|cloud)\b/.test(q)) return PRODUCT_FACTS.backend;
     if (/\b(which|what|how).{0,30}\b(models?|qwen|llama|smollm|under the hood|powered)\b|\b(deep learning|machine learning)\b/.test(q)) return PRODUCT_FACTS.models;
     if (/\b(ai|ais|bots?|agents?|assistants?|specialists?|chatbots?|types?|kinds?)\b/.test(q)) {
@@ -186,8 +199,29 @@
     return `Scholark is ${PRODUCT_FACTS.description}, built by ${PRODUCT_FACTS.creator}. ${PRODUCT_FACTS.pricing}`;
   }
 
+  function shortWordingAnswer(input = '') {
+    const request = window.ScholarkAILearning?.shortWordingRequest(input);
+    if (!request) return null;
+    const excerpt = request.excerpt;
+    const tightened = excerpt.replace(/\b(?:really|very|basically|kind of|sort of)\s+/gi, '').replace(/\b(i think that)\s+/gi, '').replace(/\b(\w+)\s+\1\b/gi, '$1').replace(/\s{2,}/g, ' ').trim();
+    return !excerpt
+      ? 'Share one exact sentence or short phrase from your draft, and I can suggest a small wording change while keeping the experience and ideas yours.'
+      : tightened !== excerpt
+        ? `Optional tighter wording: “${tightened}” I removed filler only; keep this version only if it still sounds like you. I can also explain a stronger revision direction without writing your essay.`
+        : 'This excerpt does not have obvious filler to trim safely. What effect do you want this sentence to have on a reader? I can point out a specific revision direction while keeping the wording yours.';
+  }
+
   function verifiedLearningAnswer(input = '', context = {}) {
     const q = String(input).toLowerCase().trim();
+    if (/^(?:what is (?:the )?college board|who (?:runs|administers) the sat)[?.!]*$/.test(q)) {
+      return 'College Board is a not-for-profit membership organization that runs the SAT and AP programs. Scholark is independent of College Board. For current exam policies and dates, use collegeboard.org. Source: College Board, About Our Organization.';
+    }
+    if (/\bresiduals?\s+(?:is|are)\s+(?:a\s+|an\s+|the\s+)?(?:useful\s+)?(?:linear\s+)?models?\b|\b(?:is|are)\s+residuals?\s+(?:a\s+|an\s+|the\s+)?(?:useful\s+)?(?:linear\s+)?models?\b/.test(q)) {
+      return 'No. A residual is a number: the observed value minus the value predicted by a model. Residuals help you inspect the model’s fit; a curved pattern in a residual plot can show that a straight-line model is unsuitable. Source: OpenStax Introductory Statistics 2e, section 12.3.';
+    }
+    if (/\bap\s*csp\b/.test(q) && /\b(?:mastery|mastered?|whole unit|entire unit)\b/.test(q) && /\b\d+\s*\/\s*\d+\b/.test(q)) {
+      return 'AP CSP means AP Computer Science Principles. A high score on one practice set is encouraging evidence about those particular questions; it does not establish mastery of an entire unit. Check several different skills, explain your reasoning without hints, and try new questions after a delay. Scholark should report the practice result separately from any longer-term mastery estimate.';
+    }
     if (/\b(?:why (?:did|was)|what (?:caused|started)|explain (?:the causes of)?)\b.{0,28}\b(?:world war (?:i|1|one)|first world war|wwi)\b/.test(q)) {
       return 'World War I began after the assassination of Archduke Franz Ferdinand in Sarajevo in June 1914. Austria-Hungary declared war on Serbia in July; alliances, mobilization plans, nationalism, and rivalry among European powers turned that crisis into a wider war. Germany fought with Austria-Hungary, while France, Russia, and Britain became opposing powers. Source: Imperial War Museums, “4 August 1914” factsheet.';
     }
@@ -602,6 +636,11 @@
       const answer = 'That’s outside Scholark’s study and college-planning scope. I can help with classes, test prep, applications, essays, scholarships, or careers.';
       return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'scope-redirect', answer, text: answer, failures: [] };
     }
+    const shortWording = shortWordingAnswer(input);
+    if (shortWording) {
+      return { route: { ...route, agent: 'essay' }, mode: 'grounded-local', tier: 'grounded', modelId: null,
+        generationKind: 'short-wording-coach', answer: shortWording, text: shortWording, failures: [] };
+    }
     if (route.agent === 'greeting') {
       const answer = 'Hey! I’m Scholark’s study assistant. What would you like help with?';
       return { route, mode: 'grounded-local', tier: 'grounded', modelId: null, generationKind: 'greeting', answer, text: answer, failures: [] };
@@ -656,6 +695,7 @@
     productFacts: PRODUCT_FACTS,
     sequenceFor,
     productAnswer,
+    shortWordingAnswer,
     isWeakAnswer,
     unloadRescue,
     get rescueLastUsedAt() { return rescueLastUsedAt; }

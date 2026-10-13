@@ -1,6 +1,15 @@
 # Admissions and local AI verification
 
-## Recorded results (October 10–11, 2026)
+## Follow-up audit (October 13, 2026)
+
+- 132 Node checks passed, including hostile topic routing, grounded passage alternatives, all seven prompt mappings, activity evidence, score bounds, and repeated-draft defenses.
+- 30 AI browser / hardening checks passed in system Chrome, including the actual Run Rubric Feedback button, draft/prompt invalidation, late model results, and unavailable-model handling.
+- 21 admissions / passage / homepage browser checks passed across the full run and one corrected assertion rerun: all twelve feature cards, signed-out gates, square About portrait, nine passage-edit and prompt-review flows, grading, linked scores, and mobile controls.
+- 25 Firestore rules checks passed with the root emulator configuration. Eight browser/emulator cloud flows passed in the preceding run, including already-open second-browser additions, deletions, and link revocation. No production student data was used.
+- A real on-device passage generation completed but failed grounding validation. The UI kept two usable local alternatives and left the draft unchanged. This does not count as a successful generative revision.
+- The new source-backed prompt panel uses short editorial summaries of published essays; it is not a dataset of admission outcomes or a claim to cloud-model parity.
+
+## Earlier recorded results (October 10–11, 2026)
 
 - 116 Node tests passed: activity ordering and hostile inputs, 39 essay rules with positive/negative fixtures, 12 synthetic calibration samples, edit anchoring, revision word deltas, planning-model monotonicity/bounds, AI routing/arithmetic, and existing AP/prep integrity tests.
 - 28 AI browser and hardening checks passed in Chrome: product knowledge, scope, evidence validation, safe rendering, cancellation, concurrency, persistence, model bundle import, and cinematic-before-AI startup.
@@ -30,7 +39,7 @@ For security tests, install Firebase CLI, `@firebase/rules-unit-testing`, and `f
 
 ```sh
 firebase emulators:exec --only firestore --project demo-scholark-tests \
-  --config scripts/firebase.admissions-test.json \
+  --config firebase.admissions-test.json \
   'node scripts/admissions-firestore.mjs'
 ```
 

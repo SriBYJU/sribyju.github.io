@@ -7,7 +7,11 @@
 
   // Compute explicit arithmetic locally. Never execute student input as code.
   function calculate(input = '') {
-    const expression = String(input).trim().toLowerCase()
+    const raw = String(input).trim().toLowerCase();
+    const wantsSteps = /^(?:please\s+)?(?:explain|walk me through|show(?: me)? how to (?:calculate|solve))\b|\b(?:step[- ]by[- ]step|with (?:each|every|all) step checked|with steps)\b/.test(raw);
+    const expression = raw
+      .replace(/^(?:please\s+)?(?:explain|walk me through|show(?: me)? how to (?:calculate|solve))\s+/, '')
+      .replace(/\s+(?:with (?:each|every|all) step checked|step[- ]by[- ]step|with steps)\s*[?.!]*$/, '')
       .replace(/^(?:what(?:'s| is)|calculate|compute|evaluate|solve)\s+/, '')
       .replace(/\s*(?:equals?|=)\s*\??$/, '')
       .replace(/[?]+$/, '').replace(/\bmultiplied by\b|\btimes\b|[×·]/g, '*')
@@ -42,7 +46,26 @@
       const value = sum();
       if (index !== tokens.length) return null;
       if (!Number.isFinite(value) || Math.abs(value) > Number.MAX_SAFE_INTEGER) return { expression, error: 'This expression exceeds the calculator’s supported number range.' };
-      return { expression, value: Number(value.toPrecision(12)) };
+      const result = { expression, value: Number(value.toPrecision(12)) };
+      const fractions = expression.match(/^(-?\d+)\s*\/\s*(\d+)\s*([+-])\s*(-?\d+)\s*\/\s*(\d+)$/);
+      if (fractions) {
+        const [, leftN, leftD, operator, rightN, rightD] = fractions;
+        const a = Number(leftN), b = Number(leftD), c = Number(rightN), d = Number(rightD);
+        const gcd = (x, y) => y ? gcd(y, x % y) : x;
+        const divisor = gcd(b, d), common = b / divisor * d;
+        const left = a * (common / b), right = c * (common / d);
+        const numerator = operator === '+' ? left + right : left - right;
+        if (Number.isSafeInteger(common) && Number.isSafeInteger(numerator) && common <= 1e9) {
+          const reduction = gcd(Math.abs(numerator), common);
+          const exact = common / reduction === 1 ? String(numerator / reduction) : `${numerator / reduction}/${common / reduction}`;
+          const unreduced = `${numerator}/${common}`;
+          const approximation = Number(exact) === result.value ? '' : ` (about ${Number(result.value.toPrecision(6))})`;
+          result.explanation = wantsSteps
+            ? `Use a common denominator of ${common}. ${a}/${b} = ${left}/${common} and ${c}/${d} = ${right}/${common}. Then ${left}/${common} ${operator} ${right}/${common} = ${unreduced}${exact === unreduced ? '' : ` = ${exact}`}${approximation}.`
+            : `${a}/${b} ${operator} ${c}/${d} = ${exact}${approximation}.`;
+        }
+      }
+      return result;
     } catch (error) {
       return error.message === 'division-by-zero' ? { expression, error: 'Division by zero is undefined.' } : null;
     }
@@ -52,6 +75,9 @@
   // Short, source-backed notes for common misconceptions. Keep these separate
   // from course progress: asking a science question must never imply enrollment.
   const referenceNotes = [
+    { name: 'AP Computer Science Principles', subject: 'Computer Science', matches: /\bap\s*csp\b|\bcomputer science principles\b/i,
+      text: 'AP CSP means AP Computer Science Principles, not chemistry. Its big ideas include creative development, data, algorithms and programming, computer systems and networks, and the impact of computing. One practice score describes performance on those questions; it does not establish mastery of an entire unit.',
+      url: 'https://apstudents.collegeboard.org/courses/ap-computer-science-principles', sourceLabel: 'College Board AP Students' },
     { name:'residual', subject:'Statistics', matches:/\bresiduals?\b/i, text:'A residual is a number, not a model: observed value minus predicted value. A positive residual means the observation lies above the fitted line; a negative one lies below. Residual plots can contain patterns. A systematic curve suggests that a straight-line model may be unsuitable; calculating residuals does not remove that pattern.', url:'https://openstax.org/books/introductory-statistics-2e/pages/12-3-the-regression-equation', sourceLabel:'OpenStax Introductory Statistics 2e' },
     {
       name: 'Enzyme action', subject: 'Biology', matches: /\benzymes?\b/i,
@@ -137,18 +163,39 @@
     if (names.has('Chemical bonds and energy')) {
       if (/\bbreak\w*\s+(?:chemical\s+)?bonds?\s+(?:(?:itself|alone|actually|generally|typically)\s+)*(?:releases?|produces?|gives off)\s+energy\b/.test(text)) return true;
       if (/\bform\w*\s+(?:chemical\s+)?bonds?\s+(?:requires?|absorbs?|uses?)\s+energy\b/.test(text)) return true;
+      if (/\b(?:form\w*\s+(?:a\s+|the\s+)?(?:chemical\s+)?bonds?|bond formation)\b[^.!?\n]{0,45}\b(?:endothermic|requires? energy|absorbs? energy)\b/.test(text) && !/\b(?:not|never|incorrect|false)\b/.test(text)) return true;
+      if (/\b(?:break\w*\s+(?:a\s+|the\s+)?(?:chemical\s+)?bonds?|bond breaking)\b[^.!?\n]{0,35}\bexothermic\b/.test(text) && !/\b(?:not|never|incorrect|false)\b/.test(text)) return true;
     }
     return false;
   }
 
+  function shortWordingRequest(input = '') {
+    const text = String(input).trim();
+    if (!/\b(?:rewrite|rephrase|reword|polish|revise|edit|improve)\b/i.test(text)
+      || !/\b(?:this|one|a single|the following|the first)\s+(?:sentence|phrase)\b/i.test(text)
+      || /\b(?:all|every|entire|whole|full|paragraphs?)\b/i.test(text)) return null;
+    const quoted = text.match(/[“"]([^”"]{1,500})[”"]|‘([^’]{1,500})’/);
+    const excerpt = String(quoted?.[1] || quoted?.[2] || text.split(/[:：]/).slice(1).join(':')).trim();
+    const words = excerpt.match(/\b[\w’'-]+\b/g) || [];
+    return { excerpt: excerpt.length <= 240 && words.length >= 3 && words.length <= 35 && !/[\r\n]/.test(excerpt) ? excerpt : '' };
+  }
+
   function isAuthorshipRequest(input = '', essayContext = false) {
     const q = String(input).trim().toLowerCase();
-    if (/\b(?:how (?:do|can|should) i|tips? (?:for|on)|advice (?:for|on))\b/.test(q)) return false;
+    if (shortWordingRequest(input)) return false;
     const writing = essayContext || /\b(?:essays?|paragraphs?|personal statement|application (?:response|essay)|supplement|opening|conclusion|introduction)\b/.test(q);
     if (!writing) return false;
-    return /(?:^|\b(?:please|you|to))\s*(?:write|draft|generate|compose|rewrite|rephrase|reword|polish|create|finish|complete)\b/.test(q)
+    // Advice about a student's own revision is allowed; asking the assistant to
+    // supply application prose is not. Keep this narrow so "how can I get you to
+    // write my essay" cannot bypass the boundary through its opening words.
+    if (/^(?:how (?:do|can|should) i (?:write|revise|edit|improve|rewrite|rephrase|reword|polish|structure|plan)|tips? (?:for|on)|advice (?:for|on))\b/.test(q)
+      && !/\b(?:you|scholark|assistant|bot)\s+to\s+(?:write|draft|generate|compose|rewrite|rephrase|reword|polish|revise|edit|improve|create|finish|complete)\b/.test(q)) return false;
+    if (/\b(?:how to|ways to)\s+(?:write|revise|edit|improve|rewrite|rephrase|reword|polish)\b/.test(q)
+      && !/\b(?:you|scholark|assistant|bot)\s+to\s+(?:write|draft|generate|compose|rewrite|rephrase|reword|polish|revise|edit|improve|create|finish|complete)\b/.test(q)) return false;
+    if (/\b(?:full|entire|whole|complete|finished|rewritten)\b/.test(q) && /\b(?:give|show|provide|want|need|have|send|produce|turn|convert)\b/.test(q)) return true;
+    return /(?:^|\b(?:please|you|to|me))\s*(?:write|draft|generate|compose|rewrite|rephrase|reword|polish|revise|edit|improve|create|finish|complete)\b/.test(q)
       || /\b(?:give|show|provide)\s+(?:me\s+)?(?:an?\s+)?(?:sample|example|model|complete|full)\b/.test(q);
   }
 
-  return { version: '1.0.0', calculate, retrieve, contextFor, isAuthorshipRequest, readableMath, contradictsNotes };
+  return { version: '1.0.0', calculate, retrieve, contextFor, isAuthorshipRequest, shortWordingRequest, readableMath, contradictsNotes };
 });

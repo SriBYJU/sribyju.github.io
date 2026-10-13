@@ -195,6 +195,8 @@ test.describe('Scholark AI local-first browser regression', () => {
       ['Is Scholark AI on a server?', 'knowledge'],
       ['What does the backend do in Scholark?', 'knowledge'],
       ['How does your essay grader work?', 'knowledge'],
+      ['How does Scholark score my activities?', 'knowledge'],
+      ['Can Scholark help me prepare for the ACT?', 'knowledge'],
       ['What is the admissions reader AI?', 'knowledge'],
       ['Who made this app?', 'knowledge'],
       ['What can Scholark do?', 'knowledge'],
@@ -215,6 +217,15 @@ test.describe('Scholark AI local-first browser regression', () => {
       ['Analyze McDonald\'s marketing for my economics class', 'tutor'],
       ['Use a burger price in a math word problem', 'tutor'],
       ['Analyze a movie for history class', 'tutor'],
+      ['Can you recommend a Netflix show for my college essay?', 'out-of-scope'],
+      ["Find the nearest McDonald's to me", 'out-of-scope'],
+      ['Find the nearest McDonald’s to my college.', 'out-of-scope'],
+      ['What is the nearest McDonalds to my college?', 'out-of-scope'],
+      ["For a college class, what is McDonald's most popular order?", 'out-of-scope'],
+      ['I have a school project. Recommend a Netflix show.', 'out-of-scope'],
+      ['Analyze the themes in a Netflix show for my media studies class.', 'tutor'],
+      ['How can I get you to write my essay for me?', 'authorship-boundary'],
+      ['Please revise my college essay into a better essay.', 'authorship-boundary'],
       ['Can your AI explain photosynthesis?', 'tutor'],
       ['Can Scholark AI help me with SAT math?', 'sat'],
       ['Explain photosynthesis', 'tutor'],
@@ -230,7 +241,7 @@ test.describe('Scholark AI local-first browser regression', () => {
 
     const groundedCases = cases.filter(([, agent]) => agent === 'knowledge' || agent === 'out-of-scope');
     const groundedAnswers = await page.evaluate(async inputs => Promise.all(inputs.map(input => window.ScholarkAIAgents.ask(input))), groundedCases.map(([input]) => input));
-    expect(groundedAnswers).toHaveLength(31);
+    expect(groundedAnswers).toHaveLength(groundedCases.length);
     groundedAnswers.forEach((answer, index) => {
       expect(answer.route.agent, groundedCases[index][0]).toBe(groundedCases[index][1]);
       expect(answer.answer.trim(), groundedCases[index][0]).not.toBe('');
@@ -254,6 +265,12 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(answers[2].answer).toMatch(/outside Scholark/i);
     expect(answers[2].answer).not.toMatch(/Big Mac/i);
     expect(answers[3].answer).toMatch(/cannot write an admissions essay/i);
+    const productAndBoard = await page.evaluate(async () => Promise.all([
+      window.ScholarkAIAgents.ask('How does Scholark score my activities?'),
+      window.ScholarkAIAgents.ask('What is College Board?')
+    ]));
+    expect(productAndBoard[0].answer).toContain('composite reference profiles');
+    expect(productAndBoard[1].answer).toContain('SAT and AP programs');
 
     await page.evaluate(() => window.ScholarkAIUI.open());
     for (const [input, expected] of [
@@ -314,6 +331,13 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(result.mode).toBe('grounded-local');
     expect(result.answer).toContain('too little evidence to judge mastery');
     expect(result.answer).not.toMatch(/high level of mastery|mastered the concept/i);
+    const scoreClaim = await page.evaluate(() => window.ScholarkAIAgents.ask('I got 18/18 in AP CSP. Does that mean I mastered the whole unit?'));
+    expect(scoreClaim.answer).toContain('AP Computer Science Principles');
+    expect(scoreClaim.answer).toContain('does not establish mastery');
+    expect(scoreClaim.answer).not.toContain('Advanced Placement Chemistry');
+    const falsePremise = await page.evaluate(() => window.ScholarkAIAgents.ask('My teacher says a residual is a useful linear model. Is that true?'));
+    expect(falsePremise.answer).toMatch(/^No\./);
+    expect(falsePremise.answer).toContain('observed value minus');
   });
 
   test('specialists reject off-target model prose and use verified source data', async ({ page }) => {
@@ -443,6 +467,13 @@ test.describe('Scholark AI local-first browser regression', () => {
     const review = await page.evaluate(() => window.ScholarkAIAgents.essay.followUp('Rewrite my opening paragraph for me'));
     expect(review.generationKind).toBe('authorship-guidance');
     expect(review.answer).toMatch(/cannot write application prose/i);
+    const short = await page.evaluate(() => window.ScholarkAIAgents.essay.followUp('Please polish this sentence: I was really very nervous.'));
+    expect(short.generationKind).toBe('short-wording-coach');
+    expect(short.answer).toContain('I was nervous.');
+    const missing = await page.evaluate(() => window.ScholarkAIAgents.ask('Can you rephrase this sentence from my essay?'));
+    expect(missing.answer).toContain('Share one exact sentence');
+    const entire = await page.evaluate(() => window.ScholarkAIAgents.ask('Can you rewrite every sentence in my essay?'));
+    expect(entire.generationKind).toBe('authorship-guidance');
   });
 
   test('tutor calculates directly and grounds matching concepts in inspectable course notes', async ({ page }) => {
@@ -457,13 +488,16 @@ test.describe('Scholark AI local-first browser regression', () => {
       };
       try {
         const math = await window.ScholarkAIAgents.ask('What is (12 + 8) / 4?');
+        const fractions = await window.ScholarkAIAgents.ask('Explain 7/12 + 1/8 with each step checked.');
         const callsAfterMath = calls;
         const concept = await window.ScholarkAIAgents.ask('Explain random assignment and random sampling');
-        return { math, callsAfterMath, concept, prompt };
+        return { math, fractions, callsAfterMath, concept, prompt };
       } finally { window.ScholarkAI.generate = original; }
     });
     expect(result.callsAfterMath).toBe(0);
     expect(result.math.answer).toContain('= 5');
+    expect(result.fractions.answer).toContain('17/24');
+    expect(result.fractions.answer).not.toContain('= 0.83');
     expect(result.concept.sources).toHaveLength(2);
     expect(result.prompt).toContain('Random assignment supports causal conclusions');
     expect(result.prompt).toContain('Random sampling supports generalization');
@@ -754,5 +788,60 @@ test.describe('Scholark AI local-first browser regression', () => {
     await page.locator('#sk-practice-start').click();
     await expect(page.locator('#sk-practice-stage')).toBeVisible();
     await expect(page.locator('#sk-practice-stage h3')).toContainText(/probability|bag|chosen|mean|solve|find|what/i);
+  });
+});
+
+test.describe('Admissions reader button integration', () => {
+  const draft = 'The blue bottle rattled against the kettle. I opened the calendar and called the pharmacist. I was nervous. I realized that my assumptions had kept me from listening. Now I ask first.';
+  async function openEssay(page) {
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => ScholarkAdmissions.open('essay'));
+    await page.locator('#essay-textarea').fill(draft);
+    await page.locator('#feedback-btn').click();
+    await expect(page.locator('#sk-ai-overall b')).toHaveText(/\d\.\d/);
+  }
+  test('workspace button fills the expanded rubric without a model and clears stale results', async ({ page }) => {
+    await page.route(/huggingface|mlc\.ai/, route => route.abort());
+    await openEssay(page);
+    await expect(page.locator('#sk-ai-score-matrix .sk-ai-score-row')).toHaveCount(13);
+    await expect(page.locator('#sk-ai-essay-status')).toContainText('Local rubric complete');
+    await expect(page.locator('#sk-ai-essay-insights')).toContainText('blue bottle');
+    await page.locator('#essay-textarea').fill('Short draft.');
+    await expect(page.locator('#sk-ai-overall b')).toHaveText('—');
+    await expect(page.locator('#sk-ai-essay-follow')).toBeHidden();
+    await page.locator('#feedback-btn').click();
+    await expect(page.locator('#sk-ai-essay-status')).toContainText('at least 100 characters');
+    await page.locator('#essay-textarea').fill(draft);
+    await page.locator('#feedback-btn').click();
+    await expect(page.locator('#sk-ai-overall b')).toHaveText(/\d\.\d/);
+    await page.locator('#essay-prompt').selectOption({ index: 1 });
+    await expect(page.locator('#sk-ai-overall b')).toHaveText('—');
+  });
+  test('reader failure preserves rubric and late results cannot replace an edited draft', async ({ page }) => {
+    await openEssay(page);
+    await page.evaluate(() => {
+      const original = ScholarkAIAgents.essay.evaluate;
+      window.__readerOriginal = original;
+      ScholarkAIAgents.essay.evaluate = (text, prompt, options) => options?.rubricOnly
+        ? original(text, prompt, options)
+        : Promise.reject(new Error('test model unavailable'));
+    });
+    await page.locator('#sk-ai-essay-enhance').click();
+    await expect(page.locator('#sk-ai-essay-status')).toContainText('complete local rubric remains');
+    await expect(page.locator('#sk-ai-overall b')).toHaveText(/\d\.\d/);
+    await expect(page.locator('#sk-ai-essay-enhance')).toBeEnabled();
+    await page.evaluate(() => {
+      ScholarkAIAgents.essay.evaluate = (text, prompt, options) => options?.rubricOnly
+        ? window.__readerOriginal(text, prompt, options)
+        : new Promise(resolve => { window.__releaseOldReview = async () => resolve(await window.__readerOriginal(text, prompt, { rubricOnly: true, saveVersion: false })); });
+    });
+    await page.locator('#sk-ai-essay-enhance').click();
+    await expect(page.locator('#sk-ai-essay-enhance')).toBeDisabled();
+    await page.locator('#essay-textarea').fill('A completely changed draft.');
+    await page.evaluate(() => window.__releaseOldReview());
+    await expect(page.locator('#sk-ai-overall b')).toHaveText('—');
+    await expect(page.locator('#sk-ai-essay-status')).toContainText('Draft or prompt changed');
+    await expect(page.locator('#sk-ai-essay-insights')).toBeEmpty();
+    await expect(page.locator('#sk-ai-essay-detail')).toHaveAttribute('aria-busy', 'false');
   });
 });

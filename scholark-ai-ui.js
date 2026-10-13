@@ -14,6 +14,9 @@
   let legacyEssayFeedback = null;
   let autosaveTimer = null;
   let lastEssayEvaluation = null;
+  let essayRun = 0;
+  let evaluatedEssay = null;
+  let essayProgressCleanup = null;
   let activeRequest = null;
   let lastChatExchange = null;
 
@@ -21,7 +24,7 @@
     if (q('link[href*="scholark-ai.css"]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'scholark-ai.css';
+    link.href = 'scholark-ai.css?revision=20261013';
     document.head.appendChild(link);
   }
 
@@ -316,10 +319,11 @@
   function essayDetailHTML() {
     return `<section class="sk-ai-essay-detail" id="sk-ai-essay-detail" aria-live="polite">
       <div class="sk-ai-essay-title-row">
-        <div><span class="sk-ai-kicker">Admissions Reader Simulation</span><h3>Evidence-based essay feedback</h3><p>Scores are local rubric estimates, not a university grade or admissions prediction. The on-device reader adds notes tied to your draft when available. It coaches your revisions and does not write your essay. The review draws on published <a href="https://admissions.yale.edu/essays" target="_blank" rel="noopener noreferrer">Yale</a> and <a href="https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-first-year/personal-insight-questions.html" target="_blank" rel="noopener noreferrer">UC</a> essay guidance.</p></div>
+        <div><span class="sk-ai-kicker">Admissions Reader Simulation</span><h3>Evidence-based essay feedback</h3><p>This separate reader rubric uses a 10-point scale. Use the Essay Coach’s 100-point writing score above in College Chances. Both are local estimates, not university grades or admissions predictions. The on-device reader adds notes tied to your draft when available. It coaches your revisions and does not write your essay. The review draws on published <a href="https://admissions.yale.edu/essays" target="_blank" rel="noopener noreferrer">Yale</a> and <a href="https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-first-year/personal-insight-questions.html" target="_blank" rel="noopener noreferrer">UC</a> essay guidance.</p></div>
         <div class="sk-ai-overall" id="sk-ai-overall"><b>—</b><span>/ 10</span></div>
       </div>
       <div class="sk-ai-essay-status" id="sk-ai-essay-status">Run Rubric Feedback to generate the expanded review.</div>
+      <button type="button" id="sk-ai-essay-enhance">Add on-device reader notes</button>
       <div class="sk-ai-score-matrix" id="sk-ai-score-matrix"></div>
       <div class="sk-ai-essay-insights" id="sk-ai-essay-insights"></div>
       <div class="sk-ai-essay-follow" id="sk-ai-essay-follow" hidden>
@@ -339,7 +343,8 @@
     const textarea = q('#essay-textarea');
     if (textarea && !textarea.dataset.skAiAutosave) {
       textarea.dataset.skAiAutosave = '1';
-      textarea.addEventListener('input', scheduleEssayAutosave, { passive: true });
+      textarea.addEventListener('input', () => { scheduleEssayAutosave(); invalidateEssayReview(); }, { passive: true });
+      q('#essay-prompt')?.addEventListener('change', invalidateEssayReview);
       restoreEssayAutosave();
     }
 
@@ -357,6 +362,11 @@
       window.getEssayFeedback = enhanced;
     }
 
+    const enhance = q('#sk-ai-essay-enhance');
+    if (enhance && !enhance.dataset.ready) {
+      enhance.dataset.ready = '1';
+      enhance.addEventListener('click', () => runExpandedEssayEvaluation(q('#essay-textarea')?.value.trim() || '', { enhance: true }));
+    }
     const ask = q('#sk-ai-essay-ask');
     if (ask && !ask.dataset.ready) {
       ask.dataset.ready = '1';
@@ -400,30 +410,73 @@
     window.updatePromptHint?.();
   }
 
-  async function runExpandedEssayEvaluation(text) {
+  function invalidateEssayReview() {
+    essayRun++;
+    essayProgressCleanup?.();
+    essayProgressCleanup = null;
+    lastEssayEvaluation = null;
+    evaluatedEssay = null;
     const section = q('#sk-ai-essay-detail');
     if (!section) return;
+    section.setAttribute('aria-busy', 'false');
+    q('#sk-ai-overall b', section).textContent = '—';
+    for (const id of ['sk-ai-score-matrix', 'sk-ai-essay-insights', 'sk-ai-version-compare', 'sk-ai-essay-answer']) q('#' + id, section).replaceChildren();
+    q('#sk-ai-essay-follow', section).hidden = true;
+    q('#sk-ai-essay-enhance', section).disabled = false;
     const status = q('#sk-ai-essay-status', section);
-    status.className = 'sk-ai-essay-status loading';
-    status.textContent = AI.state.capability?.generative || AI.state.capability?.cpuGenerative ? 'Preparing the private on-device admissions reader. First use may download and cache a local model…' : 'Running the expanded compatibility rubric…';
-    section.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+    status.className = 'sk-ai-essay-status';
+    status.textContent = 'Draft or prompt changed. Run Rubric Feedback to review this version.';
+  }
 
-    const stopListening = AI.on('model-progress', event => {
-      if (!status) return;
-      const pct = Number.isFinite(event.progress) ? ` ${Math.round(event.progress * 100)}%` : '';
-      status.textContent = `${event.text || 'Preparing local model'}${pct}`;
-    });
-
+  async function runExpandedEssayEvaluation(text, options = {}) {
+    installEssayEnhancement();
+    const section = q('#sk-ai-essay-detail');
+    if (!section) return;
+    invalidateEssayReview();
+    const run = ++essayRun;
+    const prompt = currentEssayPrompt();
+    const current = () => run === essayRun && text === (q('#essay-textarea')?.value.trim() || '') && prompt === currentEssayPrompt();
+    const status = q('#sk-ai-essay-status', section);
+    if (text.length < 100) {
+      status.textContent = 'Write at least 100 characters, then click Run Rubric Feedback. Short fragments do not provide enough evidence for a review.';
+      return;
+    }
+    scheduleEssayAutosave(true);
+    section.setAttribute('aria-busy', 'true');
     try {
-      const result = await Agents.essay.evaluate(text, currentEssayPrompt(), { saveVersion: true });
+      const baseline = await Agents.essay.evaluate(text, prompt, { rubricOnly: true, saveVersion: true });
+      if (!current()) return;
+      lastEssayEvaluation = baseline.evaluation;
+      evaluatedEssay = { text, prompt };
+      renderEssayEvaluation(baseline);
+      if (!options.enhance) return baseline;
+      q('#sk-ai-essay-enhance', section).disabled = true;
+      status.className = 'sk-ai-essay-status loading';
+      status.textContent = 'Rubric complete below. Preparing optional on-device reader notes; first use may download a model.';
+      essayProgressCleanup = AI.on('model-progress', event => {
+        if (!current()) return;
+        const pct = Number.isFinite(event.progress) ? ` ${Math.round(event.progress * 100)}%` : '';
+        status.textContent = `Rubric complete below. ${event.text || 'Preparing local model'}${pct}`;
+      });
+      const result = await Agents.essay.evaluate(text, prompt, { saveVersion: false });
+      if (!current()) return;
       lastEssayEvaluation = result.evaluation;
       renderEssayEvaluation(result);
+      return result;
     } catch (error) {
+      if (!current()) return;
       console.error('[Scholark AI] expanded essay evaluation failed', error);
       status.className = 'sk-ai-essay-status error';
-      status.textContent = 'The expanded review could not finish. Your existing rubric feedback and draft are unchanged.';
+      status.textContent = lastEssayEvaluation
+        ? 'The on-device notes could not finish. Your complete local rubric remains below. Retry Add on-device reader notes when ready.'
+        : 'The expanded review could not finish. Your draft and passage comments are safe. Click Run Rubric Feedback to retry.';
     } finally {
-      stopListening();
+      if (current()) {
+        essayProgressCleanup?.();
+        essayProgressCleanup = null;
+        section.setAttribute('aria-busy', 'false');
+        q('#sk-ai-essay-enhance', section).disabled = false;
+      }
     }
   }
 
@@ -436,7 +489,7 @@
     const section = q('#sk-ai-essay-detail');
     if (!e || !section) return;
     q('#sk-ai-overall b', section).textContent = Number(e.overall).toFixed(1);
-    const mode = result.mode === 'local-generative' ? `Rubric scores + on-device AI reader notes · ${result.tier} model` : ['ungrounded-essay-feedback', 'invalid-structured-output'].includes(result.reason) ? 'Local rubric review · AI notes did not pass review checks' : 'Local rubric review · AI model unavailable';
+    const mode = result.reason === 'rubric-only' ? 'Local rubric complete · Add on-device reader notes for an optional AI review' : result.mode === 'local-generative' ? `Rubric scores + on-device AI reader notes · ${result.tier} model` : ['ungrounded-essay-feedback', 'invalid-structured-output'].includes(result.reason) ? 'Local rubric review · AI notes did not pass review checks' : 'Local rubric review · AI model unavailable';
     const status = q('#sk-ai-essay-status', section);
     status.className = 'sk-ai-essay-status ready';
     status.textContent = `${mode}. Draft stayed in the browser for this evaluation path.`;
@@ -462,16 +515,23 @@
     const input = q('#sk-ai-essay-question');
     const output = q('#sk-ai-essay-answer');
     const question = input?.value.trim();
-    if (!question || !lastEssayEvaluation || !output) return;
+    if (!question || !lastEssayEvaluation || !output || !evaluatedEssay) return;
+    const run = essayRun;
+    const draft = evaluatedEssay;
+    const ask = q('#sk-ai-essay-ask');
+    ask.disabled = true;
     output.textContent = 'Reviewing this question against the current rubric…';
     try {
       const result = await Agents.essay.followUp(question, {
         evaluation: lastEssayEvaluation,
-        essay: q('#essay-textarea')?.value || ''
+        essay: draft.text
       });
+      if (run !== essayRun) return;
       output.textContent = result.answer || 'No additional feedback was produced.';
     } catch (error) {
-      output.textContent = 'The follow-up could not run. The current rubric scores remain available above.';
+      if (run === essayRun) output.textContent = 'The follow-up could not run. The current rubric scores remain available above.';
+    } finally {
+      ask.disabled = false;
     }
   }
 
@@ -530,7 +590,7 @@
       }
     });
 
-    window.ScholarkAIUI = { version: VERSION, open: openDialog, close: closeDialog, enhanceEssay: installEssayEnhancement };
+    window.ScholarkAIUI = { version: VERSION, open: openDialog, close: closeDialog, enhanceEssay: installEssayEnhancement, reviewEssay: () => runExpandedEssayEvaluation(q('#essay-textarea')?.value.trim() || '') };
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });

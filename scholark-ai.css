@@ -36,3 +36,6 @@ body.sk-ai-open{overflow:hidden}
 .sk-ai-sources a { color: inherit; text-decoration: underline; }
 
 .sk-ai-essay-title-row p,.sk-ai-essay-status,.sk-ai-essay-detail .sk-ai-kicker{color:var(--ink2)}
+#sk-ai-essay-enhance{margin:8px 0 16px;padding:10px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg2,#f7eee4);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+#sk-ai-essay-enhance:disabled{opacity:.6;cursor:wait}
+#sk-ai-essay-enhance:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
