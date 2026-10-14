@@ -14,9 +14,9 @@ export default defineConfig({
     screenshot: 'only-on-failure'
   },
   projects: [
-    { name: 'chromium-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'home-routes.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-ai-hardening.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Safari'] } },
+    { name: 'chromium-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'essay-studio.spec.mjs', 'activity-import.spec.mjs', 'home-routes.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-ai-hardening.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'essay-studio.spec.mjs', 'activity-import.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit-desktop', testMatch: ['admissions-browser.spec.mjs', 'essay-passage-revision.spec.mjs', 'essay-studio.spec.mjs', 'activity-import.spec.mjs', 'scholark-ai-browser.spec.mjs', 'scholark-cinematic-visual.spec.mjs'], use: { ...devices['Desktop Safari'] } },
     { name: 'chromium-mobile', testMatch: 'scholark-ai-mobile-smoke.spec.mjs', use: { ...devices['Pixel 7'] } },
     { name: 'webkit-mobile', testMatch: 'scholark-ai-mobile-smoke.spec.mjs', use: { ...devices['iPhone 14'] } }
   ]

@@ -520,7 +520,7 @@ test.describe('Scholark AI local-first browser regression', () => {
       const structured = await AI.generateStructured([
         { role: 'system', content: 'Review the provided draft.' },
         { role: 'user', content: 'Original essay: repairing the robotics cart taught me to check the cable.' }
-      ], { agent: 'essay', schema, validate: value => ({ valid: typeof value?.note === 'string' }) });
+      ], { agent: 'essay', schema, maxTokens:850, validate: value => ({ valid: typeof value?.note === 'string', errors:['A note string is required.'] }) });
       AI.state.modelId = 'Qwen3-0.6B-q4f32_1-MLC';
       await AI.generate([{ role: 'user', content: 'Explain robotics.' }]);
       return { structured, requests };
@@ -531,6 +531,8 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(JSON.parse(result.requests[0].response_format.schema).required).toEqual(['note']);
     expect(result.requests[0].extra_body).toBeUndefined();
     expect(result.requests[1].messages.some(message => message.content.includes('Original essay: repairing the robotics cart'))).toBe(true);
+    expect(result.requests[1].messages.at(-1).content).toContain('A note string is required.');
+    expect(result.requests[1].max_tokens).toBe(850);
     expect(result.requests[2].extra_body).toEqual({ enable_thinking: false });
   });
 

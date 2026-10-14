@@ -4,17 +4,21 @@ These are educational heuristics. They are not official university grades, train
 
 ## Activities
 
-The rubric weighs reported impact (30), external validation/selectivity (25), initiative (20), sustained depth (15), and coherence (10). Optional opportunity context adds at most 10 points; the total stays at or below 100. The adjustment is a transparent product design choice, not a measured admissions preference.
+The rubric weighs reported impact (30), external validation/selectivity (25), initiative (20), sustained engagement (15), and evidence specificity (10). Context is recorded without an automatic point bonus. Missing time information is reported separately from contribution quality. The weights are Scholark design choices, not measured admissions preferences.
 
-Scores indicate described evidence: Tier 1 85–100; Tier 2 65–84; Tier 3 40–64; Tier 4 15–39. Insufficient detail produces a request for evidence. A named employer or competition raises a score only when an actual role or result is connected to that name in the same claim; unrelated mentions do not count. Awards need level and identifying detail. Planned or explicitly negated roles are excluded where the language parser recognizes them. Free-text parsing remains imperfect and cannot verify truth.
+Scores indicate described evidence: Tier 1 85–100; Tier 2 65–84; Tier 3 40–64; Tier 4 15–39. Insufficient detail produces a request for evidence. A prestigious employer name alone earns no bonus. Actual contribution, external adoption, research tasks, responsibility and outcomes matter. Shadowing is distinguished from doing research, sponsorship from athletic recruitment, and provisional filing from a granted patent. Awards need level and identifying detail. Planned or explicitly negated roles are excluded where the language parser recognizes them. Free-text parsing remains imperfect and cannot verify truth.
 
-Paid work and caregiving receive credit for responsibility and sustained commitment without requiring prestige or a competition award. Context never guarantees an admission advantage. A user may compare scores with the context adjustment switched off.
+Paid work and caregiving receive credit for responsibility and sustained commitment without requiring prestige or a competition award. Context never guarantees an admission advantage. Opportunity context does not automatically increase a score.
 
 References are **editorial composites**, systematically generated from category ladders and domains. BM25 retrieves textually similar examples; it does not compare a student with real accepted applicants. A 1,204-entry library is broad coverage, not 1,204 independent sources of admissions evidence. Named opportunities have linked official sources; the score mapping itself is Scholark’s judgment.
 
-Portfolio scores require at least three described activities. Scores are sorted and averaged using weights 1, .8, .65, .5, .4, .3, .25, .2, .15, .1. Shape labels describe category concentration, not admissions desirability. Adding a weaker activity may lower this average; the score is not a reason to omit meaningful responsibilities from an application.
+Portfolio scores require at least three described activities. The three strongest described contributions receive weights 50%, 30%, and 20%. Additional hobbies do not dilute this summary. Shape labels describe category concentration, not admissions desirability. This summary is an explicit heuristic, not a calibrated comparison with admitted applicants. Bulk import preserves full supplied evidence in notes, proposes descriptions within 150 characters, and lets the writer review selection before adding up to ten cards.
 
 ## Essay Coach
+
+Essay Studio adds a separate model-generated review: purpose 20%, insight 25%, personal evidence 25%, voice 20%, and clarity 10%. Five 0–4 judgments produce a score out of 100. The model selects numbered draft passages; the application inserts the exact original words. Invalid output produces an explicit retry message, never a rule score labeled as AI. Each accepted review offers passage feedback, an essay-only side conversation, and on-demand two-option edits with individual Apply and Undo controls. Editing the draft or prompt invalidates the review. See [AI reader research](ESSAY_AI_RESEARCH.md) for evidence and limitations.
+
+The following describes the separate offline rule checker.
 
 39 local rules flag craft patterns and quote exact student passages. They include seven strength checks. Comments are hypotheses for the writer to inspect; passive voice, a familiar topic, short paragraphs, or an abstract opening are not automatically bad writing.
 
@@ -26,7 +30,7 @@ Optional on-device alternatives are checked for length, unsupported vocabulary, 
 
 Prompt-specific review covers all seven current Common App prompts, including gratitude for prompt 4, plus supplemental essay types. It links to seven published Johns Hopkins essays and Yale guidance using original, short craft summaries; it does not copy essays or claim those essays caused admission. Prompt mappings are editorial, not assertions about which application prompt the published author chose. Quoted draft matches are labeled possible evidence, not automatic proof of depth.
 
-Run Rubric Feedback populates the expanded reader immediately without a model download. Add on-device reader notes is optional. The reader's separate 13-dimension rubric uses a 10-point scale; College Chances takes the Essay Coach's 100-point writing score. Neither scale is validated against admissions officers. Editing the draft or prompt invalidates the expanded review, and late model responses cannot replace feedback for a newer draft.
+Run Rubric Feedback populates the expanded reader immediately without a model download. Add on-device reader notes is optional. The reader's separate 13-dimension rubric uses a 10-point scale; College Chances can take the current 100-point AI review or the explicitly labeled offline score, with the grading method recorded. Neither scale is validated against admissions officers. Editing the draft or prompt invalidates the expanded review, and late model responses cannot replace feedback for a newer draft.
 
 ## College Chances
 
@@ -43,4 +47,4 @@ Improvement examples are sensitivity calculations inside the model. They do not 
 - [Johns Hopkins Essays That Worked](https://apply.jhu.edu/college-planning-guide/essays-that-worked/): everyday experiences can reveal perspective; no published essays are copied into Scholark.
 - [Yale essay guidance](https://admissions.yale.edu/essays): the applicant’s own voice and meaningful experience.
 
-Rubrics: activities-1.0, essay-rules-1.1, planning-odds-2.0. Reference library v1, updated October 10, 2026.
+Rubrics: activities-2.0, reader-ai-1.0, essay-rules-1.1, planning-odds-2.0. Reference library v1. Methodology updated October 14, 2026.

@@ -605,12 +605,12 @@
       const repairMessages = [
         ...messages,
         { role: 'assistant', content: String(first.text).slice(0, 2000) },
-        { role: 'user', content: 'That response did not pass validation. Re-read the original source and requirements above. Return complete valid JSON only, using evidence from the original source. Correct unsupported claims and do not invent quotes.' }
+        { role: 'user', content: 'That response did not pass validation. Fix these checks: ' + (Array.isArray(validation?.errors) ? validation.errors.map(String).join('; ').slice(0,1000) : 'Return the required complete JSON shape.') + ' Re-read the original source and requirements above. Return complete valid JSON only, using evidence from the original source. Correct unsupported claims and do not invent quotes.' }
       ];
       const repaired = await reliableGenerate(repairMessages, {
         ...options,
         temperature: 0,
-        maxTokens: Math.min(options.maxTokens || 500, 600),
+        maxTokens: Math.min(options.maxTokens || 500, 1000),
         fallback: null,
         suppressFinalFallback: true,
         skipCPU: true

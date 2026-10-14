@@ -9,6 +9,15 @@
 - A real on-device passage generation completed but failed grounding validation. The UI kept two usable local alternatives and left the draft unchanged. This does not count as a successful generative revision.
 - The new source-backed prompt panel uses short editorial summaries of published essays; it is not a dataset of admission outcomes or a claim to cloud-model parity.
 
+## October 14 activity import and Essay Studio audit
+
+- Activity imports now preview distinct cards, titles, selection and descriptions while retaining original evidence. Four browser cases cover broken tables, more than ten entries, editable previews and hostile text.
+- Essay Studio adds a model-generated grade, cited criteria, a draft-aware chat and two-option passage edits. Twelve browser cases cover grading/link provenance, Apply/Undo, stale reviews and options, cancellation, scope, safe formatting, rejected fabricated revisions, account changes and mobile layout. These use controlled model responses to test integration, not literary judgment.
+- Nine existing admissions browser cases and nine passage revision cases passed. One additional Studio run hit a local asset-load timeout; its isolated rerun passed.
+- 174 Node tests passed, including 30 AI-reader contract/validation cases.
+- 25 Firestore rules checks passed. The cloud browser audit exposed a scheduled-save race after explicit sync; canceling the redundant timer fixed it. All eight cloud browser flows then passed, including deletion verified from a new browser.
+- Real-model evaluation is recorded separately below; a valid JSON response or exact citation alone does not establish useful criticism.
+
 ## Earlier recorded results (October 10–11, 2026)
 
 - 116 Node tests passed: activity ordering and hostile inputs, 39 essay rules with positive/negative fixtures, 12 synthetic calibration samples, edit anchoring, revision word deltas, planning-model monotonicity/bounds, AI routing/arithmetic, and existing AP/prep integrity tests.
@@ -27,7 +36,7 @@ The review found and corrected misleading residual explanations, irrelevant stud
 
 In the final three-draft reader run, one generated critique passed; two were rejected and returned labeled rubric feedback. This is a safety fallback, not evidence that those two drafts received usable generative reviews.
 
-Small browser models can still make factual, grammatical, or contextual errors. These checks do not establish parity with Brisk, an actual admissions officer, or a calibrated admission-probability model. Essays receive deterministic craft scores; the optional reader simulation is separate.
+Small browser models can still make factual, grammatical, or contextual errors. These checks do not establish parity with Brisk, an actual admissions officer, or a calibrated admission-probability model. The original offline coach uses deterministic craft scores; Essay Studio now offers a separately labeled model-generated score. Neither is calibrated against admissions decisions.
 
 ## Repeatable commands
 
