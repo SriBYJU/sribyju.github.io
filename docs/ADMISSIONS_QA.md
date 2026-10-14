@@ -14,7 +14,7 @@
 - Activity imports now preview distinct cards, titles, selection and descriptions while retaining original evidence. Four browser cases cover broken tables, more than ten entries, editable previews and hostile text.
 - Essay Studio adds a model-generated grade, cited criteria, a draft-aware chat and two-option passage edits. Twelve browser cases cover grading/link provenance, Apply/Undo, stale reviews and options, cancellation, scope, safe formatting, rejected fabricated revisions, account changes and mobile layout. These use controlled model responses to test integration, not literary judgment.
 - Nine existing admissions browser cases and nine passage revision cases passed. One additional Studio run hit a local asset-load timeout; its isolated rerun passed.
-- 174 Node tests passed, including 30 AI-reader contract/validation cases.
+- 175 Node tests passed, including 31 AI-reader contract/validation cases.
 - 25 Firestore rules checks passed. The cloud browser audit exposed a scheduled-save race after explicit sync; canceling the redundant timer fixed it. All eight cloud browser flows then passed, including deletion verified from a new browser.
 - Real-model evaluation is recorded separately below; a valid JSON response or exact citation alone does not establish useful criticism.
 

@@ -22,7 +22,7 @@ This is a Scholark coaching rubric. It is not a published university admissions 
 
 1. Check the full draft is 60–750 words and at most 6,000 characters. Never silently truncate a scored draft.
 2. Request five criterion judgments using numbered draft passages. The model selects passage indexes; the application supplies the original words. Validate every span, score range, criterion identity and explanation before calculating a grade.
-3. Make a separate short request for passage critiques. Each note names an exact span, explains a specific effect and gives an editing goal. Any quoted wording in a critique must exist in the draft and refer to the targeted passage. If this request fails, retain the accepted grade with an explicit warning that passage notes were not accepted.
+3. Make a separate short request for passage critiques. Each note names an exact span, explains a specific effect and gives an editing goal. Any quoted wording in a critique must exist in the draft and refer to the targeted passage. Generic notes without a substantive term from the selected passage are rejected. If this request fails, retain the accepted grade with an explicit warning that passage notes were not accepted.
 4. On demand, request two alternatives for a selected passage. The student previews both and chooses whether to apply one. The module does not mutate text.
 5. Where improvement requires an unstated fact, the model must ask a factual question rather than fabricate a scene. A question is a valid outcome, not a purported rewrite.
 

@@ -4,7 +4,7 @@ import AI from '../admissions/essay-ai.js';
 const draft='I was nervous, but I folded the note and stepped forward. My brother waited beside the door while I explained why the library mattered to our family. I had not expected the questions that followed. Instead of repeating my prepared speech, I listened to the librarian describe the missing books. We had spent three afternoons sorting the shelves, but I had never asked what readers needed. That conversation changed the questions I brought to our next meeting. Now I ask before proposing a solution, because a tidy shelf means little when the needed book is absent.';
 const quote='I was nervous, but I folded the note and stepped forward.';
 const evidence=['I folded the note and stepped forward','That conversation changed the questions','three afternoons sorting the shelves','I listened to the librarian','a tidy shelf means little'];
-const makeReview=(score=3)=>({dimensions:AI.rubric.map((r,i)=>({id:r.id,score,evidence_quote:evidence[i],explanation:r.label+' is supported by a specific action connected to the point you develop.'})),comments:[{quote,why:'The named feeling repeats what the hesitation and action could convey.',goal:'Give the concrete choice emphasis without inventing physical details.',question:'',options:[]}]});
+const makeReview=(score=3)=>({dimensions:AI.rubric.map((r,i)=>({id:r.id,score,evidence_quote:evidence[i],explanation:r.label+' is supported by a specific action connected to the point you develop.'})),comments:[{quote,why:'The named feeling repeats what the folded note and step forward could convey.',goal:'Give the concrete choice emphasis without inventing physical details.',question:'',options:[]}]});
 const comment={quote,start:0,end:quote.length,why:'The feeling is named before the concrete action.',goal:'Let the choice carry the emphasis.'};
 const options=()=>({question:'',options:[{label:'Emphasize the choice',text:'I folded the note, then stepped forward.',reason:'The action carries the tension without labeling the feeling.'},{label:'Vary the rhythm',text:'I folded the note. Then I stepped forward.',reason:'A pause gives the decision more weight while preserving what happened.'}]});
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -38,7 +38,7 @@ test('repeated explanations or a single evidence span cannot masquerade as full 
 test('numbered evidence is hydrated from the draft and the prompt matches its schema',async()=>{
  const saved=global.ScholarkAI;
  global.ScholarkAI={generateStructured:async(messages,o)=>{
-  const value=o.agent==='essay-grade'?{dimensions:AI.rubric.map((r,i)=>({id:r.id,score:3,evidence_index:i,explanation:r.label+' is supported by an action whose significance could be explored further.'}))}:{comments:[{passage_index:0,why:'The emotion label repeats what the action can suggest to the reader.',goal:'Give the action emphasis.',question:''}]};
+  const value=o.agent==='essay-grade'?{dimensions:AI.rubric.map((r,i)=>({id:r.id,score:3,evidence_index:i,explanation:r.label+' is supported by an action whose significance could be explored further.'}))}:{comments:[{passage_index:0,why:'The emotion label repeats what the folded note can suggest to the reader.',goal:'Give the action emphasis.',question:''}]};
   if(o.agent==='essay-grade'){assert.match(messages[0].content,/select evidence_index/);assert.doesNotMatch(messages[0].content,/copy.*evidence_quote/);}
   assert.equal(o.validate(value).valid,true);return {mode:'local-generative',value};
  }};
@@ -61,4 +61,8 @@ test('passage critiques cannot quote invented text or point at another sentence'
 
 test('ordinary inflection of a supplied action is allowed without new scene detail',()=>{
  const v=options();v.options[0].text='Folding the note, I stepped forward.';assert.equal(AI.validateOptions(v,{draft,comment}).valid,true);
+});
+
+test('generic passage advice without an anchor-specific detail is rejected',()=>{
+ const v=makeReview();v.comments[0].why='The author starts with a simple action, but the sentence lacks clarity and flow.';v.comments[0].goal='Use active voice and add sensory details.';assert.equal(AI.validateReview(v,draft,'ca7').valid,false);
 });
