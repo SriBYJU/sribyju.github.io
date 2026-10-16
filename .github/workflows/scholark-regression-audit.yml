@@ -256,6 +256,17 @@ jobs:
           cd scripts
           SCHOLARK_BASE_URL=http://127.0.0.1:4173 npx playwright test --config=playwright.config.mjs
 
+      - name: Preserve browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scholark-regression-browser-${{ github.sha }}
+          path: |
+            scripts/test-results
+            /tmp/scholark-http.log
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Regression summary
         run: |
           echo 'ScholarK regression contract passed.'

@@ -4,6 +4,8 @@ async function open(page){
  await page.addInitScript(()=>Object.defineProperty(Navigator.prototype,'gpu',{configurable:true,get:()=>undefined}));
  await page.goto('/?workspace=essay',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.ScholarkEssayStudio&&document.querySelector('#sk-essay-studio'));
  await page.locator('#essay-textarea').fill(DRAFT);await page.locator('#feedback-btn').click();
+ // Finish the real runtime installation before substituting model responses.
+ await page.evaluate(()=>ScholarkFeatureLoader.ensure('ai'));
  await page.evaluate(()=>{
   const draft=document.querySelector('#essay-textarea').value;
   const quotes=['I folded the note and stepped forward','The blue bottle rattled against the kettle','I had confused keeping a schedule with listening','Now I ask a question before offering an answer','with room for her own notes between mine'];

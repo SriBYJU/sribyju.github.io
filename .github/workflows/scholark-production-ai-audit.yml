@@ -67,6 +67,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: scholark-production-ai-audit-${{ github.sha }}
-          path: /tmp/scholark-production-audit
+          path: |
+            /tmp/scholark-production-audit
+            scripts/test-results
           if-no-files-found: warn
           retention-days: 14
