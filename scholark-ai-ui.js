@@ -51,6 +51,8 @@
   }
 
   function dialogHTML() {
+    // Older generic form saving used one shared key for this private composer.
+    try { localStorage.removeItem('scholark:v3:field:global:main:sk-ai-input'); } catch (_) {}
     return `<div class="sk-ai-shell" role="dialog" aria-modal="true" aria-labelledby="sk-ai-title">
       <div class="sk-ai-head">
         <div>
@@ -73,7 +75,7 @@
       <div class="sk-ai-progress" id="sk-ai-progress" hidden><span></span><div><b>Preparing your specialist</b><small id="sk-ai-progress-text">Checking this device…</small></div></div>
       <form class="sk-ai-composer" id="sk-ai-form">
         <label class="sr-only" for="sk-ai-input">Ask Scholark</label>
-        <textarea id="sk-ai-input" rows="2" maxlength="4000" placeholder="Ask a question…"></textarea>
+        <textarea id="sk-ai-input" data-sk3-private="true" rows="2" maxlength="4000" placeholder="Ask a question…"></textarea>
         <div class="sk-ai-composer-actions">
           <button type="button" class="sk-ai-new">New conversation</button>
           <div>
@@ -97,6 +99,12 @@
     q('.sk-ai-close', overlay).addEventListener('click', closeDialog);
     overlay.addEventListener('pointerdown', event => { if (event.target === overlay) closeDialog(); });
     q('#sk-ai-form', overlay).addEventListener('submit', event => { event.preventDefault(); submitAsk(); });
+    q('#sk-ai-input', overlay).addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+        event.preventDefault();
+        submitAsk();
+      }
+    });
     q('.sk-ai-stop', overlay).addEventListener('click', () => {
       if (!activeRequest) return;
       activeRequest.cancelled = true;

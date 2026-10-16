@@ -52,7 +52,7 @@
     models: 'Depending on the device and availability, Scholark can use Qwen2.5, Qwen3, or SmolLM2 through WebLLM, a Llama 3.2 rescue model, or a small CPU model. A reply labeled on-device tutor comes from a local model; a reply labeled Stored Scholark facts or Scholark assistant comes from verified app rules.',
     vision: 'This chat does not analyze camera feeds or images and does not have a computer-vision specialist.',
     backend: 'AI chat and essay feedback run in the browser. Signed-in account data can sync through Firebase; that is separate from running the local AI model.',
-    essay: 'Essay Coach uses 39 on-device craft rules for passage comments and a 0–100 heuristic writing score. Optional local model feedback is separate from that score. It assesses voice, concrete evidence, reflection, clarity, and prompt fit; it does not know a college’s private admissions decisions or write the student’s essay.'
+    essay: 'Essay Coach offers offline craft feedback and an optional on-device AI reader. Run AI review in Essay Studio to get a separate 0–100 rubric estimate across purpose, insight, specificity, voice, and clarity, with notes anchored to your draft when they pass evidence checks. You can request two short revision options, apply one, or undo it. Essay chat coaches your draft without writing a full essay. These are Scholark estimates, not official college grades or admissions predictions.'
   });
 
   let rescueEngine = null;
@@ -128,19 +128,45 @@
 
   function isOutOfScope(input = '') {
     const q = String(input).normalize('NFKC').toLowerCase().replace(/[’‘]/g, "'").replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
-    if (/\bwhat should i (?:watch|cook|eat|buy|play)\b/.test(q)) return true;
-    const offTopic = /\b(netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|restaurants?|fast food|mc\s*donald'?s|mickey d'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|recipes?|meals?|dinners?|drinks?|sports scores?|weather|forecast|vacations?|travel destinations?|shopping|horoscopes?|astrology|dating advice)\b/.test(q);
-    if (!offTopic) return false;
-    // Location, ordering and entertainment requests stay outside scope even
-    // when padded with words such as "college", "research" or "analyze".
-    const consumerRequest = /\b(?:nearest|closest|directions? to|near me|near my|opening hours|open now|where (?:is|are|can i find|should i get)|what (?:to|should i) (?:order|watch|eat|buy)|most popular order|recommend\w*|favorites?)\b/.test(q);
-    if (consumerRequest) return true;
+    // An allowed first request must not hide a second consumer request.
+    const requests = q.split(/(?:[;?]\s*|\b(?:and|also|then)\s+)(?=(?:book|reserve|recommend|suggest|find|tell|give)\b)/);
+    if (requests.length > 1 && requests.some(request => isOutOfScope(request))) return true;
+    // Check the requested action as well as its subject. Academic vocabulary
+    // alone must not turn shopping, booking or entertainment into study help.
     const academicAnalysis = /\b(?:analy[sz]e|interpret|critique|compare|explain|calculate|discuss|evaluate|revise|review|improve|feedback)\b/.test(q)
-      && /\b(?:marketing|literature|economics|math|history|science|media studies|rhetoric|symbolism|themes?|school|class|assignment|essay|course|college|application|activities|extracurriculars)\b/.test(q);
+      && /\b(?:marketing|literature|economics|math|history|science|psychology|statistics|media studies|rhetoric|symbolism|themes?|school|class|assignment|essay|course|college|application|activities|extracurriculars)\b/.test(q);
     const applicationExperience = /\b(?:job|work|worked|working|employment|shift|volunteer)\b/.test(q)
-      && /\b(?:applications?|essays?|activit(?:y|ies)|extracurriculars?|common app|college)\b/.test(q);
+      && /\b(?:applications?|essays?|activit(?:y|ies)|extracurriculars?|common app|college)\b/.test(q)
+      && /\b(?:describe|include|count|reflect|write about|revise|review|improve|critique|evaluate|feedback|phrase|list|mention)\b/.test(q);
     const academicExercise = /\b(?:use|create|solve|write|work through)\b/.test(q) && /\b(?:math word problem|probability problem|algebra exercise|economics case study)\b/.test(q);
-    return !(academicAnalysis || applicationExperience || academicExercise);
+    const studyRecommendation = /\b(?:recommend|suggest|choose|find)\b.{0,35}\b(?:statistical methods?|research methods?|study (?:resources?|materials?|tools?)|textbooks?|universities|colleges|scholarships|courses|majors|books? about|books? (?:for|on) (?:learning|studying|math|calculus|physics|history|biology))\b/.test(q);
+    const schoolPreparation = /\b(?:wear|prepare|practice|answer|introduce|etiquette)\b/.test(q) && /\b(?:college|admissions|scholarship|job|internship) interview\b/.test(q)
+      || /\b(?:laptop|computer)\b.{0,50}\b(?:computer science|programming|engineering|course requirements|class requirements)\b/.test(q);
+    const food = /\b(?:restaurants?|cafes?|fast food|mc\s*donald'?s|mickey d'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|sushi|recipes?|meals?|dinners?|drinks?|cocktails?|pancakes?)\b/.test(q);
+    const entertainment = /\b(?:netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|minecraft|fortnite|roblox|world cup|super bowl|football game|basketball game)\b/.test(q);
+    const lifestyle = /\b(?:hotels?|flights?|vacations?|travel destinations?|shopping|headphones?|shoes?|laptops?|outfits?|weddings?|workout|horoscopes?|astrology|dating|crush|leaking faucet)\b/.test(q);
+    const consumerAction = /\b(?:nearest|closest|directions? to|near me|near my|opening hours|open now|where (?:is|are|can i find|should i get)|what (?:to|should i) (?:order|watch|eat|buy)|most popular order|recommend\w*|(?:your|a) favorites?|(?:what|which|where).{0,30}best|should i buy|book (?:me|a|an|the)|reserve|order (?:me|a|some)|plan (?:my|a|our)|make (?:me|a)|how (?:can|do) i (?:make|cook|bake|fix|beat|win|impress)|who won|(?:game|match) (?:scores?|results?))\b/.test(q);
+    const writingFeedback = /\b(?:suggest|recommend|explain|review|critique)\b.{0,30}\b(?:edits|feedback|revisions|changes)\b/.test(q) && /\b(?:draft|essay|paragraph|passage|activity|description)\b/.test(q);
+    if (applicationExperience || academicExercise || studyRecommendation || schoolPreparation || writingFeedback) return false;
+    const educationalDestination = /\b(?:libraries|library|colleges?|universities|university|campus|campuses|schools?|test(?:ing)? cent(?:er|re)s?|tutoring|bookstores?)\b/.test(q);
+    if (/\b(?:nearest|closest|directions? to|near me|near my)\b/.test(q) && !educationalDestination) return true;
+    if (/\b(?:book me|reserve me|what should i order|which .{1,40} should i buy)\b/.test(q)) return true;
+    // Unspecified recommendations are not a general shopping assistant. Require
+    // a learning/application purpose, rather than naming every possible product.
+    const educationalRecommendation = /\b(?:learn|study|studying|academic|test prep|sat|act|ap|college|university|career|admissions|essay|application|research|math|calculus|physics|chemistry|biology|history|literature|programming|computer science|statistics)\b/.test(q);
+    if (/\b(?:recommend|suggest)\b/.test(q) && !educationalRecommendation && !academicAnalysis) return true;
+    if (/\bwhat should i (?:watch|cook|eat|buy|play|wear)\b/.test(q)) return true;
+    if ((food || entertainment || lifestyle) && consumerAction) return true;
+    if (/\b(?:tell|give) me (?:a |some )?jokes?\b|\b(?:write|compose|draft)\b.{0,35}\b(?:birthday|wedding|anniversary|dating|pickup) (?:messages?|wishes|cards?|vows|lines?)\b/.test(q)) return true;
+    if (/\b(?:write|create|tell)\b.{0,30}\b(?:fantasy|bedtime|short) stor(?:y|ies)\b/.test(q)
+      && !/\b(?:english|writing|literature) (?:class|course|assignment)|\bcreative writing\b/.test(q)) return true;
+    // Conceptual science is learning even without a "for class" suffix.
+    const weatherConcept = /\b(?:how|why|explain)\b/.test(q)
+      && /\b(?:weather systems?|weather patterns?|forecasting models?|climate|atmosphere)\b/.test(q)
+      && !/\b(?:today|tonight|tomorrow|this week|near me)\b/.test(q);
+    const offTopic = food || entertainment || lifestyle
+      || /\b(?:sports scores?|weather|forecast|dating advice)\b/.test(q);
+    return offTopic && !(academicAnalysis || weatherConcept);
   }
 
   function improvedRouteIntent(input = '') {

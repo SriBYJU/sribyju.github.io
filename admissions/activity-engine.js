@@ -1,6 +1,6 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.ScholarkActivities=api;})(typeof globalThis!=='undefined'?globalThis:this,()=>{
   'use strict';
-  const VERSION='activities-2.0';
+  const VERSION='activities-2.1';
   const categories=['Academic','Art','Athletics: Club','Athletics: JV/Varsity','Career-Oriented','Community Service','Computer/Technology','Cultural','Dance','Debate/Speech','Environmental','Family Responsibilities','Foreign Exchange','Journalism/Publication','Junior R.O.T.C.','LGBT','Music: Instrumental','Music: Vocal','Religious','Research','Robotics','School Spirit','Science/Math','Social Justice','Student Govt/Politics','Theater/Drama','Work (paid)','Other'];
   const contexts=['Family responsibility / caregiving','Paid job to support family','Limited school/community resources','Rural','First-gen','Self-initiated (no program existed)'];
   const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,Number(v)||0));
@@ -18,7 +18,9 @@
   function parseReport(text){
     const warnings=[],source=String(text||'');
     if(source.length>50000)return {activities:[],warnings:['Paste is over 50,000 characters. Split it into smaller batches; no text was imported.']};
-    const lines=source.split(/\r?\n/).map(line=>line.trim().replace(/^\|([^|]+)\|$/, '$1').trim().replace(/\\#/g,'#').replace(/\*\*/g,'')).filter(line=>line&&!/^[|\s:\-–—#]+$/.test(line)&&! /^(?:#|activity|description(?:\s*\([^)]*\))?|position|organization)$/i.test(line)&&! /^(?:here are your|here are (?:the|\d)|these are all|i would keep this ranking|each (?:description|activity) is|ranked (?:activities|list))/i.test(line));
+    const sourceLines=source.split(/\r?\n/);
+    const rows=sourceLines.map((raw,i)=>({text:raw.trim().replace(/^\|([^|]+)\|$/, '$1').trim().replace(/\\#/g,'#').replace(/\*\*/g,''),indented:/^\s+\S/.test(raw),blankBefore:i>0&&!sourceLines[i-1].trim()})).filter(({text:line})=>line&&!/^[|\s:\-–—#]+$/.test(line)&&! /^(?:#|activity|description(?:\s*\([^)]*\))?|position|organization)$/i.test(line)&&! /^(?:here are your|here are (?:the|\d)|these are all|i would keep this ranking|each (?:description|activity) is|ranked (?:activities|list))/i.test(line));
+    const lines=rows.map(row=>row.text);
     const entries=[];let group=null;
     const flush=()=>{if(group?.length)entries.push(group);group=null;};
     for(let lineIndex=0;lineIndex<lines.length;lineIndex++){
@@ -28,7 +30,11 @@
       const numbered=line.match(/^\s*(\d{1,2})(?:[.)]\s*|\s*$)(.*)$/);
       if(numbered){flush();group=[];if(numbered[2])group.push(numbered[2]);continue;}
       const bullet=line.match(/^[-*•●▪]\s+(.+)$/u);
-      if(bullet){flush();entries.push([bullet[1]]);continue;}
+      if(bullet){
+        const separate=group&&!rows[lineIndex].indented&&(group.length>1&&rows[lineIndex].blankBefore||/^[^:]{2,80}:\s+/.test(bullet[1])&&!/^(?:role|position|description|impact|results?|outcomes?|contribution|responsibilities|hours|grades|organization):/i.test(bullet[1]));
+        if(separate)flush();
+        if(group)group.push(bullet[1]);else entries.push([bullet[1]]);continue;
+      }
       if(group)group.push(line);else if(line.length<=80&&tokens(line).length<=10&&!/[.!?]$/.test(line)&&lines[lineIndex+1]&&tokens(lines[lineIndex+1]).length>=10&&!/^(?:I |(?:built|created|led|taught|served|worked|played|compete|founded|authored|shadowed)\b)/i.test(line))group=[line];else entries.push([line]);
     }
     flush();
@@ -45,7 +51,7 @@
       if((raw.organization||'').length>100||(raw.position||'').length>50){warnings.push('A title or role exceeds its field limit and was not imported. Shorten that field first.');continue;}
       if(activities.length===40){warnings.push('Preview supports 40 distinct activities. Additional entries remain in your paste and were not imported.');break;}
       let description=cut(raw.text.replace(/\s+/g,' '),150);if(raw.text.length>150)description=description.replace(/\s+\S*$/,'');
-      const existing=raw.organization&&activities.find(a=>normalize(a.organization)===normalize(raw.organization));
+      const existing=raw.organization&&activities.find(a=>normalize(a.organization)===normalize(raw.organization)&&normalize(a.position)===normalize(raw.position));
       if(existing){
         if(!existing.notes.includes(raw.text)){const combined=existing.notes+'\n'+raw.text;if(combined.length>1500){warnings.push(`${raw.organization}: combined evidence exceeds 1,500 characters. The additional passage remains in your paste; shorten it before importing.`);}else {existing.notes=combined;const update=refine(existing);if(!update.errors.length)existing.description=update.variants[0].text;}}
         continue;
@@ -67,9 +73,10 @@
     constructor(rows=[]){this.rows=rows;this.docs=rows.map(row=>{const ts=tokens([row.title,...(row.aliases||[]),...(row.keywords||[])].join(' '));const tf=new Map();for(const t of ts)tf.set(t,(tf.get(t)||0)+1);return {tf,length:ts.length};});this.average=this.docs.reduce((s,d)=>s+d.length,0)/Math.max(1,rows.length);this.df=new Map();for(const d of this.docs)for(const t of d.tf.keys())this.df.set(t,(this.df.get(t)||0)+1);}
     search(query,filter=()=>true,limit=3){const ts=[...new Set(tokens(query))];return this.rows.map((row,i)=>{if(!filter(row))return null;const d=this.docs[i];let score=0;for(const t of ts){const f=d.tf.get(t)||0;if(!f)continue;const df=this.df.get(t)||0;score+=Math.log(1+(this.rows.length-df+.5)/(df+.5))*f*2.2/(f+1.2*(.25+.75*d.length/(this.average||1)));}return {row,similarity:score};}).filter(x=>x&&x.similarity>0).sort((a,b)=>b.similarity-a.similarity).slice(0,limit);}
   }
+  const outputAction=/\b(publish(?:ed|ing)?|present(?:ed|ing)?|ship(?:ped|ping)?|deploy(?:ed|ing)?|build(?:ing)?|built|creat(?:e|ed|ing)|launch(?:ed|ing)?|produc(?:e|ed|ing)|design(?:ed|ing)?|repair(?:ed|ing)?|train(?:ed|ing)?|teach(?:ing)?|taught|serv(?:e|ed|ing)|car(?:e|ed|ing)|translat(?:e|ed|ing)|manag(?:e|ed|ing)|rais(?:e|ed|ing)|develop(?:ed|ing)?|prepar(?:e|ed|ing)|cook(?:ed|ing)?|pack(?:ed|ing)?|distribut(?:e|ed|ing)|clean(?:ed|ing)?|deliver(?:ed|ing)?|schedul(?:e|ed|ing)|answer(?:ed|ing)?|stock(?:ed|ing)?)\b/;
   function signals(raw,gazetteer=[]){const a=activity(raw),original=normalize([a.position,a.organization,a.description,a.notes].join('; ')),text=completedClaims(original),has=re=>re.test(text);const metrics=[...text.matchAll(/(?:\$\s*)?(\d[\d,]*(?:\.\d+)?)\s*(?:\+\s*)?(people|students|beneficiaries|families|users|downloads|members|meals|dollars|patients|readers|children|customers|visitors|participants)\b/g)].map(m=>({value:Number(m[1].replace(/,/g,'')),unit:m[2],quote:m[0]}));const clauses=text.split(/\s*[;.\n]\s*/);const entities=gazetteer.filter(e=>e.verified===true&&[...(e.names||[]),...(e.aliases||[])].some(n=>new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}\\b`,'i').test(text)));
     const namedClaims=kind=>entities.filter(e=>kind==='award'?e.kind==='competition'||e.kind==='program':e.kind==='research-employer').filter(e=>clauses.some(clause=>[...(e.names||[]),...(e.aliases||[])].some(n=>{const escaped=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const name=`\\b${escaped}\\b`;const before=kind==='award'?`\\b(?:won|winner|medalist|finalist|qualified|qualifier|selected|award|honor|participant|attended)(?:\\s+(?:at|for|to|of|the|a|an|in|from|grand|gold|silver|bronze|program|competition|fair|national|international|mathematics|science|medal|attend)){0,5}\\s+${name}`:`\\b(?:intern(?:ed|ship)?|research assistant)(?:\\s+(?:at|for|with|in|the|a|an|summer|research|lab)){0,5}\\s+${name}`;const after=kind==='award'?`${name}(?:\\s+(?:grand|gold|silver|bronze|research|science|math|program)){0,4}\\s+(?:winner|finalist|medalist|qualifier|award|honor|participant)\\b`:`${name}(?:\\s+(?:research|summer|lab)){0,3}\\s+(?:intern(?:ed|ship)?|research assistant)\\b`;if(!new RegExp(`${before}|${after}`,'i').test(clause))return false;const pos=clause.search(new RegExp(name,'i'));return !/\b(?:read|heard|learned|watched|webinar|blog|website|article|about|dream|aspir|hope|appl(?:y|ied)|rejected)\b/i.test(clause.slice(Math.max(0,pos-30),pos+n.length+25));})));
-    return {text,unverifiedIntent:text!==original,metrics,entities,awardEntities:namedClaims('award'),frontierEmployers:namedClaims('employer'),reach:Math.max(0,...metrics.map(m=>m.value)),founder:has(/\b(found(?:ed|er)|cofounder|created|built|launched|started|organized)\b/),leader:has(/\b(captain|president|director|lead|led|manager|editor|supervis(?:or|ed)|coordinator)\b/),member:has(/\b(member|participant|attend(?:ed)?|joined)\b/),casual:has(/\b(weekends?|recreational|casual|for fun)\b/),national:has(/\b(national|international|world)\b/),regional:has(/\b(state|regional|all[- ]conference|district)\b/),recognition:has(/\b(won|winner|medal(?:ist)?|finalist|qualified|qualifier|award|honor|recruited|selected|peer[- ]reviewed|published|patent)\b/),output:has(/\b(published|presented|shipped|deployed|built|created|launched|produced|designed|repaired|trained|taught|served|cared|translated|managed|raised|developed)\b/),intern:has(/\b(intern(?:ed|ship)?|research assistant)\b/),care:has(/\b(caregiv|cared for|care for|siblings?|grandparent|family|paid|work|job|employ)/),research:has(/\b(research|experiment|investigat|laboratory|lab|study)\b/),years:Math.max(a.grades.length,Number(text.match(/\b([1-9])\s*years?\b/)?.[1]||0)),selective:has(/\b(selected from \d|invitation[- ]only|acceptance rate|top \d+\s*%)\b/)};
+    return {text,unverifiedIntent:text!==original,metrics,entities,awardEntities:namedClaims('award'),frontierEmployers:namedClaims('employer'),reach:Math.max(0,...metrics.map(m=>m.value)),founder:has(/\b(found(?:ed|er)|cofounder|created|built|launched|started|organized)\b/),leader:has(/\b(captain|president|director|lead|led|manager|editor|supervis(?:or|ed)|coordinator)\b/),member:has(/\b(member|participant|attend(?:ed)?|joined)\b/),casual:has(/\b(weekends?|recreational|casual|for fun)\b/),national:has(/\b(national|international|world)\b/),regional:has(/\b(state|regional|all[- ]conference|district)\b/),recognition:has(/\b(won|winner|medal(?:ist)?|finalist|qualified|qualifier|award|honor|recruited|selected|peer[- ]reviewed|published|patent)\b/),output:has(outputAction),intern:has(/\b(intern(?:ed|ship)?|research assistant)\b/),care:has(/\b(caregiv|cared for|care for|siblings?|grandparent|family|paid|work|job|employ)/),research:has(/\b(research|experiment|investigat|laboratory|lab|study)\b/),years:Math.max(a.grades.length,Number(text.match(/\b([1-9])\s*years?\b/)?.[1]||0)),selective:has(/\b(selected from \d|invitation[- ]only|acceptance rate|top \d+\s*%)\b/)};
   }
   function grade(raw,options={}){
     const a=activity(raw),s=signals(a,options.gazetteer),text=s.text,flags=[],why=[],questions=[];
@@ -81,7 +88,7 @@
     const researchWork=does(/\b(evaluat(?:e|ed|ing)|analy[sz](?:e|ed|ing)|conduct(?:ed|ing)?|test(?:ed|ing)?|implement(?:ed|ing)?|collect(?:ed|ing)?|authored|wrote)\b/)&&has(/\b(research|data|systems?|models?|analysis|experiments?|papers?|report|valuation)\b/);
     const authored=has(/\b(authored|wrote|published|produced)\b/) &&has(/\b(report|analysis|paper|book|article|curricul(?:um|a)|lessons?)\b/);
     const invention=has(/\b(invented|prototyped|engineered)\b/);
-    const output=s.output||researchWork||authored||invention||(s.founder&&has(/\b(serving|teaching|training|supporting|providing)\b/));
+    const output=does(outputAction)||researchWork||authored||invention||(s.founder&&has(/\b(serving|teaching|training|supporting|providing)\b/));
     const adoption=has(/\b(?:adopted|used|implemented|piloted|deployed)\s+by\s+(?:an?\s+|the\s+)?(?:[\w-]+\s+){0,4}(?:firm|company|school|district|organization|business|hospital|library|team|client)\b/);
     const sponsors=has(/\b(?:\d+\+?\s+(?:brand\s+)?sponsors?|sponsored by|sponsorships?)\b/);
     const competitive=has(/\b(tournaments?|varsity|competitive|compete|competed|competing)\b/);
