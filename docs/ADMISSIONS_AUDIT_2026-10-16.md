@@ -31,11 +31,21 @@ Treat each behavior as unverified until a reproduction or test supports it. A pa
 - The final activity/migration browser rerun passed all 13 cases. The separate Shift+Enter/composition check passed.
 - New browser tests are included in all three desktop browser projects for future regression runs.
 
+## Follow-up browser investigation
+
+- A repeated Bulk paste click created two competing importers. The existing input and edited preview are now reused. The regression failed with two inputs before the fix and passed afterward.
+- Linux WebKit failure traces showed controls moving during scrolling and focus. Activities and Essay workspace document scrolling is now immediate; homepage scrolling is unchanged. The focused WebKit rerun passed all 39 cases, including saved versions, short AI revisions, cancellation and account changes.
+- One essay test installed a response fixture before the runtime finished loading, allowing runtime initialization to replace it. The test now waits for initialization before installing the fixture.
+- A production twelve-route journey reached the final route at its aggregate 30-second deadline. Its overall budget is now 60 seconds; individual destination assertions retain their normal timeouts. All three live route/About tests passed afterward.
+- Both CI runs preceding these final changes passed 249 of 250 browser cases. Their remaining failures were the WebKit saved-version interaction and the aggregate route deadline above. A final complete CI pass is still required.
+- CI now retains browser traces and screenshots on failure. The local live-WebKit run was interrupted by an internet outage after 21 passes; it is not counted as a full pass.
+- The full local Node suite still passes all 190 tests.
+
 ## Actual inference quality — concerns remain
 
 The current Qwen2.5 1.5B reader produced an 80/100 estimate for a synthetic 528-word essay, but its passage notes were generic or attached to the wrong sentence. Those notes were rejected. Two focused prompt experiments did not establish consistently useful criticism; they were not promoted.
 
-A cached Llama 3.2 3B comparison failed constrained JSON generation with a grammar-matcher error. It was not promoted. Earlier Qwen 4B experiments also did not establish a quality improvement. Model size alone is not evidence of better feedback.
+A cached Llama 3.2 3B comparison failed constrained JSON generation with a grammar-matcher error. A second unconstrained attempt failed to produce all five required rubric dimensions. Neither was promoted. Earlier Qwen 4B experiments also did not establish a quality improvement. Model size alone is not evidence of better feedback.
 
 Therefore this audit does **not** establish parity with Brisk, a professional admissions reader, or a validated admissions scoring instrument. Exact quotations and format checks cannot prove semantic correctness. Students should review each proposed passage edit; no model edit is applied automatically. Activity scoring remains an English-oriented heuristic, not an admissions-outcome model or a multilingual assessment.
 

@@ -23,3 +23,13 @@ test('service contribution synonyms receive equivalent preview scores',async({pa
  await expect(page.locator('.sk-lab-import-row')).toHaveCount(3);
  const scores=await page.locator('.sk-lab-import-row').allTextContents();expect(new Set(scores.map(t=>t.match(/Evidence rubric: (\d+)/)[1])).size).toBe(1);
 });
+test('reopening bulk paste preserves one pending import and its edited preview',async({page})=>{
+ await preview(page,'1. Science Workshop\nTaught 18 students and created weekly science lessons.');
+ await page.getByRole('textbox',{name:'Activity title / organization'}).fill('Peer Science Workshop');
+ await page.getByRole('button',{name:'Bulk paste',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'Paste activities, one per line'})).toHaveCount(1);
+ await expect(page.getByRole('textbox',{name:'Activity title / organization'})).toHaveValue('Peer Science Workshop');
+ await page.getByRole('button',{name:'Add 1 cards'}).click();
+ await expect(page.locator('#sk-lab-cards>article')).toHaveCount(1);
+ await expect(page.locator('#sk-lab-cards')).toContainText('Peer Science Workshop');
+});

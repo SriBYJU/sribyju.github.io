@@ -16,6 +16,9 @@ const routes = [
 ];
 
 test('all twelve homepage cards open the advertised section', async ({ page }) => {
+  // Twelve complete navigations share this budget; each destination assertion
+  // retains its normal timeout. Production traces reached route 12 at 30 seconds.
+  test.setTimeout(60000);
   await page.goto('/');
   await expect(page.locator('.sk6-tool-card')).toHaveCount(routes.length);
   // Navigation only: a local stub bypasses the sign-in gate; no cloud data is written.
