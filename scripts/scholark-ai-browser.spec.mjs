@@ -351,7 +351,7 @@ test.describe('Scholark AI local-first browser regression', () => {
         mode: 'local-generative', tier: 'standard', text: {
           sat: 'Concept gap. Do prerequisite_review.',
           ap: 'concept_gap and prerequisite_review.',
-          planner: 'Math review is first. Math review is second because dailyMinutes is 45.',
+          planner: 'Math review for 30 minutes. **dayOffset**=0. **Priority**: 20.',
           college: "Scholark's current dataset does not include it.",
           scholarship: 'Scholarship One needs a transcript and recommendation.'
         }[options.agent] || 'generic answer'
@@ -382,6 +382,8 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(answers.ap.answer).toContain('AP Biology: Cell communication');
     expect(answers.sat.answer + answers.ap.answer).not.toMatch(/concept_gap|prerequisite_review/);
     expect(answers.planner.answer.match(/Math review/g)).toHaveLength(1);
+    expect(answers.planner.mode).toBe('grounded-local');
+    expect(answers.planner.answer).not.toMatch(/dayOffset|Priority/);
     expect(answers.college.answer).toContain('Alpha University');
     expect(answers.college.answer).toContain('Beta College');
     expect(answers.scholarship.answer).toContain('Scholarship One has the earlier stored deadline');
@@ -499,7 +501,9 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(result.fractions.answer).toContain('17/24');
     expect(result.fractions.answer).not.toContain('= 0.83');
     expect(result.concept.sources).toHaveLength(2);
-    expect(result.prompt).toContain('Random assignment supports causal conclusions');
+    const assignment = result.concept.sources.find(note => note.name === 'random assignment');
+    expect(assignment.text).toMatch(/causal/);
+    expect(result.prompt).toContain(assignment.text);
     expect(result.prompt).toContain('Random sampling supports generalization');
     expect(result.prompt).not.toContain('Creative Development');
   });

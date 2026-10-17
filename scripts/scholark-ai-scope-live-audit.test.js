@@ -11,6 +11,7 @@ for (const name of ['scholark-ai-algorithms.js', 'scholark-ai-learning.js', 'sch
   vm.runInContext(readFileSync(new URL(`../${name}`, import.meta.url), 'utf8'), ctx, { filename: name });
 }
 const outside = [
+  'Give me three good TV series to binge',
   'Where is the nearest sushi place?', 'Book me a hotel in Paris', 'Recommend headphones under $100',
   'Which laptop should I buy for college?', 'Tell me a joke about cats', 'Write a birthday message for my cousin',
   'What should I wear to a party?', 'How can I impress my crush?', 'Who won the football game last night?',
@@ -24,6 +25,7 @@ const outside = [
   'How do I describe my restaurant job on Common App? Also recommend a sushi restaurant',
 ];
 const allowed = [
+  'Explain inflation using Big Mac prices',
   'Recommend a statistical method to analyze restaurant sales for my economics project',
   'Compare the marketing strategies of Nike and Adidas for business class', 'How do weather systems form?',
   'Explain why people believe in astrology for psychology class', 'How do I describe my restaurant job on Common App?',
@@ -74,4 +76,9 @@ test('admissions cutoff questions receive uncertainty guidance without fabricate
   assert.match(reply.answer,/official admissions website/);assert.match(reply.answer,/not a guaranteed admission threshold/);
  }
  assert.equal((await ctx.ScholarkAIAgents.ask('How do I calculate my SAT section scores?')).mode,'model-needed');
+});
+
+test('quality gate rejects model instruction echo after otherwise relevant tutoring', () => {
+ const messages=[{role:'user',content:'Solve 3(x - 2) = 15 and check your answer.'}];
+ assert.equal(ctx.ScholarkAIReliability.isWeakAnswer('x = 7. Check: 3(7 - 2) = 15. Missing Information: If the student is asked to solve a different equation, they should follow the same process.',messages),true);
 });

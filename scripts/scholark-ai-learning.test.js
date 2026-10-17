@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 const context = { console };
 context.window = context;
 vm.createContext(context);
-for (const name of ['ap-v2-data.js', 'scholark-ai-learning.js']) {
+for (const name of ['ap-v2-data.js', 'ap-v2-lessons.js', 'scholark-ai-learning.js']) {
   vm.runInContext(readFileSync(new URL(`../${name}`, import.meta.url), 'utf8'), context, { filename: name });
 }
 const learning = context.ScholarkAILearning;
@@ -125,3 +125,17 @@ test('chemistry checks catch contradictions in later sentences and reversed enth
   'Energy released overall equals energy released by forming bonds minus energy required to break bonds.'
  ])assert.equal(learning.contradictsNotes(answer,notes),false,answer);
 });
+
+ test('expanded crash-course concepts are available as grounded tutor evidence', () => {
+  const topic = context.ScholarkAPLessons.apcsp[0].topics[0];
+  const notes = learning.retrieve('Explain ' + topic.name, context.ScholarkAPData);
+  assert.ok(notes.some(note => note.name === topic.name && note.text === topic.teach));
+  assert.ok(notes.every(note => note.url && note.subject));
+});
+
+test('generic study requests do not retrieve statistical tests from the word test', () => {
+ assert.equal(learning.retrieve('How should I study for a biology test?', context.ScholarkAPData).length, 0);
+ assert.ok(learning.retrieve('Explain significance tests', context.ScholarkAPData).some(note => /significance/.test(note.name)));
+});
+
+ test('generic answer and study wording does not retrieve unrelated language or statistics notes',()=>{for(const q of ['Solve 3(x - 2) = 15 and check your answer.','How should I study for a biology test?'])assert.equal(learning.retrieve(q,context.ScholarkAPData).length,0,q);});

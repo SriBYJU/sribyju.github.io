@@ -33,3 +33,11 @@ test('reopening bulk paste preserves one pending import and its edited preview',
  await expect(page.locator('#sk-lab-cards>article')).toHaveCount(1);
  await expect(page.locator('#sk-lab-cards')).toContainText('Peer Science Workshop');
 });
+
+test('damaged saved activity rows and versions keep valid writing usable',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('scholark_admissions_v2_anon',JSON.stringify({activities:[null,{id:'retained',organization:'Peer tutoring',description:'Taught 12 students in algebra',versions:[null,42,{description:'Taught 8 students',position:'Tutor',organization:'School'}]}]})));
+ await page.goto('/?workspace=activities',{waitUntil:'domcontentloaded'});
+ await expect(page.getByLabel('Description · Common App format').last()).toHaveValue('Taught 12 students in algebra');
+ await page.locator('#sk-lab-cards>article').last().getByRole('button',{name:'Saved versions',exact:true}).click();
+ await expect(page.locator('#sk-lab-cards>article').last()).toContainText('Taught 8 students');
+});

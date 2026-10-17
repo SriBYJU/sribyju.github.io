@@ -106,17 +106,19 @@
   function retrieve(question, data, limit = 3) {
     const query = normalize(question), tokens = new Set(query.split(' ').map(stem));
     const frequency = new Map();
-    for (const subject of data?.subjects || []) for (const unit of subject.units || []) for (const concept of unit.concepts || []) {
+    const conceptsFor = (subject, unit, index) => [...(unit.concepts || []), ...(root.ScholarkAPLessons?.[subject.id]?.[index]?.topics || [])];
+    for (const subject of data?.subjects || []) for (const [index, unit] of (subject.units || []).entries()) for (const concept of conceptsFor(subject, unit, index)) {
       for (const term of new Set(normalize(concept.name).split(' ').map(stem))) frequency.set(term, (frequency.get(term) || 0) + 1);
     }
     const matches = referenceNotes.filter(note => note.matches.test(question)).map(({ matches, ...note }) => ({ ...note, score: 10 }));
     for (const subject of data?.subjects || []) {
-      for (const unit of subject.units || []) {
-        for (const concept of unit.concepts || []) {
+      for (const [index, unit] of (subject.units || []).entries()) {
+        for (const concept of conceptsFor(subject, unit, index)) {
           const name = normalize(concept.name);
           const terms = name.split(' ').filter(term => !['the', 'of', 'and', 'a', 'an', 'in', 'by'].includes(term));
           const fullMatch = terms.length && terms.every(term => tokens.has(stem(term)));
-          const distinctiveMatch = terms.some(term => term.length >= 5 && tokens.has(stem(term)) && frequency.get(stem(term)) <= 2);
+          const genericTerms = new Set(['test', 'study', 'practice', 'question', 'problem', 'concept', 'example', 'method', 'review', 'analysis', 'answer', 'response', 'explanation', 'reasoning', 'information', 'supporting', 'detail', 'learning', 'student', 'understanding', 'check', 'solve', 'describe', 'identify', 'compare'].map(stem));
+          const distinctiveMatch = terms.some(term => !genericTerms.has(stem(term)) && term.length >= 5 && tokens.has(stem(term)) && frequency.get(stem(term)) <= 2);
           if (!fullMatch && !distinctiveMatch) continue;
           matches.push({ name: concept.name, subject: subject.name, unit: unit.name, text: concept.teach, sourceLabel: 'Official course overview',
             accuracyReminder: String(concept.trap || '').startsWith('Do not substitute a memorized keyword') ? undefined : concept.trap, url: subject.courseUrl, score: fullMatch ? terms.length + (query.includes(name) ? 2 : 0) : 1 });
@@ -134,7 +136,7 @@
 
   async function contextFor(question) {
     try {
-      if (!root.ScholarkAPData) await root.ScholarkFeatureLoader?.ensure('ai-data');
+      if (!root.ScholarkAPData || !root.ScholarkAPLessons) await root.ScholarkFeatureLoader?.ensure('ai-data');
       return retrieve(question, root.ScholarkAPData);
     } catch (_) { return retrieve(question, null); }
   }

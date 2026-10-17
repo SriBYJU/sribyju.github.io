@@ -133,3 +133,14 @@ test('owned older autosave migrates once and a deliberately cleared draft stays 
  await page.reload();await page.waitForFunction(()=>window.ScholarkAIUI&&document.querySelector('#sk-essay-studio'));
  await expect(page.locator('#essay-textarea')).toHaveValue('');
 });
+
+for(const quote of [' ', 'I', 'I had'])test(`draft-specific chat rejects meaningless evidence ${JSON.stringify(quote)}`,async({page})=>{
+ await open(page);
+ await page.evaluate(quote=>{ScholarkAI.generateStructured=async(_,opts)=>{
+  const value={answer:'Your opening lacks a concrete scene and proves that you have no meaningful personal reflection.',evidence_quote:quote};
+  return opts.validate(value).valid?{mode:'local-generative',value}:{mode:'guided-help'};
+ };},quote);
+ await page.locator('#sk-essay-studio').getByRole('button',{name:'Essay chat',exact:true}).click();
+ await page.locator('#sk-studio-question').fill('What is wrong with my opening?');await page.locator('#sk-studio-question').press('Enter');
+ await expect(page.locator('.sk-studio-message[data-role=assistant]').last()).toContainText('did not return a supported answer');
+});

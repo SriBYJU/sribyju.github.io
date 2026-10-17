@@ -1309,7 +1309,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
               <input id="c-essays" type="number" min="0" max="100" step="1" placeholder="Scholark essay score, 0–100" aria-label="Essay score from zero to one hundred" oninput="this.dataset.manual='true'">
               <p id="sk-essay-linked" class="sk-lab-muted">No score yet? Leave blank: the essay is neutral and the planning range widens.</p>
               <button type="button" class="btn-secondary" onclick="ScholarkAdmissions.open('essay')">Get your Scholark Essay Coach score →</button>
-              <button type="button" class="btn-secondary" onclick="document.getElementById('c-essays').value='';document.getElementById('c-essays').dataset.manual='true'">Clear score</button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('c-essays').value='';document.getElementById('c-essays').dataset.manual='true';document.getElementById('c-essays').dispatchEvent(new Event('input',{bubbles:true}))">Clear score</button>
             </div>
           </div>
           <details><summary>Optional profile context</summary>
@@ -4982,8 +4982,8 @@ window.onload = function() {
     <div id="sk-lab-workspace"></div>
   </main>
 </div>
-<script src="admissions/boot.js?v=2.1.4" defer></script>
-<script src="scholark-feature-loader.js?build=ai-108&revision=20261016c" defer></script>
+<script src="admissions/boot.js?v=2.1.5" defer></script>
+<script src="scholark-feature-loader.js?build=ai-108&revision=20261017" defer></script>
 <script src="scholark-press.js" defer></script>
 <script src="scholark-reviews.js?build=20261001-reviews3" defer></script>
 <script src="scholark-v3.js?build=5157&revision=20261016" defer></script>

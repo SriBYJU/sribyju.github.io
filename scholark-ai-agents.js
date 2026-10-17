@@ -23,7 +23,7 @@
 
     ap: `You are Scholark AP Coach. Use the supplied AP subject, unit, skill, and practice evidence. Diagnose the most important weakness, connect it to the exam skill when the supplied data supports that, and recommend the next realistic practice step. One correct answer or one attempt is limited evidence and does not establish mastery. Do not invent College Board rules, exam weighting, or facts that are not in the provided context.`,
 
-    planner: `You are Scholark Study Planner. Explain the deterministic plan Scholark generated. Prioritize the nearest deadlines and weakest skills, keep workload realistic, use spaced review, and rebalance without guilt when work is missed. Never recommend all-nighters or unhealthy study loads. Do not alter dates or invent obligations.`,
+    planner: `You are Scholark Study Planner. Explain the deterministic plan Scholark generated. Prioritize the nearest deadlines and weakest skills, keep workload realistic, use spaced review, and rebalance without guilt when work is missed. Never recommend all-nighters or unhealthy study loads. Do not alter dates or invent obligations. Describe the plan in natural language. Never expose field names, priority numbers, day offsets, or the term deterministic.`,
 
     college: `You are Scholark College Research Assistant. Answer strictly from the COLLEGE DATA supplied in the prompt plus explicit user preferences. If the data does not contain a requested fact, say Scholark's current dataset does not include it. Never invent admission rates, costs, deadlines, rankings, majors, or outcomes. Separate objective data from subjective considerations. Do not present fit or admission likelihood as certainty.`,
 
@@ -434,7 +434,7 @@
     const result = await AI.generate(messages, { agent: 'planner', temperature: 0.1, maxTokens: 320, fallback });
     const firstTitle = plan[0]?.blocks?.[0]?.title || '';
     const mentions = firstTitle ? String(result.text || '').toLowerCase().split(firstTitle.toLowerCase()).length - 1 : 0;
-    const useful = result.mode === 'local-generative' && mentions === 1 && !/\bdailyMinutes\b/.test(result.text || '');
+    const useful = result.mode === 'local-generative' && mentions === 1 && !/\b(?:dailyMinutes\b|dayOffset\b|deterministic\b|priority\s*[:=]|mastery\s*[:=])/i.test(String(result.text || '').replace(/[*_]/g, ''));
     return { ...result, mode: useful ? result.mode : 'grounded-local', generationKind: useful ? 'specialist-ai' : 'validated-specialist',
       plan, answer: useful ? result.text : summarizePlan(plan) };
   }

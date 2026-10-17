@@ -134,7 +134,7 @@
     // Check the requested action as well as its subject. Academic vocabulary
     // alone must not turn shopping, booking or entertainment into study help.
     const academicAnalysis = /\b(?:analy[sz]e|interpret|critique|compare|explain|calculate|discuss|evaluate|revise|review|improve|feedback)\b/.test(q)
-      && /\b(?:marketing|literature|economics|math|history|science|psychology|statistics|media studies|rhetoric|symbolism|themes?|school|class|assignment|essay|course|college|application|activities|extracurriculars)\b/.test(q);
+      && /\b(?:marketing|literature|economics|inflation|supply and demand|elasticity|opportunity cost|math|history|science|psychology|statistics|media studies|rhetoric|symbolism|themes?|school|class|assignment|essay|course|college|application|activities|extracurriculars)\b/.test(q);
     const applicationExperience = /\b(?:job|work|worked|working|employment|shift|volunteer)\b/.test(q)
       && /\b(?:applications?|essays?|activit(?:y|ies)|extracurriculars?|common app|college)\b/.test(q)
       && /\b(?:describe|include|count|reflect|write about|revise|review|improve|critique|evaluate|feedback|phrase|list|mention)\b/.test(q);
@@ -143,7 +143,7 @@
     const schoolPreparation = /\b(?:wear|prepare|practice|answer|introduce|etiquette)\b/.test(q) && /\b(?:college|admissions|scholarship|job|internship) interview\b/.test(q)
       || /\b(?:laptop|computer)\b.{0,50}\b(?:computer science|programming|engineering|course requirements|class requirements)\b/.test(q);
     const food = /\b(?:restaurants?|cafes?|fast food|mc\s*donald'?s|mickey d'?s|big macs?|starbucks|burger king|taco bell|wendy'?s|kfc|chipotle|burgers?|pizzas?|sushi|recipes?|meals?|dinners?|drinks?|cocktails?|pancakes?)\b/.test(q);
-    const entertainment = /\b(?:netflix|hulu|disney\+?|tv shows?|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|minecraft|fortnite|roblox|world cup|super bowl|football game|basketball game)\b/.test(q);
+    const entertainment = /\b(?:netflix|hulu|disney\+?|tv shows?|tv series|series to binge|binge.watch|movies?|video games?|songs?|albums?|celebrit(?:y|ies)|minecraft|fortnite|roblox|world cup|super bowl|football game|basketball game)\b/.test(q);
     const lifestyle = /\b(?:hotels?|flights?|vacations?|travel destinations?|shopping|headphones?|shoes?|laptops?|outfits?|weddings?|workout|horoscopes?|astrology|dating|crush|leaking faucet)\b/.test(q);
     const consumerAction = /\b(?:nearest|closest|directions? to|near me|near my|opening hours|open now|where (?:is|are|can i find|should i get)|what (?:to|should i) (?:order|watch|eat|buy)|most popular order|recommend\w*|(?:your|a) favorites?|(?:what|which|where).{0,30}best|should i buy|book (?:me|a|an|the)|reserve|order (?:me|a|some)|plan (?:my|a|our)|make (?:me|a)|how (?:can|do) i (?:make|cook|bake|fix|beat|win|impress)|who won|(?:game|match) (?:scores?|results?))\b/.test(q);
     const writingFeedback = /\b(?:suggest|recommend|explain|review|critique)\b.{0,30}\b(?:edits|feedback|revisions|changes)\b/.test(q) && /\b(?:draft|essay|paragraph|passage|activity|description)\b/.test(q);
@@ -329,6 +329,7 @@
       phrases.set(phrase,count);if(count>=4)return true;
     }
     if (/<\/?think\b/i.test(value)) return true;
+    if (/always use the information provided in the reference notes|if the student is asked|do not repeat these instructions|the problem requires a detailed explanation of the solution process/i.test(value)) return true;
     if (/break the task into three pieces|use the relevant scholark practice or course resource|compatibility-mode guidance is rule-based/i.test(value)) return true;
     const question = lastUserText(messages).toLowerCase();
     if (/\bSAT\s*\([^)]{3,100}\)/i.test(value) || (/\bsat\b/.test(question) && /SAT fractions (?:are|is) a special type/i.test(value))) return true;

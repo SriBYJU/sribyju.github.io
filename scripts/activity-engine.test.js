@@ -94,3 +94,11 @@ test('nickname suggestions reuse source wording and never invent an award',()=>{
   const a=A.activity({organization:'Community Garden',description:'Organized planting and taught children'});assert.equal(A.nickname(a),'Community Garden');
   const b=A.activity({description:'Played competitive soccer with local club'});assert.ok(/soccer/i.test(A.nickname(b)));assert.ok(!/captain|award/i.test(A.nickname(b)));
 });
+
+test('damaged stored activities and versions recover without throwing or inventing credit',()=>{
+ for(const raw of [null,undefined,0,17,'bad',true,[]]){
+  const a=A.activity(raw);assert.equal(a.description,'');assert.deepEqual(a.versions,[]);assert.equal(A.grade(a).score,null);
+ }
+ const a=A.activity({description:'Taught 12 students in algebra',versions:[null,3,'bad',[],{description:'Taught 8 students',position:'Tutor',organization:'School'}]});
+ assert.equal(a.description,'Taught 12 students in algebra');assert.equal(a.versions.length,1);assert.equal(a.versions[0].description,'Taught 8 students');
+});
