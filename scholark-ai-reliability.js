@@ -239,6 +239,9 @@
 
   function verifiedLearningAnswer(input = '', context = {}) {
     const q = String(input).toLowerCase().trim();
+    if (/\b(?:sat|act)\b/.test(q) && (/\bcut[ -]?offs?\b/.test(q) || (/\b(?:minimum|threshold|guarantee\w*)\b/.test(q) && /\b(?:admission|accepted|college|university)\b/.test(q)))) {
+      return 'I cannot give a guaranteed future SAT or ACT admissions cutoff. Check the university’s official admissions website for current testing requirements and published score ranges. A score range describes a group of students; it is not a guaranteed admission threshold. Scholark’s College Chances tool provides an uncertain planning estimate, not a promise.';
+    }
     if (/^(?:what is (?:the )?college board|who (?:runs|administers) the sat)[?.!]*$/.test(q)) {
       return 'College Board is a not-for-profit membership organization that runs the SAT and AP programs. Scholark is independent of College Board. For current exam policies and dates, use collegeboard.org. Source: College Board, About Our Organization.';
     }
@@ -312,6 +315,19 @@
   function isWeakAnswer(text, messages) {
     const value = String(text || '').trim();
     if (value.length < 8) return true;
+    const sentences = value.toLowerCase().split(/[.!?\n]+/).map(s=>s.replace(/[^\p{L}\p{N}]+/gu,' ').trim()).filter(s=>s.split(/\s+/).length>=7);
+    const sentenceCounts = new Map();
+    for (const sentence of sentences) {
+      const count=(sentenceCounts.get(sentence)||0)+1;sentenceCounts.set(sentence,count);
+      if(count>=3)return true;
+    }
+    // Also catch run-on loops without punctuation, while allowing repeated short
+    // mathematical terms and normal parallel phrasing in explanations.
+    const tokens=value.toLowerCase().match(/[\p{L}\p{N}]+/gu)||[],phrases=new Map();
+    for(let i=0;i+10<=tokens.length;i++){
+      const phrase=tokens.slice(i,i+10).join(' '),count=(phrases.get(phrase)||0)+1;
+      phrases.set(phrase,count);if(count>=4)return true;
+    }
     if (/<\/?think\b/i.test(value)) return true;
     if (/break the task into three pieces|use the relevant scholark practice or course resource|compatibility-mode guidance is rule-based/i.test(value)) return true;
     const question = lastUserText(messages).toLowerCase();
@@ -442,6 +458,8 @@
         messages,
         temperature: options.temperature ?? 0.18,
         top_p: options.topP ?? 0.9,
+        frequency_penalty: options.schema ? 0 : 0.2,
+        presence_penalty: 0,
         max_tokens: options.maxTokens ?? 500,
         seed: Number.isFinite(options.seed) ? options.seed : 41721,
         stream: false,

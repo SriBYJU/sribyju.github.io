@@ -94,3 +94,34 @@ test('math formatting removes notation delimiters without removing scholarship c
   assert.equal(learning.readableMath('$\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$'), '1/2 + 1/4 = 3/4');
   assert.equal(learning.readableMath('$$\nx^2 = 4\n$$'), '\nx^2 = 4\n');
 });
+
+test('source consistency rejects agreement with false premises even beside correct facts',()=>{
+ const cases=[
+  ['Chemical bonds and energy','Is breaking chemical bonds what releases energy? Explain.','Breaking chemical bonds typically requires energy. The statement is correct in that it reflects the energy involved in both breaking and forming bonds.'],
+  ['Chemical bonds and energy','Breaking bonds is exothermic, right?','Yes, but forming bonds also releases energy.'],
+  ['Photosynthesis and plant mass','Plants get most of their dry mass from soil, right?','You are right. Carbon dioxide is also involved in photosynthesis.'],
+  ['correlation limits','Does correlation prove causation?','The claim is true. Other factors can still matter.']
+ ];
+ for(const [name,question,answer]of cases)assert.equal(learning.contradictsNotes(answer,[{name}],question),true,question);
+ const correct=[
+  ['Chemical bonds and energy','Does breaking bonds require energy?','Yes. Breaking bonds requires energy; forming bonds releases energy.'],
+  ['Chemical bonds and energy','Is breaking bonds what releases energy?','No. Breaking bonds requires energy; forming bonds releases energy.'],
+  ['Photosynthesis and plant mass','Plants get most of their dry mass from soil, right?','No. Carbon dioxide provides the carbon used to build organic molecules.'],
+  ['correlation limits',"Correlation doesn't prove causation, right?",'You are right. An association alone cannot establish a causal relationship.'],
+  ['correlation limits','Does correlation prove causation?','No, it does not. Other variables can explain an association.']
+ ];
+ for(const[name,question,answer]of correct)assert.equal(learning.contradictsNotes(answer,[{name}],question),false,question);
+});
+test('chemistry checks catch contradictions in later sentences and reversed enthalpy signs',()=>{
+ const notes=[{name:'Chemical bonds and energy'}];
+ for(const answer of [
+  'Breaking chemical bonds does not release energy; it requires energy. For example, in forming a bond, you need energy (e.g., 50 kJ).',
+  'The reaction enthalpy is calculated as the energy released by forming bonds minus the energy required to break bonds.',
+  'Forming a chemical bond usually absorbs energy.'
+ ])assert.equal(learning.contradictsNotes(answer,notes),true,answer);
+ for(const answer of [
+  'Forming a bond does not require energy; it releases energy.',
+  'Reaction enthalpy is energy required to break bonds minus energy released by forming bonds.',
+  'Energy released overall equals energy released by forming bonds minus energy required to break bonds.'
+ ])assert.equal(learning.contradictsNotes(answer,notes),false,answer);
+});

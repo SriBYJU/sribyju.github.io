@@ -148,7 +148,7 @@
     const broadSatFractions = subjectKey === 'sat' && /\bSAT fractions?\b[?.!]*$/i.test(question);
     const modelQuestion = broadSatFractions ? 'Explain how to add and subtract ordinary fractions. Include one correct worked addition example, then ask a short check question.' : question;
     const satContext = broadSatFractions ? '\nFocus on fraction arithmetic. Do not discuss or expand any exam abbreviation.' : subjectKey === 'sat' ? '\nSAT refers to the college admission test. Do not expand the abbreviation or describe SAT fractions as a special kind of fraction.' : '';
-    const sourceContext = courseNotes.length ? `\nREFERENCE NOTES supplied by Scholark (source links accompany the reply): ${contextJSON(courseNotes.map(({name, text, accuracyReminder}) => ({name, text, accuracyReminder})), 2200)}\nThe text and accuracyReminder fields are CORRECT facts to follow, not false claims to refute. Use them as your factual basis. Correct any conflicting assumption in the question. Explain the requested concept once, without a quiz unless the student asks for one. Do not invent exam rules or cite sources not supplied here.` : '';
+    const sourceContext = courseNotes.length ? `\nREFERENCE NOTES supplied by Scholark (source links accompany the reply): ${contextJSON(courseNotes.map(({name, text, accuracyReminder}) => ({name, text, accuracyReminder})), 2200)}\nThe text and accuracyReminder fields are CORRECT facts to follow, not false claims to refute. Use them as your factual basis. Correct any conflicting assumption in the question. If its premise is false, state the correction directly; do not endorse the premise and then contradict it later. Explain the requested concept once, without a quiz unless the student asks for one. Do not invent exam rules or cite sources not supplied here.` : '';
     // Product facts are handled by the product router. Irrelevant identity text
     // is easy for small models to echo into an otherwise academic explanation.
     const subjectContext = Object.fromEntries(Object.entries({subject: broadSatFractions ? 'mathematics' : context.subject, topic: context.topic}).filter(([, value]) => value));
@@ -168,7 +168,7 @@
     });
     if (context.signal?.aborted) throw new Error('generation-cancelled');
     const sources = courseNotes.map(({ name, subject, text, url, sourceLabel }) => ({ name, subject, text, url, sourceLabel }));
-    if (result.mode === 'local-generative' && window.ScholarkAILearning.contradictsNotes(result.text, courseNotes)) {
+    if (result.mode === 'local-generative' && window.ScholarkAILearning.contradictsNotes(result.text, courseNotes, question)) {
       return { mode: 'grounded-local', generationKind: 'verified-course-notes', reason: 'source-contradiction',
         answer: courseNotes.map(note => `${note.name}: ${note.text}`).join('\n\n'), sources };
     }

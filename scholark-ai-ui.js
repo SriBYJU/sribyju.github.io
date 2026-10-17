@@ -19,6 +19,7 @@
   let essayProgressCleanup = null;
   let activeRequest = null;
   let lastChatExchange = null;
+  let uiOwner = window.currentUser?.uid || 'local';
 
   function ensureStyles() {
     if (q('link[href*="scholark-ai.css"]')) return;
@@ -336,7 +337,7 @@
       <div class="sk-ai-essay-insights" id="sk-ai-essay-insights"></div>
       <div class="sk-ai-essay-follow" id="sk-ai-essay-follow" hidden>
         <label for="sk-ai-essay-question">Ask about this evaluation</label>
-        <div><input id="sk-ai-essay-question" maxlength="1000" placeholder="What is keeping this from an 8?"/><button type="button" id="sk-ai-essay-ask">Ask</button></div>
+        <div><input id="sk-ai-essay-question" data-sk3-private="true" maxlength="1000" placeholder="What is keeping this from an 8?"/><button type="button" id="sk-ai-essay-ask">Ask</button></div>
         <div id="sk-ai-essay-answer" class="sk-ai-follow-answer"></div>
       </div>
       <div class="sk-ai-version-compare" id="sk-ai-version-compare"></div>
@@ -344,6 +345,7 @@
   }
 
   function installEssayEnhancement() {
+    try { localStorage.removeItem('scholark:v3:field:essay:main:sk-ai-essay-question'); } catch (_) {}
     const legacyPanel = q('#essay-ai-panel');
     if (!legacyPanel) return false;
     if (!q('#sk-ai-essay-detail')) legacyPanel.insertAdjacentHTML('afterend', essayDetailHTML());
@@ -387,16 +389,18 @@
   }
 
   function essayAutosaveKey() {
-    const user = window.currentUser?.uid || window._gsUser?.uid || 'local';
+    const user = window.currentUser?.uid || 'local';
     return `essay_autosave_${user}`;
   }
 
   function scheduleEssayAutosave(immediate = false) {
     clearTimeout(autosaveTimer);
+    const ownerKey = essayAutosaveKey();
     const save = () => {
+      if (ownerKey !== essayAutosaveKey()) return;
       const textarea = q('#essay-textarea');
       if (!textarea) return;
-      AI.storage.write(essayAutosaveKey(), {
+      AI.storage.write(ownerKey, {
         text: textarea.value,
         prompt: q('#essay-prompt')?.value || '',
         updatedAt: Date.now()
@@ -410,12 +414,36 @@
   function restoreEssayAutosave() {
     const textarea = q('#essay-textarea');
     if (!textarea || textarea.value.trim()) return;
+    try { if (localStorage.getItem('scholark_essay_draft_' + (window.currentUser?.uid || 'anon')) !== null) return; } catch (_) {}
     const saved = AI.storage.read(essayAutosaveKey(), null);
     if (!saved?.text) return;
     textarea.value = saved.text;
     if (q('#essay-prompt') && saved.prompt) q('#essay-prompt').value = saved.prompt;
     window.onEssayInput?.();
     window.updatePromptHint?.();
+  }
+
+  function authChanged() {
+    const owner = window.currentUser?.uid || 'local';
+    if (owner === uiOwner) return;
+    uiOwner = owner;
+    clearTimeout(autosaveTimer);
+    if (activeRequest) {
+      activeRequest.cancelled = true;
+      activeRequest.controller.abort();
+      AI.cancelGeneration();
+    }
+    activeRequest = null;
+    setBusy(false);
+    AI.sessions.clearAll();
+    lastChatExchange = null;
+    for (const id of ['sk-ai-input', 'sk-ai-essay-question']) {
+      const input = q('#' + id);
+      if (input) input.value = '';
+    }
+    const transcript = q('#sk-ai-transcript');
+    if (transcript) transcript.innerHTML = '<div class="sk-ai-welcome"><strong>Fresh conversation</strong><span>Your account changed. Start a new private conversation.</span></div>';
+    invalidateEssayReview();
   }
 
   function invalidateEssayReview() {
@@ -598,7 +626,7 @@
       }
     });
 
-    window.ScholarkAIUI = { version: VERSION, open: openDialog, close: closeDialog, enhanceEssay: installEssayEnhancement, reviewEssay: () => runExpandedEssayEvaluation(q('#essay-textarea')?.value.trim() || '') };
+    window.ScholarkAIUI = { version: VERSION, authChanged, open: openDialog, close: closeDialog, enhanceEssay: installEssayEnhancement, reviewEssay: () => runExpandedEssayEvaluation(q('#essay-textarea')?.value.trim() || '') };
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });

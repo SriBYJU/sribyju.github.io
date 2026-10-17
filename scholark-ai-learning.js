@@ -150,9 +150,19 @@
       .replace(/\\quad\b/g, ' ').replace(/\\(?:cdot|times)\b/g, ' × ');
   }
 
-  function contradictsNotes(answer, notes = []) {
+  function contradictsNotes(answer, notes = [], question = '') {
     const text = String(answer).replace(/[*_]/g, '').toLowerCase();
     const names = new Set(notes.map(note => note.name));
+    // Agreement with a false premise can coexist with a correct sentence elsewhere.
+    // Check that relationship against the supplied topic, not just isolated keywords.
+    const premise = String(question).toLowerCase();
+    const endorses = /(?:^|[.!?]\s+)(?:yes\b|(?:the\s+)?(?:statement|claim|assumption)\s+is\s+(?:correct|true)|you(?:'re| are)\s+(?:correct|right))/.test(text);
+    const negated = /\b(?:not|never|doesn['’]t|isn['’]t|cannot|can['’]t)\b/.test(premise);
+    if (endorses && !negated) {
+      if (names.has('Chemical bonds and energy') && /\bbreak\w*\b[^.!?]{0,45}\bbonds?\b[^.!?]{0,45}\b(?:releas\w*|exothermic)\b/.test(premise)) return true;
+      if (names.has('Photosynthesis and plant mass') && /\b(?:most|majority|bulk)\b[^.!?]{0,70}\b(?:mass|carbon)\b[^.!?]{0,45}\bsoil\b/.test(premise)) return true;
+      if (names.has('correlation limits') && /\bcorrelation\b[^.!?]{0,35}\b(?:proves?|establish\w*|guarantee\w*)\b[^.!?]{0,25}\bcausation\b/.test(premise)) return true;
+    }
     if (names.has('Photosynthesis and plant mass')) {
       if (/\b(?:most|majority|bulk)\b[^.!?\n]{0,80}\b(?:mass|carbon)\b[^.!?\n]{0,60}\b(?:from|through)\s+(?:the\s+)?soil\b/.test(text)) return true;
     }
@@ -161,6 +171,11 @@
       if (/\bleaving no systematic pattern\b|\bmaking them a useful linear model\b/.test(text)) return true;
     }
     if (names.has('Chemical bonds and energy')) {
+      const clauses=text.replace(/\be\.g\./g,'for example').split(/[.!?;\n]+/);
+      for(const clause of clauses){
+        if(/\b(?:form\w*\s+(?:a\s+|the\s+)?(?:chemical\s+)?bonds?|bond formation)\b[^.!?]{0,55}\b(?:need\w*|requir\w*|absorb\w*|use\w*)\s+energy\b/.test(clause)&&!/\b(?:not|never|incorrect|false|doesn['’]t)\b/.test(clause))return true;
+        if(/\b(?:enthalpy|delta h|δh)\b[^.!?]{0,100}\bform\w*\b[^.!?]{0,50}\bminus\b[^.!?]{0,65}\bbreak\w*\b/.test(clause)&&!/\b(?:not|never|incorrect|false)\b/.test(clause))return true;
+      }
       if (/\bbreak\w*\s+(?:chemical\s+)?bonds?\s+(?:(?:itself|alone|actually|generally|typically)\s+)*(?:releases?|produces?|gives off)\s+energy\b/.test(text)) return true;
       if (/\bform\w*\s+(?:chemical\s+)?bonds?\s+(?:requires?|absorbs?|uses?)\s+energy\b/.test(text)) return true;
       if (/\b(?:form\w*\s+(?:a\s+|the\s+)?(?:chemical\s+)?bonds?|bond formation)\b[^.!?\n]{0,45}\b(?:endothermic|requires? energy|absorbs? energy)\b/.test(text) && !/\b(?:not|never|incorrect|false)\b/.test(text)) return true;

@@ -37,7 +37,7 @@ Treat each behavior as unverified until a reproduction or test supports it. A pa
 - Linux WebKit failure traces showed controls moving during scrolling and focus. Activities and Essay workspace document scrolling is now immediate; homepage scrolling is unchanged. The focused WebKit rerun passed all 39 cases, including saved versions, short AI revisions, cancellation and account changes.
 - One essay test installed a response fixture before the runtime finished loading, allowing runtime initialization to replace it. The test now waits for initialization before installing the fixture.
 - A production twelve-route journey reached the final route at its aggregate 30-second deadline. Its overall budget is now 60 seconds; individual destination assertions retain their normal timeouts. All three live route/About tests passed afterward.
-- Both CI runs preceding these final changes passed 249 of 250 browser cases. Their remaining failures were the WebKit saved-version interaction and the aggregate route deadline above. A final complete CI pass is still required.
+- Both CI runs preceding these final changes passed 249 of 250 browser cases. Their remaining failures were the WebKit saved-version interaction and the aggregate route deadline above. The subsequent b884e36 release passed all 253 browser cases in both regression CI and the production audit (runs 38949003560 and 38949003421).
 - CI now retains browser traces and screenshots on failure. The local live-WebKit run was interrupted by an internet outage after 21 passes; it is not counted as a full pass.
 - The full local Node suite still passes all 190 tests.
 
@@ -52,3 +52,15 @@ Therefore this audit does **not** establish parity with Brisk, a professional ad
 ## Scope protection
 
 No animation, cinematic markup, carousel, design palette or unrelated calculator behavior is changed. The only shared form-persistence change is an explicit opt-out attribute used by private AI text fields. Script URLs are refreshed so browsers receive the fixes.
+
+## Account ownership and model-quality follow-up
+
+- Reproduced private essay text remaining visible through the real authentication refresh. Working drafts now use an account-specific key; account changes reset the editor, review, selected passages, pending activity import, linked fields and chat. Explicitly saved essays are retained separately.
+- Old shared form drafts are preserved under `scholark_legacy_unassigned_…` for recovery, without assigning an unknown owner's writing to the next account. Existing owned AI autosaves migrate only when no newer working draft exists. Deliberately cleared drafts stay empty on reload.
+- A delayed autosave captures its owner and cannot write into a different account. Account changes cancel pending Ask requests and suppress their late answers. Legacy private question fields also opt out of generic persistence.
+- Actual 36-prompt inference audit completed: 27 grounded local answers and nine generated answers. It exposed a false-premise chemistry endorsement, a repeated study-plan loop and an unsupported future SAT cutoff response. These are not counted as 36 model-generated successes.
+- Added paired contradiction checks for the observed chemistry errors, sentence/phrase repetition rejection, modest prose-only repetition penalty, and an honest response for unverifiable admissions thresholds. Structured rubric JSON retains zero repetition penalty.
+- A subsequent three-prompt actual-inference retest produced a correct chemistry answer (16.7 seconds), a complete non-looping biology study plan (78.1 seconds using the recovery model), and a grounded uncertainty answer for the future cutoff. The study plan remains verbose and slow. This small retest does not establish general semantic reliability.
+- Current local Node suite: 194 passed. Chrome's six scope/chat regressions passed, including a delayed cross-account response and replacement of the captured incorrect chemistry output with supporting notes. Safari's expanded run passed 18 cases and exposed a test setup race in the nineteenth: the model replacement was installed before runtime initialization completed. Waiting for initialization fixed the fixture; that case then passed separately. All 19 focused behaviors now have passing Safari evidence.
+
+Remaining work: improve actual essay critique specificity and generation latency, and expand real-inference evaluation beyond the cases above. These improvements are not established by mocked model-response UI tests. No model promotion or claim of admissions-expert parity is made.

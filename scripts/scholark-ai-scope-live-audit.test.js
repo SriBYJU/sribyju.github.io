@@ -58,3 +58,20 @@ test('product facts explain the actual AI score and passage controls', async () 
     assert.match(reply.answer, /not official college grades/);
   }
 });
+test('quality gate rejects sentence and run-on generation loops',()=>{
+ const weak=ctx.ScholarkAIReliability.isWeakAnswer;
+ const messages=[{role:'user',content:'How should I study for a biology test?'}];
+ const sentence="If you are unsure about a concept, ask a teacher or study partner to clarify it.";
+ assert.equal(weak('Review your notes. '+sentence.repeat(8),messages),true);
+ assert.equal(weak('review the diagram and explain the process in your own words '.repeat(6),messages),true);
+ assert.equal(weak('Test yourself without notes. Check the answers and explain any mistakes. Return to difficult questions tomorrow instead of only rereading the chapter.',messages),false);
+ assert.equal(weak('Breaking bonds requires energy; forming bonds releases energy. Compare energy required with energy released to determine the overall change.',messages),false);
+});
+test('admissions cutoff questions receive uncertainty guidance without fabricated thresholds',async()=>{
+ for(const input of ['What will the exact SAT cutoff be for Harvard next year?','What ACT cutoff guarantees acceptance?','What minimum SAT guarantees college admission?']){
+  const reply=await ctx.ScholarkAIAgents.ask(input);
+  assert.equal(reply.generationKind,'verified-learning');
+  assert.match(reply.answer,/official admissions website/);assert.match(reply.answer,/not a guaranteed admission threshold/);
+ }
+ assert.equal((await ctx.ScholarkAIAgents.ask('How do I calculate my SAT section scores?')).mode,'model-needed');
+});

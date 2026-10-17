@@ -58,3 +58,36 @@ test('app knowledge describes the current essay AI controls rather than old rule
   await expect(answer).toContainText('apply one, or undo');
   await expect(answer).toContainText('not official college grades');
 });
+
+test('account switch clears chat and ignores a late answer from the previous account', async ({page}) => {
+  await page.goto('/?workspace=activities');
+  await page.waitForFunction(() => !!window.ScholarkAIUI);
+  await page.evaluate(() => {
+    window.currentUser = {uid:'chat-owner-a'}; updateNavForUser();
+    ScholarkAIUI.open();
+    ScholarkAIAgents.ask = () => new Promise(resolve => window.finishPrivateAnswer = resolve);
+  });
+  await page.locator('#sk-ai-input').fill('Private application question from account A');
+  await page.locator('#sk-ai-input').press('Enter');
+  await page.waitForFunction(() => !!window.finishPrivateAnswer);
+  await page.locator('#sk-ai-input').fill('Unsent private question');
+  await page.evaluate(() => {window.currentUser = {uid:'chat-owner-b'}; updateNavForUser();});
+  await expect(page.locator('#sk-ai-input')).toHaveValue('');
+  await expect(page.locator('#sk-ai-transcript')).not.toContainText('account A');
+  await page.evaluate(() => window.finishPrivateAnswer({mode:'local-generative',answer:'PRIVATE OLD ANSWER'}));
+  await expect(page.locator('#sk-ai-transcript')).not.toContainText('PRIVATE OLD ANSWER');
+  await expect(page.locator('.sk-ai-send')).toBeEnabled();
+});
+
+test('a generated chemistry contradiction is replaced with the supporting course notes', async ({page}) => {
+  await page.goto('/?workspace=activities');
+  await page.waitForFunction(() => !!window.ScholarkAIAgents && !!window.ScholarkAILearning);
+  const result = await page.evaluate(async () => {
+    await ScholarkFeatureLoader.ensure('ai');
+    ScholarkAI.generate = async () => ({mode:'local-generative',text:'Breaking chemical bonds does not release energy; it requires energy. The reaction enthalpy is calculated as energy released by forming bonds minus energy required to break bonds.'});
+    return ScholarkAIAgents.ask('Is breaking chemical bonds what releases energy? Explain.');
+  });
+  expect(result.reason).toBe('source-contradiction');
+  expect(result.answer).toContain('Forming bonds releases energy');
+  expect(result.mode).toBe('grounded-local');
+});

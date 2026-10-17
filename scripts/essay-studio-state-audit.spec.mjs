@@ -77,3 +77,59 @@ test('sent questions and Clear conversation leave an empty composer',async({page
  await expect(page.locator('.sk-studio-message[data-role=assistant]').last()).toContainText('focuses on your essay');await expect(page.locator('#sk-studio-question')).toHaveValue('');
  await page.locator('#sk-studio-question').fill('An unsent question');await page.getByRole('button',{name:'Clear conversation',exact:true}).click();await expect(page.locator('#sk-studio-question')).toHaveValue('');
 });
+
+test('real auth refresh separates private drafts and pending activity imports between accounts',async({page})=>{
+ await open(page);
+ await page.evaluate(()=>{window.currentUser={uid:'privacy-a'};updateNavForUser();});
+ await page.locator('#essay-textarea').fill('Account A private draft, retained only for its owner.');
+ await page.locator('#essay-prompt').selectOption('ca2');
+ await page.evaluate(()=>ScholarkAdmissionsUI.open('activities'));
+ await page.getByRole('button',{name:'Bulk paste',exact:true}).click();
+ await page.getByLabel('Paste activities, one per line').fill('PRIVATE A IMPORT: Tutored 12 students in algebra each week.');
+ await page.evaluate(()=>{window.currentUser={uid:'privacy-b'};updateNavForUser();});
+ await expect(page.getByLabel('Paste activities, one per line')).toHaveCount(0);
+ await expect(page.locator('#essay-textarea')).toHaveValue('');
+ await page.evaluate(()=>ScholarkAdmissionsUI.open('essay'));
+ await page.locator('#essay-textarea').fill('Account B private draft.');
+ await page.evaluate(()=>{window.currentUser={uid:'privacy-a'};updateNavForUser();});
+ await expect(page.locator('#essay-textarea')).toHaveValue('Account A private draft, retained only for its owner.');
+ await expect(page.locator('#essay-prompt')).toHaveValue('ca2');
+ await expect.poll(()=>page.evaluate(()=>localStorage.getItem('scholark:v3:field:essay:main:essay-textarea'))).toBeNull();
+ await page.evaluate(()=>{window.currentUser=null;updateNavForUser();});
+ await expect(page.locator('#essay-textarea')).toHaveValue(DRAFT);
+});
+
+test('working draft survives reload without overwriting explicitly saved essays',async({page})=>{
+ await open(page);
+ await page.evaluate(()=>localStorage.setItem('gs_essays_saved-owner',JSON.stringify([{id:'keep-me',text:'Previously saved essay',title:'Saved title'}])));
+ await page.locator('#essay-textarea').fill('Unsaved working copy survives a refresh.');
+ await page.locator('#essay-prompt').selectOption('ca5');
+ await page.reload();await page.waitForFunction(()=>window.ScholarkAdmissionsUI&&document.querySelector('#sk-essay-studio'));
+ await expect(page.locator('#essay-textarea')).toHaveValue('Unsaved working copy survives a refresh.');
+ await expect(page.locator('#essay-prompt')).toHaveValue('ca5');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('gs_essays_saved-owner'))[0].text)).toBe('Previously saved essay');
+});
+
+test('unowned legacy draft is preserved for recovery without exposing it to an account',async({page})=>{
+ await page.addInitScript(()=>{localStorage.setItem('scholark:v3:field:essay:main:essay-textarea',JSON.stringify('Unowned legacy private essay'));localStorage.setItem('gs_essays_previous',JSON.stringify([{id:'old',text:'Old explicitly saved essay'}]));});
+ await page.goto('/?workspace=essay');await page.waitForFunction(()=>window.ScholarkAdmissionsUI&&document.querySelector('#sk-essay-studio'));
+ await page.evaluate(()=>{window.currentUser={uid:'new-account'};updateNavForUser();});
+ await expect(page.locator('#essay-textarea')).toHaveValue('');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('scholark_legacy_unassigned_essay-textarea')))).toBe('Unowned legacy private essay');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('gs_essays_previous'))[0].text)).toBe('Old explicitly saved essay');
+});
+
+test('owned older autosave migrates once and a deliberately cleared draft stays empty',async({page})=>{
+ await page.addInitScript(()=>{
+   if(!localStorage.getItem('migration-seeded')){
+     localStorage.setItem('migration-seeded','1');
+     localStorage.setItem('scholark_ai_v1_essay_autosave_local',JSON.stringify({text:'Older private working draft',prompt:'ca2'}));
+   }
+ });
+ await page.goto('/?workspace=essay');await page.waitForFunction(()=>window.ScholarkAIUI&&document.querySelector('#sk-essay-studio'));
+ await expect(page.locator('#essay-textarea')).toHaveValue('Older private working draft');
+ await expect(page.locator('#essay-prompt')).toHaveValue('ca2');
+ await page.locator('#essay-textarea').fill('');
+ await page.reload();await page.waitForFunction(()=>window.ScholarkAIUI&&document.querySelector('#sk-essay-studio'));
+ await expect(page.locator('#essay-textarea')).toHaveValue('');
+});

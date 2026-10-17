@@ -192,5 +192,18 @@ function renderChances(school){read();const p=inputs(school),errors=M.validate(p
 function renderHero(){read();const host=$('sk-profile-hero');if(!host)return;if(!window.currentUser)return;const values=[['GPA',state.lastChances?.gpa||'—',Number(state.lastChances?.gpa||0)*25],['Test',state.lastChances?.test||'—',0],['Activities',state.portfolio?.score??'—',state.portfolio?.score||0],['Essay',state.essayScore?.score??'—',state.essayScore?.score||0],['Chances',state.lastChances?.range?.join('–')||'—',0]];host.replaceChildren(el('div',{class:'sk-lab-eyebrow'},'Your next step'),el('h2',{},'Build a profile with evidence'),el('div',{class:'sk-hero-rings'},...values.map(([label,value,percent])=>{const div=el('div',{class:'sk-hero-metric'},ring(String(value),percent),label);return div;})),para(!state.portfolio?.score?'Next best action: describe three activities.':!state.essayScore?'Next best action: review an essay draft.':'Next best action: check the assumptions behind your college list.'),button('Open Activities Lab',()=>open('activities')),button('Open Essay Coach',()=>open('essay')),button('College Chances',()=>open('chances')));}
 function getStamp(){const r=E.analyze($('essay-textarea')?.value||'',{promptType:$('essay-prompt')?.value||'common-app'});const {score,subScores,rubricVersion,essayHash,promptType,gradedAt}=r;return {score,subScores,rubricVersion,essayHash,promptType,gradedAt};}
 function getHistory(){read();return state.essayHistory.map(r=>({...r}));}
-window.ScholarkAdmissionsUI={getStamp,getHistory,open,initEssay,review,useEssay,useActivities,renderChances,openMentor,renderHero,refreshProfile:async()=>{read();await restore();renderHero();}};
+function accountChanged(){
+ if(owner===uid())return;
+ clearTimeout(saveTimer);clearTimeout(reviewTimer);localRevision++;
+ reviewResult=null;lastText='';filter='All';activeKey=null;dragged=null;
+ read();resetPassageSession();
+ $('sk-profile-hero')?.replaceChildren();
+ for(const id of ['c-ecs','c-essays']){const field=$(id);if(field){field.value='';delete field.dataset.manual;delete field.dataset.skLinked;}}
+ for(const id of ['sk-ec-linked','sk-essay-linked','sk-ec-summary','sk-ec-rail','sk-ec-inline','sk-ec-passages'])$(id)?.replaceChildren();
+ if($('sk-lab-workspace'))renderActivities();
+ window.ScholarkEssayStudio?.mount();
+ if(essayInstalled)review();
+ linkScores();renderHero();
+}
+window.ScholarkAdmissionsUI={accountChanged,getStamp,getHistory,open,initEssay,review,useEssay,useActivities,renderChances,openMentor,renderHero,refreshProfile:async()=>{read();await restore();renderHero();}};
 })();
