@@ -16,6 +16,8 @@
   let keyboardBound = false;
   let hubFilter = { search: '', category: 'All' };
   let taskDraft = null;
+  let loadedOwner = null;
+  let loadEpoch = 0;
 
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]; });
@@ -33,8 +35,8 @@
 
   function defaultSubjectState(s) {
     const mastery = {};
-    s.units.forEach(function (u, i) { mastery[i] = { score: 50, attempts: 0, correct: 0, confidenceTotal: 0, confidenceCount: 0, nextReviewAt: null, lastSeen: null }; });
-    return { target: 5, examDate: '', mastery, responses: [], taskAttempts: [], scoreHistory: [], bookmarks: [], notes: {}, currentSession: null, teachbacks: [], updatedAt: null };
+    s.units.forEach(function (u, i) { mastery[i] = { score: 0, attempts: 0, correct: 0, confidenceTotal: 0, confidenceCount: 0, nextReviewAt: null, lastSeen: null }; });
+    return { curriculumVersion: s.curriculumVersion || 'original', target: 5, examDate: '', mastery, responses: [], taskAttempts: [], scoreHistory: [], bookmarks: [], notes: {}, reviewedTopics: [], practicedQuestions: [], currentSession: null, teachbacks: [], updatedAt: null };
   }
 
   function defaultState() {
@@ -43,16 +45,31 @@
 
   function ensureSubject(id) {
     if (!state.subjects[id] || typeof state.subjects[id] !== 'object') state.subjects[id] = defaultSubjectState(data.subjectMap[id]);
+    if (id === 'apstats' && state.subjects[id].curriculumVersion !== data.subjectMap[id].curriculumVersion) {
+      const old = state.subjects[id], fresh = defaultSubjectState(data.subjectMap[id]);
+      fresh.target = old.target || 5; fresh.examDate = old.examDate || '';
+      if ((old.responses || []).length || Object.keys(old.notes || {}).length || (old.taskAttempts || []).length || Object.values(old.mastery || {}).some(row => row && row.attempts > 0)) fresh.previousCurriculum = old;
+      state.subjects[id] = fresh;
+    }
     const current = state.subjects[id];
     const fresh = defaultSubjectState(data.subjectMap[id]);
     current.mastery = current.mastery && typeof current.mastery === 'object' ? current.mastery : fresh.mastery;
     Object.keys(fresh.mastery).forEach(function (key) {
       if (!current.mastery[key]) current.mastery[key] = fresh.mastery[key];
       else current.mastery[key] = Object.assign({}, fresh.mastery[key], current.mastery[key]);
+      const row = current.mastery[key];
+      row.attempts = Number.isFinite(Number(row.attempts)) ? Math.max(0, Math.floor(Number(row.attempts))) : 0;
+      row.correct = Math.max(0, Math.min(row.attempts, Math.floor(Number(row.correct) || 0)));
+      row.score = row.attempts ? Math.round(100 * row.correct / row.attempts) : 0;
+      if (!row.attempts) { row.nextReviewAt = null; row.lastSeen = null; }
     });
-    current.responses = Array.isArray(current.responses) ? current.responses.slice(-2500) : [];
-    current.taskAttempts = Array.isArray(current.taskAttempts) ? current.taskAttempts.slice(-300) : [];
-    current.scoreHistory = Array.isArray(current.scoreHistory) ? current.scoreHistory.slice(-100) : [];
+    current.mastery = Object.fromEntries(Object.keys(fresh.mastery).map(key => [key,current.mastery[key]]));
+    current.responses = Array.isArray(current.responses) ? current.responses.filter(row => row && typeof row === 'object').slice(-2500) : [];
+    current.reviewedTopics = Array.isArray(current.reviewedTopics) ? [...new Set(current.reviewedTopics.filter(x => typeof x === 'string'))] : [];
+    const validQuestions = new Set(data.subjectMap[id].questions.map(q => q.id));
+    current.practicedQuestions = [...new Set([...(Array.isArray(current.practicedQuestions) ? current.practicedQuestions : []), ...current.responses.map(r => r.questionId)])].filter(id => validQuestions.has(id));
+    current.taskAttempts = Array.isArray(current.taskAttempts) ? current.taskAttempts.filter(row => row && typeof row === 'object').slice(-300) : [];
+    current.scoreHistory = Array.isArray(current.scoreHistory) ? current.scoreHistory.filter(row => row && Number.isFinite(row.percent)).slice(-100) : [];
     current.bookmarks = Array.isArray(current.bookmarks) ? Array.from(new Set(current.bookmarks)) : [];
     current.notes = current.notes && typeof current.notes === 'object' ? current.notes : {};
     current.teachbacks = Array.isArray(current.teachbacks) ? current.teachbacks.slice(-200) : [];
@@ -60,6 +77,7 @@
   }
 
   function loadState() {
+    loadedOwner = storageKey();
     const saved = safeParse(localStorage.getItem(storageKey()));
     state = Object.assign(defaultState(), saved || {});
     state.subjects = state.subjects && typeof state.subjects === 'object' ? state.subjects : {};
@@ -67,6 +85,7 @@
   }
 
   function saveState(syncCloud) {
+    if (loadedOwner !== storageKey()) { init(); return false; }
     state.version = data.version;
     state.updatedAt = new Date().toISOString();
     if (subject) ensureSubject(subject.id).updatedAt = state.updatedAt;
@@ -83,9 +102,11 @@
   function scheduleCloudSync() {
     if (!root.currentUser || !root.currentUser.uid || !root._dbSaveSyncState) return;
     clearTimeout(cloudTimer);
+    const owner = root.currentUser.uid, key = storageKey(), snapshot = JSON.parse(JSON.stringify(state));
     cloudTimer = setTimeout(async function () {
+      if (key !== storageKey()) return;
       try {
-        await root._dbSaveSyncState(root.currentUser.uid, 'ap-study', [{ id: 'ap-v2', state, updatedAt: state.updatedAt }]);
+        await root._dbSaveSyncState(owner, 'ap-study', [{ id: 'ap-v2', state: snapshot, updatedAt: snapshot.updatedAt }]);
       } catch (error) {
         console.error('AP cloud sync failed:', error);
         toast('Cloud sync failed. Your AP progress is still saved on this device.', 'error');
@@ -95,8 +116,10 @@
 
   async function loadCloudState() {
     if (!root.currentUser || !root.currentUser.uid || !root._dbGetSyncState) return;
+    const owner = root.currentUser.uid, key = storageKey(), epoch = loadEpoch;
     try {
-      const remote = await root._dbGetSyncState(root.currentUser.uid, 'ap-study');
+      const remote = await root._dbGetSyncState(owner, 'ap-study');
+      if (key !== storageKey() || epoch !== loadEpoch) return;
       const remoteState = Array.isArray(remote) ? (remote.find(function (x) { return x && x.id === 'ap-v2'; }) || {}).state : null;
       if (!remoteState) { scheduleCloudSync(); return; }
       if ((Date.parse(remoteState.updatedAt || 0) || 0) > (Date.parse(state.updatedAt || 0) || 0)) {
@@ -104,6 +127,8 @@
         state = Object.assign(defaultState(), remoteState);
         state.subjects = Object.assign({}, local.subjects || {}, remoteState.subjects || {});
         data.subjects.forEach(function (s) { ensureSubject(s.id); });
+        if (subject) session = restoreSession(subjectState().currentSession);
+        taskDraft = null;
         saveState(false);
         render();
       } else scheduleCloudSync();
@@ -123,9 +148,30 @@
 
   function rootNode() { return document.getElementById('page-ap'); }
   function subjectState() { return ensureSubject(subject.id); }
+  function conceptsFor(s, index) {
+    return s.units[index].concepts.concat(root.ScholarkAPLessons?.[s.id]?.[index]?.topics || []);
+  }
+  function topicKey(index, concept) { return index + ':' + concept.name; }
+  function studyProgress(s, index) {
+    const reviewed = new Set(ensureSubject(s.id).reviewedTopics);
+    const indices = index == null ? s.units.map((_, i) => i) : [index];
+    const keys = indices.flatMap(i => conceptsFor(s, i).map(c => topicKey(i, c)));
+    const completed = keys.filter(k => reviewed.has(k)).length;
+    return {completed, total: keys.length, percent: Math.round(100 * completed / Math.max(1, keys.length))};
+  }
+  function practiceProgress(s, index) {
+    const ss = ensureSubject(s.id), answered = new Set(ss.practicedQuestions);
+    const questions = s.questions.filter(q => index == null || q.unitIndex === index);
+    const completed = questions.filter(q => answered.has(q.id)).length;
+    return {completed, total: questions.length, percent: Math.round(100 * completed / Math.max(1, questions.length))};
+  }
   function masteryAverage(s) {
     const rows = Object.values(ensureSubject(s.id).mastery);
-    return Math.round(rows.reduce(function (sum, row) { return sum + Number(row.score || 0); }, 0) / Math.max(1, rows.length));
+    const attempted = rows.reduce((n, row) => n + row.attempts, 0);
+    return attempted ? Math.round(100 * rows.reduce((n, row) => n + row.correct, 0) / attempted) : 0;
+  }
+  function progressBar(progress, label) {
+    return '<div class="ap2-bar" role="progressbar" aria-label="' + esc(label) + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + progress.percent + '"><span style="width:' + progress.percent + '%"></span></div>';
   }
   function dueCount(s) {
     const now = Date.now();
@@ -133,7 +179,8 @@
   }
 
   function init() {
-    stopTimer();
+    stopTimer(); clearTimeout(cloudTimer); loadEpoch++;
+    session = null; taskDraft = null; view = 'overview';
     loadState();
     subject = state.activeSubject ? data.subjectMap[state.activeSubject] : null;
     if (subject) session = restoreSession(subjectState().currentSession);
@@ -174,6 +221,8 @@
     else if (action === 'resume-session') { view = 'adaptive'; renderSubject(); startTimer(); }
     else if (action === 'discard-session') discardSession();
     else if (action === 'open-unit') { view = 'units'; renderSubject(Number(id)); }
+    else if (action === 'export-old-curriculum') exportOldCurriculum();
+    else if (action === 'review-topic') toggleReviewed(Number(button.dataset.unit), Number(button.dataset.concept));
     else if (action === 'task-open') openTask(id);
     else if (action === 'task-grade') gradeTask();
     else if (action === 'task-new') openTask(id, true);
@@ -216,7 +265,7 @@
       '<main class="ap2-shell" style="--ap-accent:#7457d7;--ap-accent2:#3c7adf"><section class="ap2-hub-hero">' +
       '<div class="ap2-kicker">Scholark AP Command Center · 2027 formats</div><h1>One study system. ' + data.subjects.length + ' different AP realities.</h1>' +
       '<p class="ap2-lede">Open your course for adaptive practice, unit crash courses, pattern recognition, exam-specific task coaching, timed forms, and an evidence-weighted score studio. Every course follows its own current public exam blueprint.</p>' +
-      '<div class="ap2-proof"><article><strong>' + data.subjects.length + '</strong><span>complete AP workspaces</span></article><article><strong>' + data.questionCount.toLocaleString() + '</strong><span>original concept checks</span></article><article><strong>' + data.taskCount + '</strong><span>exam-specific task modes</span></article><article><strong>0</strong><span>paywalls or copied questions</span></article></div></section>' +
+      '<div class="ap2-proof"><article><strong>' + data.subjects.length + '</strong><span>AP study workspaces</span></article><article><strong>' + data.questionCount.toLocaleString() + '</strong><span>original concept checks</span></article><article><strong>' + data.taskCount + '</strong><span>exam-specific task modes</span></article><article><strong>0</strong><span>paywalls or copied questions</span></article></div></section>' +
       '<section class="ap2-hub-controls"><label class="ap2-search">⌕<input id="ap2-search" aria-label="Search AP courses" placeholder="Search courses…" value="' + esc(hubFilter.search) + '"></label><div class="ap2-chipbar" aria-label="Filter by category">' + categories.map(function (c) { return '<button class="' + (hubFilter.category === c ? 'active' : '') + '" data-ap-action="category" data-id="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') + '</div></section>' +
       '<div id="ap2-hub-grid"></div><div class="ap2-source-note"><strong>Independent and transparent.</strong> Exam formats and section weights link to current College Board public pages. Questions and lessons are original Scholark materials. AP® and Advanced Placement® are registered trademarks of the College Board, which does not endorse this product.</div><div id="ap2-live" class="ap2-live" aria-live="polite"></div></main>';
     renderHubGrid();
@@ -229,8 +278,8 @@
     node.innerHTML = categories.map(function (category) {
       const list = filtered.filter(function (s) { return s.category === category; });
       return '<section class="ap2-category"><div class="ap2-category-head"><h2>' + esc(category) + '</h2><span>' + list.length + ' course' + (list.length === 1 ? '' : 's') + '</span></div><div class="ap2-course-grid">' + list.map(function (s) {
-        const mastery = masteryAverage(s); const due = dueCount(s); const attempted = Object.values(ensureSubject(s.id).mastery).some(function (row) { return row.attempts > 0; });
-        return '<button class="ap2-course" data-ap-action="open-subject" data-id="' + s.id + '"><span class="ap2-course-icon" style="background:' + s.color + '">' + s.emoji + '</span><span><h3>' + esc(s.name) + '</h3><small>' + s.questions.length + ' checks · ' + s.tasks.length + ' task modes' + (due ? ' · ' + due + ' review due' : '') + '</small></span><span class="ap2-ring" style="--p:' + (attempted ? mastery : 0) + '"><span>' + (attempted ? mastery : 'NEW') + '</span></span></button>';
+        const mastery = studyProgress(s).percent; const due = dueCount(s);
+        return '<button class="ap2-course" data-ap-action="open-subject" data-id="' + s.id + '"><span class="ap2-course-icon" style="background:' + s.color + '">' + s.emoji + '</span><span><h3>' + esc(s.name) + '</h3><small>' + s.questions.length + ' checks · ' + s.tasks.length + ' task modes · topics reviewed' + (due ? ' · ' + due + ' review due' : '') + '</small></span><span class="ap2-ring" style="--p:' + mastery + '"><span>' + (mastery + '%') + '</span></span></button>';
       }).join('') + '</div></section>';
     }).join('') || '<div class="ap2-empty">No AP courses match that search.</div>';
   }
@@ -244,11 +293,11 @@
 
   function renderSubject(unitFocus) {
     if (!subject) return renderHub();
-    const ss = subjectState(); const avg = masteryAverage(subject); const estimate = estimateScore();
+    const ss = subjectState(); const avg = studyProgress(subject).percent; const estimate = estimateScore();
     rootNode().innerHTML = '<aside class="ad-reserve ad-reserve-leaderboard" data-ad-placement="ap-subject-leaderboard" aria-label="Advertisement"><span class="ad-reserve-label">Advertisement</span></aside><main class="ap2-shell" style="--ap-accent:#7457d7;--ap-accent2:#3c7adf">' +
       '<button class="ap2-back" data-ap-action="hub">← All AP courses</button><section class="ap2-subject-hero"><div class="ap2-subject-top"><div class="ap2-subject-title"><span style="background:' + subject.color + '">' + subject.emoji + '</span><div><div class="ap2-kicker">Adaptive workspace · current public format</div><h1>' + esc(subject.name) + '</h1><p>' + esc(subject.exam.mode) + ' · ' + formatMinutes(subject.exam.duration) + ' total</p></div></div><div class="ap2-target"><label for="ap2-target">Target score</label><select id="ap2-target">' + [3,4,5].map(function (n) { return '<option value="' + n + '"' + (ss.target === n ? ' selected' : '') + '>' + n + ' / 5</option>'; }).join('') + '</select></div></div>' +
-      '<div class="ap2-format-strip"><article><strong>' + subject.exam.mcq.count + '</strong><span>MCQ · ' + subject.exam.mcq.weight + '%</span></article><article><strong>' + subject.exam.written.count + '</strong><span>written tasks · ' + subject.exam.written.weight + '%</span></article><article><strong>' + (estimate.evidence ? estimate.score + '/5' : '3/5') + '</strong><span>' + (estimate.evidence ? 'practice readiness' : 'provisional baseline') + '</span></article><article><strong>' + (estimate.evidence ? avg + '%' : 'New') + '</strong><span>unit mastery</span></article></div></section>' +
-      '<nav class="ap2-nav" aria-label="' + esc(subject.short) + ' study sections">' + views.map(function (name) { const labels = {overview:'Command Center',adaptive:'Adaptive Practice',units:'Unit Courses',patterns:'Pattern Lab',tasks:'Task Studio',exam:'Exam Lab',score:'Score Studio',resources:'Resources'}; return '<button class="' + (view === name ? 'active' : '') + '" data-ap-action="view" data-id="' + name + '">' + labels[name] + '</button>'; }).join('') + '</nav><div id="ap2-workspace" class="ap2-workspace"></div><div id="ap2-live" class="ap2-live" aria-live="polite"></div></main>';
+      '<div class="ap2-format-strip"><article><strong>' + subject.exam.mcq.count + '</strong><span>MCQ · ' + subject.exam.mcq.weight + '%</span></article><article><strong>' + subject.exam.written.count + '</strong><span>written tasks · ' + subject.exam.written.weight + '%</span></article><article><strong>' + (estimate.ready ? estimate.score + '/5' : '—') + '</strong><span>' + (estimate.ready ? 'practice readiness' : 'needs scored practice') + '</span></article><article><strong>' + (avg + '%') + '</strong><span>topics reviewed</span></article></div></section>' +
+      (ss.previousCurriculum ? '<section class="ap2-callout"><strong>Statistics course outline updated for 2027</strong><p>The old unit map omitted inference and used older unit groupings. Previous results and notes are preserved separately so they are not assigned to the wrong topics.</p><button class="ap2-secondary" data-ap-action="export-old-curriculum">Download previous progress and notes</button></section>' : '') + '<nav class="ap2-nav" aria-label="' + esc(subject.short) + ' study sections">' + views.map(function (name) { const labels = {overview:'Command Center',adaptive:'Adaptive Practice',units:'Crash Courses',patterns:'Pattern Lab',tasks:'Task Studio',exam:'Exam Lab',score:'Score Studio',resources:'Resources'}; return '<button class="' + (view === name ? 'active' : '') + '" data-ap-action="view" data-id="' + name + '">' + labels[name] + '</button>'; }).join('') + '</nav><div id="ap2-workspace" class="ap2-workspace"></div><div id="ap2-live" class="ap2-live" aria-live="polite"></div></main>';
     const workspace = document.getElementById('ap2-workspace');
     if (view === 'overview') workspace.innerHTML = renderOverview();
     else if (view === 'adaptive') workspace.innerHTML = renderAdaptive();
@@ -260,15 +309,23 @@
     else workspace.innerHTML = renderResources();
   }
 
+  function exportOldCurriculum() {
+    const previous = subjectState().previousCurriculum;
+    if (!previous) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(previous,null,2)],{type:'application/json'}));
+    const link = document.createElement('a'); link.href=url; link.download='scholark-statistics-previous-progress.json';
+    link.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
   function renderOverview() {
     const ss = subjectState(); const due = dueCount(subject); const weakest = weakestUnits(3); const estimate = estimateScore(); const days = daysUntilExam(ss.examDate);
     return '<div class="ap2-grid"><section class="ap2-card wide accent"><div class="ap2-kicker">Today’s adaptive route</div><h2>' + (due ? due + ' retention reviews are ready' : 'Your next best move is ready') + '</h2><p>' + (weakest[0] ? 'Start with ' + esc(subject.units[weakest[0].index].name) + ', then interleave a neighboring unit to make the skill transferable.' : 'Complete a diagnostic to build your knowledge map.') + '</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="adaptive">Start adaptive set</button><button class="ap2-secondary" data-ap-action="start" data-kind="diagnostic">Run 20-question diagnostic</button></div></section>' +
-      '<section class="ap2-card"><div class="ap2-kicker">Score signal</div><div class="ap2-score-gauge"><div class="ap2-score-circle" style="--p:' + estimate.composite + '"><strong>' + estimate.score + '</strong></div><div><h3>' + (estimate.evidence ? 'Practice readiness' : 'Provisional readiness baseline') + '</h3><p>' + estimate.band + '</p><small>' + estimate.evidence + ' scored evidence points</small></div></div></section>' +
+      '<section class="ap2-card"><div class="ap2-kicker">Score signal</div><div class="ap2-score-gauge"><div class="ap2-score-circle" style="--p:' + estimate.composite + '"><strong>' + (estimate.ready ? estimate.score : '—') + '</strong></div><div><h3>' + (estimate.ready ? 'Practice readiness' : 'Not enough evidence yet') + '</h3><p>' + estimate.band + '</p><small>' + estimate.evidence + ' scored evidence points</small></div></div></section>' +
       '<section class="ap2-card"><div class="ap2-kicker">Exam clock</div><h2>' + (days == null ? 'Set your date' : days + ' days') + '</h2><p>' + esc(subject.exam.note) + '</p><label class="ap2-mini" for="ap2-exam-date">Your exam date</label><input id="ap2-exam-date" type="date" value="' + esc(ss.examDate) + '" style="width:100%;margin-top:6px;padding:9px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--ink)"></section>' +
-      '<section class="ap2-card wide dark"><div class="ap2-kicker">Seven differentiators, one workflow</div><h2>Built around what the exam actually asks you to do.</h2><div class="ap2-feature-grid">' + [
-        ['Knowledge-Graph Repair','Weak skills route backward to prerequisites before they become repeated misses.'],['Task-Specific Rubric Studio',subject.tasks.map(function(t){return t.name;}).join(', ') + '—not a generic FRQ box.'],['Confidence Calibration','Track when you are right for the wrong reason or confidently wrong.'],['Retention Queue','Mastery decays into spaced reviews instead of disappearing after one correct answer.'],['Pattern Lab','Fast elimination rules tied to evidence, grammar, models, or source reasoning.'],['Score Evidence Studio','Current section weights combine MCQ and rubric evidence by course.'],['Teach-Back Forge','Explain a concept from memory and get a deterministic completeness check.']
+      '<section class="ap2-card wide dark"><div class="ap2-kicker">Your study workflow</div><h2>Build understanding, then test it.</h2><div class="ap2-feature-grid">' + [
+        ['Unit reviews','Read the concepts, follow worked reasoning, and check your recall before practice.'],['Task-Specific Rubric Studio',subject.tasks.map(function(t){return t.name;}).join(', ') + '—not a generic FRQ box.'],['Confidence Calibration','Track when you are right for the wrong reason or confidently wrong.'],['Review queue','Missed questions return sooner; correct answers and confidence help set review dates.'],['Pattern Lab','Fast elimination rules tied to evidence, grammar, models, or source reasoning.'],['Score Evidence Studio','Current section weights combine MCQ and rubric evidence by course.'],['Teach-Back Forge','Explain a concept from memory and get a deterministic completeness check.']
       ].map(function (f) { return '<article class="ap2-feature"><strong>' + esc(f[0]) + '</strong><span>' + esc(f[1]) + '</span></article>'; }).join('') + '</div></section>' +
-      '<section class="ap2-card full"><div class="ap2-kicker">Mastery map</div><h2>Every unit, visible</h2><div class="ap2-mastery-list">' + masteryRows() + '</div></section></div>';
+      '<section class="ap2-card full"><div class="ap2-kicker">Your course progress</div><h2>Every unit, visible</h2><p>Topics reviewed are your checklist. Practice counts distinct submitted questions; accuracy is based on scored answers. Opening a page does not earn progress.</p><div class="ap2-mastery-list">' + masteryRows() + '</div></section></div>';
   }
 
   function renderAdaptive() {
@@ -322,7 +379,7 @@
       }).join('') + '</div><div class="ap2-hints"><details><summary>Reveal tutoring hints one step at a time</summary><ol>' + q.hints.map(function(h){return '<li>' + esc(h) + '</li>';}).join('') + '</ol></details></div>' +
       (submitted ? '<div class="ap2-explanation"><strong>' + (selected === q.answer ? 'Correct.' : 'Repair the reasoning.') + '</strong> ' + esc(q.explanation) + '</div>' : '') +
       '<div class="ap2-actions"><button class="ap2-secondary" data-ap-action="previous-question" ' + (session.idx === 0 ? 'disabled' : '') + '>← Previous</button>' + (submitted ? '<button class="ap2-primary" data-ap-action="next-question">' + (session.idx === session.ids.length - 1 ? 'Finish set' : 'Next →') + '</button>' : '<button class="ap2-primary" data-ap-action="submit-answer" ' + (selected == null ? 'disabled' : '') + '>Check answer</button>') + '<button class="ap2-secondary" data-ap-action="flag">' + (session.flags.includes(session.idx) ? '⚑ Flagged' : '⚐ Flag') + '</button></div></section>' +
-      '<aside class="ap2-side"><section class="ap2-sidebox"><h4>' + (session.timeLimit ? 'Time remaining' : 'Session progress') + '</h4><div id="ap2-timer" class="ap2-timer">' + (session.timeLimit ? clock(session.seconds) : Object.keys(session.submitted).length + ' / ' + session.ids.length) + '</div></section><section class="ap2-sidebox"><h4>Confidence before feedback</h4><div class="ap2-confidence">' + [1,2,3].map(function(n){return '<button class="' + (session.confidence[session.idx] === n ? 'active' : '') + '" data-ap-action="confidence" data-id="' + n + '" ' + (submitted ? 'disabled' : '') + '>' + ['Guess','Unsure','Certain'][n-1] + '</button>';}).join('') + '</div></section><section class="ap2-sidebox"><h4>Question map</h4><div class="ap2-map">' + session.ids.map(function(_,i){return '<button class="' + (i===session.idx?'current ':'') + (session.submitted[i]?'done ':'') + (session.flags.includes(i)?'flag':'') + '" data-ap-action="jump-question" data-id="' + i + '">' + (i+1) + '</button>';}).join('') + '</div></section><section class="ap2-sidebox"><h4>Scratchpad</h4><textarea id="ap2-scratch" rows="5" style="width:100%;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--bg);color:var(--ink)">' + esc(session.scratch[session.idx] || '') + '</textarea></section><button class="ap2-secondary" data-ap-action="finish-session">End and score set</button></aside></div>';
+      '<aside class="ap2-side"><section class="ap2-sidebox"><h4>' + (session.timeLimit ? 'Time remaining' : 'Session progress') + '</h4><div id="ap2-timer" class="ap2-timer">' + (session.timeLimit ? clock(session.seconds) : Object.keys(session.submitted).length + ' / ' + session.ids.length) + '</div></section><section class="ap2-sidebox"><h4>Confidence before feedback</h4><div class="ap2-confidence">' + [1,2,3].map(function(n){return '<button class="' + (session.confidence[session.idx] === n ? 'active' : '') + '" data-ap-action="confidence" data-id="' + n + '" ' + (submitted ? 'disabled' : '') + '>' + ['Guess','Unsure','Certain'][n-1] + '</button>';}).join('') + '</div></section><section class="ap2-sidebox"><h4>Question map</h4><div class="ap2-map">' + session.ids.map(function(_,i){return '<button class="' + (i===session.idx?'current ':'') + (session.submitted[i]?'done ':'') + (session.flags.includes(i)?'flag':'') + '" data-ap-action="jump-question" data-id="' + i + '">' + (i+1) + '</button>';}).join('') + '</div></section><section class="ap2-sidebox"><h4>Scratchpad</h4><textarea data-sk3-private="true" id="ap2-scratch" rows="5" style="width:100%;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:8px;background:var(--bg);color:var(--ink)">' + esc(session.scratch[session.idx] || '') + '</textarea></section><button class="ap2-secondary" data-ap-action="finish-session">End and score set</button></aside></div>';
   }
 
   function selectOption(i) { if (!session || session.submitted[session.idx]) return; session.answers[session.idx] = i; persistSession(); renderSubject(); }
@@ -338,7 +395,8 @@
     const q = questionById(session.ids[session.idx]); const correct = session.answers[session.idx] === q.answer; const confidence = session.confidence[session.idx] || 1; const ss = subjectState(); const row = ss.mastery[q.unitIndex];
     session.submitted[session.idx] = true;
     row.attempts += 1; if (correct) row.correct += 1; row.confidenceTotal += confidence; row.confidenceCount += 1; row.lastSeen = new Date().toISOString();
-    const delta = correct ? (confidence === 3 ? 5 : 7) : (confidence === 3 ? -9 : -5); row.score = Math.max(5, Math.min(100, Math.round(row.score * .86 + (correct ? 100 : 0) * .14 + delta * .35)));
+    row.score = Math.round(100 * row.correct / row.attempts);
+    if (!ss.practicedQuestions.includes(q.id)) ss.practicedQuestions.push(q.id);
     const intervalDays = correct ? Math.max(1, Math.round((row.score / 100) * (confidence + 1) * 3)) : 1;
     row.nextReviewAt = new Date(Date.now() + intervalDays * 86400000).toISOString();
     ss.responses.push({ questionId:q.id, unitIndex:q.unitIndex, correct, answer:session.answers[session.idx], confidence, at:new Date().toISOString(), kind:session.kind });
@@ -350,7 +408,7 @@
     const ss = subjectState(); const completed = Object.keys(session.submitted).length; const correct = session.ids.reduce(function(sum,id,i){const q=questionById(id);return sum + (session.submitted[i] && session.answers[i] === q.answer ? 1 : 0);},0); const pct = completed ? Math.round(correct/completed*100) : 0;
     if (completed) ss.scoreHistory.push({ at:new Date().toISOString(), kind:session.kind, correct, total:completed, percent:pct, estimate:estimateScore().score });
     ss.currentSession = null; const report = { correct, completed, total:session.ids.length, pct, flags:session.flags.length }; session = null; saveState();
-    document.getElementById('ap2-workspace').innerHTML = '<section class="ap2-card full accent"><div class="ap2-kicker">Set complete</div><h2>' + report.correct + ' of ' + report.completed + ' scored correct</h2><div class="ap2-proof"><article><strong>' + report.pct + '%</strong><span>accuracy</span></article><article><strong>' + report.flags + '</strong><span>flagged</span></article><article><strong>' + dueCount(subject) + '</strong><span>reviews queued</span></article><article><strong>' + estimateScore().score + '/5</strong><span>readiness signal</span></article></div><p class="ap2-lede">Your unit map and retention dates were updated. Confident misses received the strongest repair priority.</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="adaptive">Continue adaptive practice</button><button class="ap2-secondary" data-ap-action="view" data-id="score">Open Score Studio</button></div></section>';
+    document.getElementById('ap2-workspace').innerHTML = '<section class="ap2-card full accent"><div class="ap2-kicker">Set complete</div><h2>' + report.correct + ' of ' + report.completed + ' scored correct</h2><div class="ap2-proof"><article><strong>' + report.pct + '%</strong><span>accuracy</span></article><article><strong>' + report.flags + '</strong><span>flagged</span></article><article><strong>' + dueCount(subject) + '</strong><span>reviews queued</span></article><article><strong>' + (estimateScore().ready ? estimateScore().score + '/5' : '—') + '</strong><span>readiness signal</span></article></div><p class="ap2-lede">Your unit map and retention dates were updated. Review dates and practice coverage reflect your submitted answers.</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="adaptive">Continue adaptive practice</button><button class="ap2-secondary" data-ap-action="view" data-id="score">Open Score Studio</button></div></section>';
   }
 
   function discardSession() { stopTimer(); subjectState().currentSession = null; session = null; saveState(); renderSubject(); }
@@ -358,22 +416,42 @@
   function startTimer() { stopTimer(); if (!session || !session.timeLimit || session.seconds <= 0) return; timerId = setInterval(function(){ if (!session) return stopTimer(); session.seconds--; const node=document.getElementById('ap2-timer'); if(node)node.textContent=clock(session.seconds); if(session.seconds<=0){stopTimer();finishSession();} else if(session.seconds%10===0)persistSession(); },1000); }
   function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}} function stopTimerIfNoSession(){if(view!=='adaptive')stopTimer();}
 
-  function renderUnits(focus) {
-    if (Number.isInteger(focus) && subject.units[focus]) return renderUnitLesson(focus);
-    return '<section class="ap2-card full accent"><div class="ap2-kicker">Unit Crash Courses + Knowledge Graph</div><h2>Learn the anchor, expose the trap, retrieve it, then practice it.</h2><p>Each unit connects concepts to exam weight or course emphasis and routes weak performance to a prerequisite repair.</p><div class="ap2-actions"><button class="ap2-secondary" data-ap-action="copy-cram">Copy complete cram sheet</button><button class="ap2-secondary" data-ap-action="print">Print / save as PDF</button></div></section><div class="ap2-unit-grid" style="margin-top:14px">' + subject.units.map(function(u,i){const row=subjectState().mastery[i];return '<article class="ap2-unit"><div class="ap2-unit-head"><h3>' + esc(u.name) + '</h3><span>' + esc(u.weight) + '</span></div><div class="ap2-bar"><span style="width:' + row.score + '%"></span></div><p>' + u.concepts.map(function(c){return c.name;}).join(' · ') + '</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="open-unit" data-id="' + i + '">Open crash course</button><button class="ap2-secondary" data-ap-action="start" data-kind="unit" data-unit="' + i + '">Practice unit</button></div></article>';}).join('') + '</div>';
+  function renderUnits(index) {
+    if (Number.isInteger(index) && subject.units[index]) return renderUnit(index);
+    return '<section class="ap2-card full accent"><div class="ap2-kicker">Unit crash courses</div><h2>Understand it. Work through it. Recall it.</h2><p>Focused reviews with key ideas, common mistakes, worked examples and retrieval checks. Use the official course outline alongside these lessons for full syllabus coverage.</p><div class="ap2-actions"><button class="ap2-secondary" data-ap-action="copy-cram">Copy review sheet</button><button class="ap2-secondary" data-ap-action="print">Print / save as PDF</button></div></section><div class="ap2-unit-grid" style="margin-top:14px">' + subject.units.map(function(u,i){
+      const progress = studyProgress(subject,i), practice = practiceProgress(subject,i), concepts = conceptsFor(subject,i);
+      return '<article class="ap2-unit"><div class="ap2-unit-head"><h3>' + esc(u.name) + '</h3><span>' + esc(u.weight) + '</span></div><p class="ap2-mini">' + progress.completed + ' / ' + progress.total + ' topics reviewed · ' + progress.percent + '%</p>' + progressBar(progress, u.name + ' topics reviewed') + '<p>' + concepts.map(c => esc(c.name)).join(' · ') + '</p><p class="ap2-mini">' + practice.completed + ' / ' + practice.total + ' distinct practice checks submitted</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="open-unit" data-id="' + i + '">Open crash course</button><button class="ap2-secondary" data-ap-action="start" data-kind="unit" data-unit="' + i + '">Practice unit</button></div></article>';
+    }).join('') + '</div>';
   }
 
-  function renderUnitLesson(index) {
-    const u = subject.units[index]; const prior = index > 0 ? subject.units[index-1] : null;
-    return '<button class="ap2-back" data-ap-action="view" data-id="units">← All units</button><section class="ap2-card full accent"><div class="ap2-kicker">' + esc(u.weight) + ' of course emphasis</div><h2>' + esc(u.name) + '</h2><p>' + (prior ? 'Prerequisite bridge: retrieve ' + esc(prior.concepts[0].name) + ' before combining it with this unit.' : 'Foundation unit: build precise definitions before applying them to unfamiliar representations.') + '</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="unit" data-unit="' + index + '">Start 16-question unit set</button></div></section><div class="ap2-grid" style="margin-top:14px"><section class="ap2-card wide"><h2>Rapid crash course</h2>' + u.concepts.map(function(c,ci){return '<article class="ap2-concept"><strong>' + esc(c.name) + '</strong><p>' + esc(c.teach) + '</p><p class="ap2-trap">Trap: ' + esc(c.trap) + '</p><div class="ap2-actions"><button class="ap2-secondary" data-ap-action="teachback" data-id="' + index + '" data-concept="' + ci + '">Teach it back</button></div></article>';}).join('') + '</section><aside class="ap2-card"><div class="ap2-kicker">Retrieval ladder</div><h3>Say it without notes</h3><ol style="padding-left:18px;font-size:12px;line-height:1.7;color:var(--ink2)"><li>Define the anchor in one sentence.</li><li>Name the common trap.</li><li>Create a new example or representation.</li><li>Explain what evidence would change the conclusion.</li></ol><textarea data-ap-note="unit-' + index + '" rows="7" placeholder="Your unit notes…" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--ink)">' + esc(subjectState().notes['unit-'+index] || '') + '</textarea></aside></div><div id="ap2-teachback-slot"></div>';
+  function renderUnit(index) {
+    const u = subject.units[index], concepts = conceptsFor(subject,index), lesson = root.ScholarkAPLessons?.[subject.id]?.[index];
+    const progress = studyProgress(subject,index), reviewed = new Set(subjectState().reviewedTopics);
+    return '<button class="ap2-back" data-ap-action="view" data-id="units">← All units</button><section class="ap2-card full accent"><div class="ap2-kicker">' + esc(u.weight) + ' · focused review</div><h2>' + esc(u.name) + '</h2><p>Read the ideas, follow the worked reasoning, then try the retrieval check before revealing its answer.</p><p class="ap2-mini" id="ap2-lesson-progress">' + progress.completed + ' / ' + progress.total + ' topics reviewed · ' + progress.percent + '%</p>' + progressBar(progress, 'Unit topics reviewed') + '<div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="unit" data-unit="' + index + '">Practice this unit</button><a class="ap2-secondary" href="https://apstudents.collegeboard.org/courses/' + esc(subject.slug) + '" target="_blank" rel="noopener">Official course outline ↗</a></div></section><div class="ap2-lesson-layout"><section class="ap2-card"><h2>The ideas to know</h2>' + concepts.map(function(c,ci){
+      const done=reviewed.has(topicKey(index,c));
+      return '<article class="ap2-concept" id="ap2-topic-' + ci + '"><span class="ap2-pill">Topic ' + (ci+1) + '</span><h3>' + esc(c.name) + '</h3><p>' + esc(c.teach) + '</p>' + (c.trap.startsWith('Do not substitute a memorized keyword') ? '' : '<p class="ap2-trap"><strong>Watch out:</strong> ' + esc(c.trap) + '</p>') + '<div class="ap2-actions"><button class="ap2-secondary" data-ap-action="teachback" data-id="' + index + '" data-concept="' + ci + '">Teach it back</button><button class="ap2-secondary ap2-reviewed" aria-pressed="' + done + '" data-ap-action="review-topic" data-unit="' + index + '" data-concept="' + ci + '">' + (done ? 'Reviewed ✓' : 'Mark reviewed') + '</button></div></article>';
+    }).join('') + '</section><aside class="ap2-lesson-aside"><section class="ap2-card"><div class="ap2-kicker">In this review</div><ol class="ap2-topic-list">' + concepts.map((c,i) => '<li><a href="#ap2-topic-' + i + '">' + esc(c.name) + '</a></li>').join('') + '</ol><label for="ap2-unit-note"><strong>Your unit notes</strong></label><textarea data-sk3-private="true" id="ap2-unit-note" data-ap-note="unit-' + index + '" rows="7" placeholder="Write a connection, example, or question to revisit…">' + esc(subjectState().notes['unit-'+index] || '') + '</textarea></section>' + (lesson?.example ? '<section class="ap2-card ap2-worked"><div class="ap2-kicker">Worked example</div><h3>Follow the reasoning</h3><p>' + esc(lesson.example.prompt) + '</p><ol>' + lesson.example.steps.map(step => '<li>' + esc(step) + '</li>').join('') + '</ol><div class="ap2-callout"><strong>Conclusion</strong><p>' + esc(lesson.example.answer) + '</p></div></section>' : '') + (lesson?.check ? '<section class="ap2-card"><div class="ap2-kicker">Try without notes</div><h3>Check your understanding</h3><p>' + esc(lesson.check.prompt) + '</p><textarea data-sk3-private="true" aria-label="Your retrieval answer" data-ap-note="retrieval-' + index + '" rows="4" placeholder="Try your own answer first…">' + esc(subjectState().notes['retrieval-'+index] || '') + '</textarea><details class="ap2-answer"><summary>Reveal explanation</summary><p>' + esc(lesson.check.answer) + '</p></details><p class="ap2-mini">Self-check only. Revealing the answer does not count as scored practice.</p></section>' : '') + '</aside></div><div id="ap2-teachback-slot"></div><div class="ap2-actions ap2-unit-pagination">' + (index > 0 ? '<button class="ap2-secondary" data-ap-action="open-unit" data-id="' + (index-1) + '">← Previous unit</button>' : '') + (index+1 < subject.units.length ? '<button class="ap2-secondary" data-ap-action="open-unit" data-id="' + (index+1) + '">Next unit →</button>' : '') + '</div>';
+  }
+
+  function toggleReviewed(index, ci) {
+    const concept = conceptsFor(subject,index)[ci];
+    if (!concept) return;
+    const key = topicKey(index,concept), ss = subjectState();
+    ss.reviewedTopics = ss.reviewedTopics.includes(key) ? ss.reviewedTopics.filter(k => k !== key) : ss.reviewedTopics.concat(key);
+    saveState();
+    const scroll = window.scrollY;
+    renderSubject(index);
+    const button = rootNode().querySelector('[data-ap-action="review-topic"][data-concept="' + ci + '"]');
+    button?.focus({preventScroll:true});
+    window.scrollTo({top:scroll,behavior:'instant'});
   }
 
   function openTeachback(unitIndex, conceptIndex) {
-    const c=subject.units[unitIndex].concepts[conceptIndex]; const slot=document.getElementById('ap2-teachback-slot'); if(!slot)return;
-    slot.innerHTML='<section class="ap2-card full ap2-teachback" style="margin-top:14px"><div class="ap2-kicker">Teach-Back Forge</div><h2>Explain ' + esc(c.name) + ' from memory</h2><p>Include a definition, a mechanism or relationship, and a boundary/example. The check is local and deterministic.</p><textarea id="ap2-teachback-answer" placeholder="Teach the idea as if your classmate missed the lesson…"></textarea><div class="ap2-actions"><button class="ap2-primary" data-ap-action="teachback-check" data-unit="' + unitIndex + '" data-concept="' + conceptIndex + '">Check completeness</button></div><div id="ap2-teachback-feedback" class="ap2-live"></div></section>'; slot.scrollIntoView({behavior:'smooth',block:'center'});
+    const c=conceptsFor(subject,unitIndex)[conceptIndex]; const slot=document.getElementById('ap2-teachback-slot'); if(!slot)return;
+    slot.innerHTML='<section class="ap2-card full ap2-teachback" style="margin-top:14px"><div class="ap2-kicker">Teach-Back Forge</div><h2>Explain ' + esc(c.name) + ' from memory</h2><p>Include a definition, a mechanism or relationship, and a boundary/example. The check is local and deterministic.</p><textarea data-sk3-private="true" id="ap2-teachback-answer" placeholder="Teach the idea as if your classmate missed the lesson…"></textarea><div class="ap2-actions"><button class="ap2-primary" data-ap-action="teachback-check" data-unit="' + unitIndex + '" data-concept="' + conceptIndex + '">Check completeness</button></div><div id="ap2-teachback-feedback" class="ap2-live"></div></section>'; slot.scrollIntoView({behavior:'smooth',block:'center'});
   }
 
-  function checkTeachback(unitIndex, conceptIndex){const answer=(document.getElementById('ap2-teachback-answer')||{}).value||'';const c=subject.units[unitIndex].concepts[conceptIndex];const words=answer.match(/[A-Za-zÀ-ÿ0-9'’-]+/g)||[];const keywords=c.name.toLowerCase().split(/\s+/).concat(c.teach.toLowerCase().split(/\s+/).filter(function(x){return x.length>7;}).slice(0,5));const hits=keywords.filter(function(k){return answer.toLowerCase().includes(k.replace(/[^a-zà-ÿ]/g,''));}).length;const relation=/because|therefore|causes?|leads? to|depends|when|while|whereas|por que|porque|debido/i.test(answer);const example=/for example|such as|consider|suppose|example|por ejemplo/i.test(answer);const score=Math.min(100,Math.round((Math.min(words.length,80)/80)*35+Math.min(hits,5)/5*35+(relation?15:0)+(example?15:0)));subjectState().teachbacks.push({unitIndex,conceptIndex,score,at:new Date().toISOString()});saveState();document.getElementById('ap2-teachback-feedback').textContent='Completeness signal: '+score+'%. '+(score>=75?'Strong retrieval—now solve an unfamiliar application.':'Add a precise relationship, one boundary or trap, and a concrete example.');}
+  function checkTeachback(unitIndex, conceptIndex){const answer=(document.getElementById('ap2-teachback-answer')||{}).value||'';const c=conceptsFor(subject,unitIndex)[conceptIndex];const words=answer.match(/[A-Za-zÀ-ÿ0-9'’-]+/g)||[];const keywords=c.name.toLowerCase().split(/\s+/).concat(c.teach.toLowerCase().split(/\s+/).filter(function(x){return x.length>7;}).slice(0,5));const hits=keywords.filter(function(k){return answer.toLowerCase().includes(k.replace(/[^a-zà-ÿ]/g,''));}).length;const relation=/because|therefore|causes?|leads? to|depends|when|while|whereas|por que|porque|debido/i.test(answer);const example=/for example|such as|consider|suppose|example|por ejemplo/i.test(answer);const score=Math.min(100,Math.round((Math.min(words.length,80)/80)*35+Math.min(hits,5)/5*35+(relation?15:0)+(example?15:0)));subjectState().teachbacks.push({unitIndex,conceptIndex,score,at:new Date().toISOString()});saveState();document.getElementById('ap2-teachback-feedback').textContent='Completeness signal: '+score+'%. '+(score>=75?'Strong retrieval—now solve an unfamiliar application.':'Add a precise relationship, one boundary or trap, and a concrete example.');}
 
   function renderPatterns() {
     return '<section class="ap2-card full dark"><div class="ap2-kicker">Pattern Recognition Lab</div><h2>Shortcuts with a reason—not answer-choice superstition.</h2><p>Every pattern is tied to a defensible rule about evidence, source analysis, grammar, a model, representation, or algorithm. Use the move, then run the trap check.</p></section><div class="ap2-pattern-grid" style="margin-top:14px">' + subject.patterns.map(function(p,i){return '<article class="ap2-pattern"><span class="ap2-pill">Pattern ' + (i+1) + '</span><h3>' + esc(p[0]) + '</h3><p>' + esc(p[1]) + '</p><div class="ap2-callout"><strong>Trap check:</strong> ' + esc(p[2]) + '</div><button class="ap2-secondary" data-ap-action="start" data-kind="adaptive">Practice the reasoning</button></article>';}).join('') + '</div>';
@@ -417,7 +495,7 @@
   function openTask(id, refresh) { const t=subject.tasks.find(function(x){return x.id===id;}); if(!t)return; if(refresh){subjectState().notes['task-draft-' + id]='';saveState();} taskDraft=generatedTaskPrompt(t,refresh); view='tasks'; renderSubject(); }
 
   function renderTaskWorkspace() {
-    const t=taskDraft.task; return '<button class="ap2-back" data-ap-action="view" data-id="tasks" onclick="ScholarkAP.clearTask()">← All task types</button><section class="ap2-task-work"><article class="ap2-task"><div class="ap2-kicker">' + esc(t.name) + ' · ' + t.minutes + ' minute target</div><h2>Original practice prompt</h2><div class="ap2-stimulus" style="white-space:pre-line">' + esc(taskDraft.prompt) + '</div><textarea id="ap2-task-answer" placeholder="Draft your response here…">' + esc(taskDraft.answer) + '</textarea><div class="ap2-actions"><button class="ap2-primary" data-ap-action="task-grade">Run rubric check</button><button class="ap2-secondary" data-ap-action="task-new" data-id="' + t.id + '">New prompt</button></div>' + (taskDraft.feedback ? taskFeedbackHTML(taskDraft.feedback) : '') + '</article><aside class="ap2-task"><div class="ap2-kicker">Live rubric checklist</div><h3>Build the points deliberately</h3><ul class="ap2-rubric">' + t.rubric.map(function(r,i){return '<li><span>'+(i+1)+'</span>'+esc(r)+'</li>';}).join('') + '</ul><div class="ap2-callout">This local checker evaluates structure, explicit evidence signals, quantitative work, and task coverage. Compare factual accuracy and final scoring with official samples and scoring guidelines linked in Resources.</div></aside></section>';
+    const t=taskDraft.task; return '<button class="ap2-back" data-ap-action="view" data-id="tasks" onclick="ScholarkAP.clearTask()">← All task types</button><section class="ap2-task-work"><article class="ap2-task"><div class="ap2-kicker">' + esc(t.name) + ' · ' + t.minutes + ' minute target</div><h2>Original practice prompt</h2><div class="ap2-stimulus" style="white-space:pre-line">' + esc(taskDraft.prompt) + '</div><textarea data-sk3-private="true" id="ap2-task-answer" placeholder="Draft your response here…">' + esc(taskDraft.answer) + '</textarea><div class="ap2-actions"><button class="ap2-primary" data-ap-action="task-grade">Run rubric check</button><button class="ap2-secondary" data-ap-action="task-new" data-id="' + t.id + '">New prompt</button></div>' + (taskDraft.feedback ? taskFeedbackHTML(taskDraft.feedback) : '') + '</article><aside class="ap2-task"><div class="ap2-kicker">Live rubric checklist</div><h3>Build the points deliberately</h3><ul class="ap2-rubric">' + t.rubric.map(function(r,i){return '<li><span>'+(i+1)+'</span>'+esc(r)+'</li>';}).join('') + '</ul><div class="ap2-callout">This local checker evaluates structure, explicit evidence signals, quantitative work, and task coverage. Compare factual accuracy and final scoring with official samples and scoring guidelines linked in Resources.</div></aside></section>';
   }
 
   function gradeTask() {
@@ -437,11 +515,18 @@
   function examCard(title,meta,body,kind){return '<section class="ap2-card"><span class="ap2-pill">'+esc(meta)+'</span><h2 style="margin-top:10px">'+esc(title)+'</h2><p>'+esc(body)+'</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="start" data-kind="'+kind+'">Start</button></div></section>';}
 
   function estimateScore() {
-    const ss=subjectState(); const responses=ss.responses.slice(-300); const mcqCorrect=responses.filter(function(r){return r.correct;}).length; const mcqPct=responses.length?mcqCorrect/responses.length*100:masteryAverage(subject); const taskRows=ss.taskAttempts.slice(-20); const taskPct=taskRows.length?taskRows.reduce(function(sum,r){return sum+(r.score/r.max*100);},0)/taskRows.length:masteryAverage(subject); const composite=Math.round(mcqPct*subject.exam.mcq.weight/100+taskPct*subject.exam.written.weight/100); const thresholds=subject.scoreBands; let score=1; for(let i=1;i<=4;i++)if(composite>=thresholds[i])score=i+1; const evidence=responses.length+taskRows.length*3; const uncertainty=Math.max(4,Math.round(18-Math.min(14,Math.sqrt(evidence)*1.4))); return {score,composite,mcqPct:Math.round(mcqPct),taskPct:Math.round(taskPct),evidence,uncertainty,band:(Math.max(0,composite-uncertainty))+'–'+Math.min(100,composite+uncertainty)+' composite readiness'};
+    const ss=subjectState(), responses=ss.responses.slice(-300), taskRows=ss.taskAttempts.slice(-20).filter(r => Number.isFinite(r.score) && r.max > 0);
+    const mcqPct=responses.length ? responses.filter(r=>r.correct).length / responses.length * 100 : 0;
+    const taskPct=taskRows.length ? taskRows.reduce((sum,r)=>sum + Math.max(0,Math.min(100,r.score/r.max*100)),0)/taskRows.length : 0;
+    const composite=Math.round(mcqPct*subject.exam.mcq.weight/100+taskPct*subject.exam.written.weight/100);
+    const evidence=responses.length+taskRows.length*3, ready=responses.length>0 && taskRows.length>0;
+    let score=ready?1:null; if(ready)for(let i=1;i<=4;i++)if(composite>=subject.scoreBands[i])score=i+1;
+    const uncertainty=Math.max(4,Math.round(18-Math.min(14,Math.sqrt(evidence)*1.4)));
+    return {score,ready,composite,mcqPct:Math.round(mcqPct),taskPct:Math.round(taskPct),evidence,uncertainty,band:ready?(Math.max(0,composite-uncertainty))+'–'+Math.min(100,composite+uncertainty)+' composite readiness':'Complete MCQ practice and a written task before estimating readiness.'};
   }
 
   function renderScore() {
-    const e=estimateScore();const ss=subjectState();const history=ss.scoreHistory.slice(-12);return '<div class="ap2-grid"><section class="ap2-card wide accent"><div class="ap2-kicker">Evidence-Weighted Score Studio</div><div class="ap2-score-gauge"><div class="ap2-score-circle" style="--p:'+e.composite+'"><strong>'+e.score+'</strong></div><div><h2>Current practice-readiness estimate</h2><p>'+e.composite+'% weighted composite · '+e.band+'</p><small>MCQ '+subject.exam.mcq.weight+'% + written '+subject.exam.written.weight+'%, using this course’s public blueprint</small></div></div></section><section class="ap2-card"><div class="ap2-kicker">Evidence balance</div><div class="ap2-stat">'+e.evidence+'</div><p>scored evidence points</p><div class="ap2-mastery-list"><div class="ap2-mastery"><span>MCQ evidence</span><div class="ap2-bar"><span style="width:'+e.mcqPct+'%"></span></div><b>'+e.mcqPct+'%</b></div><div class="ap2-mastery"><span>Task evidence</span><div class="ap2-bar"><span style="width:'+e.taskPct+'%"></span></div><b>'+e.taskPct+'%</b></div></div></section><section class="ap2-card full"><h2>Progress over completed sets</h2>'+scoreChart(history)+'</section><section class="ap2-card wide"><div class="ap2-kicker">Subject-specific readiness bands</div><h2>Why the same raw percent does not mean the same thing everywhere</h2><p>Scholark uses current section weights and a separate readiness map for each course. These bands are independent planning estimates—not hidden College Board conversion tables. Operational cut scores are not published and may vary by form.</p><div class="ap2-proof">'+[1,2,3,4].map(function(i){return '<article><strong>'+(i+1)+'</strong><span>from about '+subject.scoreBands[i]+'% composite</span></article>';}).join('')+'</div></section><section class="ap2-card"><h3>Next evidence upgrade</h3><p>'+(ss.taskAttempts.length<2?'Complete two '+esc(subject.tasks[0].name)+' rubric checks so written performance is not inferred from MCQ alone.':'Run an official-length MCQ simulation and one task from your weakest format.')+'</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="view" data-id="exam">Open Exam Lab</button></div></section></div>';
+    const e=estimateScore();const ss=subjectState();const history=ss.scoreHistory.slice(-12);return '<div class="ap2-grid"><section class="ap2-card wide accent"><div class="ap2-kicker">Evidence-Weighted Score Studio</div><div class="ap2-score-gauge"><div class="ap2-score-circle" style="--p:'+e.composite+'"><strong>'+(e.ready?e.score:'—')+'</strong></div><div><h2>Current practice-readiness estimate</h2><p>'+e.composite+'% weighted composite · '+e.band+'</p><small>MCQ '+subject.exam.mcq.weight+'% + written '+subject.exam.written.weight+'%, using this course’s public blueprint</small></div></div></section><section class="ap2-card"><div class="ap2-kicker">Evidence balance</div><div class="ap2-stat">'+e.evidence+'</div><p>scored evidence points</p><div class="ap2-mastery-list"><div class="ap2-mastery"><span>MCQ evidence</span><div class="ap2-bar"><span style="width:'+e.mcqPct+'%"></span></div><b>'+e.mcqPct+'%</b></div><div class="ap2-mastery"><span>Task evidence</span><div class="ap2-bar"><span style="width:'+e.taskPct+'%"></span></div><b>'+e.taskPct+'%</b></div></div></section><section class="ap2-card full"><h2>Progress over completed sets</h2>'+scoreChart(history)+'</section><section class="ap2-card wide"><div class="ap2-kicker">Subject-specific readiness bands</div><h2>Why the same raw percent does not mean the same thing everywhere</h2><p>Scholark uses current section weights and a separate readiness map for each course. These bands are independent planning estimates—not hidden College Board conversion tables. Operational cut scores are not published and may vary by form.</p><div class="ap2-proof">'+[1,2,3,4].map(function(i){return '<article><strong>'+(i+1)+'</strong><span>from about '+subject.scoreBands[i]+'% composite</span></article>';}).join('')+'</div></section><section class="ap2-card"><h3>Next evidence upgrade</h3><p>'+(ss.taskAttempts.length<2?'Complete two '+esc(subject.tasks[0].name)+' rubric checks to add actual written-task evidence.':'Run an official-length MCQ simulation and one task from your weakest format.')+'</p><div class="ap2-actions"><button class="ap2-primary" data-ap-action="view" data-id="exam">Open Exam Lab</button></div></section></div>';
   }
 
   function scoreChart(points){if(!points.length)return '<div class="ap2-empty">Complete a practice set to start your progress graph.</div>';const width=760,height=230,pad=35;const coords=points.map(function(p,i){return {x:pad+(i/(Math.max(1,points.length-1)))*(width-pad*2),y:height-pad-(p.percent/100)*(height-pad*2),p};});return '<div class="ap2-chart-scroll"><svg class="ap2-score-chart" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="Practice accuracy over time">'+[0,25,50,75,100].map(function(v){const y=height-pad-(v/100)*(height-pad*2);return '<line class="grid" x1="'+pad+'" y1="'+y+'" x2="'+(width-pad)+'" y2="'+y+'"></line><text x="5" y="'+(y+4)+'">'+v+'%</text>';}).join('')+'<polyline class="line" points="'+coords.map(function(c){return c.x+','+c.y;}).join(' ')+'"></polyline>'+coords.map(function(c,i){return '<circle class="point" cx="'+c.x+'" cy="'+c.y+'" r="5"><title>'+esc(c.p.kind)+' · '+c.p.percent+'%</title></circle><text x="'+(c.x-7)+'" y="'+(height-9)+'">'+(i+1)+'</text>';}).join('')+'</svg></div>';}
@@ -451,14 +536,14 @@
   }
 
   function weakestUnits(count){return Object.entries(subjectState().mastery).map(function(entry){return {index:Number(entry[0]),score:Number(entry[1].score)||0};}).sort(function(a,b){return a.score-b.score;}).slice(0,count);}
-  function masteryRows(){return subject.units.map(function(u,i){const row=subjectState().mastery[i];return '<div class="ap2-mastery"><span>'+esc(u.name)+'</span><div class="ap2-bar"><span style="width:'+row.score+'%"></span></div><b>'+row.score+'</b></div>';}).join('');}
+  function masteryRows(){return subject.units.map(function(u,i){const row=subjectState().mastery[i],p=practiceProgress(subject,i),r=studyProgress(subject,i);return '<div class="ap2-progress-row"><h3>'+esc(u.name)+'</h3><div class="ap2-mastery"><span>Topics reviewed · '+r.completed+'/'+r.total+'</span>'+progressBar(r,u.name+' topics reviewed')+'<b>'+r.percent+'%</b></div><div class="ap2-mastery"><span>Practice · '+p.completed+'/'+p.total+'</span>'+progressBar(p,u.name+' practice completed')+'<b>'+p.percent+'%</b></div><small>'+ (row.attempts ? row.score+'% accuracy · '+row.correct+'/'+row.attempts+' correct' : 'No scored answers yet')+'</small></div>';}).join('');}
   function daysUntilExam(value){if(!value)return null;const date=Date.parse(value+'T12:00:00');if(!date)return null;return Math.max(0,Math.ceil((date-Date.now())/86400000));}
   function formatMinutes(n){return Math.floor(n/60)+'h '+(n%60?String(n%60)+'m':'');}
   function clock(seconds){const n=Math.max(0,Number(seconds)||0);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
-  async function copyCram(){const text=subject.name+' — Scholark Cram Sheet\n\n'+subject.units.map(function(u){return u.name+' ('+u.weight+')\n'+u.concepts.map(function(c){return '• '+c.name+': '+c.teach+'\n  Trap: '+c.trap;}).join('\n');}).join('\n\n');try{await navigator.clipboard.writeText(text);toast('Cram sheet copied.');}catch(error){console.error('Copy failed:',error);toast('Could not access the clipboard. Use Print / save as PDF instead.','error');}}
+  async function copyCram(){const text=subject.name+' — Scholark Cram Sheet\n\n'+subject.units.map(function(u,i){return u.name+' ('+u.weight+')\n'+conceptsFor(subject,i).map(function(c){return '• '+c.name+': '+c.teach+'\n  Trap: '+c.trap;}).join('\n');}).join('\n\n');try{await navigator.clipboard.writeText(text);toast('Cram sheet copied.');}catch(error){console.error('Copy failed:',error);toast('Could not access the clipboard. Use Print / save as PDF instead.','error');}}
   function toggleBookmark(id){const ss=subjectState();ss.bookmarks=ss.bookmarks.includes(id)?ss.bookmarks.filter(function(x){return x!==id;}):ss.bookmarks.concat(id);saveState();renderSubject();}
 
-  root.ScholarkAP = { init, clearTask:function(){taskDraft=null;}, getState:function(){return state;}, estimateScore, startSession };
+  root.ScholarkAP = { init, clearTask:function(){taskDraft=null;}, getState:function(){return state;}, authChanged:function(){if(loadedOwner !== storageKey())init();}, estimateScore, startSession, studyProgress, practiceProgress };
   root.initAPHub = init;
   root.apOpenSubject = openSubject;
   root.apBackToHub = backToHub;

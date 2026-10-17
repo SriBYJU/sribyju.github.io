@@ -23,3 +23,26 @@
 @media(max-width:980px){.ap2-course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ap2-card{grid-column:span 6}.ap2-card.wide{grid-column:1/-1}.ap2-question-layout,.ap2-task-work{grid-template-columns:1fr}.ap2-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.ap2-shell{padding:12px 10px 42px}.ap2-hub-hero,.ap2-subject-hero{padding:23px 18px;border-radius:18px}.ap2-proof,.ap2-format-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ap2-course-grid,.ap2-unit-grid,.ap2-task-grid,.ap2-pattern-grid,.ap2-resource-grid,.ap2-feature-grid{grid-template-columns:1fr}.ap2-card,.ap2-card.wide{grid-column:1/-1}.ap2-subject-top{display:block}.ap2-target{text-align:left;margin-top:14px}.ap2-question-card{padding:15px}.ap2-side{grid-template-columns:1fr}.ap2-mastery{grid-template-columns:minmax(100px,1fr) 80px 38px}.ap2-hub-hero h1{font-size:32px}.ap2-course{grid-template-columns:45px minmax(0,1fr) auto;padding:13px}.ap2-score-gauge{align-items:flex-start}.ap2-nav{top:0}}
 @media(prefers-reduced-motion:reduce){.ap2-course,.ap2-primary{transition:none}.ap2-course:hover,.ap2-primary:hover{transform:none}}
+
+/* Crash-course reading and honest evidence progress. */
+.ap2-lesson-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:20px;margin-top:20px;align-items:start}
+.ap2-lesson-aside{display:grid;gap:20px;min-width:0}
+.ap2-lesson-layout .ap2-concept{padding:24px 0;scroll-margin-top:96px}
+.ap2-lesson-layout .ap2-concept h3{font-size:21px;margin:12px 0;line-height:1.3;text-transform:none}
+.ap2-lesson-layout p,.ap2-lesson-layout li{font-size:15px;line-height:1.75}
+.ap2-lesson-layout textarea{box-sizing:border-box;width:100%;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+.ap2-topic-list,.ap2-worked ol{padding-left:22px;display:grid;gap:12px}
+.ap2-topic-list a{color:var(--ink);text-underline-offset:4px}
+.ap2-answer{margin:16px 0;border-top:1px solid var(--border);padding-top:16px}
+.ap2-answer summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.ap2-reviewed[aria-pressed="true"]{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.ap2-unit-pagination{justify-content:space-between;margin:24px 0}
+.ap2-progress-row{padding:18px 0;border-bottom:1px solid var(--border)}
+.ap2-progress-row h3{font-size:16px;margin:0 0 12px}
+.ap2-progress-row small{color:var(--ink2);display:block;margin-top:10px}
+.ap2-progress-row .ap2-mastery{margin:8px 0}
+.ap2-lesson-layout button:focus-visible,.ap2-lesson-layout a:focus-visible,.ap2-answer summary:focus-visible{outline:3px solid var(--ap-accent);outline-offset:4px}
+@media(max-width:760px){.ap2-lesson-layout{grid-template-columns:minmax(0,1fr)}.ap2-lesson-layout .ap2-card{padding:20px}.ap2-lesson-layout .ap2-actions{gap:10px}.ap2-progress-row .ap2-mastery{grid-template-columns:1fr 1fr 42px}}
+@media print{.ap2-lesson-layout{display:block}.ap2-lesson-layout .ap2-card{break-inside:avoid}.ap2-lesson-layout textarea,.ap2-unit-pagination{display:none}}
+.ap2-lesson-layout .ap2-card{grid-column:auto}
+.ap2-lesson-layout .ap2-concept h3::first-letter{text-transform:uppercase}

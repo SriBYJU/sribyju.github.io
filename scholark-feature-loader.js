@@ -13,7 +13,7 @@
     if(loaded(src)) return Promise.resolve();
     const promise=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
-      s.src=`${src}?build=${BUILD}&revision=20261016b`;
+      s.src=`${src}?build=${BUILD}&revision=20261016c`;
       s.defer=true;
       s.addEventListener('load',resolve,{once:true});
       s.addEventListener('error',()=>{s.remove();scriptLoads.delete(src);reject(new Error(`Could not load ${src}`));},{once:true});
@@ -30,7 +30,7 @@
   const suites={
     'ai-data':{files:['ap-v2-data.js'],ready:()=>!!window.ScholarkAPData,init:()=>{}},
     prep:{files:['prep-v2-data.js','prep-v2-app.js'],ready:()=>!!window.ScholarkPrep,init:()=>{window.ScholarkPrep?.init?.();notify('prep');}},
-    ap:{files:['ap-v2-data.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>{window.initAPHub?.();notify('ap');}},
+    ap:{files:['ap-v2-data.js','ap-v2-lessons.js','ap-v2-app.js'],ready:()=>typeof window.initAPHub==='function',init:()=>{window.initAPHub?.();notify('ap');}},
     ai:{
       files:[
         'scholark-ai-algorithms.js','scholark-ai-learning.js','scholark-ai-core.js','scholark-ai-agents.js',

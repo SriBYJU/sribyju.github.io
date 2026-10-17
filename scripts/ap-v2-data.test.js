@@ -98,10 +98,34 @@ test('AP app implements persistence, local fallback, cloud sync, and differentia
 test('AP UI is loaded after the legacy inline layer and includes responsive/accessibility support', () => {
   assert.ok(html.indexOf('ap-v2-data.js') > html.lastIndexOf('</script>', html.indexOf('ap-v2-data.js') - 1));
   assert.ok(html.indexOf('ap-v2-app.js') > html.indexOf('ap-v2-data.js'));
-  assert.match(html, /<link rel="stylesheet" href="ap-v2\.css">/);
+  assert.match(html, /<link rel="stylesheet" href="ap-v2\.css(?:\?revision=[^"]+)?">/);
   assert.match(css, /@media\(max-width:650px\)/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(app, /aria-live="polite"/);
   assert.match(app, /aria-label="Search AP courses"/);
   assert.match(app, /handleKey/);
+});
+
+test('crash-course enrichment covers every unit with specific topics and worked retrieval', () => {
+ const sandbox={};new Function('window',readFileSync(resolve('..','ap-v2-lessons.js'),'utf8'))(sandbox);
+ const lessons=sandbox.ScholarkAPLessons;
+ for(const subject of data.subjects){
+  assert.equal(lessons[subject.id].length,subject.units.length,subject.id);
+  subject.units.forEach((unit,i)=>{
+   const lesson=lessons[subject.id][i],label=subject.id+' '+unit.name;
+   assert.ok(lesson.topics.length>=2,label);
+   const names=unit.concepts.concat(lesson.topics).map(c=>c.name.toLowerCase());
+   assert.equal(new Set(names).size,names.length,label+' duplicate concepts');
+   for(const topic of lesson.topics){assert.ok(topic.teach.length>50,label);assert.ok(topic.trap.length>15,label);}
+   assert.ok(lesson.example.prompt.length>20,label);assert.ok(lesson.example.steps.length>=2,label);assert.ok(lesson.example.answer.length>2,label);
+   assert.ok(lesson.check.prompt.length>15,label);assert.ok(lesson.check.answer.length>3,label);
+  });
+ }
+});
+
+test('Statistics unit names and weights follow the revised 2027 course outline',()=>{
+ assert.deepEqual(data.subjectMap.apstats.units.map(u=>u.weight),['20–30%','15–25%','15–25%','10–20%','10–20%']);
+ assert.match(data.subjectMap.apstats.units[2].name,/Inference for Categorical Data/);
+ assert.match(data.subjectMap.apstats.units[3].name,/Inference for Quantitative Data/);
+ assert.match(data.subjectMap.apstats.units[4].name,/Regression Analysis/);
 });

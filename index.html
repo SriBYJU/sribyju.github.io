@@ -925,7 +925,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
 })();
 </script>
 <!-- /SCHOLARK_CONSENT_BOOTSTRAP -->
-<link rel="stylesheet" href="ap-v2.css">
+<link rel="stylesheet" href="ap-v2.css?revision=20261016c">
 <link rel="stylesheet" href="scholark-v3.css">
 </head>
 <body>
@@ -1001,7 +1001,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
     <button class="nav-link" id="nav-activities" aria-label="Activities Lab" onclick="ScholarkAdmissions.open('activities')"><span class="sk-lab-nav-full">Activities Lab</span><span class="sk-lab-nav-short" style="display:none">Lab</span></button>
     <button class="nav-link" id="nav-goals" onclick="showPage('goals')">Goals</button>
     <button class="nav-link" id="nav-prep" onclick="if(showPage('prep')) ScholarkPrep.init()">SAT Prep</button>
-    <button class="nav-link" id="nav-ap" onclick="showPage('ap');initAPHub()">AP Study</button>
+    <button class="nav-link" id="nav-ap" onclick="if(showPage('ap')!==false)window.initAPHub?.()">AP Study</button>
     <button class="nav-link" id="nav-compare" onclick="showPage('compare')">Compare</button>
     <button class="nav-link" id="nav-features" onclick="showPage('features')">Features</button>
     <button class="nav-link" id="nav-about" onclick="showPage('about')">About</button>
@@ -1021,7 +1021,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <button class="profile-menu-item" onclick="showPage('reviews');window.ScholarkReviews?.init();toggleProfileMenu()">⭐ Reviews</button>
         <button class="profile-menu-item" onclick="showPage('counselor');initCounselor();toggleProfileMenu()">🧭 Admissions Guide</button>
         <button class="profile-menu-item" onclick="if(showPage('prep')) ScholarkPrep.init();toggleProfileMenu()">📝 SAT/ACT Prep</button>
-        <button class="profile-menu-item" onclick="showPage('ap');initAPHub();toggleProfileMenu()">📚 AP Study</button>
+        <button class="profile-menu-item" onclick="if(showPage('ap')!==false)window.initAPHub?.();toggleProfileMenu()">📚 AP Study</button>
         <button class="profile-menu-item" onclick="showPage('compare');toggleProfileMenu()">⚖️ Compare Colleges</button>
         <div class="profile-menu-divider"></div>
         <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
@@ -1061,7 +1061,7 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
         <div class="hero-tool-item" onclick="showPage('goals')"><div class="hero-tool-icon" style="background:#e8f5ee">🎯</div><div><div class="hero-tool-name">GPA Goal Tracker</div><div class="hero-tool-desc">Set targets & track progress</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('quiz')"><div class="hero-tool-icon" style="background:#f0e8ff">🧩</div><div><div class="hero-tool-name">College Quiz</div><div class="hero-tool-desc">Find your perfect college match</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="if(showPage('prep')) ScholarkPrep.init()"><div class="hero-tool-icon" style="background:#e8eef8">📝</div><div><div class="hero-tool-name">SAT/ACT Prep</div><div class="hero-tool-desc">Diagnostics, mastery & adaptive plans</div></div><div class="hero-tool-arrow">→</div></div>
-        <div class="hero-tool-item" onclick="showPage('ap');initAPHub()"><div class="hero-tool-icon" style="background:#f0e8ff">📚</div><div><div class="hero-tool-name">AP Study Tools</div><div class="hero-tool-desc">Adaptive practice, task labs & unit courses for 23 APs</div></div><div class="hero-tool-arrow">→</div></div>
+        <div class="hero-tool-item" onclick="if(showPage('ap')!==false)window.initAPHub?.()"><div class="hero-tool-icon" style="background:#f0e8ff">📚</div><div><div class="hero-tool-name">AP Study Tools</div><div class="hero-tool-desc">Adaptive practice, task labs & unit courses for 23 APs</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('compare')"><div class="hero-tool-icon" style="background:#fef8e1">⚖️</div><div><div class="hero-tool-name">College Compare</div><div class="hero-tool-desc">Side-by-side with radar charts</div></div><div class="hero-tool-arrow">→</div></div>
         <div class="hero-tool-item" onclick="showPage('counselor');initCounselor()"><div class="hero-tool-icon" style="background:#fdf0e8">🧭</div><div><div class="hero-tool-name">Admissions Guide</div><div class="hero-tool-desc">Curated admissions guidance</div></div><div class="hero-tool-arrow">→</div></div>
       </div>
@@ -2465,6 +2465,7 @@ document.addEventListener('click', function(e) {
 
 function updateNavForUser() {
   window.ScholarkAIUI?.authChanged?.();
+  window.ScholarkAP?.authChanged?.();
   window.refreshEssayAccount?.();
   window.ScholarkAdmissionsUI?.accountChanged?.();
   const user = window.currentUser;
@@ -4982,10 +4983,10 @@ window.onload = function() {
   </main>
 </div>
 <script src="admissions/boot.js?v=2.1.4" defer></script>
-<script src="scholark-feature-loader.js?build=ai-108&revision=20261016b" defer></script>
+<script src="scholark-feature-loader.js?build=ai-108&revision=20261016c" defer></script>
 <script src="scholark-press.js" defer></script>
 <script src="scholark-reviews.js?build=20261001-reviews3" defer></script>
-<script src="scholark-v3.js?build=5157&revision=20261016b" defer></script>
+<script src="scholark-v3.js?build=5157&revision=20261016" defer></script>
 <script src="scholark-legal.js" defer></script>
 </body>
 </html>
