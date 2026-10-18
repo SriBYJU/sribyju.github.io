@@ -49,3 +49,10 @@ The final algebra run correctly solved x=7 with no unrelated course source and n
 AP Task Studio/teachbacks check structural completeness, not factual correctness. DBQ planning is not a complete document-based exam. Essay and activity scores are independent educational rubrics; College Chances remains an uncalibrated planning model. No admitted-student dataset or admissions probability is fabricated. Optional hosted AI is not required or claimed as tested.
 
 The cinematic/homepage animation code and its layout were not changed. Only scoped functionality, asset versions, regression tests, and audit evidence were modified.
+
+
+## October 18 CI follow-up
+
+Both broad CI suites completed with 384/385 browser checks passing. Each failure was in a WebKit College Chances case. Retained traces from both runs show the cookie-preferences banner intercepting the calculator click; the screenshot also places the button beneath that banner. The extras-audit setup now clicks **Necessary only** and verifies the banner closes before interacting with the workspace. It does not force clicks, seed consent, weaken assertions, or retry failed assertions.
+
+The two previously failing cases passed **20/20 WebKit repeat executions** with this setup, and the complete extras group passed **16/16 Chrome checks**. The deployed release also passed **29/29 live browser checks** after the preceding audit commit. These results do not change the local-model quality limitations above. A fresh full CI run is required to replace the failed broad-run statuses.
