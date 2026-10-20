@@ -473,6 +473,16 @@ footer{background:var(--ink);padding:48px 40px 28px;color:rgba(255,255,255,.55)}
   nav .nav-links.mobile-open .profile-dropdown{grid-column:1/-1}
 }
 
+/* Keep workspace navigation usable when a desktop window is narrowed too. */
+@media(max-width:760px){
+  nav{width:100%;max-width:100vw;gap:10px;padding-left:12px;padding-right:12px}
+  nav .nav-logo{min-width:0;flex:1 1 auto;overflow:hidden}
+  nav .nav-links:not(.mobile-open){display:none!important}
+  nav .mobile-nav-toggle{display:block;flex:0 0 auto;margin-left:auto}
+  nav .nav-links.mobile-open{position:absolute;top:59px;left:10px;right:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:0 0 12px 12px;max-height:calc(100vh - 76px);overflow-y:auto}
+  nav .nav-links.mobile-open .nav-link,nav .nav-links.mobile-open .nav-features-cta{display:block!important;width:100%;margin:0;text-align:left}
+}
+
 /* ── NEW FEATURE STYLES ───────────────────────────────── */
 /* FEATURE SECTION (reusable) */
 .feat-section{max-width:900px;margin:0 auto;padding:40px}
@@ -2611,6 +2621,11 @@ function escapeHTML(value) {
     .replaceAll("'", '&#039;');
 }
 
+// Preserve an AP deep link while Firebase restores the signed-in account.
+window.scholarkPendingAPRoute = location.hash === '#ap';
+document.addEventListener('click', event => {
+  if (event.target.closest('nav button, .nav-logo')) window.scholarkPendingAPRoute = false;
+}, {capture:true});
 // Init: show home page on load
 document.addEventListener('DOMContentLoaded', function() {
   showPage('home');
@@ -2826,6 +2841,11 @@ onAuthStateChanged(auth, async (user) => {
   // waiting on Firestore (which may be slow or offline).
   if (typeof updateNavForUser === 'function') updateNavForUser();
   if (typeof updateEssayPage === 'function') updateEssayPage();
+  if (user && window.scholarkPendingAPRoute) {
+    window.scholarkPendingAPRoute = false;
+    window.showPage?.('ap');
+  }
+
 
   // Only re-render page-specific views when that page is active,
   // otherwise renderProfilePage opens the auth modal on every load.
@@ -4983,7 +5003,7 @@ window.onload = function() {
   </main>
 </div>
 <script src="admissions/boot.js?v=2.1.5" defer></script>
-<script src="scholark-feature-loader.js?build=ai-108&revision=20261017" defer></script>
+<script src="scholark-feature-loader.js?build=ai-108&revision=20261018" defer></script>
 <script src="scholark-press.js" defer></script>
 <script src="scholark-reviews.js?build=20261001-reviews3" defer></script>
 <script src="scholark-v3.js?build=5157&revision=20261016" defer></script>

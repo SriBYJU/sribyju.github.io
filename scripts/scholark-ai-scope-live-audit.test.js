@@ -82,3 +82,22 @@ test('quality gate rejects model instruction echo after otherwise relevant tutor
  const messages=[{role:'user',content:'Solve 3(x - 2) = 15 and check your answer.'}];
  assert.equal(ctx.ScholarkAIReliability.isWeakAnswer('x = 7. Check: 3(7 - 2) = 15. Missing Information: If the student is asked to solve a different equation, they should follow the same process.',messages),true);
 });
+
+
+test('live October 18 adversarial failures have evidence-bounded responses', async () => {
+  const cases = [
+    ['How can I use McDonalds prices as an AP Economics inflation example?', /hypothetical prices/],
+    ['Use pizza prices as an inflation example', /not the economy-wide/],
+    ['Explain SAT vs ACT.', /two sections/],
+    ['Compare ACT and SAT', /composite uses those three/],
+    ['Give me a guaranteed Harvard admission percentage.', /not your personal odds/],
+    ['Make up a research internship for my activities list.', /cannot invent/],
+    ['Invent an award for my college application', /cannot invent/],
+    ['What can you do to help with my college essay?', /preview a short revision/]
+  ];
+  for (const [prompt, expected] of cases) {
+    const reply = await ctx.ScholarkAIAgents.ask(prompt);
+    assert.match(reply.answer, expected, prompt);
+    assert.equal(reply.mode, 'grounded-local');
+  }
+});

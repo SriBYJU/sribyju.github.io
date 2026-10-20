@@ -138,7 +138,7 @@
     const applicationExperience = /\b(?:job|work|worked|working|employment|shift|volunteer)\b/.test(q)
       && /\b(?:applications?|essays?|activit(?:y|ies)|extracurriculars?|common app|college)\b/.test(q)
       && /\b(?:describe|include|count|reflect|write about|revise|review|improve|critique|evaluate|feedback|phrase|list|mention)\b/.test(q);
-    const academicExercise = /\b(?:use|create|solve|write|work through)\b/.test(q) && /\b(?:math word problem|probability problem|algebra exercise|economics case study)\b/.test(q);
+    const academicExercise = /\b(?:use|create|solve|write|work through)\b/.test(q) && /\b(?:math word problem|probability problem|algebra exercise|economics case study|(?:economics|inflation|elasticity|supply and demand) example)\b/.test(q);
     const studyRecommendation = /\b(?:recommend|suggest|choose|find)\b.{0,35}\b(?:statistical methods?|research methods?|study (?:resources?|materials?|tools?)|textbooks?|universities|colleges|scholarships|courses|majors|books? about|books? (?:for|on) (?:learning|studying|math|calculus|physics|history|biology))\b/.test(q);
     const schoolPreparation = /\b(?:wear|prepare|practice|answer|introduce|etiquette)\b/.test(q) && /\b(?:college|admissions|scholarship|job|internship) interview\b/.test(q)
       || /\b(?:laptop|computer)\b.{0,50}\b(?:computer science|programming|engineering|course requirements|class requirements)\b/.test(q);
@@ -239,8 +239,29 @@
 
   function verifiedLearningAnswer(input = '', context = {}) {
     const q = String(input).toLowerCase().trim();
+    if (/\b(?:make up|fabricate|invent|fake|lie about|falsify)\b/.test(q) && /\b(?:internships?|research|awards?|achievements?|volunteer|activities|extracurriculars?|applications?|resume|résumé)\b/.test(q)) {
+      return 'I can help describe experiences you actually had, but I cannot invent an internship, award, impact, or credential for an application. Share your real role, work, time commitment, and outcomes; we can make that evidence clear without adding claims.';
+    }
+    if (/\bsat\b/.test(q) && /\bact\b/.test(q) && /\b(?:vs|versus|compare|comparison|difference|different|choose|which|better)\b/.test(q)) {
+      return 'The SAT has two sections: Reading and Writing, and Math. Each has two modules; standard testing time is 2 hours 14 minutes. The enhanced ACT has English, Math, and Reading as its core sections; its composite uses those three scores. Science and Writing are optional nationally, while a school-day program may include them. Check your testing program and colleges’ requirements. Try an official practice test of each and compare pacing and comfort. Sources: [College Board SAT structure](https://satsuite.collegeboard.org/sat-school-day/taking-the-test/structure) and [ACT test enhancements](https://www.act.org/content/act/en/products-and-services/the-act/test-changes/enhancements.html). Verified October 2026.';
+    }
+    if (/\b(?:inflation|price index|price changes?)\b/.test(q) && /\b(?:example|explain|illustrate|calculate|analy[sz]e|use)\b/.test(q)) {
+      return 'Compare the same item, size, and location over time. With hypothetical prices of $5 last year and $5.50 this year, the increase is (5.50 − 5) / 5 × 100 = 10%. That is the price increase for one item, not the economy-wide inflation rate. Broad inflation measures use a weighted basket of goods and services. For an AP Economics example, discuss how ingredient costs, wages, demand, or changes in the product could affect that price; label invented prices as hypothetical.';
+    }
+    if (/\b(?:brainstorm|reflect|reflection|questions)\b/.test(q) && /\b(?:volunteering|experiences?|activities|personal statement|college essay)\b/.test(q)) {
+      return 'Start with your own evidence: What did you actually do? Which moment was harder than expected? What choice did you make, and why? Who responded to your work, and what did they say or do? What changed in your thinking? What would you do differently now? Pick one specific moment and write rough answers; I can help you identify the strongest thread without inventing your story.';
+    }
+    if (/\b(?:compare|comparison|comparing)\b/.test(q) && /\b(?:college|colleges|university|universities)\b/.test(q) && /\b(?:costs?|affordability|price)\b/.test(q)) {
+      return 'Compare the same academic year and living arrangement. For each college, list tuition and fees, housing and food, books, transportation, and personal expenses. Subtract grants and scholarships to compare net cost; list loans and work-study separately because they are not discounts. Check whether aid renews and what conditions apply. Use each college’s official net-price calculator and your aid offers; Scholark’s stored sticker prices may be incomplete or outdated.';
+    }
+    if (/\b(?:what can you|how can you|can you help|what do you)\b/.test(q) && /\bessay\b/.test(q)) {
+      return 'I can review your draft for prompt fit, specific evidence, reflection, organization, clarity, and voice. In Essay Coach, paste your draft and choose its prompt. Review each passage comment and preview a short revision before applying it. I can help you decide what to change, but I will not write a whole application essay or invent experiences. Scores are writing-rubric estimates, not university grades.';
+    }
     if (/\b(?:sat|act)\b/.test(q) && (/\bcut[ -]?offs?\b/.test(q) || (/\b(?:minimum|threshold|guarantee\w*)\b/.test(q) && /\b(?:admission|accepted|college|university)\b/.test(q)))) {
       return 'I cannot give a guaranteed future SAT or ACT admissions cutoff. Check the university’s official admissions website for current testing requirements and published score ranges. A score range describes a group of students; it is not a guaranteed admission threshold. Scholark’s College Chances tool provides an uncertain planning estimate, not a promise.';
+    }
+    if (/\b(?:guarantee\w*|promise|certain|100%|exact|precise)\b/.test(q) && /\b(?:admission|admissions|acceptance|accepted|getting in|chances)\b/.test(q)) {
+      return 'No one can give you a guaranteed individual admission percentage. Published acceptance rates describe a past applicant group, not your personal odds. Check the university’s official admissions website for current requirements and published score ranges. Scholark can help you assess your evidence and build a balanced college list; its College Chances range is an uncalibrated planning estimate, not a prediction or promise.';
     }
     if (/^(?:what is (?:the )?college board|who (?:runs|administers) the sat)[?.!]*$/.test(q)) {
       return 'College Board is a not-for-profit membership organization that runs the SAT and AP programs. Scholark is independent of College Board. For current exam policies and dates, use collegeboard.org. Source: College Board, About Our Organization.';
@@ -315,11 +336,13 @@
   function isWeakAnswer(text, messages) {
     const value = String(text || '').trim();
     if (value.length < 8) return true;
+    // Reject visibly cut-off prose instead of displaying a partial claim.
+    if (value.length > 160 && /\b(?:the|a|an|of|and|or|to|with|which|that|because|including|its|their|my|your)\s*$/i.test(value)) return true;
     const sentences = value.toLowerCase().split(/[.!?\n]+/).map(s=>s.replace(/[^\p{L}\p{N}]+/gu,' ').trim()).filter(s=>s.split(/\s+/).length>=7);
     const sentenceCounts = new Map();
     for (const sentence of sentences) {
       const count=(sentenceCounts.get(sentence)||0)+1;sentenceCounts.set(sentence,count);
-      if(count>=3)return true;
+      if(count>=3||(count>=2&&sentence.split(/\s+/).length>=16))return true;
     }
     // Also catch run-on loops without punctuation, while allowing repeated short
     // mathematical terms and normal parallel phrasing in explanations.
