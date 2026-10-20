@@ -24,3 +24,12 @@ Drove the published site through visible buttons, fields and dialogs. Used a sep
 - The actual on-device essay run returned a grade but no passage comments passed grounding validation. The interface disclosed that limitation. This remains an AI-quality limitation; it is not counted as successful detailed essay feedback.
 - Some CPU answers remain shallow, and one brainstorming request reached generic guided help in the baseline. No claim of cloud-model parity or professional admissions accuracy.
 - Deployment and live retest results are recorded after publishing the repairs.
+
+
+## Published verification — October 20
+
+Repair commit `4a55e1b` deployed successfully. All associated CI workflows passed, including the broad regression and production-AI audits, the AI reliability gate, mobile WebKit stability, and frontend secret scanning.
+
+Live retesting confirmed AP deep-link restoration with the signed-in test account, clearing a selected answer when eliminated, restoring it when selected again, and no accuracy percentage for an unsubmitted set. Unit notes survived reload; a resumed exam timer counted down. The mobile College Chances recheck measured 390px document width at a 390px viewport. All ten focused chat retests produced the intended bounded responses; [recorded replies](audit-evidence/2026-10-19/live-chat-retest.jsonl).
+
+The retest exposed literal Markdown source links in chat. The follow-up renders labeled HTTP(S) links using DOM nodes, rejects unsafe schemes and credential-bearing URLs, and keeps text escaped. Its browser regression passed. This presentation fix does not change model quality.

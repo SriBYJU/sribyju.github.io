@@ -162,10 +162,22 @@
 
   function appendInlineFormatting(parent, value) {
     const source = window.ScholarkAILearning.readableMath(value);
-    const pattern = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|`([^`\n]+)`|\*([^*\n]+)\*/g;
+    const pattern = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|`([^`\n]+)`|\*([^*\n]+)\*|\[([^\]\n]+)\]\(([^\s)]+)\)/g;
     let cursor = 0;
     for (const match of source.matchAll(pattern)) {
       parent.append(document.createTextNode(source.slice(cursor, match.index)));
+      if (match[5]) {
+        let url;
+        try { url = new URL(match[6]); } catch (_) {}
+        if (url && ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password) {
+          const link = document.createElement('a');
+          link.textContent = match[5]; link.href = url.href;
+          link.target = '_blank'; link.rel = 'noopener noreferrer';
+          parent.append(link);
+        } else parent.append(document.createTextNode(match[5]));
+        cursor = match.index + match[0].length;
+        continue;
+      }
       const element = document.createElement(match[3] ? 'code' : match[4] ? 'em' : 'strong');
       element.textContent = match[1] || match[2] || match[3] || match[4];
       parent.append(element);

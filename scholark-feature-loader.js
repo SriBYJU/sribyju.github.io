@@ -13,7 +13,7 @@
     if(loaded(src)) return Promise.resolve();
     const promise=new Promise((resolve,reject)=>{
       const s=document.createElement('script');
-      s.src=`${src}?build=${BUILD}&revision=20261018`;
+      s.src=`${src}?build=${BUILD}&revision=20261020`;
       s.defer=true;
       s.addEventListener('load',resolve,{once:true});
       s.addEventListener('error',()=>{s.remove();scriptLoads.delete(src);reject(new Error(`Could not load ${src}`));},{once:true});

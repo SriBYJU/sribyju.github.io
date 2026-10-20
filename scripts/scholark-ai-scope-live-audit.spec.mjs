@@ -91,3 +91,12 @@ test('a generated chemistry contradiction is replaced with the supporting course
   expect(result.answer).toContain('Forming bonds releases energy');
   expect(result.mode).toBe('grounded-local');
 });
+
+test('verified comparison sources render as usable safe links',async({page})=>{
+ await page.goto('/?workspace=activities');await page.getByRole('button',{name:'Necessary only',exact:true}).click();
+ await page.getByRole('button',{name:'Ask Scholark LOCAL',exact:true}).click();
+ await page.getByRole('textbox',{name:'Ask Scholark',exact:true}).fill('Explain SAT vs ACT.');await page.getByRole('button',{name:'Send',exact:true}).click();
+ const source=page.locator('#sk-ai-transcript').getByRole('link',{name:'College Board SAT structure'});
+ await expect(source).toHaveAttribute('href','https://satsuite.collegeboard.org/sat-school-day/taking-the-test/structure');await expect(source).toHaveAttribute('rel','noopener noreferrer');
+ await expect(page.locator('#sk-ai-transcript')).not.toContainText('[College Board');
+});
