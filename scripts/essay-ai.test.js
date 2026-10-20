@@ -66,3 +66,6 @@ test('ordinary inflection of a supplied action is allowed without new scene deta
 test('generic passage advice without an anchor-specific detail is rejected',()=>{
  const v=makeReview();v.comments[0].why='The author starts with a simple action, but the sentence lacks clarity and flow.';v.comments[0].goal='Use active voice and add sensory details.';assert.equal(AI.validateReview(v,draft,'ca7').valid,false);
 });
+test('a single-paragraph draft cannot support references to nonexistent paragraphs',()=>{const r=makeReview();r.dimensions[0].explanation='The seventh paragraph shows how the writer listened to the librarian and changed their approach.';assert.equal(AI.validateReview(r,draft,'ca2').valid,false);r.dimensions[0].explanation='Paragraph 3 shows how the writer listened to the librarian and changed their approach.';assert.equal(AI.validateReview(r,draft,'ca2').valid,false);});
+
+test('model loading failure is distinct from rejected grading evidence',async()=>{const saved=global.ScholarkAI;global.ScholarkAI={generateStructured:async()=>({mode:'deterministic-fallback',reason:'structured-model-unavailable'})};try{const r=await AI.review({draft,promptType:'ca2'});assert.equal(r.reason,'model-unavailable');assert.match(r.message,/download and browser/);assert.equal(r.review,undefined);}finally{global.ScholarkAI=saved;}});
