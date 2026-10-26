@@ -15,6 +15,16 @@
   const STORAGE_PREFIX = 'scholark_ai_v1_';
 
   const MODEL_MANIFEST = Object.freeze({
+    reader: {
+      id: 'Qwen3-4B-q4f16_1-MLC',
+      family: 'Qwen3',
+      purpose: 'Evidence-based essay review and passage revisions',
+      runtime: `WebLLM ${WEBLLM_VERSION}`,
+      approximateFootprint: '~2.2 GB download; ~3.5 GB GPU memory',
+      license: 'Apache-2.0',
+      contextWindow: 4096,
+      fallback: null
+    },
     high: {
       id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
       family: 'Qwen2.5',
@@ -151,6 +161,7 @@
 
   function modelTierSequence(startTier) {
     const tier = startTier || state.capability?.modelTier || 'standard';
+    if (tier === 'reader') return ['reader'];
     if (tier === 'high') return ['high', 'standard', 'low'];
     if (tier === 'standard') return ['standard', 'low'];
     if (tier === 'low') return ['low'];

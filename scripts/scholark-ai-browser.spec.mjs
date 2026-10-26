@@ -81,6 +81,7 @@ test.describe('Scholark AI local-first browser regression', () => {
     expect(preflight.runtimeSource).toContain('@mlc-ai/web-llm@0.2.82');
     expect(preflight.runtimeImport, JSON.stringify(preflight.error || {})).toBe('ok');
     expect(preflight.modelManifest.map(row => row.id)).toEqual([
+      'Qwen3-4B-q4f16_1-MLC',
       'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
       'Qwen3-0.6B-q4f32_1-MLC',
       'SmolLM2-360M-Instruct-q4f32_1-MLC'
@@ -88,9 +89,11 @@ test.describe('Scholark AI local-first browser regression', () => {
 
     const reliability = await page.evaluate(() => ({
       rescue: window.ScholarkAIReliability.rescueModel.id,
+      readerSequence: window.ScholarkAIReliability.sequenceFor({ modelTier: 'standard' }, 'reader'),
       standardSequence: window.ScholarkAIReliability.sequenceFor({ modelTier: 'standard', saveData: false }, 'standard')
     }));
     expect(reliability.rescue).toBe('Llama-3.2-1B-Instruct-q4f16_1-MLC');
+    expect(reliability.readerSequence).toEqual(['reader']);
     expect(reliability.standardSequence).toEqual(['standard', 'rescue', 'low']);
   });
 
@@ -850,4 +853,20 @@ test.describe('Admissions reader button integration', () => {
     await expect(page.locator('#sk-ai-essay-insights')).toBeEmpty();
     await expect(page.locator('#sk-ai-essay-detail')).toHaveAttribute('aria-busy', 'false');
   });
+});
+
+test('essay reader JSON stays validated without grammar constraints or smaller-model fallback',async({page})=>{
+ await page.goto(BASE,{waitUntil:'domcontentloaded'});await waitForAI(page);
+ const result=await page.evaluate(async()=>{
+  const AI=ScholarkAI,requests=[],tiers=[];
+  AI.detectDevice=()=>({generative:true,modelTier:'standard',wasm:false});
+  AI.state.modelId='Qwen3-4B-q4f16_1-MLC';
+  AI.loadModel=async tier=>{tiers.push(tier);return{chat:{completions:{create:async request=>{requests.push(request);return{choices:[{message:{content:requests.length===1?'{"note":"invented"}':'{"note":"grounded in draft"}'}}]};}}}};};
+  const output=await AI.generateStructured([{role:'system',content:'Return JSON with a note about the draft.'},{role:'user',content:'My draft is about listening at the library.'}],{modelTier:'reader',schemaMode:'prompt',schema:{type:'object'},validate:v=>({valid:v?.note==='grounded in draft',errors:['Only grounded evidence is allowed.']}),fallback:null});
+  return{output,requests,tiers};
+ });
+ expect(result.output.mode).toBe('local-generative');expect(result.output.repaired).toBe(true);
+ expect(result.tiers).toEqual(['reader','reader']);expect(result.requests.every(r=>!r.response_format)).toBe(true);
+ expect(result.requests[1].messages.at(-1).content).toContain('Only grounded evidence');
+ expect(result.requests[0].extra_body).toEqual({enable_thinking:false});
 });

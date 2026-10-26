@@ -385,6 +385,7 @@
 
   function sequenceFor(capability, requestedTier) {
     const tier = requestedTier || capability?.modelTier || 'standard';
+    if (tier === 'reader') return ['reader'];
     if (tier === 'high') return ['high', 'standard', 'rescue', 'low'];
     if (tier === 'standard') return ['standard', 'rescue', 'low'];
     if (tier === 'low') return ['low'];
@@ -487,7 +488,8 @@
         max_tokens: options.maxTokens ?? 500,
         seed: Number.isFinite(options.seed) ? options.seed : 41721,
         stream: false,
-        ...(options.schema ? { response_format: { type: 'json_object', schema: JSON.stringify(options.schema) } } : {}),
+        // Essay reader uses prompt-format JSON: validate and repair it below without the WebLLM grammar failure.
+        ...(options.schema && options.schemaMode !== 'prompt' ? { response_format: { type: 'json_object', schema: JSON.stringify(options.schema) } } : {}),
         ...(AI.state.modelId?.startsWith('Qwen3') ? { extra_body: { enable_thinking: options.enableThinking === true } } : {})
       };
       const result = await withTimeout(

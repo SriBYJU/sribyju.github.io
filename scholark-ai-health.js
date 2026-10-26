@@ -96,8 +96,8 @@
     }));
 
     rows.push(check('models:manifest-complete', () => {
-      const ids = ['high','standard','low'].map(k => AI.modelManifest?.[k]?.id).filter(Boolean);
-      return ids.length === 3 && new Set(ids).size === 3;
+      const ids = ['reader','high','standard','low'].map(k => AI.modelManifest?.[k]?.id).filter(Boolean);
+      return ids.length === 4 && new Set(ids).size === 4;
     }));
 
     if (Practice) {
