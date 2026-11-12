@@ -1,9 +1,12 @@
 name: Scholark AsembleAI Invite (One Time)
 
 on:
-  # Thursday, November 12, 2026 at 8:00 AM EST = 13:00 UTC.
-  schedule:
-    - cron: '0 13 12 11 *'
+  # Explicit Nov 12, 2026 catch-up trigger after the delayed scheduled run.
+  # Restrict push triggering to this workflow file (only the activation commit).
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scholark-asembleai-invite.yml'
   workflow_dispatch:
 
 concurrency:
