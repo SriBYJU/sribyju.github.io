@@ -91,6 +91,11 @@ function makeEmail(sender) {
 }
 
 async function main() {
+  // GitHub cron expressions have no year field. Future years must never resend.
+  if (new Date().getUTCFullYear() > 2026) {
+    console.log("One-time 2026 campaign expired; no messages sent.");
+    return;
+  }
   assertSendWindow();
   const service = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || "null");
   const sender = process.env.EMAIL_USER;
