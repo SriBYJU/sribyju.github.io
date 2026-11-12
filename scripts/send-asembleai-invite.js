@@ -24,8 +24,8 @@ function assertSendWindow() {
   }).formatToParts(new Date());
   const fields = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
   if (fields.year !== "2026" || fields.month !== "11" || fields.day !== "12" ||
-      Number(fields.hour) < 8 || Number(fields.hour) > 11) {
-    throw new Error("Outside the one-time November 12, 2026 8:00–11:59 AM EST send window.");
+      Number(fields.hour) < 8) {
+    throw new Error("Outside the one-time November 12, 2026 send window (after 8:00 AM EST).");
   }
 }
 
