@@ -1,0 +1,39 @@
+name: Scholark AsembleAI Invite (One Time)
+
+on:
+  # Thursday, November 12, 2026 at 8:00 AM EST = 13:00 UTC.
+  schedule:
+    - cron: '0 13 12 11 *'
+  workflow_dispatch:
+
+concurrency:
+  group: scholark-asembleai-2026-11-12
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send-invitations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm ci
+      - name: Validate invitation sender
+        working-directory: scripts
+        run: node --check send-asembleai-invite.js
+      - name: Send invitation to eligible Scholark newsletter recipients
+        working-directory: scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64: ${{ secrets.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64 }}
+          WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2: ${{ secrets.WEEKLY_EMAIL_EXCLUSIONS_GZIP_BASE64_2 }}
+        run: node send-asembleai-invite.js
